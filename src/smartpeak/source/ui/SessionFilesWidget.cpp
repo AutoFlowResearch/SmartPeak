@@ -472,25 +472,25 @@ namespace SmartPeak
     ImGui::SetNextItemWidth(180);
     if (ImGui::BeginCombo("##file mode", fef.combo_file_mode_.c_str()))
     {
-      for (const auto& mode : file_modes_strings_)
+      for (const auto& file_mode : file_modes_strings_)
       {
-        if (mode != file_modes_strings_[EEmbedded] || (filenames_.isEmbeddable(file_id)))
+        if (file_mode != file_modes_strings_[EEmbedded] || (filenames_.isEmbeddable(file_id)))
         {
-          if (ImGui::Selectable(mode.c_str()))
+          if (ImGui::Selectable(file_mode.c_str()))
           {
-            if (mode == file_modes_strings_[EEmbedded])
+            if (file_mode == file_modes_strings_[EEmbedded])
             {
               file_editor_fields_.at(file_id).embedded_ = true;
             }
-            else if (mode == file_modes_strings_[ENotUsed])
+            else if (file_mode == file_modes_strings_[ENotUsed])
             {
               clearEntry(file_id);
             }
-            else if (mode == file_modes_strings_[EExternal])
+            else if (file_mode == file_modes_strings_[EExternal])
             {
               file_editor_fields_.at(file_id).embedded_ = false;
             }
-            fef.combo_file_mode_ = mode;
+            fef.combo_file_mode_ = file_mode;
           }
         }
       }
@@ -517,35 +517,38 @@ namespace SmartPeak
     ImGui::TableSetColumnIndex(EPathColumn);
     ImGui::PushID(id_++);
     ImGui::PushItemWidth(500);
-    bool invalid = isInvalid(file_id);
-    one_invalid_ |= invalid;
-    if (invalid)
+    if (fef.combo_file_mode_ != file_modes_strings_[ENotUsed])
     {
-      ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
-    }
-    ImGui::InputTextWithHint("",
-      fef.text_editor_hint_.c_str(),
-      &fef.text_editor_
-    );
-    if (invalid)
-    {
-      ImGui::PopStyleColor();
-      if (ImGui::IsItemHovered())
+      bool invalid = isInvalid(file_id);
+      one_invalid_ |= invalid;
+      if (invalid)
       {
-        ImGui::SetTooltip("File not found");
+        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
       }
-    }
-    ImGui::PopID();
-    ImGui::SameLine();
-    ImGui::PushID(id_++);
-    std::string select_button_label = "Select";
-    if ((filenames_.isEmbeddable(file_id)) && file_editor_fields_.at(file_id).embedded_)
-    {
-      select_button_label = "Import";
-    }
-    if (ImGui::Button(select_button_label.c_str()))
-    {
-      popup_file_picker_ = file_id;
+      ImGui::InputTextWithHint("",
+        fef.text_editor_hint_.c_str(),
+        &fef.text_editor_
+      );
+      if (invalid)
+      {
+        ImGui::PopStyleColor();
+        if (ImGui::IsItemHovered())
+        {
+          ImGui::SetTooltip("File not found");
+        }
+      }
+      ImGui::PopID();
+      ImGui::SameLine();
+      ImGui::PushID(id_++);
+      std::string select_button_label = "Select";
+      if ((filenames_.isEmbeddable(file_id)) && file_editor_fields_.at(file_id).embedded_)
+      {
+        select_button_label = "Import";
+      }
+      if (ImGui::Button(select_button_label.c_str()))
+      {
+        popup_file_picker_ = file_id;
+      }
     }
     ImGui::PopID();
   }

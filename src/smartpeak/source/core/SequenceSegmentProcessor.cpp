@@ -55,6 +55,17 @@ namespace SmartPeak
     }
   }
 
+  void SequenceSegmentProcessor::processForAllSegments(
+    std::vector<SmartPeak::SequenceSegmentHandler>& sequence_segment_handlers,
+    SequenceSegmentObservable* sequence_segment_observable,
+    Filenames& filenames)
+  {
+    for (SequenceSegmentHandler& sequence_segment_handler : sequence_segment_handlers) {
+      sequence_segment_observable_ = sequence_segment_observable;
+      process(sequence_segment_handler, SequenceHandler(), {}, filenames);
+    }
+  }
+
   ParameterSet CalculateCalibration::getParameterSchema() const
   {
     OpenMS::AbsoluteQuantitation oms_params;
@@ -165,10 +176,9 @@ namespace SmartPeak
     }
     Filenames filenames;
     filenames.setFullPath("quantitationMethods", filename);
-    for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler->sequenceHandler_.getSequenceSegments()) {
-      sequence_segment_observable_ = &(application_handler->sequenceHandler_);
-      process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
-    }
+    processForAllSegments(application_handler->sequenceHandler_.getSequenceSegments(),
+                          &(application_handler->sequenceHandler_),
+                          filenames);
     return true;
   }
 
@@ -256,10 +266,9 @@ namespace SmartPeak
     }
     Filenames filenames;
     filenames.setFullPath("quantitationMethods", filename);
-    for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler->sequenceHandler_.getSequenceSegments()) {
-      sequence_segment_observable_ = &(application_handler->sequenceHandler_);
-      process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
-    }
+    processForAllSegments(application_handler->sequenceHandler_.getSequenceSegments(),
+      &(application_handler->sequenceHandler_),
+      filenames);
     return true;
   }
 
@@ -348,10 +357,9 @@ namespace SmartPeak
     }
     Filenames filenames;
     filenames.setFullPath("quantitationMethods", filename);
-    for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler->sequenceHandler_.getSequenceSegments()) {
-      sequence_segment_observable_ = &(application_handler->sequenceHandler_);
-      process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
-    }
+    processForAllSegments(application_handler->sequenceHandler_.getSequenceSegments(),
+      &(application_handler->sequenceHandler_),
+      filenames);
     return true;
   }
 
@@ -431,26 +439,19 @@ namespace SmartPeak
 
   bool LoadFeatureFilters::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
   {
-    if (application_handler->sequenceHandler_.getSequence().size() == 0)
+    Filenames filenames;
+    if (!FeatureFiltersUtils::onFilePicked(
+      filename,
+      application_handler,
+      "featureFilterComponents",
+      "featureFilterComponentGroups",
+      component_group_))
     {
-      LOGE << "File cannot be loaded without first loading the sequence.";
       return false;
     }
-    Filenames filenames;
-    if (component_group_)
-    {
-      filenames.setFullPath("featureFilterComponents", "");
-      filenames.setFullPath("featureFilterComponentGroups", filename);
-    }
-    else
-    {
-      filenames.setFullPath("featureFilterComponents", filename);
-      filenames.setFullPath("featureFilterComponentGroups", "");
-    }
-    for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler->sequenceHandler_.getSequenceSegments()) {
-      sequence_segment_observable_ = &(application_handler->sequenceHandler_);
-      process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
-    }
+    processForAllSegments(application_handler->sequenceHandler_.getSequenceSegments(),
+      &(application_handler->sequenceHandler_),
+      filenames);
     return true;
   }
 
@@ -493,26 +494,19 @@ namespace SmartPeak
 
   bool LoadFeatureQCs::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
   {
-    if (application_handler->sequenceHandler_.getSequence().size() == 0)
+    Filenames filenames;
+    if (!FeatureFiltersUtils::onFilePicked(
+      filename,
+      application_handler,
+      "featureQCComponents",
+      "featureQCComponentGroups",
+      component_group_))
     {
-      LOGE << "File cannot be loaded without first loading the sequence.";
       return false;
     }
-    Filenames filenames;
-    if (component_group_)
-    {
-      filenames.setFullPath("featureQCComponents", "");
-      filenames.setFullPath("featureQCComponentGroups", filename);
-    }
-    else
-    {
-      filenames.setFullPath("featureQCComponents", filename);
-      filenames.setFullPath("featureQCComponentGroups", "");
-    }
-    for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler->sequenceHandler_.getSequenceSegments()) {
-      sequence_segment_observable_ = &(application_handler->sequenceHandler_);
-      process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
-    }
+    processForAllSegments(application_handler->sequenceHandler_.getSequenceSegments(),
+      &(application_handler->sequenceHandler_),
+      filenames);
     return true;
   }
 
@@ -555,26 +549,19 @@ namespace SmartPeak
 
   bool StoreFeatureFilters::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
   {
-    if (application_handler->sequenceHandler_.getSequence().size() == 0)
+    Filenames filenames;
+    if (!FeatureFiltersUtils::onFilePicked(
+      filename,
+      application_handler,
+      "featureFilterComponents",
+      "featureFilterComponentGroups",
+      component_group_))
     {
-      LOGE << "File cannot be loaded without first loading the sequence.";
       return false;
     }
-    Filenames filenames;
-    if (component_group_)
-    {
-      filenames.setFullPath("featureFilterComponents", "");
-      filenames.setFullPath("featureFilterComponentGroups", filename);
-    }
-    else
-    {
-      filenames.setFullPath("featureFilterComponents", filename);
-      filenames.setFullPath("featureFilterComponentGroups", "");
-    }
-    for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler->sequenceHandler_.getSequenceSegments()) {
-      sequence_segment_observable_ = &(application_handler->sequenceHandler_);
-      process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
-    }
+    processForAllSegments(application_handler->sequenceHandler_.getSequenceSegments(),
+      &(application_handler->sequenceHandler_),
+      filenames);
     return true;
   }
 
@@ -614,26 +601,19 @@ namespace SmartPeak
 
   bool StoreFeatureQCs::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
   {
-    if (application_handler->sequenceHandler_.getSequence().size() == 0)
+    Filenames filenames;
+    if (!FeatureFiltersUtils::onFilePicked(
+      filename,
+      application_handler,
+      "featureQCComponents",
+      "featureQCComponentGroups",
+      component_group_))
     {
-      LOGE << "File cannot be loaded without first loading the sequence.";
       return false;
     }
-    Filenames filenames;
-    if (component_group_)
-    {
-      filenames.setFullPath("featureQCComponents", "");
-      filenames.setFullPath("featureQCComponentGroups", filename);
-    }
-    else
-    {
-      filenames.setFullPath("featureQCComponents", filename);
-      filenames.setFullPath("featureQCComponentGroups", "");
-    }
-    for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler->sequenceHandler_.getSequenceSegments()) {
-      sequence_segment_observable_ = &(application_handler->sequenceHandler_);
-      process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
-    }
+    processForAllSegments(application_handler->sequenceHandler_.getSequenceSegments(),
+      &(application_handler->sequenceHandler_),
+      filenames);
     return true;
   }
 
@@ -693,26 +673,19 @@ namespace SmartPeak
 
   bool LoadFeatureRSDFilters::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
   {
-    if (application_handler->sequenceHandler_.getSequence().size() == 0)
+    Filenames filenames;
+    if (!FeatureFiltersUtils::onFilePicked(
+      filename,
+      application_handler,
+      "featureRSDFilterComponents",
+      "featureRSDFilterComponentGroups",
+      component_group_))
     {
-      LOGE << "File cannot be loaded without first loading the sequence.";
       return false;
     }
-    Filenames filenames;
-    if (component_group_)
-    {
-      filenames.setFullPath("featureRSDFilterComponents", "");
-      filenames.setFullPath("featureRSDFilterComponentGroups", filename);
-    }
-    else
-    {
-      filenames.setFullPath("featureRSDFilterComponents", filename);
-      filenames.setFullPath("featureRSDFilterComponentGroups", "");
-    }
-    for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler->sequenceHandler_.getSequenceSegments()) {
-      sequence_segment_observable_ = &(application_handler->sequenceHandler_);
-      process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
-    }
+    processForAllSegments(application_handler->sequenceHandler_.getSequenceSegments(),
+      &(application_handler->sequenceHandler_),
+      filenames);
     return true;
   }
 
@@ -763,26 +736,19 @@ namespace SmartPeak
 
   bool LoadFeatureRSDQCs::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
   {
-    if (application_handler->sequenceHandler_.getSequence().size() == 0)
+    Filenames filenames;
+    if (!FeatureFiltersUtils::onFilePicked(
+      filename,
+      application_handler,
+      "featureRSDQCComponents",
+      "featureRSDQCComponentGroups",
+      component_group_))
     {
-      LOGE << "File cannot be loaded without first loading the sequence.";
       return false;
     }
-    Filenames filenames;
-    if (component_group_)
-    {
-      filenames.setFullPath("featureRSDQCComponents", "");
-      filenames.setFullPath("featureRSDQCComponentGroups", filename);
-    }
-    else
-    {
-      filenames.setFullPath("featureRSDQCComponents", filename);
-      filenames.setFullPath("featureRSDQCComponentGroups", "");
-    }
-    for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler->sequenceHandler_.getSequenceSegments()) {
-      sequence_segment_observable_ = &(application_handler->sequenceHandler_);
-      process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
-    }
+    processForAllSegments(application_handler->sequenceHandler_.getSequenceSegments(),
+      &(application_handler->sequenceHandler_),
+      filenames);
     return true;
   }
 
@@ -813,26 +779,19 @@ namespace SmartPeak
 
   bool StoreFeatureRSDFilters::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
   {
-    if (application_handler->sequenceHandler_.getSequence().size() == 0)
+    Filenames filenames;
+    if (!FeatureFiltersUtils::onFilePicked(
+      filename,
+      application_handler,
+      "featureRSDFilterComponents",
+      "featureRSDFilterComponentGroups",
+      component_group_))
     {
-      LOGE << "File cannot be loaded without first loading the sequence.";
       return false;
     }
-    Filenames filenames;
-    if (component_group_)
-    {
-      filenames.setFullPath("featureRSDFilterComponents", "");
-      filenames.setFullPath("featureRSDFilterComponentGroups", filename);
-    }
-    else
-    {
-      filenames.setFullPath("featureRSDFilterComponents", filename);
-      filenames.setFullPath("featureRSDFilterComponentGroups", "");
-    }
-    for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler->sequenceHandler_.getSequenceSegments()) {
-      sequence_segment_observable_ = &(application_handler->sequenceHandler_);
-      process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
-    }
+    processForAllSegments(application_handler->sequenceHandler_.getSequenceSegments(),
+      &(application_handler->sequenceHandler_),
+      filenames);
     return true;
   }
 
@@ -876,26 +835,19 @@ namespace SmartPeak
 
   bool StoreFeatureRSDQCs::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
   {
-    if (application_handler->sequenceHandler_.getSequence().size() == 0)
+    Filenames filenames;
+    if (!FeatureFiltersUtils::onFilePicked(
+      filename,
+      application_handler,
+      "featureRSDQCComponents",
+      "featureRSDQCComponentGroups",
+      component_group_))
     {
-      LOGE << "File cannot be loaded without first loading the sequence.";
       return false;
     }
-    Filenames filenames;
-    if (component_group_)
-    {
-      filenames.setFullPath("featureRSDQCComponents", "");
-      filenames.setFullPath("featureRSDQCComponentGroups", filename);
-    }
-    else
-    {
-      filenames.setFullPath("featureRSDQCComponents", filename);
-      filenames.setFullPath("featureRSDQCComponentGroups", "");
-    }
-    for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler->sequenceHandler_.getSequenceSegments()) {
-      sequence_segment_observable_ = &(application_handler->sequenceHandler_);
-      process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
-    }
+    processForAllSegments(application_handler->sequenceHandler_.getSequenceSegments(),
+      &(application_handler->sequenceHandler_),
+      filenames);
     return true;
   }
 
@@ -959,26 +911,19 @@ namespace SmartPeak
 
   bool LoadFeatureBackgroundFilters::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
   {
-    if (application_handler->sequenceHandler_.getSequence().size() == 0)
+    Filenames filenames;
+    if (!FeatureFiltersUtils::onFilePicked(
+      filename,
+      application_handler,
+      "featureBackgroundFilterComponents",
+      "featureBackgroundFilterComponentGroups",
+      component_group_))
     {
-      LOGE << "File cannot be loaded without first loading the sequence.";
       return false;
     }
-    Filenames filenames;
-    if (component_group_)
-    {
-      filenames.setFullPath("featureBackgroundFilterComponents", "");
-      filenames.setFullPath("featureBackgroundFilterComponentGroups", filename);
-    }
-    else
-    {
-      filenames.setFullPath("featureBackgroundFilterComponents", filename);
-      filenames.setFullPath("featureBackgroundFilterComponentGroups", "");
-    }
-    for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler->sequenceHandler_.getSequenceSegments()) {
-      sequence_segment_observable_ = &(application_handler->sequenceHandler_);
-      process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
-    }
+    processForAllSegments(application_handler->sequenceHandler_.getSequenceSegments(),
+      &(application_handler->sequenceHandler_),
+      filenames);
     return true;
   }
 
@@ -1029,26 +974,19 @@ namespace SmartPeak
 
   bool LoadFeatureBackgroundQCs::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
   {
-    if (application_handler->sequenceHandler_.getSequence().size() == 0)
+    Filenames filenames;
+    if (!FeatureFiltersUtils::onFilePicked(
+      filename,
+      application_handler,
+      "featureBackgroundQCComponents",
+      "featureBackgroundQCComponentGroups",
+      component_group_))
     {
-      LOGE << "File cannot be loaded without first loading the sequence.";
       return false;
     }
-    Filenames filenames;
-    if (component_group_)
-    {
-      filenames.setFullPath("featureBackgroundQCComponents", "");
-      filenames.setFullPath("featureBackgroundQCComponentGroups", filename);
-    }
-    else
-    {
-      filenames.setFullPath("featureBackgroundQCComponents", filename);
-      filenames.setFullPath("featureBackgroundQCComponentGroups", "");
-    }
-    for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler->sequenceHandler_.getSequenceSegments()) {
-      sequence_segment_observable_ = &(application_handler->sequenceHandler_);
-      process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
-    }
+    processForAllSegments(application_handler->sequenceHandler_.getSequenceSegments(),
+      &(application_handler->sequenceHandler_),
+      filenames);
     return true;
   }
 
@@ -1079,26 +1017,19 @@ namespace SmartPeak
 
   bool StoreFeatureBackgroundFilters::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
   {
-    if (application_handler->sequenceHandler_.getSequence().size() == 0)
+    Filenames filenames;
+    if (!FeatureFiltersUtils::onFilePicked(
+      filename,
+      application_handler,
+      "featureBackgroundFilterComponents",
+      "featureBackgroundFilterComponentGroups",
+      component_group_))
     {
-      LOGE << "File cannot be loaded without first loading the sequence.";
       return false;
     }
-    Filenames filenames;
-    if (component_group_)
-    {
-      filenames.setFullPath("featureBackgroundFilterComponents", "");
-      filenames.setFullPath("featureBackgroundFilterComponentGroups", filename);
-    }
-    else
-    {
-      filenames.setFullPath("featureBackgroundFilterComponents", filename);
-      filenames.setFullPath("featureBackgroundFilterComponentGroups", "");
-    }
-    for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler->sequenceHandler_.getSequenceSegments()) {
-      sequence_segment_observable_ = &(application_handler->sequenceHandler_);
-      process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
-    }
+    processForAllSegments(application_handler->sequenceHandler_.getSequenceSegments(),
+      &(application_handler->sequenceHandler_),
+      filenames);
     return true;
   }
 
@@ -1142,26 +1073,19 @@ namespace SmartPeak
 
   bool StoreFeatureBackgroundQCs::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
   {
-    if (application_handler->sequenceHandler_.getSequence().size() == 0)
+    Filenames filenames;
+    if (!FeatureFiltersUtils::onFilePicked(
+      filename,
+      application_handler,
+      "featureBackgroundQCComponents",
+      "featureBackgroundQCComponentGroups",
+      component_group_))
     {
-      LOGE << "File cannot be loaded without first loading the sequence.";
       return false;
     }
-    Filenames filenames;
-    if (component_group_)
-    {
-      filenames.setFullPath("featureBackgroundQCComponents", "");
-      filenames.setFullPath("featureBackgroundQCComponentGroups", filename);
-    }
-    else
-    {
-      filenames.setFullPath("featureBackgroundQCComponents", filename);
-      filenames.setFullPath("featureBackgroundQCComponentGroups", "");
-    }
-    for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler->sequenceHandler_.getSequenceSegments()) {
-      sequence_segment_observable_ = &(application_handler->sequenceHandler_);
-      process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
-    }
+    processForAllSegments(application_handler->sequenceHandler_.getSequenceSegments(),
+      &(application_handler->sequenceHandler_),
+      filenames);
     return true;
   }
 
@@ -1525,26 +1449,19 @@ namespace SmartPeak
 
   bool StoreFeatureRSDEstimations::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
   {
-    if (application_handler->sequenceHandler_.getSequence().size() == 0)
+    Filenames filenames;
+    if (!FeatureFiltersUtils::onFilePicked(
+      filename,
+      application_handler,
+      "featureRSDEstimationComponents",
+      "featureRSDEstimationComponentGroups",
+      component_group_))
     {
-      LOGE << "File cannot be loaded without first loading the sequence.";
       return false;
     }
-    Filenames filenames;
-    if (component_group_)
-    {
-      filenames.setFullPath("featureRSDEstimationComponents", "");
-      filenames.setFullPath("featureRSDEstimationComponentGroups", filename);
-    }
-    else
-    {
-      filenames.setFullPath("featureRSDEstimationComponents", filename);
-      filenames.setFullPath("featureRSDEstimationComponentGroups", "");
-    }
-    for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler->sequenceHandler_.getSequenceSegments()) {
-      sequence_segment_observable_ = &(application_handler->sequenceHandler_);
-      process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
-    }
+    processForAllSegments(application_handler->sequenceHandler_.getSequenceSegments(),
+      &(application_handler->sequenceHandler_),
+      filenames);
     return true;
   }
 
@@ -1639,26 +1556,19 @@ namespace SmartPeak
 
   bool StoreFeatureBackgroundEstimations::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
   {
-    if (application_handler->sequenceHandler_.getSequence().size() == 0)
+    Filenames filenames;
+    if (!FeatureFiltersUtils::onFilePicked(
+      filename,
+      application_handler,
+      "featureBackgroundEstimationComponents",
+      "featureBackgroundEstimationComponentGroups",
+      component_group_))
     {
-      LOGE << "File cannot be loaded without first loading the sequence.";
       return false;
     }
-    Filenames filenames;
-    if (component_group_)
-    {
-      filenames.setFullPath("featureBackgroundEstimationComponents", "");
-      filenames.setFullPath("featureBackgroundEstimationComponentGroups", filename);
-    }
-    else
-    {
-      filenames.setFullPath("featureBackgroundEstimationComponents", filename);
-      filenames.setFullPath("featureBackgroundEstimationComponentGroups", "");
-    }
-    for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler->sequenceHandler_.getSequenceSegments()) {
-      sequence_segment_observable_ = &(application_handler->sequenceHandler_);
-      process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
-    }
+    processForAllSegments(application_handler->sequenceHandler_.getSequenceSegments(),
+      &(application_handler->sequenceHandler_),
+      filenames);
     return true;
   }
 

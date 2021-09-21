@@ -23,18 +23,12 @@
 
 #pragma once
 
-#include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/ApplicationHandler.h>
+#include <SmartPeak/core/Filenames.h>
 #include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureSelector.h>
 #include <OpenMS/FORMAT/MRMFeatureQCFile.h>
 
 #include <string>
-
-#ifndef CSV_IO_NO_THREAD
-#define CSV_IO_NO_THREAD
-#endif
-#include <SmartPeak/io/csv.h>
-#include <plog/Log.h>
 
 namespace SmartPeak
 {
@@ -48,13 +42,19 @@ public:
     FeatureFiltersUtils(FeatureFiltersUtils&&)                 = delete;
     FeatureFiltersUtils& operator=(FeatureFiltersUtils&&)      = delete;
 
-    static void storeFeatureFiltersInDB(std::string file_id,
-                                        std::string file_group_id,
+    static bool onFilePicked(const std::filesystem::path& filename,
+      ApplicationHandler* application_handler,
+      const std::string& file_id,
+      const std::string& file_group_id,
+      bool is_component_group);
+      
+    static void storeFeatureFiltersInDB(const std::string& file_id,
+                                        const std::string& file_group_id,
                                         Filenames& filenames,
                                         const OpenMS::MRMFeatureQC& features_qc);
 
-    static void loadFeatureFiltersFromDB(std::string file_id, 
-                                         std::string file_group_id,
+    static void loadFeatureFiltersFromDB(const std::string& file_id, 
+                                         const std::string& file_group_id,
                                          Filenames& filenames,
                                          OpenMS::MRMFeatureQC& features_qc,
                                          std::function<void()> notification,

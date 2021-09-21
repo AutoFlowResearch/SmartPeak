@@ -22,22 +22,48 @@
 // --------------------------------------------------------------------------
 
 #include <SmartPeak/core/FeatureFiltersUtils.h>
-#include <SmartPeak/core/Parameters.h>
-#include <SmartPeak/core/ApplicationProcessor.h>
-#include <SmartPeak/core/SharedProcessors.h>
-#include <SmartPeak/core/SequenceProcessor.h>
-#include <OpenMS/DATASTRUCTURES/Param.h>
 #include <algorithm>
 #include <iostream>
 #include <numeric>
+
+#ifndef CSV_IO_NO_THREAD
+#define CSV_IO_NO_THREAD
+#endif
+#include <SmartPeak/io/csv.h>
 #include <plog/Log.h>
 
 namespace SmartPeak
 {
-  void FeatureFiltersUtils::storeFeatureFiltersInDB(std::string file_id,
-                                          std::string file_group_id,
-                                          Filenames& filenames,
-                                          const OpenMS::MRMFeatureQC& features_qc)
+
+  bool FeatureFiltersUtils::onFilePicked(const std::filesystem::path& filename,
+                                         ApplicationHandler* application_handler,
+                                         const std::string& file_id,
+                                         const std::string& file_group_id,
+                                         bool is_component_group)
+  {
+    if (application_handler->sequenceHandler_.getSequence().size() == 0)
+    {
+      LOGE << "File cannot be loaded without first loading the sequence.";
+      return false;
+    }
+    Filenames filenames;
+    if (is_component_group)
+    {
+      filenames.setFullPath(file_id, "");
+      filenames.setFullPath(file_group_id, filename);
+    }
+    else
+    {
+      filenames.setFullPath(file_id, filename);
+      filenames.setFullPath(file_group_id, "");
+    }
+    return true;
+  }
+
+  void FeatureFiltersUtils::storeFeatureFiltersInDB(const std::string& file_id,
+                                                    const std::string& file_group_id,
+                                                    Filenames& filenames,
+                                                    const OpenMS::MRMFeatureQC& features_qc)
   {
     if (!InputDataValidation::prepareToStoreOneOfTwo(filenames, file_id, file_group_id))
     {
@@ -174,8 +200,8 @@ namespace SmartPeak
   }
 
   void FeatureFiltersUtils::loadFeatureFiltersFromDB(
-    std::string file_id,
-    std::string file_group_id,
+    const std::string& file_id,
+    const std::string& file_group_id,
     Filenames& filenames,
     OpenMS::MRMFeatureQC& features_qc,
     std::function<void()> notification,

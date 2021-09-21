@@ -72,7 +72,6 @@ namespace SmartPeak
       std::vector<size_t>& sampleIndices
     );
 
-
     /* IFilenamesHandler */
     virtual void getFilenames(Filenames& filenames) const override { };
 
@@ -87,6 +86,10 @@ namespace SmartPeak
     // Even though this class is abstract and hence can't be instantiated,
     // derived classes will call the base's constructor
     SequenceSegmentProcessor() = default;
+
+    void processForAllSegments(std::vector<SmartPeak::SequenceSegmentHandler>& sequence_segment_handlers,
+                               SequenceSegmentObservable* sequence_segment_observable,
+                               Filenames& filenames);
   };
 
   struct CalculateCalibration : SequenceSegmentProcessor
