@@ -540,16 +540,19 @@ namespace SmartPeak
     
     try {
       for (auto & p : std::filesystem::directory_iterator(folder_path, std::filesystem::directory_options::skip_permission_denied)) {
-        if (!isHiddenEntry(p)) {
+        if (!isHiddenEntry(p))
+        {
           auto last_write_time = std::filesystem::last_write_time(p.path());
           auto sctp = std::chrono::time_point_cast<std::chrono::system_clock::duration>(last_write_time
             - std::filesystem::file_time_type::clock::now()
             + std::chrono::system_clock::now());
           std::time_t cftime = std::chrono::system_clock::to_time_t(sctp);
-          if (p.is_regular_file() && (!only_directories)) {
+          if (p.is_regular_file() && (!only_directories))
+          {
             entries_temp.push_back(std::make_tuple(p.path().filename().string(), p.file_size(), p.path().extension().string(), cftime));
           }
-          else if (p.is_directory()) {
+          else if (p.is_directory())
+          {
             std::tuple<float, uintmax_t> directory_info;
             getDirectoryInfo(p, directory_info);
             entries_temp.push_back(std::make_tuple(p.path().filename().string(), std::get<1>(directory_info), "Directory", cftime));
