@@ -131,7 +131,6 @@ namespace SmartPeak {
   }
 
   std::set<std::string> WorkflowManager::getRequirements(
-    ApplicationHandler& source_app_handler,
     const std::vector<ApplicationHandler::Command>& commands) const
   {
     std::set<std::string> requirements;
@@ -162,5 +161,27 @@ namespace SmartPeak {
       }
     }
     return requirements;
+  }
+
+  bool WorkflowManager::isMissingRequirements(const Filenames& filenames, const std::set<std::string>& requirements) const
+  {
+    const auto file_ids = filenames.getFileIds();
+    bool missing_requirement = false;
+    for (const auto& req_file_id : requirements)
+    {
+      bool found = false;
+      if (std::find(std::begin(file_ids), std::end(file_ids), req_file_id) != std::end(file_ids))
+      {
+        const auto full_path = filenames.getFullPath(req_file_id);
+        found = (filenames.isEmbedded(req_file_id) ||
+          (!full_path.empty() && std::filesystem::exists(full_path)));
+      }
+      if (!found)
+      {
+        missing_requirement = true;
+        break;
+      }
+    }
+    return missing_requirement;
   }
 }

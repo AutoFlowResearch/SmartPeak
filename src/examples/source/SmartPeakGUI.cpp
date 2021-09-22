@@ -73,8 +73,6 @@ bool SmartPeak::enable_quick_help = true;
 
 void initializeDataDirs(ApplicationHandler& state);
 
-bool isMissingRequirements(const ApplicationHandler& application_handler, const std::set<std::string>& requirements);
-
 void initializeDataDir(
   ApplicationHandler& state,
   const std::string& label,
@@ -597,8 +595,8 @@ int main(int argc, char** argv)
           }
           else
           {
-            auto requirements = workflow_manager_.getRequirements(application_handler_, buildCommandsFromNames.commands_);
-            bool missing_requirement = isMissingRequirements(application_handler_, requirements);
+            auto requirements = workflow_manager_.getRequirements(buildCommandsFromNames.commands_);
+            bool missing_requirement = workflow_manager_.isMissingRequirements(application_handler_.filenames_, requirements);
             if (missing_requirement)
             {
               session_files_widget_modify_->open(application_handler_.filenames_, requirements);
@@ -944,24 +942,3 @@ std::string getMainWindowTitle(const ApplicationHandler& application_handler)
   return os.str();
 }
 
-bool isMissingRequirements(const ApplicationHandler& application_handler, const std::set<std::string>& requirements)
-{
-  const auto file_ids = application_handler.filenames_.getFileIds();
-  bool missing_requirement = false;
-  for (const auto& req_file_id : requirements)
-  {
-    bool found = false;
-    if (std::find(std::begin(file_ids), std::end(file_ids), req_file_id) != std::end(file_ids))
-    {
-      const auto full_path = application_handler.filenames_.getFullPath(req_file_id);
-      found = (application_handler.filenames_.isEmbedded(req_file_id) ||
-        (!full_path.empty() && std::filesystem::exists(full_path)));
-    }
-    if (!found)
-    {
-      missing_requirement = true;
-      break;
-    }
-  }
-  return missing_requirement;
-}

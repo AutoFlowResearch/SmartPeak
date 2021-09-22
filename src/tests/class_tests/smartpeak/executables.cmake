@@ -25,6 +25,7 @@ set(core_executables_list
 	Task_test
 	Utilities_test
 	WorkflowObservable_test
+	WorkflowManager_test
 )
 
 set(io_executables_list

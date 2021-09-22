@@ -85,8 +85,12 @@ namespace SmartPeak {
     /**
       @brief Returns the list of requirements to run the workflow.
     */
-    std::set<std::string> getRequirements(ApplicationHandler& source_app_handler,
-                                      const std::vector<ApplicationHandler::Command>& commands) const;
+    std::set<std::string> getRequirements(const std::vector<ApplicationHandler::Command>& commands) const;
+
+    /**
+      @brief return true if the Filenames contains all the requirements to reun the commands
+    */
+    bool isMissingRequirements(const Filenames& filenames, const std::set<std::string>& requirements) const;
 
   private:
     /**
