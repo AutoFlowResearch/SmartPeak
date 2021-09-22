@@ -227,7 +227,14 @@ namespace SmartPeak
     ImGui::Separator();
 
     ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.9f);
-    ImGui::InputTextWithHint("", "File name", &selected_filename_);
+    if (mode_ == Mode::EDirectory)
+    {
+      ImGui::InputTextWithHint("", "Directory name", &selected_filename_);
+    }
+    else
+    {
+      ImGui::InputTextWithHint("", "File name", &selected_filename_);
+    }
     ImGui::PopItemWidth();
 
     ImGui::SameLine();
