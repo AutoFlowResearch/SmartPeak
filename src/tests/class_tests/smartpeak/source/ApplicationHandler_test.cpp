@@ -67,3 +67,28 @@ TEST_F(ApplicationHandlerFixture, SetOutputFeaturesPathname_ProcessSetsPath)
   EXPECT_TRUE(cmd.onFilePicked("test", &ah_));
   EXPECT_STREQ(ah_.features_out_dir_.generic_string().c_str(), "test");
 }
+
+TEST_F(ApplicationHandlerFixture, sessionIsOpen)
+{
+  EXPECT_FALSE(ah_.sessionIsOpened());
+  ah_.filenames_.setFullPath("test", "test");
+  EXPECT_TRUE(ah_.sessionIsOpened());
+}
+
+TEST_F(ApplicationHandlerFixture, sessionIsSaved)
+{
+  EXPECT_TRUE(ah_.sessionIsSaved());
+  ah_.setFileSavedState("test", false);
+  EXPECT_FALSE(ah_.sessionIsSaved());
+  ah_.setFileSavedState("test", true);
+  EXPECT_TRUE(ah_.sessionIsSaved());
+}
+
+TEST_F(ApplicationHandlerFixture, setFileSavedState)
+{
+  EXPECT_TRUE(ah_.isFileSaved("test"));
+  ah_.setFileSavedState("test", false);
+  EXPECT_FALSE(ah_.isFileSaved("test"));
+  ah_.setFileSavedState("test", true);
+  EXPECT_TRUE(ah_.isFileSaved("test"));
+}

@@ -48,7 +48,7 @@ namespace SmartPeak
 
   std::vector<std::string> SelectDilutions::getRequirements() const
   {
-    return { "sequence" }; // TODO add selectDilutions, but at the moment there is no separate Load processor for this file
+    return { "sequence", "traML" }; // TODO add selectDilutions, but at the moment there is no separate Load processor for this file
   }
 
   void SelectDilutions::getFilenames(Filenames& filenames) const
@@ -145,7 +145,7 @@ namespace SmartPeak
 
   std::vector<std::string> MergeInjections::getRequirements() const
   {
-    return { "sequence" };
+    return { "sequence", "traML" };
   }
 
   ParameterSet MergeInjections::getParameterSchema() const

@@ -285,8 +285,16 @@ namespace SmartPeak
       else
       {
         // we don't changed embedded status but we may have changed url
-        file_must_exist = true;
-        file_can_be_empty = true;
+        if (fef.original_filepath_ != fef.text_editor_)
+        {
+          file_must_exist = true;
+          file_can_be_empty = true;
+        }
+        else
+        {
+          file_must_exist = false;
+          file_can_be_empty = true;
+        }
       }
     }
     else if (mode == file_modes_strings_[ENotUsed])

@@ -44,7 +44,7 @@ TEST(WorkflowManager, getRequirements)
   ASSERT_TRUE(buildCommandsFromNames.process());
 
   auto requirements = workflow_manager.getRequirements(buildCommandsFromNames.commands_);
-  ASSERT_EQ(requirements, std::set<std::string>({"sequence"}));
+  ASSERT_EQ(requirements, std::set<std::string>({"sequence", "traML"}));
   EXPECT_TRUE(workflow_manager.isWorkflowDone());
 }
 

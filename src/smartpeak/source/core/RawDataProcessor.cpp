@@ -399,7 +399,7 @@ namespace SmartPeak
 
   std::vector<std::string> StoreFeatures::getRequirements() const
   {
-    return { "sequence" };
+    return { "sequence", "traML" };
   }
 
   void StoreFeatures::getFilenames(Filenames& filenames) const
@@ -470,7 +470,7 @@ namespace SmartPeak
 
   std::vector<std::string> StoreAnnotations::getRequirements() const
   {
-    return { "sequence" };
+    return { "sequence", "traML" };
   }
 
   void StoreAnnotations::getFilenames(Filenames& filenames) const
@@ -507,7 +507,7 @@ namespace SmartPeak
 
   std::vector<std::string> PickMRMFeatures::getRequirements() const
   {
-    return { "sequence" };
+    return { "sequence", "traML" };
   }
 
   ParameterSet PickMRMFeatures::getParameterSchema() const
@@ -556,7 +556,7 @@ namespace SmartPeak
 
   std::vector<std::string> FilterFeatures::getRequirements() const
   {
-    return { "sequence" };
+    return { "sequence", "traML" };
   }
 
   ParameterSet FilterFeatures::getParameterSchema() const
@@ -594,7 +594,7 @@ namespace SmartPeak
 
   std::vector<std::string> CheckFeatures::getRequirements() const
   {
-    return { "sequence" };
+    return { "sequence", "traML" };
   }
 
   ParameterSet CheckFeatures::getParameterSchema() const
@@ -630,7 +630,7 @@ namespace SmartPeak
 
   std::vector<std::string> SelectFeatures::getRequirements() const
   {
-    return { "sequence" };
+    return { "sequence", "traML" };
   }
 
   void SelectFeatures::process(
@@ -698,7 +698,7 @@ namespace SmartPeak
 
   std::vector<std::string> ValidateFeatures::getRequirements() const
   {
-    return { "sequence" };
+    return { "sequence", "traML" };
   }
 
   ParameterSet ValidateFeatures::getParameterSchema() const
@@ -749,7 +749,7 @@ namespace SmartPeak
 
   std::vector<std::string> PlotFeatures::getRequirements() const
   {
-    return { "sequence" };
+    return { "sequence", "traML" };
   }
 
   void PlotFeatures::process(
@@ -962,7 +962,7 @@ namespace SmartPeak
 
   std::vector<std::string> StoreFeatureFiltersRDP::getRequirements() const
   {
-    return { "sequence" };
+    return { "sequence", "traML" };
   }
 
   bool StoreFeatureFiltersRDP::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
@@ -1039,7 +1039,7 @@ namespace SmartPeak
 
   std::vector<std::string> StoreFeatureQCsRDP::getRequirements() const
   {
-    return { "sequence" };
+    return { "sequence", "traML" };
   }
 
   void StoreFeatureQCsRDP::getFilenames(Filenames& filenames) const
@@ -1295,7 +1295,7 @@ namespace SmartPeak
 
   std::vector<std::string> StoreValidationData::getRequirements() const
   {
-    return { "sequence" };
+    return { "sequence", "traML" };
   }
 
   void StoreValidationData::getFilenames(Filenames& filenames) const
@@ -1535,7 +1535,7 @@ namespace SmartPeak
 
   std::vector<std::string> StoreParameters::getRequirements() const
   {
-    return { "sequence" };
+    return { "sequence", "traML" };
   }
 
   void StoreParameters::getFilenames(Filenames& filenames) const
@@ -1621,7 +1621,7 @@ namespace SmartPeak
 
   std::vector<std::string> ZeroChromatogramBaseline::getRequirements() const
   {
-    return { "sequence" };
+    return { "sequence", "traML" };
   }
 
   void ZeroChromatogramBaseline::process(
@@ -1642,7 +1642,7 @@ namespace SmartPeak
 
   std::vector<std::string> MapChromatograms::getRequirements() const
   {
-    return { "sequence" };
+    return { "sequence", "traML" };
   }
 
   ParameterSet MapChromatograms::getParameterSchema() const
@@ -1674,7 +1674,7 @@ namespace SmartPeak
 
   std::vector<std::string> ExtractChromatogramWindows::getRequirements() const
   {
-    return { "sequence" };
+    return { "sequence", "traML" };
   }
 
   void ExtractChromatogramWindows::process(
@@ -1740,7 +1740,7 @@ namespace SmartPeak
 
   std::vector<std::string> ExtractSpectraWindows::getRequirements() const
   {
-    return { "sequence" };
+    return { "sequence", "traML" };
   }
 
   ParameterSet ExtractSpectraWindows::getParameterSchema() const
@@ -1808,7 +1808,7 @@ namespace SmartPeak
 
   std::vector<std::string> FitFeaturesEMG::getRequirements() const
   {
-    return { "sequence" };
+    return { "sequence", "traML" };
   }
 
   ParameterSet FitFeaturesEMG::getParameterSchema() const
@@ -1954,7 +1954,7 @@ namespace SmartPeak
 
   std::vector<std::string> FilterFeaturesRSDs::getRequirements() const
   {
-    return { "sequence" };
+    return { "sequence", "traML" };
   }
 
   ParameterSet FilterFeaturesRSDs::getParameterSchema() const
@@ -1992,7 +1992,7 @@ namespace SmartPeak
 
   std::vector<std::string> CheckFeaturesRSDs::getRequirements() const
   {
-    return { "sequence" };
+    return { "sequence", "traML" };
   }
 
   ParameterSet CheckFeaturesRSDs::getParameterSchema() const
@@ -2028,7 +2028,7 @@ namespace SmartPeak
 
   std::vector<std::string> FilterFeaturesBackgroundInterferences::getRequirements() const
   {
-    return { "sequence" };
+    return { "sequence", "traML" };
   }
 
   ParameterSet FilterFeaturesBackgroundInterferences::getParameterSchema() const
@@ -2066,7 +2066,7 @@ namespace SmartPeak
 
   std::vector<std::string> CheckFeaturesBackgroundInterferences::getRequirements() const
   {
-    return { "sequence" };
+    return { "sequence", "traML" };
   }
 
   ParameterSet CheckFeaturesBackgroundInterferences::getParameterSchema() const
@@ -2102,7 +2102,7 @@ namespace SmartPeak
 
   std::vector<std::string> MergeSpectra::getRequirements() const
   {
-    return { "sequence" };
+    return { "sequence", "traML" };
   }
 
   ParameterSet MergeSpectra::getParameterSchema() const
@@ -2235,7 +2235,7 @@ namespace SmartPeak
 
   std::vector<std::string> PickMS1Features::getRequirements() const
   {
-    return { "sequence" };
+    return { "sequence", "traML" };
   }
 
   ParameterSet PickMS1Features::getParameterSchema() const
@@ -2461,7 +2461,7 @@ namespace SmartPeak
 
   std::vector<std::string> SearchAccurateMass::getRequirements() const
   {
-    return { "sequence" };
+    return { "sequence", "traML" };
   }
 
   ParameterSet SearchAccurateMass::getParameterSchema() const
@@ -2541,7 +2541,7 @@ namespace SmartPeak
 
   std::vector<std::string> MergeFeatures::getRequirements() const
   {
-    return { "sequence" };
+    return { "sequence", "traML" };
   }
 
   void MergeFeatures::process(RawDataHandler& rawDataHandler_IO,
@@ -2634,7 +2634,7 @@ namespace SmartPeak
 
   std::vector<std::string> SearchSpectrum::getRequirements() const
   {
-    return { "sequence" };
+    return { "sequence", "traML" };
   }
 
   ParameterSet SearchSpectrum::getParameterSchema() const
@@ -2672,7 +2672,7 @@ namespace SmartPeak
 
   std::vector<std::string> DDA::getRequirements() const
   {
-    return { "sequence" };
+    return { "sequence", "traML" };
   }
 
   ParameterSet DDA::getParameterSchema() const
@@ -2783,7 +2783,7 @@ namespace SmartPeak
 
   std::vector<std::string> CalculateMDVs::getRequirements() const
   {
-    return { "sequence" };
+    return { "sequence", "traML" };
   }
 
   ParameterSet CalculateMDVs::getParameterSchema() const
@@ -2862,7 +2862,7 @@ namespace SmartPeak
 
   std::vector<std::string> IsotopicCorrections::getRequirements() const
   {
-    return { "sequence" };
+    return { "sequence", "traML" };
   }
 
   ParameterSet IsotopicCorrections::getParameterSchema() const
@@ -2926,7 +2926,7 @@ namespace SmartPeak
 
   std::vector<std::string> CalculateIsotopicPurities::getRequirements() const
   {
-    return { "sequence" };
+    return { "sequence", "traML" };
   }
 
   ParameterSet CalculateIsotopicPurities::getParameterSchema() const
@@ -3027,7 +3027,7 @@ namespace SmartPeak
 
   std::vector<std::string> CalculateMDVAccuracies::getRequirements() const
   {
-    return { "sequence" };
+    return { "sequence", "traML" };
   }
 
   ParameterSet CalculateMDVAccuracies::getParameterSchema() const
@@ -3108,7 +3108,7 @@ namespace SmartPeak
 
   std::vector<std::string> PickMS2Features::getRequirements() const
   {
-    return { "sequence" };
+    return { "sequence", "traML" };
   }
 
   ParameterSet PickMS2Features::getParameterSchema() const

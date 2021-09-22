@@ -80,7 +80,7 @@ namespace SmartPeak
 
   std::vector<std::string> CalculateCalibration::getRequirements() const
   {
-    return { "sequence" };
+    return { "sequence", "traML" };
   }
 
   ParameterSet CalculateCalibration::getParameterSchema() const
@@ -181,7 +181,7 @@ namespace SmartPeak
 
   std::vector<std::string> LoadStandardsConcentrations::getRequirements() const
   {
-    return { "sequence" };
+    return { "sequence", "traML" };
   }
 
   ParameterSet LoadStandardsConcentrations::getParameterSchema() const
@@ -276,7 +276,7 @@ namespace SmartPeak
 
   std::vector<std::string> StoreStandardsConcentrations::getRequirements() const
   {
-    return { "sequence" };
+    return { "sequence", "traML" };
   }
 
   ParameterSet StoreStandardsConcentrations::getParameterSchema() const
@@ -363,7 +363,7 @@ namespace SmartPeak
 
   std::vector<std::string> LoadQuantitationMethods::getRequirements() const
   {
-    return { "sequence" };
+    return { "sequence", "traML" };
   }
 
   ParameterSet LoadQuantitationMethods::getParameterSchema() const
@@ -422,7 +422,7 @@ namespace SmartPeak
 
   std::vector<std::string> StoreQuantitationMethods::getRequirements() const
   {
-    return { "sequence" };
+    return { "sequence", "traML" };
   }
 
   ParameterSet StoreQuantitationMethods::getParameterSchema() const
@@ -467,7 +467,7 @@ namespace SmartPeak
 
   std::vector<std::string> LoadFeatureFilters::getRequirements() const
   {
-    return { "sequence" };
+    return { "sequence", "traML" };
   }
 
   ParameterSet LoadFeatureFilters::getParameterSchema() const
@@ -528,7 +528,7 @@ namespace SmartPeak
 
   std::vector<std::string> LoadFeatureQCs::getRequirements() const
   {
-    return { "sequence" };
+    return { "sequence", "traML" };
   }
 
   ParameterSet LoadFeatureQCs::getParameterSchema() const
@@ -589,7 +589,7 @@ namespace SmartPeak
 
   std::vector<std::string> StoreFeatureFilters::getRequirements() const
   {
-    return { "sequence" };
+    return { "sequence", "traML" };
   }
 
   ParameterSet StoreFeatureFilters::getParameterSchema() const
@@ -646,7 +646,7 @@ namespace SmartPeak
 
   std::vector<std::string> StoreFeatureQCs::getRequirements() const
   {
-    return { "sequence" };
+    return { "sequence", "traML" };
   }
 
   ParameterSet StoreFeatureQCs::getParameterSchema() const
@@ -703,7 +703,7 @@ namespace SmartPeak
 
   std::vector<std::string> LoadFeatureRSDFilters::getRequirements() const
   {
-    return { "sequence" };
+    return { "sequence", "traML" };
   }
 
   ParameterSet LoadFeatureRSDFilters::getParameterSchema() const
@@ -772,7 +772,7 @@ namespace SmartPeak
 
   std::vector<std::string> LoadFeatureRSDQCs::getRequirements() const
   {
-    return { "sequence" };
+    return { "sequence", "traML" };
   }
 
   ParameterSet LoadFeatureRSDQCs::getParameterSchema() const
@@ -841,7 +841,7 @@ namespace SmartPeak
 
   std::vector<std::string> StoreFeatureRSDFilters::getRequirements() const
   {
-    return { "sequence" };
+    return { "sequence", "traML" };
   }
 
   ParameterSet StoreFeatureRSDFilters::getParameterSchema() const
@@ -902,7 +902,7 @@ namespace SmartPeak
 
   std::vector<std::string> StoreFeatureRSDQCs::getRequirements() const
   {
-    return { "sequence" };
+    return { "sequence", "traML" };
   }
 
   ParameterSet StoreFeatureRSDQCs::getParameterSchema() const
@@ -963,7 +963,7 @@ namespace SmartPeak
 
   std::vector<std::string> LoadFeatureBackgroundFilters::getRequirements() const
   {
-    return { "sequence" };
+    return { "sequence", "traML" };
   }
 
   ParameterSet LoadFeatureBackgroundFilters::getParameterSchema() const
@@ -1032,7 +1032,7 @@ namespace SmartPeak
 
   std::vector<std::string> LoadFeatureBackgroundQCs::getRequirements() const
   {
-    return { "sequence" };
+    return { "sequence", "traML" };
   }
 
   ParameterSet LoadFeatureBackgroundQCs::getParameterSchema() const
@@ -1101,7 +1101,7 @@ namespace SmartPeak
 
   std::vector<std::string> StoreFeatureBackgroundFilters::getRequirements() const
   {
-    return { "sequence" };
+    return { "sequence", "traML" };
   }
 
   ParameterSet StoreFeatureBackgroundFilters::getParameterSchema() const
@@ -1162,7 +1162,7 @@ namespace SmartPeak
 
   std::vector<std::string> StoreFeatureBackgroundQCs::getRequirements() const
   {
-    return { "sequence" };
+    return { "sequence", "traML" };
   }
 
   ParameterSet StoreFeatureBackgroundQCs::getParameterSchema() const
@@ -1223,7 +1223,7 @@ namespace SmartPeak
 
   std::vector<std::string> EstimateFeatureFilterValues::getRequirements() const
   {
-    return { "sequence" };
+    return { "sequence", "traML" };
   }
 
   ParameterSet EstimateFeatureFilterValues::getParameterSchema() const
@@ -1288,7 +1288,7 @@ namespace SmartPeak
 
   std::vector<std::string> EstimateFeatureQCValues::getRequirements() const
   {
-    return { "sequence" };
+    return { "sequence", "traML" };
   }
 
   ParameterSet EstimateFeatureQCValues::getParameterSchema() const
@@ -1353,7 +1353,7 @@ namespace SmartPeak
 
   std::vector<std::string> TransferLOQToFeatureFilters::getRequirements() const
   {
-    return { "sequence" };
+    return { "sequence", "traML" };
   }
 
   ParameterSet TransferLOQToFeatureFilters::getParameterSchema() const
@@ -1389,7 +1389,7 @@ namespace SmartPeak
 
   std::vector<std::string> TransferLOQToFeatureQCs::getRequirements() const
   {
-    return { "sequence" };
+    return { "sequence", "traML" };
   }
 
   ParameterSet TransferLOQToFeatureQCs::getParameterSchema() const
@@ -1425,7 +1425,7 @@ namespace SmartPeak
 
   std::vector<std::string> EstimateFeatureRSDs::getRequirements() const
   {
-    return { "sequence" };
+    return { "sequence", "traML" };
   }
 
   ParameterSet EstimateFeatureRSDs::getParameterSchema() const
@@ -1478,7 +1478,7 @@ namespace SmartPeak
 
   std::vector<std::string> EstimateFeatureBackgroundInterferences::getRequirements() const
   {
-    return { "sequence" };
+    return { "sequence", "traML" };
   }
 
   ParameterSet EstimateFeatureBackgroundInterferences::getParameterSchema() const
@@ -1533,7 +1533,7 @@ namespace SmartPeak
 
   std::vector<std::string> LoadFeatureRSDEstimations::getRequirements() const
   {
-    return { "sequence" };
+    return { "sequence", "traML" };
   }
 
   ParameterSet LoadFeatureRSDEstimations::getParameterSchema() const
@@ -1601,7 +1601,7 @@ namespace SmartPeak
 
   std::vector<std::string> StoreFeatureRSDEstimations::getRequirements() const
   {
-    return { "sequence" };
+    return { "sequence", "traML" };
   }
 
   ParameterSet StoreFeatureRSDEstimations::getParameterSchema() const
@@ -1648,7 +1648,7 @@ namespace SmartPeak
 
   std::vector<std::string> LoadFeatureBackgroundEstimations::getRequirements() const
   {
-    return { "sequence" };
+    return { "sequence", "traML" };
   }
 
   ParameterSet LoadFeatureBackgroundEstimations::getParameterSchema() const
@@ -1718,7 +1718,7 @@ namespace SmartPeak
 
   std::vector<std::string> StoreFeatureBackgroundEstimations::getRequirements() const
   {
-    return { "sequence" };
+    return { "sequence", "traML" };
   }
 
   ParameterSet StoreFeatureBackgroundEstimations::getParameterSchema() const
