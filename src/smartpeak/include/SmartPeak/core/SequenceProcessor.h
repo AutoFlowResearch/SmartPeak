@@ -220,7 +220,7 @@ namespace SmartPeak
   */
   void processSegment(SequenceSegmentHandler& sequence_segment,
                       SequenceHandler& sequenceHandler_IO,
-                      const Filenames& filenames,
+                      Filenames& filenames,
                       const std::vector<std::shared_ptr<SequenceSegmentProcessor>>& methods);
 
   /**
@@ -233,7 +233,7 @@ namespace SmartPeak
   */
   void processSampleGroup(SampleGroupHandler& sample_group,
                           SequenceHandler& sequenceHandler_IO,
-                          const Filenames& filenames,
+                          Filenames& filenames,
                           const std::vector<std::shared_ptr<SampleGroupProcessor>>& methods);
 
   struct SequenceProcessor : IProcessorDescription, IFilenamesHandler {

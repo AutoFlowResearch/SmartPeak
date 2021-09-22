@@ -63,14 +63,9 @@ namespace SmartPeak
     
     if (ImGui::Button("Choose folder"))
     {
-      file_picker_.setButtonToSave();
-      file_picker_.visible_ = true;
+      file_picker_.open("Choose folder to export plot", nullptr, SmartPeak::FilePicker::Mode::EDirectory, application_handler_);
     }
-    if (file_picker_.visible_)
-    {
-      ImGui::OpenPopup("Pick a pathname");
-      file_picker_.draw();
-    }
+    file_picker_.draw();
     ImGui::SameLine();
     static int selected_format = 0;
     static const char* formats[] = { "Save As PNG", "Save As PDF", "Save As HTML", "Save As SVG"};

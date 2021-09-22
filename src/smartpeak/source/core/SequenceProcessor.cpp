@@ -149,7 +149,7 @@ namespace SmartPeak
   void processSegment(
     SequenceSegmentHandler& sequence_segment,
     SequenceHandler& sequenceHandler_IO,
-    const Filenames& filenames,
+    Filenames& filenames,
     const std::vector<std::shared_ptr<SequenceSegmentProcessor>>& methods)
   {
     const size_t nr_methods = methods.size();
@@ -186,7 +186,7 @@ namespace SmartPeak
         processSegment,
         std::ref(sequence_seg),
         std::ref(sequenceHandler_IO),
-        std::cref(filenames_.at( sequence_seg.getSequenceSegmentName())),
+        std::ref(filenames_.at( sequence_seg.getSequenceSegmentName())),
         std::cref(sequence_segment_processing_methods_));
           
         LOGI << ">>SequenceSegment [" << sequence_seg.getSequenceSegmentName() << "]: waiting...";
@@ -225,7 +225,7 @@ namespace SmartPeak
         processSampleGroup,
         std::ref(sequence_seg),
         std::ref(sequenceHandler_IO),
-        std::cref(filenames_.at( sequence_seg.getSampleGroupName())),
+        std::ref(filenames_.at( sequence_seg.getSampleGroupName())),
         std::cref(sample_group_processing_methods_));
           
         LOGI << ">>SequenceSegment [" << sequence_seg.getSampleGroupName() << "]: waiting...";
@@ -295,7 +295,7 @@ namespace SmartPeak
   void processSampleGroup(
     SampleGroupHandler& sample_group,
     SequenceHandler& sequenceHandler_IO,
-    const Filenames& filenames,
+    Filenames& filenames,
     const std::vector<std::shared_ptr<SampleGroupProcessor>>& methods)
   {
     const size_t n = methods.size();

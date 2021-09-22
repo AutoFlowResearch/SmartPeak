@@ -181,8 +181,9 @@ TEST(Widget, GenericTableWidget_searcher)
 class GraphicDataVizWidget_Test : public GraphicDataVizWidget
 {
 public:
-  GraphicDataVizWidget_Test(SessionHandler& session_handler,
-    SequenceHandler& sequence_handler,
+  GraphicDataVizWidget_Test(
+    SessionHandler& session_handler,
+    ApplicationHandler& application_handler,
     const std::string& id,
     const std::string& title) :
     GraphicDataVizWidget(session_handler, application_handler, id, title)

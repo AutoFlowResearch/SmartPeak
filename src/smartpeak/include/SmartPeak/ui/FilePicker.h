@@ -61,21 +61,20 @@ namespace SmartPeak
     bool fileLoadingIsDone() { return loading_is_done_; };
     bool fileWasLoaded() { return file_was_loaded_; };
     bool errorLoadingFile() { return error_loading_file_; };
-  
+
   protected:
     std::array<std::vector<std::string>, 4> pathname_content_;
     std::filesystem::path current_pathname_ = std::filesystem::current_path();
     std::string picked_pathname_;
-    
+
     std::shared_ptr<IFilePickerHandler> file_picker_handler_ = nullptr;
-    ApplicationHandler *application_handler_ = nullptr;
+    ApplicationHandler* application_handler_ = nullptr;
 
     bool loading_is_done_ = true;
     bool file_was_loaded_ = true;
     bool error_loading_file_ = false;
-    bool set_button_to_save_ = false;
     FilePicker::Mode mode_;
-    std::atomic_bool files_scanned_ {false};
+    std::atomic_bool files_scanned_{ false };
     const ImGuiTableSortSpecs* s_current_sort_specs = NULL;
     std::string selected_filename_;
     int selected_entry = -1;
@@ -88,21 +87,14 @@ namespace SmartPeak
       bool& loading_is_done,
       bool& file_was_loaded
     );
-    
+
     ///!  rescan pathname_content_ into content_items when needed
     void updateContents(std::vector<ImEntry>& content_items);
 
     void drawConfirmationPopup();
 
-    void draw() override;
-    std::string getPickedPathname() const;
-    void setFilePickerHandler(std::shared_ptr<IFilePickerHandler> file_picker_handler, ApplicationHandler& application_handler);
-    void runProcessor();
-    void clearProcessor();
-    bool fileLoadingIsDone() { return loading_is_done_; };
-    bool fileWasLoaded() { return file_was_loaded_; };
-    bool errorLoadingFile() { return error_loading_file_; };
     void doOpenFile();
+
     bool isReadyToOpen(const std::string& full_path);
   };
 }
