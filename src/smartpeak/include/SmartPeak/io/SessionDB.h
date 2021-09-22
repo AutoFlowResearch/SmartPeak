@@ -75,8 +75,6 @@ namespace SmartPeak
 
     void endWrite(SessionDB::DBContext& db_context);
 
-    std::string getSmartPeakVersion();
-
   protected:
     template<typename Value, typename ...Args>
     void beginRead(std::ostringstream& os, std::vector<std::string>& columns, const Value& value, const Args& ...args);
