@@ -59,11 +59,21 @@ namespace SmartPeak
 
   void SessionDB::endRead(SessionDB::DBContext& db_context)
   {
+    if (db_context.stmt)
+    {
+      sqlite3_finalize(db_context.stmt);
+      db_context.stmt = nullptr;
+    }
     closeSessionDB(db_context.db);
   }
 
   void SessionDB::endWrite(SessionDB::DBContext& db_context)
   {
+    if (db_context.stmt)
+    {
+      sqlite3_finalize(db_context.stmt);
+      db_context.stmt = nullptr;
+    }
     closeSessionDB(db_context.db);
   }
 
@@ -94,17 +104,16 @@ namespace SmartPeak
         switch (sqlite3_step(stmt))
         {
         case SQLITE_ROW:
-        {
           smartpeak_version_ = (const char*)sqlite3_column_text(stmt, 0);
-          return;
-        }
+          break;
         case SQLITE_DONE:
-          return;
+          break;
         default:
           LOGE << "Error reading database: " << sqlite3_errmsg(db);
-          return;
+          break;
         }
       }
+      sqlite3_finalize(stmt);
     }
   }
 
@@ -148,6 +157,7 @@ namespace SmartPeak
       if (rc != SQLITE_OK)
       {
         logSQLError(zErrMsg, sql);
+        sqlite3_free(zErrMsg);
         return;
       }
       smartpeak_version_ = Utilities::getSmartPeakVersion();
