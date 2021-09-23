@@ -630,11 +630,6 @@ namespace SmartPeak
 
   bool InputDataValidation::prepareToLoadOneOfTwo(const Filenames& filenames, const std::string& id1, const std::string& id2)
   {
-    LOGI << "Loading: " << 
-      filenames.getFullPath(id1).generic_string() 
-      << " and " <<
-      filenames.getFullPath(id2).generic_string();
-
     const auto& full_path_1 = filenames.getFullPath(id1);
     const auto& full_path_2 = filenames.getFullPath(id2);
     const bool is_embedded_1 = filenames.isEmbedded(id1);
@@ -651,11 +646,29 @@ namespace SmartPeak
       LOGE << "File not found: " << full_path_1.generic_string();
       return false;
     }
+    
+    if (is_embedded_1)
+    {
+      LOGI << "Loading from Session DB: " << id1;
+    }
+    else if (!full_path_1.empty())
+    {
+      LOGI << "Loading: " << full_path_1.generic_string();
+    }
 
     if (!is_embedded_2 && !full_path_2.empty() &&
       !InputDataValidation::fileExists(full_path_2)) {
       LOGE << "File not found: " << full_path_2.generic_string();
       return false;
+    }
+
+    if (is_embedded_2)
+    {
+      LOGI << "Loading from Session DB: " << id2;
+    }
+    else if (!full_path_2.empty())
+    {
+      LOGI << "Loading: " << full_path_2.generic_string();
     }
 
     return true;
@@ -683,15 +696,33 @@ namespace SmartPeak
 
   bool InputDataValidation::prepareToStoreOneOfTwo(const Filenames& filenames, const std::string& file_id1, const std::string& file_id2)
   {
-    LOGI << "Storing: " << 
-      filenames.getFullPath(file_id1).generic_string()
-      << " and " <<
-      filenames.getFullPath(file_id2).generic_string();
+    const auto& full_path_1 = filenames.getFullPath(file_id1);
+    const auto& full_path_2 = filenames.getFullPath(file_id2);
+    const bool is_embedded_1 = filenames.isEmbedded(file_id1);
+    const bool is_embedded_2 = filenames.isEmbedded(file_id2);
 
     if (filenames.getFullPath(file_id1).empty() &&
       filenames.getFullPath(file_id2).empty()) {
       LOGE << "Filenames are both empty";
       return false;
+    }
+
+    if (is_embedded_1)
+    {
+      LOGI << "Storing in Session DB: " << file_id1;
+    }
+    else if (!full_path_1.empty())
+    {
+      LOGI << "Storing: " << full_path_1.generic_string();
+    }
+
+    if (is_embedded_2)
+    {
+      LOGI << "Storing in Session DB: " << file_id2;
+    }
+    else if (!full_path_2.empty())
+    {
+      LOGI << "Storing: " << full_path_2.generic_string();
     }
 
     return true;
