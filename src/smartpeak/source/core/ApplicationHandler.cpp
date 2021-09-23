@@ -181,7 +181,7 @@ namespace SmartPeak
 
   void ApplicationHandler::setFileSavedState(const std::string& file_id, bool saved_state)
   {
-    saved_files_[file_id] = saved_state;
+    saved_files_.emplace(file_id, saved_state);
   }
 
   bool ApplicationHandler::isFileSaved(const std::string& file_id) const
