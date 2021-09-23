@@ -510,7 +510,6 @@ namespace SmartPeak
       );
     }
     application_handler_.filenames_.getSessionDB().endWrite(*db_context);
-    //    application_handler_->filenames_.setSavedState("filenames", true);
     LOGD << "END StoreFilenames";
     return true;
   }

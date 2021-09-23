@@ -69,7 +69,7 @@ namespace SmartPeak
       {
         selected_filename_.clear();
       }
-      selected_entry = -1;
+      selected_entry_ = -1;
     }
     ImGui::SameLine();
     ImGui::Text("Path: %s", current_pathname_.string().c_str());
@@ -93,7 +93,7 @@ namespace SmartPeak
           selected_filename_.clear();
         }
         files_scanned_ = false;
-        selected_entry = -1;
+        selected_entry_ = -1;
         ImGui::CloseCurrentPopup();
       }
       ImGui::SameLine();
@@ -107,7 +107,7 @@ namespace SmartPeak
     static bool show_confirmation_popup = false;
     drawConfirmationPopup();
 
-    filter.Draw("Filter filename (inc,-exc)");
+    filter_.Draw("Filter filename (inc,-exc)");
 
     // File type filter
     static int selected_extension = 0; // If the selection isn't within 0..count, Combo won't display a preview
@@ -148,7 +148,7 @@ namespace SmartPeak
             qsort(&Im_directory_entries[0], (size_t)Im_directory_entries.size(), sizeof(Im_directory_entries[0]), ImEntry::CompareWithSortSpecs);
           ImEntry::s_current_sort_specs = NULL;
           sorts_specs->SpecsDirty = false;
-          selected_entry = -1;
+          selected_entry_ = -1;
         }
       }
 
@@ -156,7 +156,7 @@ namespace SmartPeak
 
       for (int row = 0; row < pathname_content_[0].size(); row++)
       {
-        if (!filter.PassFilter(pathname_content_[0][row].c_str()))
+        if (!filter_.PassFilter(pathname_content_[0][row].c_str()))
         {
           continue; // continue if it does not pass the filter
         }
@@ -174,16 +174,16 @@ namespace SmartPeak
           char text_buffer[256];
           std::snprintf(text_buffer, sizeof text_buffer, "%s", item.entry_contents[column].c_str());
 
-          const bool is_selected = (selected_entry == row);
+          const bool is_selected = (selected_entry_ == row);
           ImGui::TableSetColumnIndex(column);
           if (ImGui::Selectable(text_buffer, is_selected, selectable_flags))
           {
-            selected_entry = row;
+            selected_entry_ = row;
             bool is_dir = !std::strcmp(item.entry_contents[2].c_str(), "Directory");
             if ((is_dir && (mode_ == Mode::EDirectory)) ||
               (!is_dir && (mode_ != Mode::EDirectory)))
             {
-              selected_filename_ = Im_directory_entries[selected_entry].entry_contents[0];
+              selected_filename_ = Im_directory_entries[selected_entry_].entry_contents[0];
             }
             if (ImGui::IsMouseDoubleClicked(0) && is_dir)
             {
@@ -194,14 +194,14 @@ namespace SmartPeak
               }
               files_scanned_ = false;
               updateContents(Im_directory_entries);
-              filter.Clear();
-              selected_entry = -1;
+              filter_.Clear();
+              selected_entry_ = -1;
               break;
             }
             else if (ImGui::IsMouseDoubleClicked(0) || ImGui::IsMouseClicked(0))
             {
               picked_pathname_ = current_pathname_.string();
-              if (selected_entry >= 0)
+              if (selected_entry_ >= 0)
               {
                 if (picked_pathname_.back() != '/')
                 {
@@ -262,7 +262,7 @@ namespace SmartPeak
     if (ImGui::Button("Cancel"))
     {
       picked_pathname_.clear();
-      selected_entry = -1;
+      selected_entry_ = -1;
       visible_ = false;
       ImGui::CloseCurrentPopup();
     }
@@ -326,7 +326,6 @@ namespace SmartPeak
     application_handler_ = &application_handler;
     error_loading_file_ = false;
     mode_ = mode;
-    file_was_loaded_ = false;
     visible_ = true;
     selected_filename_ = default_file_name;
     files_scanned_ = false;
@@ -354,7 +353,7 @@ namespace SmartPeak
     if (!file_picker_handler_)
       return;
     loading_is_done_ = false;
-    run_and_join(file_picker_handler_.get(), picked_pathname_, loading_is_done_, file_was_loaded_);
+    run_and_join(file_picker_handler_.get(), picked_pathname_, loading_is_done_);
   }
 
   void FilePicker::clearProcessor()
@@ -366,8 +365,7 @@ namespace SmartPeak
   void FilePicker::run_and_join(
     IFilePickerHandler* file_picker_handler,
     const std::string& pathname,
-    bool& loading_is_done,
-    bool& file_was_loaded
+    bool& loading_is_done
   )
   {
     std::future<bool> f = std::async(
@@ -377,8 +375,7 @@ namespace SmartPeak
 
     try {
       LOGN << "File is being loaded...";
-      file_was_loaded = f.get();
-      if (file_was_loaded) {
+      if (f.get()) {
         LOGN << "File has been loaded.";
       }
       else 
@@ -396,7 +393,7 @@ namespace SmartPeak
 
   void FilePicker::doOpenFile()
   {
-    filter.Clear();
+    filter_.Clear();
     LOGI << "Picked file : " << picked_pathname_;
     if (isReadyToOpen(picked_pathname_))
     {
@@ -407,7 +404,7 @@ namespace SmartPeak
       LOGE << "Invalid File selection: " << picked_pathname_;
     }
     clearProcessor();
-    selected_entry = -1;
+    selected_entry_ = -1;
     if (mode_ != Mode::EFileCreate)
     {
       selected_filename_.clear();
