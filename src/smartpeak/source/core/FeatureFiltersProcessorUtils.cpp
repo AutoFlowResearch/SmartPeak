@@ -276,9 +276,34 @@ namespace SmartPeak
             features_id.push_back(feature_id);
           }
           filenames.getSessionDB().endRead(*db_context);
-          //=========================================================
-          // TODO: read
-          //=========================================================
+          // read metadata
+          int index = 0;
+          for (auto& feature_filter : features_qc.component_qcs)
+          {
+            auto feature_id = features_id[index];
+            auto db_context = filenames.getSessionDB().beginReadWhere(
+              "metadata_" + file_id,
+              "feature_id",
+              feature_id,
+              "name",
+              "l",
+              "u"
+            );
+            OpenMS::String metadata_name;
+            double metadata_value_l;
+            double metadata_value_u;
+            while (filenames.getSessionDB().read(
+              *db_context,
+              metadata_name,
+              metadata_value_l,
+              metadata_value_u
+            ))
+            {
+              feature_filter.meta_value_qc.emplace(metadata_name, std::make_pair(metadata_value_l, metadata_value_u));
+            }
+            ++index;
+          }
+          filenames.getSessionDB().endRead(*db_context);
         }
         else
         {

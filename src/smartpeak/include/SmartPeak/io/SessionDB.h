@@ -62,6 +62,9 @@ namespace SmartPeak
     template<typename Value, typename ...Args>
     std::optional<DBContext> beginRead(const std::string& table_name, const Value& value, const Args& ...args);
 
+    template<typename WhereValue, typename Value, typename ...Args>
+    std::optional<SessionDB::DBContext> beginReadWhere(const std::string& table_name, const std::string& where_id, const WhereValue& where_value, const Value& value, const Args& ...args);
+
     template<typename ...Args>
     bool read(SessionDB::DBContext& db_context, Args& ...args);
 
@@ -258,6 +261,44 @@ namespace SmartPeak
     os << " FROM ";
     os << table_name;
     os << "; ";
+    std::string sql = os.str();
+    rc = sqlite3_prepare(*db, sql.c_str(), sql.size(), &db_context.stmt, NULL);
+    if (rc != SQLITE_OK)
+    {
+      logSQLError(sqlite3_errmsg(*db), sql);
+      return std::nullopt;
+    }
+    return db_context;
+  }
+
+  template<typename WhereValue, typename Value, typename ...Args>
+  std::optional<SessionDB::DBContext> SessionDB::beginReadWhere(const std::string& table_name, const std::string& where_id, const WhereValue& where_value, const Value& value, const Args& ...args)
+  {
+    std::ostringstream os;
+    int rc;
+    DBContext db_context;
+
+    // open DB
+    auto db = openSessionDB();
+    if (!db)
+    {
+      return std::nullopt;
+    }
+
+    updateSessionInfo(*db);
+    displaySessionInfo();
+
+    db_context.table = table_name;
+    db_context.db = *db;
+
+    os.str("");
+    os << "SELECT ";
+    beginRead(os, db_context.columns, value, args...);
+    os << " FROM ";
+    os << table_name;
+    os << " ";
+    os << " WHERE ";
+    os << where_id << "=" << where_value << "; ";
     std::string sql = os.str();
     rc = sqlite3_prepare(*db, sql.c_str(), sql.size(), &db_context.stmt, NULL);
     if (rc != SQLITE_OK)
