@@ -115,6 +115,7 @@ namespace SmartPeak
       }
       if (!filenames.getFullPath(file_group_id).empty())
       {
+        std::vector<int> inserted_rows;
         if (filenames.isEmbedded(file_group_id))
         {
           auto db_context = filenames.getSessionDB().beginWrite(
@@ -175,8 +176,10 @@ namespace SmartPeak
               feature_filter.overall_quality_l,
               feature_filter.overall_quality_u
             );
+            inserted_rows.push_back(filenames.getSessionDB().getLastInsertedRowId(*db_context));
           }
           filenames.getSessionDB().endWrite(*db_context);
+          storeMetadataInDB(filenames, file_id, inserted_rows, features_qc.component_group_qcs);
         }
         else
         {
@@ -256,8 +259,10 @@ namespace SmartPeak
       {
         if (filenames.isEmbedded(file_group_id))
         {
+          std::vector<int> features_id;
           auto db_context = filenames.getSessionDB().beginRead(
             file_group_id,
+            "ID"
             "component_group_name",
             "n_heavy_l ",
             "n_heavy_u",
@@ -287,8 +292,10 @@ namespace SmartPeak
             return;
           }
           OpenMS::MRMFeatureQC::ComponentGroupQCs feature_filter;
+          int feature_id;
           while (filenames.getSessionDB().read(
             *db_context,
+            feature_id,
             feature_filter.component_group_name,
             feature_filter.n_heavy_l,
             feature_filter.n_heavy_u,
@@ -315,8 +322,10 @@ namespace SmartPeak
           ))
           {
             features_qc.component_group_qcs.push_back(feature_filter);
+            features_id.push_back(feature_id);
           }
           filenames.getSessionDB().endRead(*db_context);
+          loadMetadataFromDB(filenames, file_id, features_id, features_qc.component_group_qcs);
         }
         else
         {

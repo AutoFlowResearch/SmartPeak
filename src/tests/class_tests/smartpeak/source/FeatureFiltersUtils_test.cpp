@@ -64,3 +64,37 @@ TEST(FeatureFiltersUtils, storeAndLoadFeatureFiltersInDB)
   EXPECT_FLOAT_EQ(feature_qc_2.meta_value_qc.at("width_at_50").second, 0.25);
 }
 
+TEST(FeatureFiltersUtils, storeAndLoadFeatureFiltersGroupsInDB)
+{
+  const std::string filename = SMARTPEAK_GET_TEST_DATA_PATH("FeatureFiltersGroups_with_metadata.csv");
+  OpenMS::MRMFeatureQC features_qc_1;
+
+  Filenames filenames;
+  filenames.setFullPath("test", "");
+  filenames.setFullPath("testgroup", filename);
+  FeatureFiltersUtils::loadFeatureFilters("test", "testgroup", filenames, features_qc_1, nullptr, nullptr);
+
+  // Check the file loading succeeded
+  ASSERT_EQ(features_qc_1.component_group_qcs.size(), 11);
+  auto feature_qc_1 = features_qc_1.component_group_qcs[0];
+  ASSERT_EQ(feature_qc_1.meta_value_qc.count("width_at_50"), 1);
+  EXPECT_FLOAT_EQ(feature_qc_1.meta_value_qc.at("width_at_50").first, 0.001);
+  EXPECT_FLOAT_EQ(feature_qc_1.meta_value_qc.at("width_at_50").second, 0.25);
+
+  // Store in DB
+  auto path_db = "c:\\tmp\\test_session.db"; //std::tmpnam(nullptr);
+  filenames.getSessionDB().setDBFilePath(path_db);
+  filenames.setEmbedded("testgroup", true);
+  FeatureFiltersUtils::storeFeatureFilters("test", "testgroup", filenames, features_qc_1);
+
+  // Load from DB
+  OpenMS::MRMFeatureQC features_qc_2;
+  FeatureFiltersUtils::loadFeatureFilters("test", "testgroup", filenames, features_qc_2, nullptr, nullptr);
+
+  // Check the loading from DB succeeded
+  ASSERT_EQ(features_qc_2.component_group_qcs.size(), 11);
+  auto feature_qc_2 = features_qc_2.component_group_qcs[0];
+  ASSERT_EQ(feature_qc_2.meta_value_qc.count("width_at_50"), 1);
+  EXPECT_FLOAT_EQ(feature_qc_2.meta_value_qc.at("width_at_50").first, 0.001);
+  EXPECT_FLOAT_EQ(feature_qc_2.meta_value_qc.at("width_at_50").second, 0.25);
+}
