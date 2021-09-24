@@ -515,7 +515,7 @@ namespace SmartPeak
   {
     LOGD << "START loadFeatureFilter";
     getFilenames(filenames_I);
-    FeatureFiltersUtils::loadFeatureFiltersFromDB(
+    FeatureFiltersUtils::loadFeatureFilters(
       "featureFilterComponents",
       "featureFilterComponentGroups",
       filenames_I,
@@ -576,7 +576,7 @@ namespace SmartPeak
   {
     LOGD << "START loadFeatureQC";
     getFilenames(filenames_I);
-    FeatureFiltersUtils::loadFeatureFiltersFromDB(
+    FeatureFiltersUtils::loadFeatureFilters(
       "featureQCComponents",
       "featureQCComponentGroups",
       filenames_I,
@@ -636,7 +636,7 @@ namespace SmartPeak
   {
     LOGD << "START storeFeatureFilter";
     getFilenames(filenames_I);
-    FeatureFiltersUtils::storeFeatureFiltersInDB(
+    FeatureFiltersUtils::storeFeatureFilters(
       "featureFilterComponents",
       "featureFilterComponentGroups",
       filenames_I,
@@ -693,7 +693,7 @@ namespace SmartPeak
   {
     LOGD << "START storeFeatureQC";
     getFilenames(filenames_I);
-    FeatureFiltersUtils::storeFeatureFiltersInDB(
+    FeatureFiltersUtils::storeFeatureFilters(
       "featureQCComponents",
       "featureQCComponentGroups",
       filenames_I,
@@ -759,7 +759,7 @@ namespace SmartPeak
   {
     LOGD << "START loadFeatureRSDFilter";
     getFilenames(filenames_I);
-    FeatureFiltersUtils::loadFeatureFiltersFromDB(
+    FeatureFiltersUtils::loadFeatureFilters(
       "featureRSDFilterComponents",
       "featureRSDFilterComponentGroups",
       filenames_I,
@@ -828,7 +828,7 @@ namespace SmartPeak
   {
     LOGD << "START loadFeatureRSDQC";
     getFilenames(filenames_I);
-    FeatureFiltersUtils::loadFeatureFiltersFromDB(
+    FeatureFiltersUtils::loadFeatureFilters(
       "featureRSDQCComponents",
       "featureRSDQCComponentGroups",
       filenames_I,
@@ -892,7 +892,7 @@ namespace SmartPeak
   {
     LOGD << "START storeFeatureRSDFilter";
     getFilenames(filenames_I);
-    FeatureFiltersUtils::storeFeatureFiltersInDB(
+    FeatureFiltersUtils::storeFeatureFilters(
       "featureRSDFilterComponents",
       "featureRSDFilterComponentGroups",
       filenames_I,
@@ -953,7 +953,7 @@ namespace SmartPeak
   {
     LOGD << "START storeFeatureRSDQC";
     getFilenames(filenames_I);
-    FeatureFiltersUtils::storeFeatureFiltersInDB(
+    FeatureFiltersUtils::storeFeatureFilters(
       "featureRSDQCComponents",
       "featureRSDQCComponentGroups",
       filenames_I,
@@ -1019,7 +1019,7 @@ namespace SmartPeak
   {
     LOGD << "START loadFeatureBackgroundFilter";
     getFilenames(filenames_I);
-    FeatureFiltersUtils::loadFeatureFiltersFromDB(
+    FeatureFiltersUtils::loadFeatureFilters(
       "featureBackgroundFilterComponents",
       "featureBackgroundFilterComponentGroups",
       filenames_I,
@@ -1088,7 +1088,7 @@ namespace SmartPeak
   {
     LOGD << "START loadFeatureBackgroundQC";
     getFilenames(filenames_I);
-    FeatureFiltersUtils::loadFeatureFiltersFromDB(
+    FeatureFiltersUtils::loadFeatureFilters(
       "featureBackgroundQCComponents",
       "featureBackgroundQCComponentGroups",
       filenames_I,
@@ -1152,7 +1152,7 @@ namespace SmartPeak
   {
     LOGD << "START storeFeatureBackgroundFilter";
     getFilenames(filenames_I);
-    FeatureFiltersUtils::storeFeatureFiltersInDB(
+    FeatureFiltersUtils::storeFeatureFilters(
       "featureBackgroundFilterComponents",
       "featureBackgroundFilterComponentGroups",
       filenames_I,
@@ -1213,7 +1213,7 @@ namespace SmartPeak
   {
     LOGD << "START storeFeatureBackgroundQC";
     getFilenames(filenames_I);
-    FeatureFiltersUtils::storeFeatureFiltersInDB(
+    FeatureFiltersUtils::storeFeatureFilters(
       "featureBackgroundQCComponents",
       "featureBackgroundQCComponentGroups",
       filenames_I,
@@ -1570,7 +1570,7 @@ namespace SmartPeak
   {
     LOGD << "START loadFeatureRSDEstimation";
     getFilenames(filenames_I);
-    FeatureFiltersUtils::loadFeatureFiltersFromDB(
+    FeatureFiltersUtils::loadFeatureFilters(
       "featureRSDEstimationComponents",
       "featureRSDEstimationComponentGroups",
       filenames_I,
@@ -1638,7 +1638,7 @@ namespace SmartPeak
   {
     LOGD << "START storeFeatureRSDEstimation";
     getFilenames(filenames_I);
-    FeatureFiltersUtils::storeFeatureFiltersInDB(
+    FeatureFiltersUtils::storeFeatureFilters(
       "featureRSDEstimationComponents",
       "featureRSDEstimationComponentGroups",
       filenames_I,
@@ -1687,7 +1687,7 @@ namespace SmartPeak
   {
     LOGD << "START loadFeatureBackgroundEstimation";
     getFilenames(filenames_I);
-    FeatureFiltersUtils::loadFeatureFiltersFromDB(
+    FeatureFiltersUtils::loadFeatureFilters(
       "featureBackgroundEstimationComponents",
       "featureBackgroundEstimationComponentGroups",
       filenames_I,
@@ -1757,7 +1757,7 @@ namespace SmartPeak
   {
     LOGD << "START storeFeatureBackgroundEstimation";
     getFilenames(filenames_I);
-    FeatureFiltersUtils::storeFeatureFiltersInDB(
+    FeatureFiltersUtils::storeFeatureFilters(
       "featureBackgroundEstimationComponents",
       "featureBackgroundEstimationComponentGroups",
       filenames_I,

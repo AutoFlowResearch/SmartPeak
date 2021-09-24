@@ -37,7 +37,7 @@ TEST(FeatureFiltersUtils, storeAndLoadFeatureFiltersInDB)
   Filenames filenames;
   filenames.setFullPath("test", filename);
   filenames.setFullPath("testgroup", "");
-  FeatureFiltersUtils::loadFeatureFiltersFromDB("test", "testgroup", filenames, features_qc_1, nullptr, nullptr);
+  FeatureFiltersUtils::loadFeatureFilters("test", "testgroup", filenames, features_qc_1, nullptr, nullptr);
 
   // Check the file loading succeeded
   ASSERT_EQ(features_qc_1.component_qcs.size(), 22);
@@ -50,11 +50,11 @@ TEST(FeatureFiltersUtils, storeAndLoadFeatureFiltersInDB)
   auto path_db = "c:\\tmp\\test_session.db"; //std::tmpnam(nullptr);
   filenames.getSessionDB().setDBFilePath(path_db);
   filenames.setEmbedded("test", true);
-  FeatureFiltersUtils::storeFeatureFiltersInDB("test", "testgroup", filenames, features_qc_1);
+  FeatureFiltersUtils::storeFeatureFilters("test", "testgroup", filenames, features_qc_1);
 
   // Load from DB
   OpenMS::MRMFeatureQC features_qc_2;
-  FeatureFiltersUtils::loadFeatureFiltersFromDB("test", "testgroup", filenames, features_qc_2, nullptr, nullptr);
+  FeatureFiltersUtils::loadFeatureFilters("test", "testgroup", filenames, features_qc_2, nullptr, nullptr);
 
   // Check the loading from DB succeeded
   ASSERT_EQ(features_qc_2.component_qcs.size(), 22);

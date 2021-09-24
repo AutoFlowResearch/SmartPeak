@@ -37,7 +37,7 @@ namespace SmartPeak
   */
   class FeatureFiltersUtils
   {
-public:
+  public:
     FeatureFiltersUtils()                                      = delete;
     ~FeatureFiltersUtils()                                     = delete;
     FeatureFiltersUtils(const FeatureFiltersUtils&)            = delete;
@@ -45,23 +45,39 @@ public:
     FeatureFiltersUtils(FeatureFiltersUtils&&)                 = delete;
     FeatureFiltersUtils& operator=(FeatureFiltersUtils&&)      = delete;
 
-    static bool onFilePicked(const std::filesystem::path& filename,
+    static bool onFilePicked(
+      const std::filesystem::path& filename,
       ApplicationHandler* application_handler,
       Filenames& filenames,
       const std::string& file_id,
       const std::string& file_group_id,
       bool is_component_group);
       
-    static void storeFeatureFiltersInDB(const std::string& file_id,
-                                        const std::string& file_group_id,
-                                        Filenames& filenames,
-                                        const OpenMS::MRMFeatureQC& features_qc);
+    static void storeFeatureFilters(
+      const std::string& file_id,
+      const std::string& file_group_id,
+      Filenames& filenames,
+      const OpenMS::MRMFeatureQC& features_qc);
 
-    static void loadFeatureFiltersFromDB(const std::string& file_id, 
-                                         const std::string& file_group_id,
-                                         Filenames& filenames,
-                                         OpenMS::MRMFeatureQC& features_qc,
-                                         std::function<void()> notification,
-                                         std::function<void()> notification_group);
+    static void loadFeatureFilters(
+      const std::string& file_id, 
+      const std::string& file_group_id,
+      Filenames& filenames,
+      OpenMS::MRMFeatureQC& features_qc,
+      std::function<void()> notification,
+      std::function<void()> notification_group);
+
+  private:
+    static void storeMetadataInDB(
+      Filenames& filenames,
+      const std::string& file_id,
+      const std::vector<int>& inserted_rows,
+      const std::vector<OpenMS::MRMFeatureQC::ComponentQCs>& component_qcs);
+
+    static void loadMetadataFromDB(
+      Filenames& filenames,
+      const std::string& file_id,
+      const std::vector<int>& features_id,
+      std::vector<OpenMS::MRMFeatureQC::ComponentQCs>& component_qcs);
   };
 }

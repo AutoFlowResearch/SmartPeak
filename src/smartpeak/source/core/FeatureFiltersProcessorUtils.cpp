@@ -60,7 +60,7 @@ namespace SmartPeak
     return true;
   }
 
-  void FeatureFiltersUtils::storeFeatureFiltersInDB(const std::string& file_id,
+  void FeatureFiltersUtils::storeFeatureFilters(const std::string& file_id,
                                                     const std::string& file_group_id,
                                                     Filenames& filenames,
                                                     const OpenMS::MRMFeatureQC& features_qc)
@@ -76,7 +76,7 @@ namespace SmartPeak
       {
         if (filenames.isEmbedded(file_id))
         {
-          std::vector<uint64_t> inserted_rows;
+          std::vector<int> inserted_rows;
           auto db_context = filenames.getSessionDB().beginWrite(
             file_id,
             "component_name", "TEXT",
@@ -106,40 +106,7 @@ namespace SmartPeak
             inserted_rows.push_back(filenames.getSessionDB().getLastInsertedRowId(*db_context));
           }
           filenames.getSessionDB().endWrite(*db_context);
-          //==============================================
-          {
-            auto db_context = filenames.getSessionDB().beginWrite(
-              "metadata_" + file_id,
-              "feature_id", "INTEGER",
-              "name", "TEXT",
-              "l", "REAL",
-              "u", "REAL"
-            );
-            if (!db_context)
-            {
-              return;
-            }
-            int index = 0;
-            for (const auto& feature_filter : features_qc.component_qcs)
-            {
-              auto feature_filter_id = inserted_rows.at(index);
-              for (const auto metadata : feature_filter.meta_value_qc)
-              {
-                const auto& metadata_name = metadata.first;
-                const auto& metadata_value = metadata.second;
-                filenames.getSessionDB().write(
-                  *db_context,
-                  feature_filter_id,
-                  metadata_name,
-                  metadata_value.first,
-                  metadata_value.second
-                );
-              }
-              ++index;
-            }
-            filenames.getSessionDB().endWrite(*db_context);
-          }
-          //==============================================
+          storeMetadataInDB(filenames, file_id, inserted_rows, features_qc.component_qcs);
         }
         else
         {
@@ -223,7 +190,7 @@ namespace SmartPeak
     }
   }
 
-  void FeatureFiltersUtils::loadFeatureFiltersFromDB(
+  void FeatureFiltersUtils::loadFeatureFilters(
     const std::string& file_id,
     const std::string& file_group_id,
     Filenames& filenames,
@@ -276,34 +243,7 @@ namespace SmartPeak
             features_id.push_back(feature_id);
           }
           filenames.getSessionDB().endRead(*db_context);
-          // read metadata
-          int index = 0;
-          for (auto& feature_filter : features_qc.component_qcs)
-          {
-            auto feature_id = features_id[index];
-            auto db_context = filenames.getSessionDB().beginReadWhere(
-              "metadata_" + file_id,
-              "feature_id",
-              feature_id,
-              "name",
-              "l",
-              "u"
-            );
-            OpenMS::String metadata_name;
-            double metadata_value_l;
-            double metadata_value_u;
-            while (filenames.getSessionDB().read(
-              *db_context,
-              metadata_name,
-              metadata_value_l,
-              metadata_value_u
-            ))
-            {
-              feature_filter.meta_value_qc.emplace(metadata_name, std::make_pair(metadata_value_l, metadata_value_u));
-            }
-            ++index;
-          }
-          filenames.getSessionDB().endRead(*db_context);
+          loadMetadataFromDB(filenames, file_id, features_id, features_qc.component_qcs);
         }
         else
         {
@@ -392,6 +332,79 @@ namespace SmartPeak
       features_qc.component_group_pair_qcs.clear();
       LOGE << e.what();
       LOGI << "feature filter load exception";
+    }
+  }
+
+  void FeatureFiltersUtils::storeMetadataInDB(
+    Filenames& filenames,
+    const std::string& file_id,
+    const std::vector<int>& inserted_rows,
+    const std::vector<OpenMS::MRMFeatureQC::ComponentQCs>& component_qcs)
+  {
+    auto db_context = filenames.getSessionDB().beginWrite(
+      "metadata_" + file_id,
+      "feature_id", "INTEGER",
+      "name", "TEXT",
+      "l", "REAL",
+      "u", "REAL"
+    );
+    if (!db_context)
+    {
+      return;
+    }
+    int index = 0;
+    for (const auto& feature_filter : component_qcs)
+    {
+      auto feature_filter_id = inserted_rows.at(index);
+      for (const auto metadata : feature_filter.meta_value_qc)
+      {
+        const auto& metadata_name = metadata.first;
+        const auto& metadata_value = metadata.second;
+        filenames.getSessionDB().write(
+          *db_context,
+          feature_filter_id,
+          metadata_name,
+          metadata_value.first,
+          metadata_value.second
+        );
+      }
+      ++index;
+    }
+    filenames.getSessionDB().endWrite(*db_context);
+  }
+
+  void FeatureFiltersUtils::loadMetadataFromDB(
+    Filenames& filenames,
+    const std::string& file_id,
+    const std::vector<int>& features_id,
+    std::vector<OpenMS::MRMFeatureQC::ComponentQCs>& component_qcs)
+  {
+    int index = 0;
+    for (auto& feature_filter : component_qcs)
+    {
+      auto feature_id = features_id[index];
+      auto db_context = filenames.getSessionDB().beginReadWhere(
+        "metadata_" + file_id,
+        "feature_id",
+        feature_id,
+        "name",
+        "l",
+        "u"
+      );
+      OpenMS::String metadata_name;
+      double metadata_value_l;
+      double metadata_value_u;
+      while (filenames.getSessionDB().read(
+        *db_context,
+        metadata_name,
+        metadata_value_l,
+        metadata_value_u
+      ))
+      {
+        feature_filter.meta_value_qc.emplace(metadata_name, std::make_pair(metadata_value_l, metadata_value_u));
+      }
+      filenames.getSessionDB().endRead(*db_context);
+      ++index;
     }
   }
 }
