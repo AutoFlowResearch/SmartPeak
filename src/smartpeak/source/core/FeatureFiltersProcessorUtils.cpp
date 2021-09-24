@@ -76,6 +76,7 @@ namespace SmartPeak
       {
         if (filenames.isEmbedded(file_id))
         {
+          std::vector<uint64_t> inserted_rows;
           auto db_context = filenames.getSessionDB().beginWrite(
             file_id,
             "component_name", "TEXT",
@@ -102,8 +103,43 @@ namespace SmartPeak
               feature_filter.retention_time_l,
               feature_filter.retention_time_u
             );
+            inserted_rows.push_back(filenames.getSessionDB().getLastInsertedRowId(*db_context));
           }
           filenames.getSessionDB().endWrite(*db_context);
+          //==============================================
+          {
+            auto db_context = filenames.getSessionDB().beginWrite(
+              "metadata_" + file_id,
+              "feature_id", "INTEGER",
+              "name", "TEXT",
+              "l", "REAL",
+              "u", "REAL"
+            );
+            if (!db_context)
+            {
+              return;
+            }
+            int index = 0;
+            for (const auto& feature_filter : features_qc.component_qcs)
+            {
+              auto feature_filter_id = inserted_rows.at(index);
+              for (const auto metadata : feature_filter.meta_value_qc)
+              {
+                const auto& metadata_name = metadata.first;
+                const auto& metadata_value = metadata.second;
+                filenames.getSessionDB().write(
+                  *db_context,
+                  feature_filter_id,
+                  metadata_name,
+                  metadata_value.first,
+                  metadata_value.second
+                );
+              }
+              ++index;
+            }
+            filenames.getSessionDB().endWrite(*db_context);
+          }
+          //==============================================
         }
         else
         {
@@ -206,8 +242,10 @@ namespace SmartPeak
       {
         if (filenames.isEmbedded(file_id))
         {
+          std::vector<int> features_id;
           auto db_context = filenames.getSessionDB().beginRead(
             file_id,
+            "ID",
             "component_name",
             "intensity_l",
             "intensity_u",
@@ -221,8 +259,10 @@ namespace SmartPeak
             return;
           }
           OpenMS::MRMFeatureQC::ComponentQCs feature_filter;
+          int feature_id;
           while (filenames.getSessionDB().read(
             *db_context,
+            feature_id,
             feature_filter.component_name,
             feature_filter.intensity_l,
             feature_filter.intensity_u,
@@ -233,8 +273,12 @@ namespace SmartPeak
           ))
           {
             features_qc.component_qcs.push_back(feature_filter);
+            features_id.push_back(feature_id);
           }
           filenames.getSessionDB().endRead(*db_context);
+          //=========================================================
+          // TODO: read
+          //=========================================================
         }
         else
         {

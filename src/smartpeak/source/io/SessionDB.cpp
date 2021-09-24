@@ -210,4 +210,9 @@ namespace SmartPeak
       LOGE << "SQL Command: " << sql_command;
     }
   }
+
+  int64_t SessionDB::getLastInsertedRowId(SessionDB::DBContext& db_context) const
+  {
+    return sqlite3_last_insert_rowid(db_context.db);
+  }
 }

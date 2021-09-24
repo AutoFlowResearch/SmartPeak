@@ -75,6 +75,8 @@ namespace SmartPeak
 
     void endWrite(SessionDB::DBContext& db_context);
 
+    int64_t getLastInsertedRowId(SessionDB::DBContext& db_context) const;
+
   protected:
     template<typename Value, typename ...Args>
     void beginRead(std::ostringstream& os, std::vector<std::string>& columns, const Value& value, const Args& ...args);
