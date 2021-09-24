@@ -19,7 +19,12 @@ PROTOBUF_PRAGMA_INIT_SEG
 namespace SmartPeakServer {
 constexpr WorkflowParameters::WorkflowParameters(
   ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized)
-  : sequence_file_(&::PROTOBUF_NAMESPACE_ID::internal::fixed_address_empty_string){}
+  : sequence_file_(&::PROTOBUF_NAMESPACE_ID::internal::fixed_address_empty_string)
+  , report_metadata_(&::PROTOBUF_NAMESPACE_ID::internal::fixed_address_empty_string)
+  , report_sample_types_(&::PROTOBUF_NAMESPACE_ID::internal::fixed_address_empty_string)
+  , integrity_(&::PROTOBUF_NAMESPACE_ID::internal::fixed_address_empty_string)
+  , export__(0)
+{}
 struct WorkflowParametersDefaultTypeInternal {
   constexpr WorkflowParametersDefaultTypeInternal()
     : _instance(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized{}) {}
@@ -44,9 +49,33 @@ struct WorkflowStatusDefaultTypeInternal {
   };
 };
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT WorkflowStatusDefaultTypeInternal _WorkflowStatus_default_instance_;
+constexpr InquireLogs::InquireLogs(
+  ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized)
+  : nr_lines_(0){}
+struct InquireLogsDefaultTypeInternal {
+  constexpr InquireLogsDefaultTypeInternal()
+    : _instance(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized{}) {}
+  ~InquireLogsDefaultTypeInternal() {}
+  union {
+    InquireLogs _instance;
+  };
+};
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT InquireLogsDefaultTypeInternal _InquireLogs_default_instance_;
+constexpr LogStream::LogStream(
+  ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized)
+  : log_line_(&::PROTOBUF_NAMESPACE_ID::internal::fixed_address_empty_string){}
+struct LogStreamDefaultTypeInternal {
+  constexpr LogStreamDefaultTypeInternal()
+    : _instance(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized{}) {}
+  ~LogStreamDefaultTypeInternal() {}
+  union {
+    LogStream _instance;
+  };
+};
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT LogStreamDefaultTypeInternal _LogStream_default_instance_;
 }  // namespace SmartPeakServer
-static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_workflow_2eproto[2];
-static constexpr ::PROTOBUF_NAMESPACE_ID::EnumDescriptor const** file_level_enum_descriptors_workflow_2eproto = nullptr;
+static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_workflow_2eproto[4];
+static const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* file_level_enum_descriptors_workflow_2eproto[1];
 static constexpr ::PROTOBUF_NAMESPACE_ID::ServiceDescriptor const** file_level_service_descriptors_workflow_2eproto = nullptr;
 
 const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_workflow_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
@@ -56,6 +85,10 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_workflow_2eproto::offsets[] PR
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   PROTOBUF_FIELD_OFFSET(::SmartPeakServer::WorkflowParameters, sequence_file_),
+  PROTOBUF_FIELD_OFFSET(::SmartPeakServer::WorkflowParameters, export__),
+  PROTOBUF_FIELD_OFFSET(::SmartPeakServer::WorkflowParameters, report_metadata_),
+  PROTOBUF_FIELD_OFFSET(::SmartPeakServer::WorkflowParameters, report_sample_types_),
+  PROTOBUF_FIELD_OFFSET(::SmartPeakServer::WorkflowParameters, integrity_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::SmartPeakServer::WorkflowStatus, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -65,31 +98,55 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_workflow_2eproto::offsets[] PR
   PROTOBUF_FIELD_OFFSET(::SmartPeakServer::WorkflowStatus, status_code_),
   PROTOBUF_FIELD_OFFSET(::SmartPeakServer::WorkflowStatus, session_id_),
   PROTOBUF_FIELD_OFFSET(::SmartPeakServer::WorkflowStatus, path_to_results_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::SmartPeakServer::InquireLogs, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::SmartPeakServer::InquireLogs, nr_lines_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::SmartPeakServer::LogStream, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::SmartPeakServer::LogStream, log_line_),
 };
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::SmartPeakServer::WorkflowParameters)},
-  { 6, -1, sizeof(::SmartPeakServer::WorkflowStatus)},
+  { 10, -1, sizeof(::SmartPeakServer::WorkflowStatus)},
+  { 19, -1, sizeof(::SmartPeakServer::InquireLogs)},
+  { 25, -1, sizeof(::SmartPeakServer::LogStream)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::SmartPeakServer::_WorkflowParameters_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::SmartPeakServer::_WorkflowStatus_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::SmartPeakServer::_InquireLogs_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::SmartPeakServer::_LogStream_default_instance_),
 };
 
 const char descriptor_table_protodef_workflow_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\016workflow.proto\022\017SmartPeakServer\"+\n\022Wor"
-  "kflowParameters\022\025\n\rsequence_file\030\001 \001(\t\"o"
-  "\n\016WorkflowStatus\022\033\n\023progress_in_percent\030"
-  "\001 \001(\005\022\023\n\013status_code\030\002 \001(\t\022\022\n\nsession_id"
-  "\030\003 \001(\t\022\027\n\017path_to_results\030\004 \001(\t2a\n\010Workf"
-  "low\022U\n\013runWorkflow\022#.SmartPeakServer.Wor"
-  "kflowParameters\032\037.SmartPeakServer.Workfl"
-  "owStatus\"\000b\006proto3"
+  "\n\016workflow.proto\022\017SmartPeakServer\"\356\001\n\022Wo"
+  "rkflowParameters\022\025\n\rsequence_file\030\001 \001(\t\022"
+  "@\n\006export\030\002 \001(\01620.SmartPeakServer.Workfl"
+  "owParameters.ExportReport\022\027\n\017report_meta"
+  "data\030\003 \001(\t\022\033\n\023report_sample_types\030\004 \001(\t\022"
+  "\021\n\tintegrity\030\005 \001(\t\"6\n\014ExportReport\022\007\n\003AL"
+  "L\020\000\022\r\n\tFEATUREDB\020\001\022\016\n\nPIVOTTABLE\020\002\"o\n\016Wo"
+  "rkflowStatus\022\033\n\023progress_in_percent\030\001 \001("
+  "\005\022\023\n\013status_code\030\002 \001(\t\022\022\n\nsession_id\030\003 \001"
+  "(\t\022\027\n\017path_to_results\030\004 \001(\t\"\037\n\013InquireLo"
+  "gs\022\020\n\010nr_lines\030\001 \001(\005\"\035\n\tLogStream\022\020\n\010log"
+  "_line\030\001 \001(\t2\257\001\n\010Workflow\022U\n\013runWorkflow\022"
+  "#.SmartPeakServer.WorkflowParameters\032\037.S"
+  "martPeakServer.WorkflowStatus\"\000\022L\n\014getLo"
+  "gStream\022\034.SmartPeakServer.InquireLogs\032\032."
+  "SmartPeakServer.LogStream\"\0000\001b\006proto3"
   ;
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_workflow_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_workflow_2eproto = {
-  false, false, 298, descriptor_table_protodef_workflow_2eproto, "workflow.proto", 
-  &descriptor_table_workflow_2eproto_once, nullptr, 0, 2,
+  false, false, 637, descriptor_table_protodef_workflow_2eproto, "workflow.proto", 
+  &descriptor_table_workflow_2eproto_once, nullptr, 0, 4,
   schemas, file_default_instances, TableStruct_workflow_2eproto::offsets,
   file_level_metadata_workflow_2eproto, file_level_enum_descriptors_workflow_2eproto, file_level_service_descriptors_workflow_2eproto,
 };
@@ -102,6 +159,29 @@ descriptor_table_workflow_2eproto_metadata_getter(int index) {
 // Force running AddDescriptors() at dynamic initialization time.
 PROTOBUF_ATTRIBUTE_INIT_PRIORITY static ::PROTOBUF_NAMESPACE_ID::internal::AddDescriptorsRunner dynamic_init_dummy_workflow_2eproto(&descriptor_table_workflow_2eproto);
 namespace SmartPeakServer {
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* WorkflowParameters_ExportReport_descriptor() {
+  ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&descriptor_table_workflow_2eproto);
+  return file_level_enum_descriptors_workflow_2eproto[0];
+}
+bool WorkflowParameters_ExportReport_IsValid(int value) {
+  switch (value) {
+    case 0:
+    case 1:
+    case 2:
+      return true;
+    default:
+      return false;
+  }
+}
+
+#if (__cplusplus < 201703) && (!defined(_MSC_VER) || _MSC_VER >= 1900)
+constexpr WorkflowParameters_ExportReport WorkflowParameters::ALL;
+constexpr WorkflowParameters_ExportReport WorkflowParameters::FEATUREDB;
+constexpr WorkflowParameters_ExportReport WorkflowParameters::PIVOTTABLE;
+constexpr WorkflowParameters_ExportReport WorkflowParameters::ExportReport_MIN;
+constexpr WorkflowParameters_ExportReport WorkflowParameters::ExportReport_MAX;
+constexpr int WorkflowParameters::ExportReport_ARRAYSIZE;
+#endif  // (__cplusplus < 201703) && (!defined(_MSC_VER) || _MSC_VER >= 1900)
 
 // ===================================================================
 
@@ -123,11 +203,31 @@ WorkflowParameters::WorkflowParameters(const WorkflowParameters& from)
     sequence_file_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_sequence_file(), 
       GetArena());
   }
+  report_metadata_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  if (!from._internal_report_metadata().empty()) {
+    report_metadata_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_report_metadata(), 
+      GetArena());
+  }
+  report_sample_types_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  if (!from._internal_report_sample_types().empty()) {
+    report_sample_types_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_report_sample_types(), 
+      GetArena());
+  }
+  integrity_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  if (!from._internal_integrity().empty()) {
+    integrity_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_integrity(), 
+      GetArena());
+  }
+  export__ = from.export__;
   // @@protoc_insertion_point(copy_constructor:SmartPeakServer.WorkflowParameters)
 }
 
 void WorkflowParameters::SharedCtor() {
 sequence_file_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+report_metadata_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+report_sample_types_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+integrity_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+export__ = 0;
 }
 
 WorkflowParameters::~WorkflowParameters() {
@@ -139,6 +239,9 @@ WorkflowParameters::~WorkflowParameters() {
 void WorkflowParameters::SharedDtor() {
   GOOGLE_DCHECK(GetArena() == nullptr);
   sequence_file_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  report_metadata_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  report_sample_types_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  integrity_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
 
 void WorkflowParameters::ArenaDtor(void* object) {
@@ -158,6 +261,10 @@ void WorkflowParameters::Clear() {
   (void) cached_has_bits;
 
   sequence_file_.ClearToEmpty();
+  report_metadata_.ClearToEmpty();
+  report_sample_types_.ClearToEmpty();
+  integrity_.ClearToEmpty();
+  export__ = 0;
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
@@ -174,6 +281,41 @@ const char* WorkflowParameters::_InternalParse(const char* ptr, ::PROTOBUF_NAMES
           auto str = _internal_mutable_sequence_file();
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "SmartPeakServer.WorkflowParameters.sequence_file"));
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // .SmartPeakServer.WorkflowParameters.ExportReport export = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16)) {
+          ::PROTOBUF_NAMESPACE_ID::uint64 val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+          _internal_set_export_(static_cast<::SmartPeakServer::WorkflowParameters_ExportReport>(val));
+        } else goto handle_unusual;
+        continue;
+      // string report_metadata = 3;
+      case 3:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 26)) {
+          auto str = _internal_mutable_report_metadata();
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "SmartPeakServer.WorkflowParameters.report_metadata"));
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // string report_sample_types = 4;
+      case 4:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 34)) {
+          auto str = _internal_mutable_report_sample_types();
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "SmartPeakServer.WorkflowParameters.report_sample_types"));
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // string integrity = 5;
+      case 5:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 42)) {
+          auto str = _internal_mutable_integrity();
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "SmartPeakServer.WorkflowParameters.integrity"));
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
@@ -215,6 +357,43 @@ failure:
         1, this->_internal_sequence_file(), target);
   }
 
+  // .SmartPeakServer.WorkflowParameters.ExportReport export = 2;
+  if (this->export_() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteEnumToArray(
+      2, this->_internal_export_(), target);
+  }
+
+  // string report_metadata = 3;
+  if (this->report_metadata().size() > 0) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_report_metadata().data(), static_cast<int>(this->_internal_report_metadata().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "SmartPeakServer.WorkflowParameters.report_metadata");
+    target = stream->WriteStringMaybeAliased(
+        3, this->_internal_report_metadata(), target);
+  }
+
+  // string report_sample_types = 4;
+  if (this->report_sample_types().size() > 0) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_report_sample_types().data(), static_cast<int>(this->_internal_report_sample_types().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "SmartPeakServer.WorkflowParameters.report_sample_types");
+    target = stream->WriteStringMaybeAliased(
+        4, this->_internal_report_sample_types(), target);
+  }
+
+  // string integrity = 5;
+  if (this->integrity().size() > 0) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_integrity().data(), static_cast<int>(this->_internal_integrity().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "SmartPeakServer.WorkflowParameters.integrity");
+    target = stream->WriteStringMaybeAliased(
+        5, this->_internal_integrity(), target);
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
@@ -236,6 +415,33 @@ size_t WorkflowParameters::ByteSizeLong() const {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
         this->_internal_sequence_file());
+  }
+
+  // string report_metadata = 3;
+  if (this->report_metadata().size() > 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->_internal_report_metadata());
+  }
+
+  // string report_sample_types = 4;
+  if (this->report_sample_types().size() > 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->_internal_report_sample_types());
+  }
+
+  // string integrity = 5;
+  if (this->integrity().size() > 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->_internal_integrity());
+  }
+
+  // .SmartPeakServer.WorkflowParameters.ExportReport export = 2;
+  if (this->export_() != 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::EnumSize(this->_internal_export_());
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -272,6 +478,18 @@ void WorkflowParameters::MergeFrom(const WorkflowParameters& from) {
   if (from.sequence_file().size() > 0) {
     _internal_set_sequence_file(from._internal_sequence_file());
   }
+  if (from.report_metadata().size() > 0) {
+    _internal_set_report_metadata(from._internal_report_metadata());
+  }
+  if (from.report_sample_types().size() > 0) {
+    _internal_set_report_sample_types(from._internal_report_sample_types());
+  }
+  if (from.integrity().size() > 0) {
+    _internal_set_integrity(from._internal_integrity());
+  }
+  if (from.export_() != 0) {
+    _internal_set_export_(from._internal_export_());
+  }
 }
 
 void WorkflowParameters::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
@@ -296,6 +514,10 @@ void WorkflowParameters::InternalSwap(WorkflowParameters* other) {
   using std::swap;
   _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
   sequence_file_.Swap(&other->sequence_file_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  report_metadata_.Swap(&other->report_metadata_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  report_sample_types_.Swap(&other->report_sample_types_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  integrity_.Swap(&other->integrity_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  swap(export__, other->export__);
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata WorkflowParameters::GetMetadata() const {
@@ -606,6 +828,395 @@ void WorkflowStatus::InternalSwap(WorkflowStatus* other) {
 }
 
 
+// ===================================================================
+
+class InquireLogs::_Internal {
+ public:
+};
+
+InquireLogs::InquireLogs(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena) {
+  SharedCtor();
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:SmartPeakServer.InquireLogs)
+}
+InquireLogs::InquireLogs(const InquireLogs& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  nr_lines_ = from.nr_lines_;
+  // @@protoc_insertion_point(copy_constructor:SmartPeakServer.InquireLogs)
+}
+
+void InquireLogs::SharedCtor() {
+nr_lines_ = 0;
+}
+
+InquireLogs::~InquireLogs() {
+  // @@protoc_insertion_point(destructor:SmartPeakServer.InquireLogs)
+  SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+void InquireLogs::SharedDtor() {
+  GOOGLE_DCHECK(GetArena() == nullptr);
+}
+
+void InquireLogs::ArenaDtor(void* object) {
+  InquireLogs* _this = reinterpret_cast< InquireLogs* >(object);
+  (void)_this;
+}
+void InquireLogs::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
+void InquireLogs::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+
+void InquireLogs::Clear() {
+// @@protoc_insertion_point(message_clear_start:SmartPeakServer.InquireLogs)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  nr_lines_ = 0;
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* InquireLogs::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  while (!ctx->Done(&ptr)) {
+    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    CHK_(ptr);
+    switch (tag >> 3) {
+      // int32 nr_lines = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+          nr_lines_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->SetLastTag(tag);
+          goto success;
+        }
+        ptr = UnknownFieldParse(tag,
+            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+            ptr, ctx);
+        CHK_(ptr != nullptr);
+        continue;
+      }
+    }  // switch
+  }  // while
+success:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto success;
+#undef CHK_
+}
+
+::PROTOBUF_NAMESPACE_ID::uint8* InquireLogs::_InternalSerialize(
+    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:SmartPeakServer.InquireLogs)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // int32 nr_lines = 1;
+  if (this->nr_lines() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(1, this->_internal_nr_lines(), target);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:SmartPeakServer.InquireLogs)
+  return target;
+}
+
+size_t InquireLogs::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:SmartPeakServer.InquireLogs)
+  size_t total_size = 0;
+
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // int32 nr_lines = 1;
+  if (this->nr_lines() != 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+        this->_internal_nr_lines());
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
+        _internal_metadata_, total_size, &_cached_size_);
+  }
+  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void InquireLogs::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:SmartPeakServer.InquireLogs)
+  GOOGLE_DCHECK_NE(&from, this);
+  const InquireLogs* source =
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<InquireLogs>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:SmartPeakServer.InquireLogs)
+    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:SmartPeakServer.InquireLogs)
+    MergeFrom(*source);
+  }
+}
+
+void InquireLogs::MergeFrom(const InquireLogs& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:SmartPeakServer.InquireLogs)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (from.nr_lines() != 0) {
+    _internal_set_nr_lines(from._internal_nr_lines());
+  }
+}
+
+void InquireLogs::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:SmartPeakServer.InquireLogs)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void InquireLogs::CopyFrom(const InquireLogs& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:SmartPeakServer.InquireLogs)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool InquireLogs::IsInitialized() const {
+  return true;
+}
+
+void InquireLogs::InternalSwap(InquireLogs* other) {
+  using std::swap;
+  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
+  swap(nr_lines_, other->nr_lines_);
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata InquireLogs::GetMetadata() const {
+  return GetMetadataStatic();
+}
+
+
+// ===================================================================
+
+class LogStream::_Internal {
+ public:
+};
+
+LogStream::LogStream(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena) {
+  SharedCtor();
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:SmartPeakServer.LogStream)
+}
+LogStream::LogStream(const LogStream& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  log_line_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  if (!from._internal_log_line().empty()) {
+    log_line_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_log_line(), 
+      GetArena());
+  }
+  // @@protoc_insertion_point(copy_constructor:SmartPeakServer.LogStream)
+}
+
+void LogStream::SharedCtor() {
+log_line_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+
+LogStream::~LogStream() {
+  // @@protoc_insertion_point(destructor:SmartPeakServer.LogStream)
+  SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+void LogStream::SharedDtor() {
+  GOOGLE_DCHECK(GetArena() == nullptr);
+  log_line_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+
+void LogStream::ArenaDtor(void* object) {
+  LogStream* _this = reinterpret_cast< LogStream* >(object);
+  (void)_this;
+}
+void LogStream::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
+void LogStream::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+
+void LogStream::Clear() {
+// @@protoc_insertion_point(message_clear_start:SmartPeakServer.LogStream)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  log_line_.ClearToEmpty();
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* LogStream::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  while (!ctx->Done(&ptr)) {
+    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    CHK_(ptr);
+    switch (tag >> 3) {
+      // string log_line = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
+          auto str = _internal_mutable_log_line();
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "SmartPeakServer.LogStream.log_line"));
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->SetLastTag(tag);
+          goto success;
+        }
+        ptr = UnknownFieldParse(tag,
+            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+            ptr, ctx);
+        CHK_(ptr != nullptr);
+        continue;
+      }
+    }  // switch
+  }  // while
+success:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto success;
+#undef CHK_
+}
+
+::PROTOBUF_NAMESPACE_ID::uint8* LogStream::_InternalSerialize(
+    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:SmartPeakServer.LogStream)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // string log_line = 1;
+  if (this->log_line().size() > 0) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_log_line().data(), static_cast<int>(this->_internal_log_line().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "SmartPeakServer.LogStream.log_line");
+    target = stream->WriteStringMaybeAliased(
+        1, this->_internal_log_line(), target);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:SmartPeakServer.LogStream)
+  return target;
+}
+
+size_t LogStream::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:SmartPeakServer.LogStream)
+  size_t total_size = 0;
+
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // string log_line = 1;
+  if (this->log_line().size() > 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->_internal_log_line());
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
+        _internal_metadata_, total_size, &_cached_size_);
+  }
+  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void LogStream::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:SmartPeakServer.LogStream)
+  GOOGLE_DCHECK_NE(&from, this);
+  const LogStream* source =
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<LogStream>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:SmartPeakServer.LogStream)
+    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:SmartPeakServer.LogStream)
+    MergeFrom(*source);
+  }
+}
+
+void LogStream::MergeFrom(const LogStream& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:SmartPeakServer.LogStream)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (from.log_line().size() > 0) {
+    _internal_set_log_line(from._internal_log_line());
+  }
+}
+
+void LogStream::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:SmartPeakServer.LogStream)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void LogStream::CopyFrom(const LogStream& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:SmartPeakServer.LogStream)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool LogStream::IsInitialized() const {
+  return true;
+}
+
+void LogStream::InternalSwap(LogStream* other) {
+  using std::swap;
+  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
+  log_line_.Swap(&other->log_line_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata LogStream::GetMetadata() const {
+  return GetMetadataStatic();
+}
+
+
 // @@protoc_insertion_point(namespace_scope)
 }  // namespace SmartPeakServer
 PROTOBUF_NAMESPACE_OPEN
@@ -614,6 +1225,12 @@ template<> PROTOBUF_NOINLINE ::SmartPeakServer::WorkflowParameters* Arena::Creat
 }
 template<> PROTOBUF_NOINLINE ::SmartPeakServer::WorkflowStatus* Arena::CreateMaybeMessage< ::SmartPeakServer::WorkflowStatus >(Arena* arena) {
   return Arena::CreateMessageInternal< ::SmartPeakServer::WorkflowStatus >(arena);
+}
+template<> PROTOBUF_NOINLINE ::SmartPeakServer::InquireLogs* Arena::CreateMaybeMessage< ::SmartPeakServer::InquireLogs >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::SmartPeakServer::InquireLogs >(arena);
+}
+template<> PROTOBUF_NOINLINE ::SmartPeakServer::LogStream* Arena::CreateMaybeMessage< ::SmartPeakServer::LogStream >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::SmartPeakServer::LogStream >(arena);
 }
 PROTOBUF_NAMESPACE_CLOSE
 

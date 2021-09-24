@@ -65,38 +65,9 @@
 #include <backends/imgui_impl_opengl2.h>
 #include <misc/cpp/imgui_stdlib.h>
 
-#include "service/workflow_grpc.h"
-#include <grpcpp/grpcpp.h>
+#include "service/services.hpp"
 
 using namespace SmartPeak;
-
-class WorkflowClient {
- public:
-  WorkflowClient(std::shared_ptr<grpc::Channel> channel)
-      : stub_(SmartPeakServer::Workflow::NewStub(channel)) {}
-  
-  std::string runWorkflow(const std::string& sequence_file_path) {
-
-  SmartPeakServer::WorkflowParameters workflow_parameters;
-  workflow_parameters.set_sequence_file(sequence_file_path);
-  SmartPeakServer::WorkflowStatus workflow_status;
-    
-  grpc::ClientContext context;
-  context.AddMetadata("smartpeak_version", Utilities::getSmartPeakVersion());
-  grpc::Status status = stub_->runWorkflow(&context, workflow_parameters, &workflow_status);
-
-  if (status.ok()) {
-    return workflow_status.status_code();
-  } else {
-    std::cout << status.error_code() << ": " << status.error_message()
-              << std::endl;
-    return "RPC failed";
-  }
-}
-
- private:
-  std::unique_ptr<SmartPeakServer::Workflow::Stub> stub_;
-};
 
 bool SmartPeak::enable_quick_help = true;
 
@@ -739,10 +710,19 @@ int main(int argc, char** argv)
     // Server-Side Execution
     // ======================================
       if (server_dialogue_->fields_set_) {
-        WorkflowClient workflow_client( grpc::CreateChannel(server_dialogue_->server_ip_address_, grpc::InsecureChannelCredentials()) );
-        std::string workflow_status = workflow_client.runWorkflow(server_dialogue_->sequence_file_path_);
-        std::cout << " >>> GUI client received: " << workflow_status << std::endl;
-        //remote_execution_done_ = true;
+        for (int i=0; i<2; ++i) {
+          WorkflowClientS workflow_client(grpc::CreateChannel(server_dialogue_->server_ip_address_, grpc::InsecureChannelCredentials()));
+          LogStreamClientS logstream_client(grpc::CreateChannel(server_dialogue_->server_ip_address_, grpc::InsecureChannelCredentials()));
+          
+          //WorkflowClientA workflow_client(grpc::CreateChannel(server_dialogue_->server_ip_address_, grpc::InsecureChannelCredentials()));
+          //LogStreamClientA logstream_client(grpc::CreateChannel(server_dialogue_->server_ip_address_, grpc::InsecureChannelCredentials()));
+          
+          std::string workflow_status = workflow_client.runWorkflow(server_dialogue_->sequence_file_path_);
+          logstream_client.getLogstream();
+          
+          std::cout << ">>> GUI workflow_status : " << workflow_status << std::endl;
+          std::this_thread::sleep_for(std::chrono::seconds(3));
+        }
         server_dialogue_->fields_set_ = false;
       }
 

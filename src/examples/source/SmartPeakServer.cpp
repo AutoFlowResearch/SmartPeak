@@ -17,45 +17,21 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Krzysztof Abram $
-// $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
+// $Maintainer: Ahmed Khalil $
+// $Authors: Ahmed Khalil $
 // --------------------------------------------------------------------------
-#include <iostream>
-#include <chrono>
-#include <algorithm>
-#include <plog/Log.h>
 
-#include <SmartPeak/cli/Parser.h>
-#include <SmartPeak/cli/ApplicationSettings.h>
-#include <SmartPeak/cli/ApplicationManager.h>
-#include <SmartPeak/cli/Task.h>
+#include "service/services.hpp"
 
 
 int main(int argc, char** argv)
 {
-    namespace cli = SmartPeak::cli;
-
-    auto parser = cli::Parser{argc, argv};
-    auto application_settings = cli::ApplicationSettings{parser};
-    auto application = cli::ApplicationManager{application_settings};
-    try
-    {
-        application
-            .add(std::make_shared<cli::InitializeApplicationSettings>())
-            .add(std::make_shared<cli::InitializeLogger>())
-            .add(std::make_shared<cli::LoadSession>())
-            .add(std::make_shared<cli::InitializeWorkflowResources>())
-            .add(std::make_shared<cli::InitializeWorkflowSettings>())
-            .add(std::make_shared<cli::RunIntegrityChecks>())
-            .add(std::make_shared<cli::RunWorkflow>())
-            .add(std::make_shared<cli::ExportReport>());
-
-        return !application.run();
-    }
-    catch(const std::exception& e)
-    {
-        LOG_ERROR << e.what();
-        return 1;
-    }
-    return 0;
+  runSyncServer("localhost:50051");
+  
+//  AsyncServer a_serv("localhost:50051");
+//  a_serv.init("localhost:50051", "localhost");
+//  a_serv.run();
+  
+  return 0;
 }
+

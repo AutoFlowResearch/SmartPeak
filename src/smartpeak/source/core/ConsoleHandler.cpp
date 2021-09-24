@@ -109,34 +109,34 @@ bool ConsoleHandler::_initialize_log_location(const std::string& filename, std::
 
 void ConsoleHandler::_initialize_log_console(bool init_file_appender)
 {
-    if (nullptr == m_file_appender && init_file_appender)
+  if (nullptr == m_file_appender && init_file_appender)
+  {
+    // Add .csv appender: 32 MiB per file, max. 100 log files
+    m_file_appender = std::make_shared<
+        plog::RollingFileAppender<plog::CsvFormatter>>(
+            m_log_filepath.c_str(), 1024 * 1024 * 32, 100);
+  }
+  if (nullptr == m_console_appender)
+  {
+    if (m_enable_colors)
     {
-        // Add .csv appender: 32 MiB per file, max. 100 log files
-        m_file_appender = std::make_shared<
-            plog::RollingFileAppender<plog::CsvFormatter>>(
-                m_log_filepath.c_str(), 1024 * 1024 * 32, 100);
-    }
-    if (nullptr == m_console_appender)
-    {
-        if (m_enable_colors)
-        {
-            m_console_appender = std::make_shared<
-                plog::ColorConsoleAppender<plog::TxtFormatter>>();
-        }
-        else
-        {
-            m_console_appender = std::make_shared<
-                plog::ConsoleAppender<plog::TxtFormatter>>();
-        }
-    }
-    if (nullptr == m_file_appender)
-    {
-        plog::init(plog::debug, m_console_appender.get());
+      m_console_appender = std::make_shared<
+          plog::ColorConsoleAppender<plog::TxtFormatter>>();
     }
     else
     {
-        plog::init(plog::debug, m_file_appender.get()).addAppender(m_console_appender.get());
+      m_console_appender = std::make_shared<
+          plog::ConsoleAppender<plog::TxtFormatter>>();
     }
+  }
+  if (nullptr == m_file_appender)
+  {
+    plog::init(plog::debug, m_console_appender.get()).addAppender(&gui_appender_);
+  }
+  else
+  {
+    plog::init(plog::debug, m_file_appender.get()).addAppender(m_console_appender.get()).addAppender(&gui_appender_);
+  }
 }
 
 } /* namespace SmartPeak */

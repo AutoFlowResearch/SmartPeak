@@ -23,6 +23,7 @@ namespace SmartPeakServer {
 
 static const char* Workflow_method_names[] = {
   "/SmartPeakServer.Workflow/runWorkflow",
+  "/SmartPeakServer.Workflow/getLogStream",
 };
 
 std::unique_ptr< Workflow::Stub> Workflow::NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options) {
@@ -33,6 +34,7 @@ std::unique_ptr< Workflow::Stub> Workflow::NewStub(const std::shared_ptr< ::grpc
 
 Workflow::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options)
   : channel_(channel), rpcmethod_runWorkflow_(Workflow_method_names[0], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_getLogStream_(Workflow_method_names[1], options.suffix_for_stats(),::grpc::internal::RpcMethod::SERVER_STREAMING, channel)
   {}
 
 ::grpc::Status Workflow::Stub::runWorkflow(::grpc::ClientContext* context, const ::SmartPeakServer::WorkflowParameters& request, ::SmartPeakServer::WorkflowStatus* response) {
@@ -58,6 +60,22 @@ void Workflow::Stub::async::runWorkflow(::grpc::ClientContext* context, const ::
   return result;
 }
 
+::grpc::ClientReader< ::SmartPeakServer::LogStream>* Workflow::Stub::getLogStreamRaw(::grpc::ClientContext* context, const ::SmartPeakServer::InquireLogs& request) {
+  return ::grpc::internal::ClientReaderFactory< ::SmartPeakServer::LogStream>::Create(channel_.get(), rpcmethod_getLogStream_, context, request);
+}
+
+void Workflow::Stub::async::getLogStream(::grpc::ClientContext* context, const ::SmartPeakServer::InquireLogs* request, ::grpc::ClientReadReactor< ::SmartPeakServer::LogStream>* reactor) {
+  ::grpc::internal::ClientCallbackReaderFactory< ::SmartPeakServer::LogStream>::Create(stub_->channel_.get(), stub_->rpcmethod_getLogStream_, context, request, reactor);
+}
+
+::grpc::ClientAsyncReader< ::SmartPeakServer::LogStream>* Workflow::Stub::AsyncgetLogStreamRaw(::grpc::ClientContext* context, const ::SmartPeakServer::InquireLogs& request, ::grpc::CompletionQueue* cq, void* tag) {
+  return ::grpc::internal::ClientAsyncReaderFactory< ::SmartPeakServer::LogStream>::Create(channel_.get(), cq, rpcmethod_getLogStream_, context, request, true, tag);
+}
+
+::grpc::ClientAsyncReader< ::SmartPeakServer::LogStream>* Workflow::Stub::PrepareAsyncgetLogStreamRaw(::grpc::ClientContext* context, const ::SmartPeakServer::InquireLogs& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncReaderFactory< ::SmartPeakServer::LogStream>::Create(channel_.get(), cq, rpcmethod_getLogStream_, context, request, false, nullptr);
+}
+
 Workflow::Service::Service() {
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       Workflow_method_names[0],
@@ -69,6 +87,16 @@ Workflow::Service::Service() {
              ::SmartPeakServer::WorkflowStatus* resp) {
                return service->runWorkflow(ctx, req, resp);
              }, this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      Workflow_method_names[1],
+      ::grpc::internal::RpcMethod::SERVER_STREAMING,
+      new ::grpc::internal::ServerStreamingHandler< Workflow::Service, ::SmartPeakServer::InquireLogs, ::SmartPeakServer::LogStream>(
+          [](Workflow::Service* service,
+             ::grpc::ServerContext* ctx,
+             const ::SmartPeakServer::InquireLogs* req,
+             ::grpc::ServerWriter<::SmartPeakServer::LogStream>* writer) {
+               return service->getLogStream(ctx, req, writer);
+             }, this)));
 }
 
 Workflow::Service::~Service() {
@@ -78,6 +106,13 @@ Workflow::Service::~Service() {
   (void) context;
   (void) request;
   (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
+::grpc::Status Workflow::Service::getLogStream(::grpc::ServerContext* context, const ::SmartPeakServer::InquireLogs* request, ::grpc::ServerWriter< ::SmartPeakServer::LogStream>* writer) {
+  (void) context;
+  (void) request;
+  (void) writer;
   return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
 }
 

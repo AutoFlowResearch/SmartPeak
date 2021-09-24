@@ -30,6 +30,7 @@
 #include <google/protobuf/message.h>
 #include <google/protobuf/repeated_field.h>  // IWYU pragma: export
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
+#include <google/protobuf/generated_enum_reflection.h>
 #include <google/protobuf/unknown_field_set.h>
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
@@ -46,7 +47,7 @@ struct TableStruct_workflow_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::AuxiliaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[2]
+  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[4]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::FieldMetadata field_metadata[];
   static const ::PROTOBUF_NAMESPACE_ID::internal::SerializationTable serialization_table[];
@@ -55,6 +56,12 @@ struct TableStruct_workflow_2eproto {
 extern const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_workflow_2eproto;
 ::PROTOBUF_NAMESPACE_ID::Metadata descriptor_table_workflow_2eproto_metadata_getter(int index);
 namespace SmartPeakServer {
+class InquireLogs;
+struct InquireLogsDefaultTypeInternal;
+extern InquireLogsDefaultTypeInternal _InquireLogs_default_instance_;
+class LogStream;
+struct LogStreamDefaultTypeInternal;
+extern LogStreamDefaultTypeInternal _LogStream_default_instance_;
 class WorkflowParameters;
 struct WorkflowParametersDefaultTypeInternal;
 extern WorkflowParametersDefaultTypeInternal _WorkflowParameters_default_instance_;
@@ -63,11 +70,39 @@ struct WorkflowStatusDefaultTypeInternal;
 extern WorkflowStatusDefaultTypeInternal _WorkflowStatus_default_instance_;
 }  // namespace SmartPeakServer
 PROTOBUF_NAMESPACE_OPEN
+template<> ::SmartPeakServer::InquireLogs* Arena::CreateMaybeMessage<::SmartPeakServer::InquireLogs>(Arena*);
+template<> ::SmartPeakServer::LogStream* Arena::CreateMaybeMessage<::SmartPeakServer::LogStream>(Arena*);
 template<> ::SmartPeakServer::WorkflowParameters* Arena::CreateMaybeMessage<::SmartPeakServer::WorkflowParameters>(Arena*);
 template<> ::SmartPeakServer::WorkflowStatus* Arena::CreateMaybeMessage<::SmartPeakServer::WorkflowStatus>(Arena*);
 PROTOBUF_NAMESPACE_CLOSE
 namespace SmartPeakServer {
 
+enum WorkflowParameters_ExportReport : int {
+  WorkflowParameters_ExportReport_ALL = 0,
+  WorkflowParameters_ExportReport_FEATUREDB = 1,
+  WorkflowParameters_ExportReport_PIVOTTABLE = 2,
+  WorkflowParameters_ExportReport_WorkflowParameters_ExportReport_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::PROTOBUF_NAMESPACE_ID::int32>::min(),
+  WorkflowParameters_ExportReport_WorkflowParameters_ExportReport_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::PROTOBUF_NAMESPACE_ID::int32>::max()
+};
+bool WorkflowParameters_ExportReport_IsValid(int value);
+constexpr WorkflowParameters_ExportReport WorkflowParameters_ExportReport_ExportReport_MIN = WorkflowParameters_ExportReport_ALL;
+constexpr WorkflowParameters_ExportReport WorkflowParameters_ExportReport_ExportReport_MAX = WorkflowParameters_ExportReport_PIVOTTABLE;
+constexpr int WorkflowParameters_ExportReport_ExportReport_ARRAYSIZE = WorkflowParameters_ExportReport_ExportReport_MAX + 1;
+
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* WorkflowParameters_ExportReport_descriptor();
+template<typename T>
+inline const std::string& WorkflowParameters_ExportReport_Name(T enum_t_value) {
+  static_assert(::std::is_same<T, WorkflowParameters_ExportReport>::value ||
+    ::std::is_integral<T>::value,
+    "Incorrect type passed to function WorkflowParameters_ExportReport_Name.");
+  return ::PROTOBUF_NAMESPACE_ID::internal::NameOfEnum(
+    WorkflowParameters_ExportReport_descriptor(), enum_t_value);
+}
+inline bool WorkflowParameters_ExportReport_Parse(
+    ::PROTOBUF_NAMESPACE_ID::ConstStringParam name, WorkflowParameters_ExportReport* value) {
+  return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<WorkflowParameters_ExportReport>(
+    WorkflowParameters_ExportReport_descriptor(), name, value);
+}
 // ===================================================================
 
 class WorkflowParameters PROTOBUF_FINAL :
@@ -180,10 +215,46 @@ class WorkflowParameters PROTOBUF_FINAL :
 
   // nested types ----------------------------------------------------
 
+  typedef WorkflowParameters_ExportReport ExportReport;
+  static constexpr ExportReport ALL =
+    WorkflowParameters_ExportReport_ALL;
+  static constexpr ExportReport FEATUREDB =
+    WorkflowParameters_ExportReport_FEATUREDB;
+  static constexpr ExportReport PIVOTTABLE =
+    WorkflowParameters_ExportReport_PIVOTTABLE;
+  static inline bool ExportReport_IsValid(int value) {
+    return WorkflowParameters_ExportReport_IsValid(value);
+  }
+  static constexpr ExportReport ExportReport_MIN =
+    WorkflowParameters_ExportReport_ExportReport_MIN;
+  static constexpr ExportReport ExportReport_MAX =
+    WorkflowParameters_ExportReport_ExportReport_MAX;
+  static constexpr int ExportReport_ARRAYSIZE =
+    WorkflowParameters_ExportReport_ExportReport_ARRAYSIZE;
+  static inline const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor*
+  ExportReport_descriptor() {
+    return WorkflowParameters_ExportReport_descriptor();
+  }
+  template<typename T>
+  static inline const std::string& ExportReport_Name(T enum_t_value) {
+    static_assert(::std::is_same<T, ExportReport>::value ||
+      ::std::is_integral<T>::value,
+      "Incorrect type passed to function ExportReport_Name.");
+    return WorkflowParameters_ExportReport_Name(enum_t_value);
+  }
+  static inline bool ExportReport_Parse(::PROTOBUF_NAMESPACE_ID::ConstStringParam name,
+      ExportReport* value) {
+    return WorkflowParameters_ExportReport_Parse(name, value);
+  }
+
   // accessors -------------------------------------------------------
 
   enum : int {
     kSequenceFileFieldNumber = 1,
+    kReportMetadataFieldNumber = 3,
+    kReportSampleTypesFieldNumber = 4,
+    kIntegrityFieldNumber = 5,
+    kExportFieldNumber = 2,
   };
   // string sequence_file = 1;
   void clear_sequence_file();
@@ -201,6 +272,63 @@ class WorkflowParameters PROTOBUF_FINAL :
   std::string* _internal_mutable_sequence_file();
   public:
 
+  // string report_metadata = 3;
+  void clear_report_metadata();
+  const std::string& report_metadata() const;
+  void set_report_metadata(const std::string& value);
+  void set_report_metadata(std::string&& value);
+  void set_report_metadata(const char* value);
+  void set_report_metadata(const char* value, size_t size);
+  std::string* mutable_report_metadata();
+  std::string* release_report_metadata();
+  void set_allocated_report_metadata(std::string* report_metadata);
+  private:
+  const std::string& _internal_report_metadata() const;
+  void _internal_set_report_metadata(const std::string& value);
+  std::string* _internal_mutable_report_metadata();
+  public:
+
+  // string report_sample_types = 4;
+  void clear_report_sample_types();
+  const std::string& report_sample_types() const;
+  void set_report_sample_types(const std::string& value);
+  void set_report_sample_types(std::string&& value);
+  void set_report_sample_types(const char* value);
+  void set_report_sample_types(const char* value, size_t size);
+  std::string* mutable_report_sample_types();
+  std::string* release_report_sample_types();
+  void set_allocated_report_sample_types(std::string* report_sample_types);
+  private:
+  const std::string& _internal_report_sample_types() const;
+  void _internal_set_report_sample_types(const std::string& value);
+  std::string* _internal_mutable_report_sample_types();
+  public:
+
+  // string integrity = 5;
+  void clear_integrity();
+  const std::string& integrity() const;
+  void set_integrity(const std::string& value);
+  void set_integrity(std::string&& value);
+  void set_integrity(const char* value);
+  void set_integrity(const char* value, size_t size);
+  std::string* mutable_integrity();
+  std::string* release_integrity();
+  void set_allocated_integrity(std::string* integrity);
+  private:
+  const std::string& _internal_integrity() const;
+  void _internal_set_integrity(const std::string& value);
+  std::string* _internal_mutable_integrity();
+  public:
+
+  // .SmartPeakServer.WorkflowParameters.ExportReport export = 2;
+  void clear_export_();
+  ::SmartPeakServer::WorkflowParameters_ExportReport export_() const;
+  void set_export_(::SmartPeakServer::WorkflowParameters_ExportReport value);
+  private:
+  ::SmartPeakServer::WorkflowParameters_ExportReport _internal_export_() const;
+  void _internal_set_export_(::SmartPeakServer::WorkflowParameters_ExportReport value);
+  public:
+
   // @@protoc_insertion_point(class_scope:SmartPeakServer.WorkflowParameters)
  private:
   class _Internal;
@@ -209,6 +337,10 @@ class WorkflowParameters PROTOBUF_FINAL :
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr sequence_file_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr report_metadata_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr report_sample_types_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr integrity_;
+  int export__;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_workflow_2eproto;
 };
@@ -403,6 +535,287 @@ class WorkflowStatus PROTOBUF_FINAL :
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_workflow_2eproto;
 };
+// -------------------------------------------------------------------
+
+class InquireLogs PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:SmartPeakServer.InquireLogs) */ {
+ public:
+  inline InquireLogs() : InquireLogs(nullptr) {}
+  virtual ~InquireLogs();
+  explicit constexpr InquireLogs(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  InquireLogs(const InquireLogs& from);
+  InquireLogs(InquireLogs&& from) noexcept
+    : InquireLogs() {
+    *this = ::std::move(from);
+  }
+
+  inline InquireLogs& operator=(const InquireLogs& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline InquireLogs& operator=(InquireLogs&& from) noexcept {
+    if (GetArena() == from.GetArena()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
+  static const InquireLogs& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const InquireLogs* internal_default_instance() {
+    return reinterpret_cast<const InquireLogs*>(
+               &_InquireLogs_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    2;
+
+  friend void swap(InquireLogs& a, InquireLogs& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(InquireLogs* other) {
+    if (other == this) return;
+    if (GetArena() == other->GetArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(InquireLogs* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline InquireLogs* New() const final {
+    return CreateMaybeMessage<InquireLogs>(nullptr);
+  }
+
+  InquireLogs* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<InquireLogs>(arena);
+  }
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void CopyFrom(const InquireLogs& from);
+  void MergeFrom(const InquireLogs& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  inline void SharedCtor();
+  inline void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(InquireLogs* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "SmartPeakServer.InquireLogs";
+  }
+  protected:
+  explicit InquireLogs(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    return ::descriptor_table_workflow_2eproto_metadata_getter(kIndexInFileMessages);
+  }
+
+  public:
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kNrLinesFieldNumber = 1,
+  };
+  // int32 nr_lines = 1;
+  void clear_nr_lines();
+  ::PROTOBUF_NAMESPACE_ID::int32 nr_lines() const;
+  void set_nr_lines(::PROTOBUF_NAMESPACE_ID::int32 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_nr_lines() const;
+  void _internal_set_nr_lines(::PROTOBUF_NAMESPACE_ID::int32 value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:SmartPeakServer.InquireLogs)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::int32 nr_lines_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_workflow_2eproto;
+};
+// -------------------------------------------------------------------
+
+class LogStream PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:SmartPeakServer.LogStream) */ {
+ public:
+  inline LogStream() : LogStream(nullptr) {}
+  virtual ~LogStream();
+  explicit constexpr LogStream(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  LogStream(const LogStream& from);
+  LogStream(LogStream&& from) noexcept
+    : LogStream() {
+    *this = ::std::move(from);
+  }
+
+  inline LogStream& operator=(const LogStream& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline LogStream& operator=(LogStream&& from) noexcept {
+    if (GetArena() == from.GetArena()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
+  static const LogStream& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const LogStream* internal_default_instance() {
+    return reinterpret_cast<const LogStream*>(
+               &_LogStream_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    3;
+
+  friend void swap(LogStream& a, LogStream& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(LogStream* other) {
+    if (other == this) return;
+    if (GetArena() == other->GetArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(LogStream* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline LogStream* New() const final {
+    return CreateMaybeMessage<LogStream>(nullptr);
+  }
+
+  LogStream* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<LogStream>(arena);
+  }
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void CopyFrom(const LogStream& from);
+  void MergeFrom(const LogStream& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  inline void SharedCtor();
+  inline void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(LogStream* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "SmartPeakServer.LogStream";
+  }
+  protected:
+  explicit LogStream(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    return ::descriptor_table_workflow_2eproto_metadata_getter(kIndexInFileMessages);
+  }
+
+  public:
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kLogLineFieldNumber = 1,
+  };
+  // string log_line = 1;
+  void clear_log_line();
+  const std::string& log_line() const;
+  void set_log_line(const std::string& value);
+  void set_log_line(std::string&& value);
+  void set_log_line(const char* value);
+  void set_log_line(const char* value, size_t size);
+  std::string* mutable_log_line();
+  std::string* release_log_line();
+  void set_allocated_log_line(std::string* log_line);
+  private:
+  const std::string& _internal_log_line() const;
+  void _internal_set_log_line(const std::string& value);
+  std::string* _internal_mutable_log_line();
+  public:
+
+  // @@protoc_insertion_point(class_scope:SmartPeakServer.LogStream)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr log_line_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_workflow_2eproto;
+};
 // ===================================================================
 
 
@@ -473,6 +886,209 @@ inline void WorkflowParameters::set_allocated_sequence_file(std::string* sequenc
   sequence_file_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), sequence_file,
       GetArena());
   // @@protoc_insertion_point(field_set_allocated:SmartPeakServer.WorkflowParameters.sequence_file)
+}
+
+// .SmartPeakServer.WorkflowParameters.ExportReport export = 2;
+inline void WorkflowParameters::clear_export_() {
+  export__ = 0;
+}
+inline ::SmartPeakServer::WorkflowParameters_ExportReport WorkflowParameters::_internal_export_() const {
+  return static_cast< ::SmartPeakServer::WorkflowParameters_ExportReport >(export__);
+}
+inline ::SmartPeakServer::WorkflowParameters_ExportReport WorkflowParameters::export_() const {
+  // @@protoc_insertion_point(field_get:SmartPeakServer.WorkflowParameters.export)
+  return _internal_export_();
+}
+inline void WorkflowParameters::_internal_set_export_(::SmartPeakServer::WorkflowParameters_ExportReport value) {
+  
+  export__ = value;
+}
+inline void WorkflowParameters::set_export_(::SmartPeakServer::WorkflowParameters_ExportReport value) {
+  _internal_set_export_(value);
+  // @@protoc_insertion_point(field_set:SmartPeakServer.WorkflowParameters.export)
+}
+
+// string report_metadata = 3;
+inline void WorkflowParameters::clear_report_metadata() {
+  report_metadata_.ClearToEmpty();
+}
+inline const std::string& WorkflowParameters::report_metadata() const {
+  // @@protoc_insertion_point(field_get:SmartPeakServer.WorkflowParameters.report_metadata)
+  return _internal_report_metadata();
+}
+inline void WorkflowParameters::set_report_metadata(const std::string& value) {
+  _internal_set_report_metadata(value);
+  // @@protoc_insertion_point(field_set:SmartPeakServer.WorkflowParameters.report_metadata)
+}
+inline std::string* WorkflowParameters::mutable_report_metadata() {
+  // @@protoc_insertion_point(field_mutable:SmartPeakServer.WorkflowParameters.report_metadata)
+  return _internal_mutable_report_metadata();
+}
+inline const std::string& WorkflowParameters::_internal_report_metadata() const {
+  return report_metadata_.Get();
+}
+inline void WorkflowParameters::_internal_set_report_metadata(const std::string& value) {
+  
+  report_metadata_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArena());
+}
+inline void WorkflowParameters::set_report_metadata(std::string&& value) {
+  
+  report_metadata_.Set(
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, ::std::move(value), GetArena());
+  // @@protoc_insertion_point(field_set_rvalue:SmartPeakServer.WorkflowParameters.report_metadata)
+}
+inline void WorkflowParameters::set_report_metadata(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  report_metadata_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, ::std::string(value), GetArena());
+  // @@protoc_insertion_point(field_set_char:SmartPeakServer.WorkflowParameters.report_metadata)
+}
+inline void WorkflowParameters::set_report_metadata(const char* value,
+    size_t size) {
+  
+  report_metadata_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, ::std::string(
+      reinterpret_cast<const char*>(value), size), GetArena());
+  // @@protoc_insertion_point(field_set_pointer:SmartPeakServer.WorkflowParameters.report_metadata)
+}
+inline std::string* WorkflowParameters::_internal_mutable_report_metadata() {
+  
+  return report_metadata_.Mutable(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArena());
+}
+inline std::string* WorkflowParameters::release_report_metadata() {
+  // @@protoc_insertion_point(field_release:SmartPeakServer.WorkflowParameters.report_metadata)
+  return report_metadata_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline void WorkflowParameters::set_allocated_report_metadata(std::string* report_metadata) {
+  if (report_metadata != nullptr) {
+    
+  } else {
+    
+  }
+  report_metadata_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), report_metadata,
+      GetArena());
+  // @@protoc_insertion_point(field_set_allocated:SmartPeakServer.WorkflowParameters.report_metadata)
+}
+
+// string report_sample_types = 4;
+inline void WorkflowParameters::clear_report_sample_types() {
+  report_sample_types_.ClearToEmpty();
+}
+inline const std::string& WorkflowParameters::report_sample_types() const {
+  // @@protoc_insertion_point(field_get:SmartPeakServer.WorkflowParameters.report_sample_types)
+  return _internal_report_sample_types();
+}
+inline void WorkflowParameters::set_report_sample_types(const std::string& value) {
+  _internal_set_report_sample_types(value);
+  // @@protoc_insertion_point(field_set:SmartPeakServer.WorkflowParameters.report_sample_types)
+}
+inline std::string* WorkflowParameters::mutable_report_sample_types() {
+  // @@protoc_insertion_point(field_mutable:SmartPeakServer.WorkflowParameters.report_sample_types)
+  return _internal_mutable_report_sample_types();
+}
+inline const std::string& WorkflowParameters::_internal_report_sample_types() const {
+  return report_sample_types_.Get();
+}
+inline void WorkflowParameters::_internal_set_report_sample_types(const std::string& value) {
+  
+  report_sample_types_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArena());
+}
+inline void WorkflowParameters::set_report_sample_types(std::string&& value) {
+  
+  report_sample_types_.Set(
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, ::std::move(value), GetArena());
+  // @@protoc_insertion_point(field_set_rvalue:SmartPeakServer.WorkflowParameters.report_sample_types)
+}
+inline void WorkflowParameters::set_report_sample_types(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  report_sample_types_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, ::std::string(value), GetArena());
+  // @@protoc_insertion_point(field_set_char:SmartPeakServer.WorkflowParameters.report_sample_types)
+}
+inline void WorkflowParameters::set_report_sample_types(const char* value,
+    size_t size) {
+  
+  report_sample_types_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, ::std::string(
+      reinterpret_cast<const char*>(value), size), GetArena());
+  // @@protoc_insertion_point(field_set_pointer:SmartPeakServer.WorkflowParameters.report_sample_types)
+}
+inline std::string* WorkflowParameters::_internal_mutable_report_sample_types() {
+  
+  return report_sample_types_.Mutable(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArena());
+}
+inline std::string* WorkflowParameters::release_report_sample_types() {
+  // @@protoc_insertion_point(field_release:SmartPeakServer.WorkflowParameters.report_sample_types)
+  return report_sample_types_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline void WorkflowParameters::set_allocated_report_sample_types(std::string* report_sample_types) {
+  if (report_sample_types != nullptr) {
+    
+  } else {
+    
+  }
+  report_sample_types_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), report_sample_types,
+      GetArena());
+  // @@protoc_insertion_point(field_set_allocated:SmartPeakServer.WorkflowParameters.report_sample_types)
+}
+
+// string integrity = 5;
+inline void WorkflowParameters::clear_integrity() {
+  integrity_.ClearToEmpty();
+}
+inline const std::string& WorkflowParameters::integrity() const {
+  // @@protoc_insertion_point(field_get:SmartPeakServer.WorkflowParameters.integrity)
+  return _internal_integrity();
+}
+inline void WorkflowParameters::set_integrity(const std::string& value) {
+  _internal_set_integrity(value);
+  // @@protoc_insertion_point(field_set:SmartPeakServer.WorkflowParameters.integrity)
+}
+inline std::string* WorkflowParameters::mutable_integrity() {
+  // @@protoc_insertion_point(field_mutable:SmartPeakServer.WorkflowParameters.integrity)
+  return _internal_mutable_integrity();
+}
+inline const std::string& WorkflowParameters::_internal_integrity() const {
+  return integrity_.Get();
+}
+inline void WorkflowParameters::_internal_set_integrity(const std::string& value) {
+  
+  integrity_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArena());
+}
+inline void WorkflowParameters::set_integrity(std::string&& value) {
+  
+  integrity_.Set(
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, ::std::move(value), GetArena());
+  // @@protoc_insertion_point(field_set_rvalue:SmartPeakServer.WorkflowParameters.integrity)
+}
+inline void WorkflowParameters::set_integrity(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  integrity_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, ::std::string(value), GetArena());
+  // @@protoc_insertion_point(field_set_char:SmartPeakServer.WorkflowParameters.integrity)
+}
+inline void WorkflowParameters::set_integrity(const char* value,
+    size_t size) {
+  
+  integrity_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, ::std::string(
+      reinterpret_cast<const char*>(value), size), GetArena());
+  // @@protoc_insertion_point(field_set_pointer:SmartPeakServer.WorkflowParameters.integrity)
+}
+inline std::string* WorkflowParameters::_internal_mutable_integrity() {
+  
+  return integrity_.Mutable(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArena());
+}
+inline std::string* WorkflowParameters::release_integrity() {
+  // @@protoc_insertion_point(field_release:SmartPeakServer.WorkflowParameters.integrity)
+  return integrity_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline void WorkflowParameters::set_allocated_integrity(std::string* integrity) {
+  if (integrity != nullptr) {
+    
+  } else {
+    
+  }
+  integrity_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), integrity,
+      GetArena());
+  // @@protoc_insertion_point(field_set_allocated:SmartPeakServer.WorkflowParameters.integrity)
 }
 
 // -------------------------------------------------------------------
@@ -682,15 +1298,118 @@ inline void WorkflowStatus::set_allocated_path_to_results(std::string* path_to_r
   // @@protoc_insertion_point(field_set_allocated:SmartPeakServer.WorkflowStatus.path_to_results)
 }
 
+// -------------------------------------------------------------------
+
+// InquireLogs
+
+// int32 nr_lines = 1;
+inline void InquireLogs::clear_nr_lines() {
+  nr_lines_ = 0;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 InquireLogs::_internal_nr_lines() const {
+  return nr_lines_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 InquireLogs::nr_lines() const {
+  // @@protoc_insertion_point(field_get:SmartPeakServer.InquireLogs.nr_lines)
+  return _internal_nr_lines();
+}
+inline void InquireLogs::_internal_set_nr_lines(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  
+  nr_lines_ = value;
+}
+inline void InquireLogs::set_nr_lines(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_set_nr_lines(value);
+  // @@protoc_insertion_point(field_set:SmartPeakServer.InquireLogs.nr_lines)
+}
+
+// -------------------------------------------------------------------
+
+// LogStream
+
+// string log_line = 1;
+inline void LogStream::clear_log_line() {
+  log_line_.ClearToEmpty();
+}
+inline const std::string& LogStream::log_line() const {
+  // @@protoc_insertion_point(field_get:SmartPeakServer.LogStream.log_line)
+  return _internal_log_line();
+}
+inline void LogStream::set_log_line(const std::string& value) {
+  _internal_set_log_line(value);
+  // @@protoc_insertion_point(field_set:SmartPeakServer.LogStream.log_line)
+}
+inline std::string* LogStream::mutable_log_line() {
+  // @@protoc_insertion_point(field_mutable:SmartPeakServer.LogStream.log_line)
+  return _internal_mutable_log_line();
+}
+inline const std::string& LogStream::_internal_log_line() const {
+  return log_line_.Get();
+}
+inline void LogStream::_internal_set_log_line(const std::string& value) {
+  
+  log_line_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArena());
+}
+inline void LogStream::set_log_line(std::string&& value) {
+  
+  log_line_.Set(
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, ::std::move(value), GetArena());
+  // @@protoc_insertion_point(field_set_rvalue:SmartPeakServer.LogStream.log_line)
+}
+inline void LogStream::set_log_line(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  log_line_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, ::std::string(value), GetArena());
+  // @@protoc_insertion_point(field_set_char:SmartPeakServer.LogStream.log_line)
+}
+inline void LogStream::set_log_line(const char* value,
+    size_t size) {
+  
+  log_line_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, ::std::string(
+      reinterpret_cast<const char*>(value), size), GetArena());
+  // @@protoc_insertion_point(field_set_pointer:SmartPeakServer.LogStream.log_line)
+}
+inline std::string* LogStream::_internal_mutable_log_line() {
+  
+  return log_line_.Mutable(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArena());
+}
+inline std::string* LogStream::release_log_line() {
+  // @@protoc_insertion_point(field_release:SmartPeakServer.LogStream.log_line)
+  return log_line_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline void LogStream::set_allocated_log_line(std::string* log_line) {
+  if (log_line != nullptr) {
+    
+  } else {
+    
+  }
+  log_line_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), log_line,
+      GetArena());
+  // @@protoc_insertion_point(field_set_allocated:SmartPeakServer.LogStream.log_line)
+}
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 
 // @@protoc_insertion_point(namespace_scope)
 
 }  // namespace SmartPeakServer
+
+PROTOBUF_NAMESPACE_OPEN
+
+template <> struct is_proto_enum< ::SmartPeakServer::WorkflowParameters_ExportReport> : ::std::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::SmartPeakServer::WorkflowParameters_ExportReport>() {
+  return ::SmartPeakServer::WorkflowParameters_ExportReport_descriptor();
+}
+
+PROTOBUF_NAMESPACE_CLOSE
 
 // @@protoc_insertion_point(global_scope)
 

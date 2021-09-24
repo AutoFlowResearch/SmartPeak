@@ -4,13 +4,22 @@ package SmartPeakServer;
 
 service Workflow {
   rpc runWorkflow (WorkflowParameters) returns (WorkflowStatus) {}
+  rpc getLogStream (InquireLogs) returns (stream LogStream) {}
 }
 
 message WorkflowParameters {
+  enum ExportReport {
+    ALL = 0;
+    FEATUREDB = 1;
+    PIVOTTABLE = 2;
+  }
   string sequence_file = 1;
+  ExportReport export = 2;
+  string report_metadata = 3;
+  string report_sample_types = 4;
+  string integrity = 5; 
 }
 
-// workflow progression status
 message WorkflowStatus {
   int32 progress_in_percent = 1;
   string status_code = 2;
@@ -18,4 +27,10 @@ message WorkflowStatus {
   string path_to_results = 4;
 }
 
-// log streaming
+message InquireLogs {
+  int32 nr_lines = 1;
+}
+
+message LogStream {
+  string log_line = 1;
+}
