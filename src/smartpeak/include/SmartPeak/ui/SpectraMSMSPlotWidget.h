@@ -42,13 +42,13 @@ namespace SmartPeak
   {
   public:
     SpectraMSMSPlotWidget(SessionHandler& session_handler,
-      SequenceHandler& sequence_handler,
+      ApplicationHandler& application_handler,
       const std::string& id,
       const std::string& title,
       std::shared_ptr<ChromatogramXICPlotWidget> chromatogram_xic_widget,
       const int ms_level,
       SequenceObservable& sequence_observable) :
-      GraphicDataVizWidget(session_handler, sequence_handler, id, title),
+      GraphicDataVizWidget(session_handler, application_handler, id, title),
       chromatogram_xic_widget_(chromatogram_xic_widget),
       ms_level_(ms_level)
     {

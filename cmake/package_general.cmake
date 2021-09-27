@@ -40,8 +40,8 @@ if (APPLE)
   set(BUNDLE_OUTPUT_PATH                "${CMAKE_BINARY_DIR}/bin/SmartPeakGUI.app")
   set(CPACK_MONOLITHIC_INSTALL          ON)
   set(CPACK_BUNDLE_NAME                 "SmartPeak")
-  set(CPACK_BUNDLE_PLIST                ${PROJECT_SOURCE_DIR}/cmake/MacOSX/Info.plist)
-  set(CPACK_BUNDLE_ICON                 ${PROJECT_SOURCE_DIR}/cmake/MacOSX/sp.icns)
+  set(CPACK_BUNDLE_PLIST                ${SMARTPEAK_HOST_DIRECTORY}/cmake/MacOSX/Info.plist)
+  set(CPACK_BUNDLE_ICON                 ${SMARTPEAK_HOST_DIRECTORY}/cmake/MacOSX/sp.icns)
 
 elseif(UNIX AND CMAKE_SYSTEM_NAME MATCHES Linux)
 

@@ -1,6 +1,20 @@
 SmartPeak Changelog
 ===================
 
+v1.13.0 (2020-09-13)
+--------------------
+
+Features
+~~~~~~~~
+- SmartPeak support for exporting workflow results as plots `(#412) <https://github.com/AutoFlowResearch/SmartPeak/pull/412>`_
+- Improving Feature Table `(#385) <https://github.com/AutoFlowResearch/SmartPeak/pull/385>`_
+- Multithreading options for SequenceProcessor methods `(#401) <https://github.com/AutoFlowResearch/SmartPeak/pull/401>`_
+ 
+Fix
+~~~
+- Fixed sorted data for Calibrator plot. `(#413) <https://github.com/AutoFlowResearch/SmartPeak/pull/413>`_
+- Fixed Pivot table header with component name and groups `(#410) <https://github.com/AutoFlowResearch/SmartPeak/pull/410>`_
+
 v1.12.0 (2020-08-13)
 --------------------
 

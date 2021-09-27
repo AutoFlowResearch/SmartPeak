@@ -48,6 +48,7 @@ namespace SmartPeak
     bool loading_is_done_ = true;
     bool file_was_loaded_ = true;
     bool error_loading_file_ = false;
+    bool set_button_to_save_ = false;
     std::atomic_bool files_scanned_ {false};
     const ImGuiTableSortSpecs* s_current_sort_specs = NULL;
 
@@ -72,5 +73,6 @@ namespace SmartPeak
     bool fileLoadingIsDone() { return loading_is_done_; };
     bool fileWasLoaded() { return file_was_loaded_; };
     bool errorLoadingFile() { return error_loading_file_; };
+    void setButtonToSave() { set_button_to_save_ = true; }
   };
 }

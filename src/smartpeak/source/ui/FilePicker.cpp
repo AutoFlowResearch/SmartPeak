@@ -219,7 +219,7 @@ namespace SmartPeak
 
     ImGui::SameLine();
     ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.5f);
-    if (ImGui::Button("Open"))
+    if (ImGui::Button( set_button_to_save_ ? "Save" : "Open"))
     {
       picked_pathname_ = current_pathname_.string();
       if (picked_pathname_.back() != '/')

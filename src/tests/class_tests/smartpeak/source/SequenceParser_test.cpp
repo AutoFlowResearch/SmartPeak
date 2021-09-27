@@ -333,10 +333,10 @@ TEST_F(SequenceParserFixture, makeDataMatrixFromMetaValue)
 
   EXPECT_EQ(columns_out.size(), 6);
   EXPECT_STREQ(columns_out(0).c_str(), "170808_Jonathan_yeast_Sacc1_1x");
-  EXPECT_EQ(rows_out.dimension(0), 636);
+  EXPECT_EQ(rows_out.dimension(0), 912);
   EXPECT_EQ(rows_out.dimension(1), 3);
   EXPECT_STREQ(rows_out(0,1).c_str(), "23dpg");
-  EXPECT_NEAR(data_out(0,0), 15.6053667, 1e-3);
+  EXPECT_NEAR(data_out(1,0), 15.6053667, 1e-3);
   EXPECT_NEAR(data_out(rows_out.dimension(0)-1,columns_out.size()-1), 1.66744995, 1e-3);
 
   SequenceParser::makeDataMatrixFromMetaValue(sequence_handler_,
@@ -407,17 +407,20 @@ TEST_F(SequenceParserFixture, writeDataMatrixFromMetaValue)
   std::string injection_4;
   std::string injection_5;
   std::string injection_6;
-  in.read_row(
-    component_name,
-    component_group_name,
-    meta_value,
-    injection_1,
-    injection_2,
-    injection_3,
-    injection_4,
-    injection_5,
-    injection_6
-  );
+  for (int i = 0; i < 27; ++i)  // we will check row 27 (previous are 0-values)
+  {
+    in.read_row(
+      component_name,
+      component_group_name,
+      meta_value,
+      injection_1,
+      injection_2,
+      injection_3,
+      injection_4,
+      injection_5,
+      injection_6
+    );
+  }
 
   EXPECT_STREQ(component_name.c_str(), "accoa.accoa_1.Light");
   EXPECT_STREQ(component_group_name.c_str(), "accoa");

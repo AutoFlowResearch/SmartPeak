@@ -179,14 +179,18 @@ class GraphicDataVizWidget_Test : public SmartPeak::GraphicDataVizWidget
 {
 public:
   GraphicDataVizWidget_Test(SmartPeak::SessionHandler& session_handler,
-    SmartPeak::SequenceHandler& sequence_handler,
+                            SmartPeak::ApplicationHandler& application_handler,
     const std::string& id,
     const std::string& title) :
-    GraphicDataVizWidget(session_handler, sequence_handler, id, title)
+    GraphicDataVizWidget(session_handler, application_handler, id, title)
   {};
 
   virtual void updateData() override
   {
+//    GraphicDataVizWidget(SessionHandler& session_handler,
+//      ApplicationHandler& application_handler,
+//      const std::string& id,
+//      const std::string& title) :
   };
 
 public:
@@ -218,10 +222,10 @@ public:
 TEST(GraphicDataVizWidget, markerPosition)
 {
   SmartPeak::SessionHandler session_handler;
-  SmartPeak::SequenceHandler sequence_handler;
+  SmartPeak::ApplicationHandler application_handler;
   std::string id = "GraphicDataVizWidget";
   std::string title = "GraphicDataVizWidget";
-  GraphicDataVizWidget_Test test_graphic_data_viz(session_handler, sequence_handler, id, title);
+  GraphicDataVizWidget_Test test_graphic_data_viz(session_handler, application_handler, id, title);
   EXPECT_FALSE(test_graphic_data_viz.wrapper_getMarkerPosition());
   test_graphic_data_viz.wrapper_setMarkerPosition(42.0f);
   EXPECT_EQ(test_graphic_data_viz.wrapper_getMarkerPosition(), 42.0f);
@@ -230,10 +234,10 @@ TEST(GraphicDataVizWidget, markerPosition)
 TEST(GraphicDataVizWidget, plotLimits)
 {
   SmartPeak::SessionHandler session_handler;
-  SmartPeak::SequenceHandler sequence_handler;
+  SmartPeak::ApplicationHandler application_handler;
   std::string id = "GraphicDataVizWidget";
   std::string title = "GraphicDataVizWidget";
-  GraphicDataVizWidget_Test test_graphic_data_viz(session_handler, sequence_handler, id, title);
+  GraphicDataVizWidget_Test test_graphic_data_viz(session_handler, application_handler, id, title);
   
   std::vector<float> data_x_1 = { 1.0f, 10.0f, 5.0f };
   std::vector<float> data_y_1 = { 101.0f, 110.0f, 105.0f };
