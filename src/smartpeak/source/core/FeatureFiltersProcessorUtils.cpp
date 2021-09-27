@@ -22,6 +22,7 @@
 // --------------------------------------------------------------------------
 
 #include <SmartPeak/core/FeatureFiltersUtils.h>
+#include <SmartPeak/core/ApplicationHandler.h>
 #include <algorithm>
 #include <iostream>
 #include <numeric>
@@ -40,19 +41,19 @@ namespace SmartPeak
                                          Filenames& filenames,
                                          const std::string& file_id,
                                          const std::string& file_group_id,
-                                         bool is_component_group)
+                                         int feature_filter_mode)
   {
     if (application_handler->sequenceHandler_.getSequence().size() == 0)
     {
       LOGE << "File cannot be loaded without first loading the sequence.";
       return false;
     }
-    if (is_component_group)
+    if (feature_filter_mode & FeatureFiltersUtils::EHandleComponentsGroups)
     {
       filenames.setFullPath(file_id, "");
       filenames.setFullPath(file_group_id, filename);
     }
-    else
+    else if (feature_filter_mode & FeatureFiltersUtils::EHandleComponents)
     {
       filenames.setFullPath(file_id, filename);
       filenames.setFullPath(file_group_id, "");
@@ -106,7 +107,12 @@ namespace SmartPeak
             inserted_rows.push_back(filenames.getSessionDB().getLastInsertedRowId(*db_context));
           }
           filenames.getSessionDB().endWrite(*db_context);
-          storeMetadataInDB(filenames, file_id, inserted_rows, features_qc.component_qcs);
+          std::vector<const std::map<OpenMS::String, std::pair<double, double>>*> metadata_values;
+          for (auto& comp : features_qc.component_qcs)
+          {
+            metadata_values.push_back(&comp.meta_value_qc);
+          }
+          storeMetadataInDB(filenames, file_id, inserted_rows, metadata_values);
         }
         else
         {
@@ -179,7 +185,12 @@ namespace SmartPeak
             inserted_rows.push_back(filenames.getSessionDB().getLastInsertedRowId(*db_context));
           }
           filenames.getSessionDB().endWrite(*db_context);
-          storeMetadataInDB(filenames, file_id, inserted_rows, features_qc.component_group_qcs);
+          std::vector<const std::map<OpenMS::String, std::pair<double, double>>*> metadata_values;
+          for (auto& comp : features_qc.component_group_qcs)
+          {
+            metadata_values.push_back(&comp.meta_value_qc);
+          }
+          storeMetadataInDB(filenames, file_group_id, inserted_rows, metadata_values);
         }
         else
         {
@@ -246,7 +257,12 @@ namespace SmartPeak
             features_id.push_back(feature_id);
           }
           filenames.getSessionDB().endRead(*db_context);
-          loadMetadataFromDB(filenames, file_id, features_id, features_qc.component_qcs);
+          std::vector<std::map<OpenMS::String, std::pair<double, double>>*> metadata_values;
+          for (auto& comp : features_qc.component_qcs)
+          {
+            metadata_values.push_back(&comp.meta_value_qc);
+          }
+          loadMetadataFromDB(filenames, file_id, features_id, metadata_values);
         }
         else
         {
@@ -262,7 +278,7 @@ namespace SmartPeak
           std::vector<int> features_id;
           auto db_context = filenames.getSessionDB().beginRead(
             file_group_id,
-            "ID"
+            "ID",
             "component_group_name",
             "n_heavy_l ",
             "n_heavy_u",
@@ -325,7 +341,12 @@ namespace SmartPeak
             features_id.push_back(feature_id);
           }
           filenames.getSessionDB().endRead(*db_context);
-          loadMetadataFromDB(filenames, file_id, features_id, features_qc.component_group_qcs);
+          std::vector<std::map<OpenMS::String, std::pair<double, double>>*> metadata_values;
+          for (auto& comp : features_qc.component_group_qcs)
+          {
+            metadata_values.push_back(&comp.meta_value_qc);
+          }
+          loadMetadataFromDB(filenames, file_group_id, features_id, metadata_values);
         }
         else
         {
@@ -348,7 +369,7 @@ namespace SmartPeak
     Filenames& filenames,
     const std::string& file_id,
     const std::vector<int>& inserted_rows,
-    const std::vector<OpenMS::MRMFeatureQC::ComponentQCs>& component_qcs)
+    const std::vector<const std::map<OpenMS::String, std::pair<double, double>>*> metadata_values)
   {
     auto db_context = filenames.getSessionDB().beginWrite(
       "metadata_" + file_id,
@@ -362,10 +383,10 @@ namespace SmartPeak
       return;
     }
     int index = 0;
-    for (const auto& feature_filter : component_qcs)
+    for (const auto& feature_filter : metadata_values)
     {
       auto feature_filter_id = inserted_rows.at(index);
-      for (const auto metadata : feature_filter.meta_value_qc)
+      for (const auto metadata : *feature_filter)
       {
         const auto& metadata_name = metadata.first;
         const auto& metadata_value = metadata.second;
@@ -386,10 +407,10 @@ namespace SmartPeak
     Filenames& filenames,
     const std::string& file_id,
     const std::vector<int>& features_id,
-    std::vector<OpenMS::MRMFeatureQC::ComponentQCs>& component_qcs)
+    std::vector<std::map<OpenMS::String, std::pair<double, double>>*> metadata_values)
   {
     int index = 0;
-    for (auto& feature_filter : component_qcs)
+    for (auto& feature_filter : metadata_values)
     {
       auto feature_id = features_id[index];
       auto db_context = filenames.getSessionDB().beginReadWhere(
@@ -410,7 +431,7 @@ namespace SmartPeak
         metadata_value_u
       ))
       {
-        feature_filter.meta_value_qc.emplace(metadata_name, std::make_pair(metadata_value_l, metadata_value_u));
+        feature_filter->emplace(metadata_name, std::make_pair(metadata_value_l, metadata_value_u));
       }
       filenames.getSessionDB().endRead(*db_context);
       ++index;

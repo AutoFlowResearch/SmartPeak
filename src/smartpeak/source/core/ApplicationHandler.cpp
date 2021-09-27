@@ -41,22 +41,22 @@ namespace SmartPeak
         std::make_shared<LoadValidationData>(),
         std::make_shared<LoadQuantitationMethods>(true),
         std::make_shared<LoadStandardsConcentrations>(true),
-        std::make_shared<LoadFeatureFilters>(false, true),
-        std::make_shared<LoadFeatureFilters>(true, true),
-        std::make_shared<LoadFeatureQCs>(false, true),
-        std::make_shared<LoadFeatureQCs>(true, true),
-        std::make_shared<LoadFeatureRSDFilters>(false, true),
-        std::make_shared<LoadFeatureRSDFilters>(true, true),
-        std::make_shared<LoadFeatureRSDQCs>(false, true),
-        std::make_shared<LoadFeatureRSDQCs>(true, true),
-        std::make_shared<LoadFeatureBackgroundFilters>(false, true),
-        std::make_shared<LoadFeatureBackgroundFilters>(true, true),
-        std::make_shared<LoadFeatureBackgroundQCs>(false, true),
-        std::make_shared<LoadFeatureBackgroundQCs>(true, true),
-        std::make_shared<LoadFeatureRSDEstimations>(false, true),
-        std::make_shared<LoadFeatureRSDEstimations>(true, true),
-        std::make_shared<LoadFeatureBackgroundEstimations>(false, true),
-        std::make_shared<LoadFeatureBackgroundEstimations>(true, true)
+        std::make_shared<LoadFeatureFilters>(FeatureFiltersUtils::EHandleComponents, true),
+        std::make_shared<LoadFeatureFilters>(FeatureFiltersUtils::EHandleComponentsGroups, true),
+        std::make_shared<LoadFeatureQCs>(FeatureFiltersUtils::EHandleComponents, true),
+        std::make_shared<LoadFeatureQCs>(FeatureFiltersUtils::EHandleComponentsGroups, true),
+        std::make_shared<LoadFeatureRSDFilters>(FeatureFiltersUtils::EHandleComponents, true),
+        std::make_shared<LoadFeatureRSDFilters>(FeatureFiltersUtils::EHandleComponentsGroups, true),
+        std::make_shared<LoadFeatureRSDQCs>(FeatureFiltersUtils::EHandleComponents, true),
+        std::make_shared<LoadFeatureRSDQCs>(FeatureFiltersUtils::EHandleComponentsGroups, true),
+        std::make_shared<LoadFeatureBackgroundFilters>(FeatureFiltersUtils::EHandleComponents, true),
+        std::make_shared<LoadFeatureBackgroundFilters>(FeatureFiltersUtils::EHandleComponentsGroups, true),
+        std::make_shared<LoadFeatureBackgroundQCs>(FeatureFiltersUtils::EHandleComponents, true),
+        std::make_shared<LoadFeatureBackgroundQCs>(FeatureFiltersUtils::EHandleComponentsGroups, true),
+        std::make_shared<LoadFeatureRSDEstimations>(FeatureFiltersUtils::EHandleComponents, true),
+        std::make_shared<LoadFeatureRSDEstimations>(FeatureFiltersUtils::EHandleComponentsGroups, true),
+        std::make_shared<LoadFeatureBackgroundEstimations>(FeatureFiltersUtils::EHandleComponents, true),
+        std::make_shared<LoadFeatureBackgroundEstimations>(FeatureFiltersUtils::EHandleComponentsGroups, true)
     };
     storing_processors_ =
     {
@@ -67,22 +67,22 @@ namespace SmartPeak
         std::make_shared<StoreValidationData>(),
         std::make_shared<StoreQuantitationMethods>(true),
         std::make_shared<StoreStandardsConcentrations>(true),
-        std::make_shared<StoreFeatureFilters>(false, true),
-        std::make_shared<StoreFeatureFilters>(true, true),
-        std::make_shared<StoreFeatureQCs>(false, true),
-        std::make_shared<StoreFeatureQCs>(true, true),
-        std::make_shared<StoreFeatureRSDFilters>(false, true),
-        std::make_shared<StoreFeatureRSDFilters>(true, true),
-        std::make_shared<StoreFeatureRSDQCs>(false, true),
-        std::make_shared<StoreFeatureRSDQCs>(true, true),
-        std::make_shared<StoreFeatureBackgroundFilters>(false, true),
-        std::make_shared<StoreFeatureBackgroundFilters>(true, true),
-        std::make_shared<StoreFeatureBackgroundQCs>(false, true),
-        std::make_shared<StoreFeatureBackgroundQCs>(true, true),
-        std::make_shared<StoreFeatureRSDEstimations>(false, true),
-        std::make_shared<StoreFeatureRSDEstimations>(true, true),
-        std::make_shared<StoreFeatureBackgroundEstimations>(false, true),
-        std::make_shared<StoreFeatureBackgroundEstimations>(true, true)
+        std::make_shared<StoreFeatureFilters>(FeatureFiltersUtils::EHandleComponentsGroups, true),
+        std::make_shared<StoreFeatureFilters>(FeatureFiltersUtils::EHandleComponents, true),
+        std::make_shared<StoreFeatureQCs>(FeatureFiltersUtils::EHandleComponentsGroups, true),
+        std::make_shared<StoreFeatureQCs>(FeatureFiltersUtils::EHandleComponents, true),
+        std::make_shared<StoreFeatureRSDFilters>(FeatureFiltersUtils::EHandleComponentsGroups, true),
+        std::make_shared<StoreFeatureRSDFilters>(FeatureFiltersUtils::EHandleComponents, true),
+        std::make_shared<StoreFeatureRSDQCs>(FeatureFiltersUtils::EHandleComponentsGroups, true),
+        std::make_shared<StoreFeatureRSDQCs>(FeatureFiltersUtils::EHandleComponents, true),
+        std::make_shared<StoreFeatureBackgroundFilters>(FeatureFiltersUtils::EHandleComponentsGroups, true),
+        std::make_shared<StoreFeatureBackgroundFilters>(FeatureFiltersUtils::EHandleComponents, true),
+        std::make_shared<StoreFeatureBackgroundQCs>(FeatureFiltersUtils::EHandleComponentsGroups, true),
+        std::make_shared<StoreFeatureBackgroundQCs>(FeatureFiltersUtils::EHandleComponents, true),
+        std::make_shared<StoreFeatureRSDEstimations>(FeatureFiltersUtils::EHandleComponentsGroups, true),
+        std::make_shared<StoreFeatureRSDEstimations>(FeatureFiltersUtils::EHandleComponents, true),
+        std::make_shared<StoreFeatureBackgroundEstimations>(FeatureFiltersUtils::EHandleComponentsGroups, true),
+        std::make_shared<StoreFeatureBackgroundEstimations>(FeatureFiltersUtils::EHandleComponents, true)
     };
   }
 
@@ -181,7 +181,7 @@ namespace SmartPeak
 
   void ApplicationHandler::setFileSavedState(const std::string& file_id, bool saved_state)
   {
-    saved_files_.emplace(file_id, saved_state);
+    saved_files_.insert_or_assign(file_id, saved_state);
   }
 
   bool ApplicationHandler::isFileSaved(const std::string& file_id) const

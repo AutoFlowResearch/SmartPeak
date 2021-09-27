@@ -974,11 +974,11 @@ namespace SmartPeak
     }
     RawDataHandler& rawDataHandler = application_handler->sequenceHandler_.getSequence().at(0).getRawData();
     Filenames filenames;
-    if (component_group_)
+    if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponentsGroups)
     {
       filenames.setFullPath("featureFilterComponentGroups", filename);
     }
-    else
+    else if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponents)
     {
       filenames.setFullPath("featureFilterComponents", filename);
     }
@@ -988,11 +988,11 @@ namespace SmartPeak
 
   void StoreFeatureFiltersRDP::getFilenames(Filenames& filenames) const
   {
-    if (component_group_)
+    if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponentsGroups)
     {
       filenames.addFileName("featureFilterComponentGroups", "${MAIN_DIR}/featureFilterComponentGroups.csv", "Components Group Filters", true, true);
     }
-    else
+    else if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponents)
     {
       filenames.addFileName("featureFilterComponents", "${MAIN_DIR}/featureFilterComponents.csv", "Components Filters", true, true);
     }
@@ -1025,11 +1025,11 @@ namespace SmartPeak
     }
     RawDataHandler& rawDataHandler = application_handler->sequenceHandler_.getSequence().at(0).getRawData();
     Filenames filenames;
-    if (component_group_)
+    if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponentsGroups)
     {
       filenames.setFullPath("featureQCComponentGroups", filename);
     }
-    else
+    else if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponents)
     {
       filenames.setFullPath("featureQCComponents", filename);
     }

@@ -615,3 +615,51 @@ TEST(SessionFilesWidget, LoadSessionWizard_PopupError)
     EXPECT_EQ(session_widget_test_modify->isToBeSaved(fef.first), false);
   }
 }
+
+TEST(SessionFilesWidget, SessionFilesWidget_EmbedAllFiles)
+{
+  // More integration test like, 
+  // we just try to embed lot of file from different nature: parameters, feature filters files ...
+  // Note: we save in working directory as this implies differrent cases compared to other test case above.
+  ApplicationHandler application_handler;
+  Filenames filenames = Utilities::buildFilenamesFromDirectory(application_handler, SMARTPEAK_GET_TEST_DATA_PATH("workflow_csv_files"));
+  SessionFilesWidget_Test session_widget_test_create(application_handler, SessionFilesWidget::Mode::ECreation);
+  session_widget_test_create.open(filenames);
+  auto& file_editor_fields = session_widget_test_create.getEditorFileFields();
+  EXPECT_EQ(file_editor_fields.size(), 23);
+
+  // embed files
+  file_editor_fields.at("parameters").embedded_ = true;
+  file_editor_fields.at("featureBackgroundFilterComponentGroups").embedded_ = true;
+  file_editor_fields.at("featureBackgroundFilterComponents").embedded_ = true;
+  file_editor_fields.at("featureBackgroundQCComponentGroups").embedded_ = true;
+  file_editor_fields.at("featureBackgroundQCComponents").embedded_ = true;
+  file_editor_fields.at("featureFilterComponents").embedded_ = true;
+  file_editor_fields.at("featureFilterComponentGroups").embedded_ = true;
+  file_editor_fields.at("featureQCComponents").embedded_ = true;
+  file_editor_fields.at("featureQCComponentGroups").embedded_ = true;
+  file_editor_fields.at("featureRSDFilterComponentGroups").embedded_ = true;
+  file_editor_fields.at("featureRSDFilterComponents").embedded_ = true;
+  file_editor_fields.at("featureRSDQCComponentGroups").embedded_ = true;
+  file_editor_fields.at("featureRSDQCComponents").embedded_ = true;
+  file_editor_fields.at("sequence").embedded_ = true;
+  file_editor_fields.at("standardsConcentrations").embedded_ = true;
+  session_widget_test_create.doUpdateSession();
+
+  // Save (in working directory) and Reload, to check it's well embedded
+  auto tmp_dir_path = Utilities::createEmptyTempDirectory();
+  auto db_path = SMARTPEAK_GET_TEST_DATA_PATH("workflow_csv_files") + std::string("/session_test.db");
+  SaveSession save_session(application_handler);
+  save_session.onFilePicked(db_path, &application_handler);
+
+  auto session_widget_test_modify = std::make_shared<SessionFilesWidget_Test>(application_handler, SessionFilesWidget::Mode::EModification);
+  auto session_widget_modify = std::static_pointer_cast<SessionFilesWidget>(session_widget_test_modify);
+  auto load_session_wizard_ = std::make_shared<LoadSessionWizard>(session_widget_modify);
+  load_session_wizard_->onFilePicked(db_path, &application_handler);
+  session_widget_test_modify->doUpdateSession();
+
+  ParameterSet& parameter_set3 = application_handler.sequenceHandler_.getSequence().at(0).getRawData().getParameters();
+  auto parameter3 = parameter_set3.findParameter("MRMFeatureFinderScoring", "TransitionGroupPicker:peak_integration");
+  ASSERT_NE(parameter3, nullptr);
+  EXPECT_EQ(parameter3->getValueAsString(), "smoothed");
+}

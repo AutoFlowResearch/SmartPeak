@@ -194,7 +194,6 @@ namespace SmartPeak
   {
     std::ostringstream os;
     int rc;
-    sqlite3_stmt* stmt;
     char* zErrMsg = nullptr;
 
     os << "INSERT INTO ";

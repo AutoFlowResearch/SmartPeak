@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <SmartPeak/core/FeatureFiltersUtils.h>
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/MetaDataHandler.h>
 #include <SmartPeak/core/SampleType.h>
@@ -149,9 +150,8 @@ namespace SmartPeak
 
   struct StoreStandardsConcentrations : SequenceSegmentProcessor, IFilePickerHandler
   {
-    StoreStandardsConcentrations(bool component_group = false, bool static_filenames = false)
-      : component_group_(component_group), static_filenames_(static_filenames) {}
-    bool component_group_;
+    StoreStandardsConcentrations(bool static_filenames = false)
+      : static_filenames_(static_filenames) {}
     bool static_filenames_;
 
     /* IFilePickerHandler */
@@ -208,9 +208,8 @@ namespace SmartPeak
 
   struct StoreQuantitationMethods : SequenceSegmentProcessor
   {
-    StoreQuantitationMethods(bool component_group = false, bool static_filenames = false)
-      : component_group_(component_group), static_filenames_(static_filenames) {}
-    bool component_group_;
+    StoreQuantitationMethods(bool static_filenames = false)
+      : static_filenames_(static_filenames) {}
     bool static_filenames_;
 
     /* IProcessorDescription */
@@ -235,9 +234,9 @@ namespace SmartPeak
 
   struct LoadFeatureFilters : SequenceSegmentProcessor, IFilePickerHandler
   {
-    LoadFeatureFilters(bool component_group = false, bool static_filenames = false)
-      : component_group_(component_group), static_filenames_(static_filenames) {}
-    bool component_group_;
+    LoadFeatureFilters(int feature_filter_mode = FeatureFiltersUtils::EHandleAll, bool static_filenames = false)
+      : feature_filter_mode_(feature_filter_mode), static_filenames_(static_filenames) {}
+    int feature_filter_mode_;
     bool static_filenames_;
 
     /* IFilePickerHandler */
@@ -264,9 +263,9 @@ namespace SmartPeak
 
   struct LoadFeatureQCs : SequenceSegmentProcessor, IFilePickerHandler
   {
-    LoadFeatureQCs(bool component_group = false, bool static_filenames = false)
-      : component_group_(component_group), static_filenames_(static_filenames) {}
-    bool component_group_;
+    LoadFeatureQCs(int feature_filter_mode = FeatureFiltersUtils::EHandleAll, bool static_filenames = false)
+      : feature_filter_mode_(feature_filter_mode), static_filenames_(static_filenames) {}
+    int feature_filter_mode_;
     bool static_filenames_;
 
     /* IProcessorDescription */
@@ -293,9 +292,9 @@ namespace SmartPeak
 
   struct StoreFeatureFilters : SequenceSegmentProcessor, IFilePickerHandler
   {
-    StoreFeatureFilters(bool component_group = false, bool static_filenames = false)
-      : component_group_(component_group), static_filenames_(static_filenames) {}
-    bool component_group_;
+    StoreFeatureFilters(int feature_filter_mode = FeatureFiltersUtils::EHandleAll, bool static_filenames = false)
+      : feature_filter_mode_(feature_filter_mode), static_filenames_(static_filenames) {}
+    int feature_filter_mode_;
     bool static_filenames_;
 
     /* IProcessorDescription */
@@ -322,9 +321,9 @@ namespace SmartPeak
 
   struct StoreFeatureQCs : SequenceSegmentProcessor, IFilePickerHandler
   {
-    StoreFeatureQCs(bool component_group = false, bool static_filenames = false)
-      : component_group_(component_group), static_filenames_(static_filenames) {}
-    bool component_group_;
+    StoreFeatureQCs(int feature_filter_mode = FeatureFiltersUtils::EHandleAll, bool static_filenames = false)
+      : feature_filter_mode_(feature_filter_mode), static_filenames_(static_filenames) {}
+    int feature_filter_mode_;
     bool static_filenames_;
 
     /* IProcessorDescription */
@@ -351,9 +350,9 @@ namespace SmartPeak
 
   struct LoadFeatureRSDFilters : SequenceSegmentProcessor, IFilePickerHandler
   {
-    LoadFeatureRSDFilters(bool component_group = false, bool static_filenames = false)
-      : component_group_(component_group), static_filenames_(static_filenames) {}
-    bool component_group_;
+    LoadFeatureRSDFilters(int feature_filter_mode = FeatureFiltersUtils::EHandleAll, bool static_filenames = false)
+      : feature_filter_mode_(feature_filter_mode), static_filenames_(static_filenames) {}
+    int feature_filter_mode_;
     bool static_filenames_;
 
     /* IFilePickerHandler */
@@ -380,9 +379,9 @@ namespace SmartPeak
 
   struct LoadFeatureRSDQCs : SequenceSegmentProcessor, IFilePickerHandler
   {
-    LoadFeatureRSDQCs(bool component_group = false, bool static_filenames = false)
-      : component_group_(component_group), static_filenames_(static_filenames) {}
-    bool component_group_;
+    LoadFeatureRSDQCs(int feature_filter_mode = FeatureFiltersUtils::EHandleAll, bool static_filenames = false)
+      : feature_filter_mode_(feature_filter_mode), static_filenames_(static_filenames) {}
+    int feature_filter_mode_;
     bool static_filenames_;
 
     /* IFilePickerHandler */
@@ -409,8 +408,8 @@ namespace SmartPeak
 
   struct StoreFeatureRSDFilters : SequenceSegmentProcessor, IFilePickerHandler
   {
-    StoreFeatureRSDFilters(bool component_group = false, bool static_filenames = false) : component_group_(component_group), static_filenames_(static_filenames) {}
-    bool component_group_;
+    StoreFeatureRSDFilters(int feature_filter_mode = FeatureFiltersUtils::EHandleAll, bool static_filenames = false) : feature_filter_mode_(feature_filter_mode), static_filenames_(static_filenames) {}
+    int feature_filter_mode_;
     bool static_filenames_;
 
     /* IProcessorDescription */
@@ -437,9 +436,9 @@ namespace SmartPeak
 
   struct StoreFeatureRSDQCs : SequenceSegmentProcessor, IFilePickerHandler
   {
-    StoreFeatureRSDQCs(bool component_group = false, bool static_filenames = false)
-      : component_group_(component_group), static_filenames_(static_filenames) {}
-    bool component_group_;
+    StoreFeatureRSDQCs(int feature_filter_mode = FeatureFiltersUtils::EHandleAll, bool static_filenames = false)
+      : feature_filter_mode_(feature_filter_mode), static_filenames_(static_filenames) {}
+    int feature_filter_mode_;
     bool static_filenames_;
 
     /* IProcessorDescription */
@@ -461,14 +460,14 @@ namespace SmartPeak
     virtual void getFilenames(Filenames& filenames) const override;
 
     /* IProcessorDescription */
-    bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
+    virtual bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
   };
 
   struct LoadFeatureBackgroundFilters : SequenceSegmentProcessor, IFilePickerHandler
   {
-    LoadFeatureBackgroundFilters(bool component_group = false, bool static_filenames = false)
-      : component_group_(component_group), static_filenames_(static_filenames) {}
-    bool component_group_;
+    LoadFeatureBackgroundFilters(int feature_filter_mode = FeatureFiltersUtils::EHandleAll, bool static_filenames = false)
+      : feature_filter_mode_(feature_filter_mode), static_filenames_(static_filenames) {}
+    int feature_filter_mode_;
     bool static_filenames_;
 
     /* IFilePickerHandler */
@@ -495,9 +494,9 @@ namespace SmartPeak
 
   struct LoadFeatureBackgroundQCs : SequenceSegmentProcessor, IFilePickerHandler
   {
-    LoadFeatureBackgroundQCs(bool component_group = false, bool static_filenames = false)
-      : component_group_(component_group), static_filenames_(static_filenames) {}
-    bool component_group_;
+    LoadFeatureBackgroundQCs(int feature_filter_mode = FeatureFiltersUtils::EHandleAll, bool static_filenames = false)
+      : feature_filter_mode_(feature_filter_mode), static_filenames_(static_filenames) {}
+    int feature_filter_mode_;
     bool static_filenames_;
 
     /* IFilePickerHandler */
@@ -524,9 +523,9 @@ namespace SmartPeak
 
   struct StoreFeatureBackgroundFilters : SequenceSegmentProcessor, IFilePickerHandler
   {
-    StoreFeatureBackgroundFilters(bool component_group = false, bool static_filenames = false)
-      : component_group_(component_group), static_filenames_(static_filenames) {}
-    bool component_group_;
+    StoreFeatureBackgroundFilters(int feature_filter_mode = FeatureFiltersUtils::EHandleAll, bool static_filenames = false)
+      : feature_filter_mode_(feature_filter_mode), static_filenames_(static_filenames) {}
+    int feature_filter_mode_;
     bool static_filenames_;
 
     /* IProcessorDescription */
@@ -553,9 +552,9 @@ namespace SmartPeak
 
   struct StoreFeatureBackgroundQCs : SequenceSegmentProcessor, IFilePickerHandler
   {
-    StoreFeatureBackgroundQCs(bool component_group = false, bool static_filenames = false)
-      : component_group_(component_group), static_filenames_(static_filenames) {}
-    bool component_group_;
+    StoreFeatureBackgroundQCs(int feature_filter_mode = FeatureFiltersUtils::EHandleAll, bool static_filenames = false)
+      : feature_filter_mode_(feature_filter_mode), static_filenames_(static_filenames) {}
+    int feature_filter_mode_;
     bool static_filenames_;
 
     /* IProcessorDescription */
@@ -702,9 +701,9 @@ namespace SmartPeak
 
   struct LoadFeatureRSDEstimations : SequenceSegmentProcessor
   {
-    LoadFeatureRSDEstimations(bool component_group = false, bool static_filenames = false)
-      : component_group_(component_group), static_filenames_(static_filenames) {}
-    bool component_group_;
+    LoadFeatureRSDEstimations(int feature_filter_mode = FeatureFiltersUtils::EHandleAll, bool static_filenames = false)
+      : feature_filter_mode_(feature_filter_mode), static_filenames_(static_filenames) {}
+    int feature_filter_mode_;
     bool static_filenames_;
 
     /* IProcessorDescription */
@@ -728,9 +727,9 @@ namespace SmartPeak
 
   struct StoreFeatureRSDEstimations : SequenceSegmentProcessor, IFilePickerHandler
   {
-    StoreFeatureRSDEstimations(bool component_group = false, bool static_filenames = false)
-      : component_group_(component_group), static_filenames_(static_filenames) {}
-    bool component_group_;
+    StoreFeatureRSDEstimations(int feature_filter_mode = FeatureFiltersUtils::EHandleAll, bool static_filenames = false)
+      : feature_filter_mode_(feature_filter_mode), static_filenames_(static_filenames) {}
+    int feature_filter_mode_;
     bool static_filenames_;
 
     /* IProcessorDescription */
@@ -757,9 +756,9 @@ namespace SmartPeak
 
   struct LoadFeatureBackgroundEstimations : SequenceSegmentProcessor
   {
-    LoadFeatureBackgroundEstimations(bool component_group = false, bool static_filenames = false)
-      : component_group_(component_group), static_filenames_(static_filenames) {}
-    bool component_group_;
+    LoadFeatureBackgroundEstimations(int feature_filter_mode = FeatureFiltersUtils::EHandleAll, bool static_filenames = false)
+      : feature_filter_mode_(feature_filter_mode), static_filenames_(static_filenames) {}
+    int feature_filter_mode_;
     bool static_filenames_;
 
     /* IProcessorDescription */
@@ -783,9 +782,9 @@ namespace SmartPeak
 
   struct StoreFeatureBackgroundEstimations : SequenceSegmentProcessor, IFilePickerHandler
   {
-    StoreFeatureBackgroundEstimations(bool component_group = false, bool static_filenames = false)
-      : component_group_(component_group), static_filenames_(static_filenames) {}
-    bool component_group_;
+    StoreFeatureBackgroundEstimations(int feature_filter_mode = FeatureFiltersUtils::EHandleAll, bool static_filenames = false)
+      : feature_filter_mode_(feature_filter_mode), static_filenames_(static_filenames) {}
+    int feature_filter_mode_;
     bool static_filenames_;
 
     /* IProcessorDescription */

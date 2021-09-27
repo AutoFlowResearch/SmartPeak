@@ -484,7 +484,7 @@ namespace SmartPeak
       filenames,
       "featureFilterComponents",
       "featureFilterComponentGroups",
-      component_group_))
+      feature_filter_mode_))
     {
       return false;
     }
@@ -496,11 +496,11 @@ namespace SmartPeak
 
   void LoadFeatureFilters::getFilenames(Filenames& filenames) const
   {
-    if (component_group_)
+    if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponentsGroups)
     {
       filenames.addFileName("featureFilterComponentGroups", constructFilename("featureFilterComponentGroups.csv", static_filenames_), "Components Group Filters", true, true);
     }
-    else
+    else if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponents)
     {
       filenames.addFileName("featureFilterComponents", constructFilename("featureFilterComponents.csv", static_filenames_), "Components Filters", true, true);
     }
@@ -545,7 +545,7 @@ namespace SmartPeak
       filenames,
       "featureQCComponents",
       "featureQCComponentGroups",
-      component_group_))
+      feature_filter_mode_))
     {
       return false;
     }
@@ -557,11 +557,11 @@ namespace SmartPeak
 
   void LoadFeatureQCs::getFilenames(Filenames& filenames) const
   {
-    if (component_group_)
+    if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponentsGroups)
     {
       filenames.addFileName("featureQCComponentGroups", constructFilename("featureQCComponentGroups.csv", static_filenames_), "Components Group QCs", true, true);
     }
-    else
+    else if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponents)
     {
       filenames.addFileName("featureQCComponents", constructFilename("featureQCComponents.csv", static_filenames_), "Components QCs", true, true);
     }
@@ -606,7 +606,7 @@ namespace SmartPeak
       filenames,
       "featureFilterComponents",
       "featureFilterComponentGroups",
-      component_group_))
+      feature_filter_mode_))
     {
       return false;
     }
@@ -617,11 +617,11 @@ namespace SmartPeak
 
   void StoreFeatureFilters::getFilenames(Filenames& filenames) const
   {
-    if (component_group_)
+    if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponentsGroups)
     {
       filenames.addFileName("featureFilterComponentGroups", constructFilename("featureFilterComponentGroups.csv", static_filenames_), "Components Group Filters", true, true);
     }
-    else
+    else if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponents)
     {
       filenames.addFileName("featureFilterComponents", constructFilename("featureFilterComponents.csv", static_filenames_), "Components Filters", true, true);
     }
@@ -663,7 +663,7 @@ namespace SmartPeak
       filenames,
       "featureQCComponents",
       "featureQCComponentGroups",
-      component_group_))
+      feature_filter_mode_))
     {
       return false;
     }
@@ -674,11 +674,11 @@ namespace SmartPeak
 
   void StoreFeatureQCs::getFilenames(Filenames& filenames) const
   {
-    if (component_group_)
+    if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponentsGroups)
     {
       filenames.addFileName("featureQCComponentGroups", constructFilename("featureQCComponentGroups.csv", static_filenames_), "Components Group QC", true, true);
     }
-    else
+    else if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponents)
     {
       filenames.addFileName("featureQCComponents", constructFilename("featureQCComponents.csv", static_filenames_), "Components QC", true, true);
     }
@@ -713,7 +713,7 @@ namespace SmartPeak
 
   void LoadFeatureRSDFilters::getFilenames(Filenames& filenames) const
   {
-    if (component_group_)
+    if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponentsGroups)
     {
       filenames.addFileName("featureRSDFilterComponentGroups", 
                             constructFilename("featureRSDFilterComponentGroups.csv", static_filenames_),
@@ -721,7 +721,7 @@ namespace SmartPeak
                             true,
                             true);
     }
-    else
+    else if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponents)
     {
       filenames.addFileName("featureRSDFilterComponents",
                             constructFilename("featureRSDFilterComponents.csv", static_filenames_),
@@ -740,7 +740,7 @@ namespace SmartPeak
       filenames,
       "featureRSDFilterComponents",
       "featureRSDFilterComponentGroups",
-      component_group_))
+      feature_filter_mode_))
     {
       return false;
     }
@@ -782,7 +782,7 @@ namespace SmartPeak
 
   void LoadFeatureRSDQCs::getFilenames(Filenames& filenames) const
   {
-    if (component_group_)
+    if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponentsGroups)
     {
       filenames.addFileName("featureRSDQCComponentGroups",
                             constructFilename("featureRSDQCComponentGroups.csv", static_filenames_),
@@ -790,7 +790,7 @@ namespace SmartPeak
                             true,
                             true);
     }
-    else
+    else if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponents)
     {
       filenames.addFileName("featureRSDQCComponents",
                             constructFilename("featureRSDQCComponents.csv", static_filenames_),
@@ -809,7 +809,7 @@ namespace SmartPeak
       filenames,
       "featureRSDQCComponents",
       "featureRSDQCComponentGroups",
-      component_group_))
+      feature_filter_mode_))
     {
       return false;
     }
@@ -858,7 +858,7 @@ namespace SmartPeak
       filenames,
       "featureRSDFilterComponents",
       "featureRSDFilterComponentGroups",
-      component_group_))
+      feature_filter_mode_))
     {
       return false;
     }
@@ -869,13 +869,13 @@ namespace SmartPeak
 
   void StoreFeatureRSDFilters::getFilenames(Filenames& filenames) const
   {
-    if (component_group_)
+    if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponentsGroups)
     {
       filenames.addFileName("featureRSDFilterComponentGroups",
                             constructFilename("featureRSDFilterComponentGroups.csv", static_filenames_),
                             "Components group %RSD Filters");
     }
-    else
+    else if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponents)
     {
       filenames.addFileName("featureRSDFilterComponents",
                             constructFilename("featureRSDFilterComponents.csv", static_filenames_),
@@ -919,7 +919,7 @@ namespace SmartPeak
       filenames,
       "featureRSDQCComponents",
       "featureRSDQCComponentGroups",
-      component_group_))
+      feature_filter_mode_))
     {
       return false;
     }
@@ -930,13 +930,13 @@ namespace SmartPeak
 
   void StoreFeatureRSDQCs::getFilenames(Filenames& filenames) const
   {
-    if (component_group_)
+    if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponentsGroups)
     {
       filenames.addFileName("featureRSDQCComponentGroups",
                             constructFilename("featureRSDQCComponentGroups.csv", static_filenames_),
                             "Components Group %RSD QCs");
     }
-    else
+    else if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponents)
     {
       filenames.addFileName("featureRSDQCComponents",
                             constructFilename("featureRSDQCComponents.csv", static_filenames_),
@@ -973,7 +973,7 @@ namespace SmartPeak
 
   void LoadFeatureBackgroundFilters::getFilenames(Filenames& filenames) const
   {
-    if (component_group_)
+    if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponentsGroups)
     {
       filenames.addFileName("featureBackgroundFilterComponentGroups", 
         constructFilename("featureBackgroundFilterComponentGroups.csv", static_filenames_),
@@ -981,7 +981,7 @@ namespace SmartPeak
         true,
         true);
     }
-    else
+    else if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponents)
     {
       filenames.addFileName("featureBackgroundFilterComponents", 
         constructFilename("featureBackgroundFilterComponents.csv", static_filenames_),
@@ -1000,7 +1000,7 @@ namespace SmartPeak
       filenames,
       "featureBackgroundFilterComponents",
       "featureBackgroundFilterComponentGroups",
-      component_group_))
+      feature_filter_mode_))
     {
       return false;
     }
@@ -1042,7 +1042,7 @@ namespace SmartPeak
 
   void LoadFeatureBackgroundQCs::getFilenames(Filenames& filenames) const
   {
-    if (component_group_)
+    if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponentsGroups)
     {
       filenames.addFileName("featureBackgroundQCComponentGroups",
                             constructFilename("featureBackgroundQCComponentGroups.csv", static_filenames_),
@@ -1050,7 +1050,7 @@ namespace SmartPeak
                             true,
                             true);
     }
-    else
+    else if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponents)
     {
       filenames.addFileName("featureBackgroundQCComponents",
                             constructFilename("featureBackgroundQCComponents.csv", static_filenames_),
@@ -1069,7 +1069,7 @@ namespace SmartPeak
       filenames,
       "featureBackgroundQCComponents",
       "featureBackgroundQCComponentGroups",
-      component_group_))
+      feature_filter_mode_))
     {
       return false;
     }
@@ -1118,7 +1118,7 @@ namespace SmartPeak
       filenames,
       "featureBackgroundFilterComponents",
       "featureBackgroundFilterComponentGroups",
-      component_group_))
+      feature_filter_mode_))
     {
       return false;
     }
@@ -1129,13 +1129,13 @@ namespace SmartPeak
 
   void StoreFeatureBackgroundFilters::getFilenames(Filenames& filenames) const
   {
-    if (component_group_)
+    if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponentsGroups)
     {
       filenames.addFileName("featureBackgroundFilterComponentGroups",
                             constructFilename("featureBackgroundFilterComponentGroups.csv", static_filenames_),
                             "Components Group % Background Filters");
     }
-    else
+    else if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponents)
     {
       filenames.addFileName("featureBackgroundFilterComponents",
                             constructFilename("featureBackgroundFilterComponents.csv", static_filenames_),
@@ -1179,7 +1179,7 @@ namespace SmartPeak
       filenames,
       "featureBackgroundQCComponents",
       "featureBackgroundQCComponentGroups",
-      component_group_))
+      feature_filter_mode_))
     {
       return false;
     }
@@ -1190,13 +1190,13 @@ namespace SmartPeak
 
   void StoreFeatureBackgroundQCs::getFilenames(Filenames& filenames) const
   {
-    if (component_group_)
+    if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponentsGroups)
     {
       filenames.addFileName("featureBackgroundQCComponentGroups",
                             constructFilename("featureBackgroundQCComponentGroups.csv", static_filenames_),
                             "Components Group %Background QCs");
     }
-    else
+    else if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponents)
     {
       filenames.addFileName("featureBackgroundQCComponents",
                             constructFilename("featureBackgroundQCComponents.csv", static_filenames_),
@@ -1543,7 +1543,7 @@ namespace SmartPeak
 
   void LoadFeatureRSDEstimations::getFilenames(Filenames& filenames) const
   {
-    if (component_group_)
+    if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponentsGroups)
     {
       filenames.addFileName("featureRSDEstimationComponentGroups",
         constructFilename("featureRSDEstimationComponentGroups.csv", static_filenames_),
@@ -1551,7 +1551,7 @@ namespace SmartPeak
         true,
         true);
     }
-    else
+    else if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponents)
     {
       filenames.addFileName("featureRSDEstimationComponents",
         constructFilename("featureRSDEstimationComponents.csv", static_filenames_),
@@ -1590,7 +1590,7 @@ namespace SmartPeak
       filenames,
       "featureRSDEstimationComponents",
       "featureRSDEstimationComponentGroups",
-      component_group_))
+      feature_filter_mode_))
     {
       return false;
     }
@@ -1611,7 +1611,7 @@ namespace SmartPeak
 
   void StoreFeatureRSDEstimations::getFilenames(Filenames& filenames) const
   {
-    if (component_group_)
+    if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponentsGroups)
     {
       filenames.addFileName("featureRSDEstimationComponentGroups",
         constructFilename("featureRSDEstimationComponentGroups.csv", static_filenames_),
@@ -1619,7 +1619,7 @@ namespace SmartPeak
         true,
         true);
     }
-    else
+    else if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponents)
     {
       filenames.addFileName("featureRSDEstimationComponents",
         constructFilename("featureRSDEstimationComponents.csv", static_filenames_),
@@ -1658,7 +1658,7 @@ namespace SmartPeak
 
   void LoadFeatureBackgroundEstimations::getFilenames(Filenames& filenames) const
   {
-    if (component_group_)
+    if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponentsGroups)
     {
       filenames.addFileName("featureBackgroundEstimationComponentGroups",
         constructFilename("featureBackgroundEstimationComponentGroups.csv", static_filenames_),
@@ -1667,7 +1667,7 @@ namespace SmartPeak
         true
       );
     }
-    else
+    else if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponents)
     {
       filenames.addFileName("featureBackgroundEstimationComponents",
         constructFilename("featureBackgroundEstimationComponents.csv", static_filenames_),
@@ -1707,7 +1707,7 @@ namespace SmartPeak
       filenames,
       "featureBackgroundEstimationComponents",
       "featureBackgroundEstimationComponentGroups",
-      component_group_))
+      feature_filter_mode_))
     {
       return false;
     }
@@ -1728,7 +1728,7 @@ namespace SmartPeak
 
   void StoreFeatureBackgroundEstimations::getFilenames(Filenames& filenames) const
   {
-    if (component_group_)
+    if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponentsGroups)
     {
       filenames.addFileName("featureBackgroundEstimationComponentGroups",
         constructFilename("featureBackgroundEstimationComponentGroups.csv", static_filenames_),
@@ -1737,7 +1737,7 @@ namespace SmartPeak
         true
       );
     }
-    else
+    else if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponents)
     {
       filenames.addFileName("featureBackgroundEstimationComponents",
         constructFilename("featureBackgroundEstimationComponents.csv", static_filenames_),

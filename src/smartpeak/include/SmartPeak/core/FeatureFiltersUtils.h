@@ -23,15 +23,16 @@
 
 #pragma once
 
-#include <SmartPeak/core/ApplicationHandler.h>
 #include <SmartPeak/core/Filenames.h>
-#include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureSelector.h>
 #include <OpenMS/FORMAT/MRMFeatureQCFile.h>
 
 #include <string>
 
 namespace SmartPeak
 {
+  // forward class
+  class ApplicationHandler;
+
   /**
   * Class used by all the processor loading and storing Features Filters.
   */
@@ -44,6 +45,13 @@ namespace SmartPeak
     FeatureFiltersUtils& operator=(const FeatureFiltersUtils&) = delete;
     FeatureFiltersUtils(FeatureFiltersUtils&&)                 = delete;
     FeatureFiltersUtils& operator=(FeatureFiltersUtils&&)      = delete;
+    
+    enum Mode
+    {
+      EHandleComponents = 1,
+      EHandleComponentsGroups = 1 << 1,
+      EHandleAll = (EHandleComponents | EHandleComponentsGroups)
+    };
 
     static bool onFilePicked(
       const std::filesystem::path& filename,
@@ -51,7 +59,7 @@ namespace SmartPeak
       Filenames& filenames,
       const std::string& file_id,
       const std::string& file_group_id,
-      bool is_component_group);
+      int feature_filter_mode);
       
     static void storeFeatureFilters(
       const std::string& file_id,
@@ -72,12 +80,12 @@ namespace SmartPeak
       Filenames& filenames,
       const std::string& file_id,
       const std::vector<int>& inserted_rows,
-      const std::vector<OpenMS::MRMFeatureQC::ComponentQCs>& component_qcs);
+      const std::vector<const std::map<OpenMS::String, std::pair<double, double>>*> metadata_values);
 
     static void loadMetadataFromDB(
       Filenames& filenames,
       const std::string& file_id,
       const std::vector<int>& features_id,
-      std::vector<OpenMS::MRMFeatureQC::ComponentQCs>& component_qcs);
+      std::vector<std::map<OpenMS::String, std::pair<double, double>>*> metadata_values);
   };
 }

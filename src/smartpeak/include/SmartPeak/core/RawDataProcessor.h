@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <SmartPeak/core/FeatureFiltersUtils.h>
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/MetaDataHandler.h>
 #include <SmartPeak/core/RawDataHandler.h>
@@ -567,9 +568,9 @@ namespace SmartPeak
 
   struct StoreFeatureFiltersRDP : RawDataProcessor, IFilePickerHandler
   {
-    StoreFeatureFiltersRDP(bool component_group = false, bool static_filenames = false)
-      : component_group_(component_group), static_filenames_(static_filenames) {}
-    bool component_group_;
+    StoreFeatureFiltersRDP(int feature_filter_mode = FeatureFiltersUtils::EHandleAll, bool static_filenames = false)
+      : feature_filter_mode_(feature_filter_mode), static_filenames_(static_filenames) {}
+    int feature_filter_mode_;
     bool static_filenames_;
 
     /* IProcessorDescription */
@@ -596,9 +597,9 @@ namespace SmartPeak
 
   struct StoreFeatureQCsRDP : RawDataProcessor, IFilePickerHandler
   {
-    StoreFeatureQCsRDP(bool component_group = false, bool static_filenames = false)
-      : component_group_(component_group), static_filenames_(static_filenames) {}
-    bool component_group_;
+    StoreFeatureQCsRDP(int feature_filter_mode = FeatureFiltersUtils::EHandleAll, bool static_filenames = false)
+      : feature_filter_mode_(feature_filter_mode), static_filenames_(static_filenames) {}
+    int feature_filter_mode_;
     bool static_filenames_;
 
     /* IProcessorDescription */

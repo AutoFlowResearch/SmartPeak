@@ -1149,7 +1149,7 @@ namespace SmartPeak
 
   void SessionHandler::setComponentGroupBackgroundQCsTable(const SequenceHandler& sequence_handler, GenericTableData& table_data)
   {
-    if (sequence_handler.getSequenceSegments().size() > 0 && sequence_handler.getSequenceSegments().at(0).getFeatureBackgroundQC().component_qcs.size() > 0) {
+    if (sequence_handler.getSequenceSegments().size() > 0 && sequence_handler.getSequenceSegments().at(0).getFeatureBackgroundQC().component_group_qcs.size() > 0) {
       // Make the comp_group_background_qcs table headers
       if (table_data.headers_.size() <= 0) {
         LOGD << "Making comp_group_background_qcs_table_headers";
