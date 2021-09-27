@@ -656,7 +656,6 @@ TEST(SessionFilesWidget, SessionFilesWidget_EmbedAllFiles)
   auto session_widget_modify = std::static_pointer_cast<SessionFilesWidget>(session_widget_test_modify);
   auto load_session_wizard_ = std::make_shared<LoadSessionWizard>(session_widget_modify);
   load_session_wizard_->onFilePicked(db_path, &application_handler);
-  session_widget_test_modify->doUpdateSession();
 
   ParameterSet& parameter_set3 = application_handler.sequenceHandler_.getSequence().at(0).getRawData().getParameters();
   auto parameter3 = parameter_set3.findParameter("MRMFeatureFinderScoring", "TransitionGroupPicker:peak_integration");

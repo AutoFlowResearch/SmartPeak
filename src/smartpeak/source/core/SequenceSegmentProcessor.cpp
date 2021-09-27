@@ -496,11 +496,11 @@ namespace SmartPeak
 
   void LoadFeatureFilters::getFilenames(Filenames& filenames) const
   {
-    if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponentsGroups)
+    if (feature_filter_mode_ & FeatureFiltersUtilsMode::EFeatureFiltersModeGroup)
     {
       filenames.addFileName("featureFilterComponentGroups", constructFilename("featureFilterComponentGroups.csv", static_filenames_), "Components Group Filters", true, true);
     }
-    else if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponents)
+    else if (feature_filter_mode_ & FeatureFiltersUtilsMode::EFeatureFiltersModeComponent)
     {
       filenames.addFileName("featureFilterComponents", constructFilename("featureFilterComponents.csv", static_filenames_), "Components Filters", true, true);
     }
@@ -521,7 +521,8 @@ namespace SmartPeak
       filenames_I,
       sequenceSegmentHandler_IO.getFeatureFilter(),
       [&]() { if (sequence_segment_observable_) sequence_segment_observable_->notifyFeatureFiltersComponentsUpdated(); },
-      [&]() { if (sequence_segment_observable_) sequence_segment_observable_->notifyFeatureFiltersComponentGroupsUpdated(); }
+      [&]() { if (sequence_segment_observable_) sequence_segment_observable_->notifyFeatureFiltersComponentGroupsUpdated(); },
+      feature_filter_mode_
     );
     LOGD << "END loadFeatureFilter";
   }
@@ -557,11 +558,11 @@ namespace SmartPeak
 
   void LoadFeatureQCs::getFilenames(Filenames& filenames) const
   {
-    if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponentsGroups)
+    if (feature_filter_mode_ & FeatureFiltersUtilsMode::EFeatureFiltersModeGroup)
     {
       filenames.addFileName("featureQCComponentGroups", constructFilename("featureQCComponentGroups.csv", static_filenames_), "Components Group QCs", true, true);
     }
-    else if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponents)
+    else if (feature_filter_mode_ & FeatureFiltersUtilsMode::EFeatureFiltersModeComponent)
     {
       filenames.addFileName("featureQCComponents", constructFilename("featureQCComponents.csv", static_filenames_), "Components QCs", true, true);
     }
@@ -582,7 +583,8 @@ namespace SmartPeak
       filenames_I,
       sequenceSegmentHandler_IO.getFeatureQC(),
       [&]() { if (sequence_segment_observable_) sequence_segment_observable_->notifyFeatureQCComponentsUpdated(); },
-      [&]() { if (sequence_segment_observable_) sequence_segment_observable_->notifyFeatureQCComponentGroupsUpdated(); }
+      [&]() { if (sequence_segment_observable_) sequence_segment_observable_->notifyFeatureQCComponentGroupsUpdated(); },
+      feature_filter_mode_
     );
     LOGD << "END loadFeatureQC";
   }
@@ -617,11 +619,11 @@ namespace SmartPeak
 
   void StoreFeatureFilters::getFilenames(Filenames& filenames) const
   {
-    if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponentsGroups)
+    if (feature_filter_mode_ & FeatureFiltersUtilsMode::EFeatureFiltersModeGroup)
     {
       filenames.addFileName("featureFilterComponentGroups", constructFilename("featureFilterComponentGroups.csv", static_filenames_), "Components Group Filters", true, true);
     }
-    else if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponents)
+    else if (feature_filter_mode_ & FeatureFiltersUtilsMode::EFeatureFiltersModeComponent)
     {
       filenames.addFileName("featureFilterComponents", constructFilename("featureFilterComponents.csv", static_filenames_), "Components Filters", true, true);
     }
@@ -640,7 +642,8 @@ namespace SmartPeak
       "featureFilterComponents",
       "featureFilterComponentGroups",
       filenames_I,
-      sequenceSegmentHandler_IO.getFeatureFilter());
+      sequenceSegmentHandler_IO.getFeatureFilter(),
+      feature_filter_mode_);
     LOGD << "END storeFeatureFilter";
   }
 
@@ -674,11 +677,11 @@ namespace SmartPeak
 
   void StoreFeatureQCs::getFilenames(Filenames& filenames) const
   {
-    if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponentsGroups)
+    if (feature_filter_mode_ & FeatureFiltersUtilsMode::EFeatureFiltersModeGroup)
     {
       filenames.addFileName("featureQCComponentGroups", constructFilename("featureQCComponentGroups.csv", static_filenames_), "Components Group QC", true, true);
     }
-    else if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponents)
+    else if (feature_filter_mode_ & FeatureFiltersUtilsMode::EFeatureFiltersModeComponent)
     {
       filenames.addFileName("featureQCComponents", constructFilename("featureQCComponents.csv", static_filenames_), "Components QC", true, true);
     }
@@ -697,7 +700,8 @@ namespace SmartPeak
       "featureQCComponents",
       "featureQCComponentGroups",
       filenames_I,
-      sequenceSegmentHandler_IO.getFeatureQC());
+      sequenceSegmentHandler_IO.getFeatureQC(),
+      feature_filter_mode_);
     LOGD << "END storeFeatureQC";
   }
 
@@ -713,7 +717,7 @@ namespace SmartPeak
 
   void LoadFeatureRSDFilters::getFilenames(Filenames& filenames) const
   {
-    if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponentsGroups)
+    if (feature_filter_mode_ & FeatureFiltersUtilsMode::EFeatureFiltersModeGroup)
     {
       filenames.addFileName("featureRSDFilterComponentGroups", 
                             constructFilename("featureRSDFilterComponentGroups.csv", static_filenames_),
@@ -721,7 +725,7 @@ namespace SmartPeak
                             true,
                             true);
     }
-    else if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponents)
+    else if (feature_filter_mode_ & FeatureFiltersUtilsMode::EFeatureFiltersModeComponent)
     {
       filenames.addFileName("featureRSDFilterComponents",
                             constructFilename("featureRSDFilterComponents.csv", static_filenames_),
@@ -765,7 +769,8 @@ namespace SmartPeak
       filenames_I,
       sequenceSegmentHandler_IO.getFeatureRSDFilter(),
       [&]() { if (sequence_segment_observable_) sequence_segment_observable_->notifyFeatureRSDFilterComponentsUpdated(); },
-      [&]() { if (sequence_segment_observable_) sequence_segment_observable_->notifyFeatureRSDFilterComponentGroupsUpdated(); }
+      [&]() { if (sequence_segment_observable_) sequence_segment_observable_->notifyFeatureRSDFilterComponentGroupsUpdated(); },
+      feature_filter_mode_
     );
     LOGD << "END loadFeatureRSDFilter";
   }
@@ -782,7 +787,7 @@ namespace SmartPeak
 
   void LoadFeatureRSDQCs::getFilenames(Filenames& filenames) const
   {
-    if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponentsGroups)
+    if (feature_filter_mode_ & FeatureFiltersUtilsMode::EFeatureFiltersModeGroup)
     {
       filenames.addFileName("featureRSDQCComponentGroups",
                             constructFilename("featureRSDQCComponentGroups.csv", static_filenames_),
@@ -790,7 +795,7 @@ namespace SmartPeak
                             true,
                             true);
     }
-    else if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponents)
+    else if (feature_filter_mode_ & FeatureFiltersUtilsMode::EFeatureFiltersModeComponent)
     {
       filenames.addFileName("featureRSDQCComponents",
                             constructFilename("featureRSDQCComponents.csv", static_filenames_),
@@ -834,7 +839,8 @@ namespace SmartPeak
       filenames_I,
       sequenceSegmentHandler_IO.getFeatureRSDQC(),
       [&]() { if (sequence_segment_observable_) sequence_segment_observable_->notifyFeatureRSDQCComponentsUpdated(); },
-      [&]() { if (sequence_segment_observable_) sequence_segment_observable_->notifyFeatureRSDQCComponentGroupsUpdated(); }
+      [&]() { if (sequence_segment_observable_) sequence_segment_observable_->notifyFeatureRSDQCComponentGroupsUpdated(); },
+      feature_filter_mode_
     );
     LOGD << "END loadFeatureRSDQC";
   }
@@ -869,13 +875,13 @@ namespace SmartPeak
 
   void StoreFeatureRSDFilters::getFilenames(Filenames& filenames) const
   {
-    if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponentsGroups)
+    if (feature_filter_mode_ & FeatureFiltersUtilsMode::EFeatureFiltersModeGroup)
     {
       filenames.addFileName("featureRSDFilterComponentGroups",
                             constructFilename("featureRSDFilterComponentGroups.csv", static_filenames_),
                             "Components group %RSD Filters");
     }
-    else if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponents)
+    else if (feature_filter_mode_ & FeatureFiltersUtilsMode::EFeatureFiltersModeComponent)
     {
       filenames.addFileName("featureRSDFilterComponents",
                             constructFilename("featureRSDFilterComponents.csv", static_filenames_),
@@ -896,7 +902,8 @@ namespace SmartPeak
       "featureRSDFilterComponents",
       "featureRSDFilterComponentGroups",
       filenames_I,
-      sequenceSegmentHandler_IO.getFeatureRSDFilter());
+      sequenceSegmentHandler_IO.getFeatureRSDFilter(),
+      feature_filter_mode_);
     LOGD << "END storeFeatureRSDFilter";
   }
 
@@ -930,13 +937,13 @@ namespace SmartPeak
 
   void StoreFeatureRSDQCs::getFilenames(Filenames& filenames) const
   {
-    if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponentsGroups)
+    if (feature_filter_mode_ & FeatureFiltersUtilsMode::EFeatureFiltersModeGroup)
     {
       filenames.addFileName("featureRSDQCComponentGroups",
                             constructFilename("featureRSDQCComponentGroups.csv", static_filenames_),
                             "Components Group %RSD QCs");
     }
-    else if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponents)
+    else if (feature_filter_mode_ & FeatureFiltersUtilsMode::EFeatureFiltersModeComponent)
     {
       filenames.addFileName("featureRSDQCComponents",
                             constructFilename("featureRSDQCComponents.csv", static_filenames_),
@@ -957,7 +964,8 @@ namespace SmartPeak
       "featureRSDQCComponents",
       "featureRSDQCComponentGroups",
       filenames_I,
-      sequenceSegmentHandler_IO.getFeatureRSDQC());
+      sequenceSegmentHandler_IO.getFeatureRSDQC(),
+      feature_filter_mode_);
     LOGD << "END storeFeatureRSDQC";
   }
 
@@ -973,7 +981,7 @@ namespace SmartPeak
 
   void LoadFeatureBackgroundFilters::getFilenames(Filenames& filenames) const
   {
-    if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponentsGroups)
+    if (feature_filter_mode_ & FeatureFiltersUtilsMode::EFeatureFiltersModeGroup)
     {
       filenames.addFileName("featureBackgroundFilterComponentGroups", 
         constructFilename("featureBackgroundFilterComponentGroups.csv", static_filenames_),
@@ -981,7 +989,7 @@ namespace SmartPeak
         true,
         true);
     }
-    else if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponents)
+    else if (feature_filter_mode_ & FeatureFiltersUtilsMode::EFeatureFiltersModeComponent)
     {
       filenames.addFileName("featureBackgroundFilterComponents", 
         constructFilename("featureBackgroundFilterComponents.csv", static_filenames_),
@@ -1025,7 +1033,8 @@ namespace SmartPeak
       filenames_I,
       sequenceSegmentHandler_IO.getFeatureBackgroundFilter(),
       [&]() { if (sequence_segment_observable_) sequence_segment_observable_->notifyFeatureBackgroundFilterComponentsUpdated(); },
-      [&]() { if (sequence_segment_observable_) sequence_segment_observable_->notifyFeatureBackgroundFilterComponentGroupsUpdated(); }
+      [&]() { if (sequence_segment_observable_) sequence_segment_observable_->notifyFeatureBackgroundFilterComponentGroupsUpdated(); },
+      feature_filter_mode_
     );
     LOGD << "END loadFeatureBackgroundFilter";
   }
@@ -1042,7 +1051,7 @@ namespace SmartPeak
 
   void LoadFeatureBackgroundQCs::getFilenames(Filenames& filenames) const
   {
-    if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponentsGroups)
+    if (feature_filter_mode_ & FeatureFiltersUtilsMode::EFeatureFiltersModeGroup)
     {
       filenames.addFileName("featureBackgroundQCComponentGroups",
                             constructFilename("featureBackgroundQCComponentGroups.csv", static_filenames_),
@@ -1050,7 +1059,7 @@ namespace SmartPeak
                             true,
                             true);
     }
-    else if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponents)
+    else if (feature_filter_mode_ & FeatureFiltersUtilsMode::EFeatureFiltersModeComponent)
     {
       filenames.addFileName("featureBackgroundQCComponents",
                             constructFilename("featureBackgroundQCComponents.csv", static_filenames_),
@@ -1094,7 +1103,8 @@ namespace SmartPeak
       filenames_I,
       sequenceSegmentHandler_IO.getFeatureBackgroundQC(),
       [&]() { if (sequence_segment_observable_) sequence_segment_observable_->notifyFeatureBackgroundQCComponentsUpdated(); },
-      [&]() { if (sequence_segment_observable_) sequence_segment_observable_->notifyFeatureBackgroundQCComponentGroupsUpdated(); }
+      [&]() { if (sequence_segment_observable_) sequence_segment_observable_->notifyFeatureBackgroundQCComponentGroupsUpdated(); },
+      feature_filter_mode_
     );
     LOGD << "END loadFeatureBackgroundQC";
   }
@@ -1129,13 +1139,13 @@ namespace SmartPeak
 
   void StoreFeatureBackgroundFilters::getFilenames(Filenames& filenames) const
   {
-    if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponentsGroups)
+    if (feature_filter_mode_ & FeatureFiltersUtilsMode::EFeatureFiltersModeGroup)
     {
       filenames.addFileName("featureBackgroundFilterComponentGroups",
                             constructFilename("featureBackgroundFilterComponentGroups.csv", static_filenames_),
                             "Components Group % Background Filters");
     }
-    else if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponents)
+    else if (feature_filter_mode_ & FeatureFiltersUtilsMode::EFeatureFiltersModeComponent)
     {
       filenames.addFileName("featureBackgroundFilterComponents",
                             constructFilename("featureBackgroundFilterComponents.csv", static_filenames_),
@@ -1156,7 +1166,8 @@ namespace SmartPeak
       "featureBackgroundFilterComponents",
       "featureBackgroundFilterComponentGroups",
       filenames_I,
-      sequenceSegmentHandler_IO.getFeatureBackgroundFilter());
+      sequenceSegmentHandler_IO.getFeatureBackgroundFilter(),
+      feature_filter_mode_);
     LOGD << "END storeFeatureBackgroundFilter";
   }
 
@@ -1190,13 +1201,13 @@ namespace SmartPeak
 
   void StoreFeatureBackgroundQCs::getFilenames(Filenames& filenames) const
   {
-    if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponentsGroups)
+    if (feature_filter_mode_ & FeatureFiltersUtilsMode::EFeatureFiltersModeGroup)
     {
       filenames.addFileName("featureBackgroundQCComponentGroups",
                             constructFilename("featureBackgroundQCComponentGroups.csv", static_filenames_),
                             "Components Group %Background QCs");
     }
-    else if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponents)
+    else if (feature_filter_mode_ & FeatureFiltersUtilsMode::EFeatureFiltersModeComponent)
     {
       filenames.addFileName("featureBackgroundQCComponents",
                             constructFilename("featureBackgroundQCComponents.csv", static_filenames_),
@@ -1217,7 +1228,8 @@ namespace SmartPeak
       "featureBackgroundQCComponents",
       "featureBackgroundQCComponentGroups",
       filenames_I,
-      sequenceSegmentHandler_IO.getFeatureBackgroundQC());
+      sequenceSegmentHandler_IO.getFeatureBackgroundQC(),
+      feature_filter_mode_);
     LOGD << "END storeFeatureBackgroundQC";
   }
 
@@ -1543,7 +1555,7 @@ namespace SmartPeak
 
   void LoadFeatureRSDEstimations::getFilenames(Filenames& filenames) const
   {
-    if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponentsGroups)
+    if (feature_filter_mode_ & FeatureFiltersUtilsMode::EFeatureFiltersModeGroup)
     {
       filenames.addFileName("featureRSDEstimationComponentGroups",
         constructFilename("featureRSDEstimationComponentGroups.csv", static_filenames_),
@@ -1551,7 +1563,7 @@ namespace SmartPeak
         true,
         true);
     }
-    else if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponents)
+    else if (feature_filter_mode_ & FeatureFiltersUtilsMode::EFeatureFiltersModeComponent)
     {
       filenames.addFileName("featureRSDEstimationComponents",
         constructFilename("featureRSDEstimationComponents.csv", static_filenames_),
@@ -1576,7 +1588,8 @@ namespace SmartPeak
       filenames_I,
       sequenceSegmentHandler_IO.getFeatureRSDEstimations(),
       nullptr,
-      nullptr
+      nullptr,
+      feature_filter_mode_
     );
     LOGD << "END loadFeatureRSDEstimation";
   }
@@ -1611,7 +1624,7 @@ namespace SmartPeak
 
   void StoreFeatureRSDEstimations::getFilenames(Filenames& filenames) const
   {
-    if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponentsGroups)
+    if (feature_filter_mode_ & FeatureFiltersUtilsMode::EFeatureFiltersModeGroup)
     {
       filenames.addFileName("featureRSDEstimationComponentGroups",
         constructFilename("featureRSDEstimationComponentGroups.csv", static_filenames_),
@@ -1619,7 +1632,7 @@ namespace SmartPeak
         true,
         true);
     }
-    else if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponents)
+    else if (feature_filter_mode_ & FeatureFiltersUtilsMode::EFeatureFiltersModeComponent)
     {
       filenames.addFileName("featureRSDEstimationComponents",
         constructFilename("featureRSDEstimationComponents.csv", static_filenames_),
@@ -1642,7 +1655,8 @@ namespace SmartPeak
       "featureRSDEstimationComponents",
       "featureRSDEstimationComponentGroups",
       filenames_I,
-      sequenceSegmentHandler_IO.getFeatureRSDEstimations());
+      sequenceSegmentHandler_IO.getFeatureRSDEstimations(),
+      feature_filter_mode_);
     LOGD << "END storeFeatureRSDEstimation";
   }
 
@@ -1658,7 +1672,7 @@ namespace SmartPeak
 
   void LoadFeatureBackgroundEstimations::getFilenames(Filenames& filenames) const
   {
-    if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponentsGroups)
+    if (feature_filter_mode_ & FeatureFiltersUtilsMode::EFeatureFiltersModeGroup)
     {
       filenames.addFileName("featureBackgroundEstimationComponentGroups",
         constructFilename("featureBackgroundEstimationComponentGroups.csv", static_filenames_),
@@ -1667,7 +1681,7 @@ namespace SmartPeak
         true
       );
     }
-    else if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponents)
+    else if (feature_filter_mode_ & FeatureFiltersUtilsMode::EFeatureFiltersModeComponent)
     {
       filenames.addFileName("featureBackgroundEstimationComponents",
         constructFilename("featureBackgroundEstimationComponents.csv", static_filenames_),
@@ -1693,7 +1707,8 @@ namespace SmartPeak
       filenames_I,
       sequenceSegmentHandler_IO.getFeatureBackgroundEstimations(),
       nullptr,
-      nullptr
+      nullptr,
+      feature_filter_mode_
     );
     LOGD << "END loadFeatureBackgroundEstimation";
   }
@@ -1728,7 +1743,7 @@ namespace SmartPeak
 
   void StoreFeatureBackgroundEstimations::getFilenames(Filenames& filenames) const
   {
-    if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponentsGroups)
+    if (feature_filter_mode_ & FeatureFiltersUtilsMode::EFeatureFiltersModeGroup)
     {
       filenames.addFileName("featureBackgroundEstimationComponentGroups",
         constructFilename("featureBackgroundEstimationComponentGroups.csv", static_filenames_),
@@ -1737,7 +1752,7 @@ namespace SmartPeak
         true
       );
     }
-    else if (feature_filter_mode_ & FeatureFiltersUtils::EHandleComponents)
+    else if (feature_filter_mode_ & FeatureFiltersUtilsMode::EFeatureFiltersModeComponent)
     {
       filenames.addFileName("featureBackgroundEstimationComponents",
         constructFilename("featureBackgroundEstimationComponents.csv", static_filenames_),
@@ -1761,7 +1776,8 @@ namespace SmartPeak
       "featureBackgroundEstimationComponents",
       "featureBackgroundEstimationComponentGroups",
       filenames_I,
-      sequenceSegmentHandler_IO.getFeatureBackgroundEstimations());
+      sequenceSegmentHandler_IO.getFeatureBackgroundEstimations(),
+      feature_filter_mode_);
     LOGD << "END storeFeatureBackgroundEstimation";
   }
 }

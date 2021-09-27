@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <SmartPeak/core/ApplicationHandler.h>
 #include <SmartPeak/core/Filenames.h>
 #include <OpenMS/FORMAT/MRMFeatureQCFile.h>
 
@@ -30,8 +31,6 @@
 
 namespace SmartPeak
 {
-  // forward class
-  class ApplicationHandler;
 
   /**
   * Class used by all the processor loading and storing Features Filters.
@@ -45,13 +44,6 @@ namespace SmartPeak
     FeatureFiltersUtils& operator=(const FeatureFiltersUtils&) = delete;
     FeatureFiltersUtils(FeatureFiltersUtils&&)                 = delete;
     FeatureFiltersUtils& operator=(FeatureFiltersUtils&&)      = delete;
-    
-    enum Mode
-    {
-      EHandleComponents = 1,
-      EHandleComponentsGroups = 1 << 1,
-      EHandleAll = (EHandleComponents | EHandleComponentsGroups)
-    };
 
     static bool onFilePicked(
       const std::filesystem::path& filename,
@@ -65,7 +57,8 @@ namespace SmartPeak
       const std::string& file_id,
       const std::string& file_group_id,
       Filenames& filenames,
-      const OpenMS::MRMFeatureQC& features_qc);
+      const OpenMS::MRMFeatureQC& features_qc,
+      int feature_filter_mode);
 
     static void loadFeatureFilters(
       const std::string& file_id, 
@@ -73,7 +66,8 @@ namespace SmartPeak
       Filenames& filenames,
       OpenMS::MRMFeatureQC& features_qc,
       std::function<void()> notification,
-      std::function<void()> notification_group);
+      std::function<void()> notification_group,
+      int feature_filter_mode);
 
   private:
     static void storeMetadataInDB(

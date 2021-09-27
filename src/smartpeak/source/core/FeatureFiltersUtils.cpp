@@ -48,12 +48,12 @@ namespace SmartPeak
       LOGE << "File cannot be loaded without first loading the sequence.";
       return false;
     }
-    if (feature_filter_mode & FeatureFiltersUtils::EHandleComponentsGroups)
+    if (feature_filter_mode & FeatureFiltersUtilsMode::EFeatureFiltersModeGroup)
     {
       filenames.setFullPath(file_id, "");
       filenames.setFullPath(file_group_id, filename);
     }
-    else if (feature_filter_mode & FeatureFiltersUtils::EHandleComponents)
+    else if (feature_filter_mode & FeatureFiltersUtilsMode::EFeatureFiltersModeComponent)
     {
       filenames.setFullPath(file_id, filename);
       filenames.setFullPath(file_group_id, "");
@@ -62,9 +62,10 @@ namespace SmartPeak
   }
 
   void FeatureFiltersUtils::storeFeatureFilters(const std::string& file_id,
-                                                    const std::string& file_group_id,
-                                                    Filenames& filenames,
-                                                    const OpenMS::MRMFeatureQC& features_qc)
+                                                const std::string& file_group_id,
+                                                Filenames& filenames,
+                                                const OpenMS::MRMFeatureQC& features_qc,
+                                                int feature_filter_mode)
   {
     if (!InputDataValidation::prepareToStoreOneOfTwo(filenames, file_id, file_group_id))
     {
@@ -73,7 +74,8 @@ namespace SmartPeak
 
     try {
       OpenMS::MRMFeatureQCFile featureQCFile;
-      if (!filenames.getFullPath(file_id).empty())  // because we don't know if either of the two names is empty
+      if ((feature_filter_mode & FeatureFiltersUtilsMode::EFeatureFiltersModeComponent)
+        && (!filenames.getFullPath(file_id).empty()))  // because we don't know if either of the two names is empty
       {
         if (filenames.isEmbedded(file_id))
         {
@@ -119,7 +121,8 @@ namespace SmartPeak
           featureQCFile.store(filenames.getFullPath(file_id).generic_string(), features_qc, false);
         }
       }
-      if (!filenames.getFullPath(file_group_id).empty())
+      if ((feature_filter_mode & FeatureFiltersUtilsMode::EFeatureFiltersModeGroup) 
+          && (!filenames.getFullPath(file_group_id).empty()))
       {
         std::vector<int> inserted_rows;
         if (filenames.isEmbedded(file_group_id))
@@ -210,7 +213,8 @@ namespace SmartPeak
     Filenames& filenames,
     OpenMS::MRMFeatureQC& features_qc,
     std::function<void()> notification,
-    std::function<void()> notification_group)
+    std::function<void()> notification_group,
+    int feature_filter_mode)
   {
     if (!InputDataValidation::prepareToLoadOneOfTwo(filenames, file_id, file_group_id))
     {
@@ -219,7 +223,8 @@ namespace SmartPeak
 
     try {
       OpenMS::MRMFeatureQCFile featureQCFile;
-      if (!filenames.getFullPath(file_id).empty())  // because we don't know if either of the two names is empty
+      if ((feature_filter_mode & FeatureFiltersUtilsMode::EFeatureFiltersModeComponent)
+        && (!filenames.getFullPath(file_id).empty()))  // because we don't know if either of the two names is empty
       {
         if (filenames.isEmbedded(file_id))
         {
@@ -271,7 +276,8 @@ namespace SmartPeak
           if (notification) notification();
         }
       }
-      if (!filenames.getFullPath(file_group_id).empty())
+      if ((feature_filter_mode & FeatureFiltersUtilsMode::EFeatureFiltersModeGroup)
+        && !filenames.getFullPath(file_group_id).empty())
       {
         if (filenames.isEmbedded(file_group_id))
         {

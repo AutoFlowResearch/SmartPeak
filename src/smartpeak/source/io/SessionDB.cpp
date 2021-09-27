@@ -47,7 +47,6 @@ namespace SmartPeak
     }
     else
     {
-      LOGI << "Opened database successfully";
       return db;
     }
   }

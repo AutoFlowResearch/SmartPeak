@@ -8,7 +8,7 @@ set(sources_list
 	CastValue.cpp
 	ConsoleHandler.cpp
 	EventDispatcher.cpp
-	FeatureFiltersProcessorUtils.cpp
+	FeatureFiltersUtils.cpp
 	FeatureMetadata.cpp
 	Filenames.cpp
 	Helloworld.cpp

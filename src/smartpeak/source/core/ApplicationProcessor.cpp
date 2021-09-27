@@ -353,11 +353,19 @@ namespace SmartPeak
       }
     }
 
-    if (checkConsistency) {
-      InputDataValidation::sampleNamesAreConsistent(application_handler_.sequenceHandler_);
-      InputDataValidation::componentNamesAreConsistent(application_handler_.sequenceHandler_);
-      InputDataValidation::componentNameGroupsAreConsistent(application_handler_.sequenceHandler_);
-      InputDataValidation::heavyComponentsAreConsistent(application_handler_.sequenceHandler_);
+    if (checkConsistency)
+    {
+      if (!application_handler_.sequenceHandler_.getSequenceSegments().empty())
+      {
+        InputDataValidation::sampleNamesAreConsistent(application_handler_.sequenceHandler_);
+        InputDataValidation::componentNamesAreConsistent(application_handler_.sequenceHandler_);
+        InputDataValidation::componentNameGroupsAreConsistent(application_handler_.sequenceHandler_);
+        InputDataValidation::heavyComponentsAreConsistent(application_handler_.sequenceHandler_);
+      }
+      else
+      {
+        LOGW << "No Sequence available, cannot check consistency";
+      }
     }
 
     application_handler_.sequenceHandler_.notifySequenceUpdated();

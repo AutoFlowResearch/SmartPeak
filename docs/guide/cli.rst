@@ -14,13 +14,19 @@ Load session
 
 SmartPeak CLI requires only one parameter ``load-session`` to start running a workflow. 
 All other parameters are optional and can be specified to customize settings.
-The parameter accepts a path to a ``sequence.csv`` file. An example below:
+The parameter accepts a path to a session file (ex: ``session.db``) file, created from SmartPeakGUI.
+It's also possible to give a session directory that would have a specific directory and file naming organisation as a parameter. This solution however should not be preferred. 
+An An example below:
 
 .. tabs::
 
     .. code-tab:: powershell
 
-        ./SmartPeakCLI --load-session C:/data/GCMS_SIM_Unknowns/sequence.csv
+        ./SmartPeakCLI --load-session C:/data/GCMS_SIM_Unknowns/session.db
+
+    .. code-tab:: powershell
+
+        ./SmartPeakCLI --load-session C:/data/GCMS_SIM_Unknowns
 
     .. code-tab:: bash
 
