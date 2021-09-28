@@ -64,6 +64,8 @@ void ApplicationSettings::define_options()
     m_parser.set_optional<std::string>("o", "output", ".", 
         "An absolute or relative path to an output directory. Overrides the default location which is the current working directory. " 
         "SmartPeak will create given directory if one does not exist.");
+    m_parser.set_optional<std::string>("f", "input-file", "",
+        "Override input files. To list the overridable files, use this option with empty value.");
     m_parser.run_and_exit_if_error();
 }
 
@@ -81,6 +83,7 @@ void ApplicationSettings::load_options()
     disable_progressbar     = m_parser.get<bool>("p");
     log_dir                 = m_parser.get<std::string>("ld");
     out_dir                 = m_parser.get<std::string>("o");
+    input_files             = m_parser.get<std::string>("f");
 }
 
 void ApplicationSettings::process_options()
@@ -117,6 +120,24 @@ bool ApplicationSettings::contains_option(
         }
     }
     return flag;
+}
+
+std::map<std::string, std::string> ApplicationSettings::get_split_option(
+  const std::string& option)
+{
+  std::map<std::string, std::string> map_option;
+  auto key_value = option;
+  auto separator_pos = key_value.find("=");
+  if (separator_pos != key_value.npos)
+  {
+    std::string key = key_value.substr(0, separator_pos);
+    std::string value = key_value.substr((separator_pos + 1), key_value.size() - (separator_pos + 1));
+    if (!key.empty() && !value.empty())
+    {
+      map_option.emplace(key, value);
+    }
+  }
+  return map_option;
 }
 
 void ApplicationSettings::validate_report() const

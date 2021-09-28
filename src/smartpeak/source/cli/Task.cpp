@@ -88,20 +88,31 @@ namespace SmartPeak {
         LOGE << "Session not found: " << application_settings.load_session;
         return false;
       }
-      else if (std::filesystem::is_regular_file(application_settings.load_session))
-      {
-        // Load from session
-        SmartPeak::LoadSession create_sequence(application_handler);
-        return create_sequence.onFilePicked(application_settings.load_session, &application_handler);
-      }
       else
       {
-        LOGW << "Loading session from directory - backward compatibility - deprecated, prefer loading from session file.";
-        Filenames filenames_main = Utilities::buildFilenamesFromDirectory(application_handler, application_settings.load_session);
-        application_handler.main_dir_ = filenames_main.getTag(Filenames::Tag::MAIN_DIR);
+        // =================================
+        Filenames filenames_override;
+        auto split_options = application_settings.get_split_option(application_settings.input_files);
+        for (const auto& split_option : split_options)
+        {
+          filenames_override.setFullPath(split_option.first, split_option.second);
+        }
+        // =================================
         SmartPeak::LoadSession create_sequence(application_handler);
-        create_sequence.filenames_ = filenames_main;
-        return create_sequence.process();
+        create_sequence.filenames_override_ = filenames_override;
+        if (std::filesystem::is_regular_file(application_settings.load_session))
+        {
+          // Load from session
+          return create_sequence.onFilePicked(application_settings.load_session, &application_handler);
+        }
+        else
+        {
+          LOGW << "Loading session from directory - backward compatibility - deprecated, prefer loading from session file.";
+          Filenames filenames_main = Utilities::buildFilenamesFromDirectory(application_handler, application_settings.load_session);
+          application_handler.main_dir_ = filenames_main.getTag(Filenames::Tag::MAIN_DIR);
+          create_sequence.filenames_ = filenames_main;
+          return create_sequence.process();
+        }
       }
     }
 

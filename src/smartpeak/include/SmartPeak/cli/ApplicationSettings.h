@@ -24,6 +24,7 @@
 #include <iostream>
 #include <algorithm>
 #include <vector>
+#include <map>
 
 #include <SmartPeak/cli/Parser.h>
 
@@ -85,6 +86,12 @@ struct ApplicationSettings {
         const std::string& option, 
         std::string log_msg="");
 
+    /**
+     * Returns list of options from one string "key1=value1;key2=value2;..."
+     */ 
+    static std::map<std::string, std::string> get_split_option(
+      const std::string& option);
+
 public:
     /* options */
     std::string load_session;
@@ -99,6 +106,7 @@ public:
     bool disable_progressbar;
     std::string log_dir; 
     std::string out_dir;
+    std::string input_files;
 
 public:
     void validate_report() const;

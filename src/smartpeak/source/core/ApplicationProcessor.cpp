@@ -302,6 +302,15 @@ namespace SmartPeak
       filenames_ = application_handler_.filenames_;
     }
 
+    if (filenames_override_)
+    {
+      for (const auto& file_id : filenames_override_->getFileIds())
+      {
+        const auto value = filenames_override_->getFullPath(file_id);
+        filenames_->setFullPath(file_id, value);
+      }
+    }
+
     for (auto& loading_processor : application_handler_.loading_processors_)
     {
       // check if we need to use that loading processor

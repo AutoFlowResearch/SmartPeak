@@ -89,9 +89,10 @@ namespace SmartPeak
     /* IFilePickerHandler */
     bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
 
-    std::optional<Filenames> filenames_;                            /// Pathnames to load
+    std::optional<Filenames> filenames_;           /// Pathnames to load - if not set, read it from session
+    std::optional<Filenames> filenames_override_;  /// Pathnames override
     std::string      delimiter = ",";              /// String delimiter of the imported file
-    bool             checkConsistency = true;             /// Check consistency of data contained in files
+    bool             checkConsistency = true;      /// Check consistency of data contained in files
 
     LoadSession() = default;
     explicit LoadSession(ApplicationHandler& application_handler) : ApplicationProcessor(application_handler) {}
