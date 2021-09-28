@@ -563,6 +563,7 @@ namespace SmartPeak
     catch (const std::exception& e) {
       LOGE << "Utilities::getFolderContents : " << typeid(e).name() << " : " << e.what();
     }
+
     
     if (entries_temp.size() > 1)
     {

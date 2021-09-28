@@ -877,7 +877,7 @@ namespace SmartPeak
             {
               datum = SequenceHandler::getMetaValue(feature, feature, meta_value_name);
             }
-            if (datum.getTag() == CastValue::Type::FLOAT && datum.f_ != 0.0 && !std::isnan(datum.f_)) { // Skip NAN (replaced by 0 later)
+            if (datum.getTag() == CastValue::Type::FLOAT && !std::isnan(datum.f_)) { // Skip NAN (replaced by 0 later)
               data_dict[sample_name].emplace(row_tuple_name, datum.f_);
               columns.insert(sample_name);
               rows.insert(row_tuple_name);
@@ -911,7 +911,7 @@ namespace SmartPeak
               else if (datum.s_ == "FP") datum = static_cast<float>(-1.0);
               else datum = static_cast<float>(-2.0);
             }
-            if (datum.getTag() == CastValue::Type::FLOAT && datum.f_ != 0.0 && !std::isnan(datum.f_)) { // Skip NAN (replaced by 0 later)
+            if (datum.getTag() == CastValue::Type::FLOAT && !std::isnan(datum.f_)) { // Skip NAN (replaced by 0 later)
               data_dict[sample_name].emplace(row_tuple_name, datum.f_);
               columns.insert(sample_name);
               rows.insert(row_tuple_name);
