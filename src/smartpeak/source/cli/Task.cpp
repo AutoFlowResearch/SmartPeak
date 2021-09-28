@@ -83,7 +83,12 @@ namespace SmartPeak {
     {
       auto& application_settings = application_manager.get_application_settings();
       auto& application_handler = application_manager.get_application_handler();
-      if (std::filesystem::is_regular_file(application_settings.load_session))
+      if (!std::filesystem::exists(application_settings.load_session))
+      {
+        LOGE << "Session not found: " << application_settings.load_session;
+        return false;
+      }
+      else if (std::filesystem::is_regular_file(application_settings.load_session))
       {
         // Load from session
         SmartPeak::LoadSession create_sequence(application_handler);
