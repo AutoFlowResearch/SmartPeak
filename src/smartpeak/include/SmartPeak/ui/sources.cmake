@@ -8,6 +8,7 @@ set(sources_list_h
 	ChromatogramPlotWidget.h
 	ChromatogramTICPlotWidget.h
 	ChromatogramXICPlotWidget.h
+	CreateSessionWidget.h
 	FilePicker.h
 	GraphicDataVizWidget.h
 	GuiAppender.h
@@ -15,6 +16,7 @@ set(sources_list_h
 	Help.h
 	ImEntry.h
 	InfoWidget.h
+	LoadSessionWizard.h
 	LogWidget.h
 	ParameterEditorWidget.h
 	ParametersTableWidget.h
@@ -24,6 +26,7 @@ set(sources_list_h
 	SampleTypeEditorWidget.h
 	SequenceGroupsEditorWidget.h
 	SequenceTableWidget.h
+	SessionFilesWidget.h
 	SpectraMSMSPlotWidget.h
 	SpectraPlotWidget.h
 	StatisticsWidget.h

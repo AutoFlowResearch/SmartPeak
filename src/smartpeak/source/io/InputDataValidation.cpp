@@ -598,18 +598,31 @@ namespace SmartPeak
     return oss.str();
   }
 
-  bool InputDataValidation::prepareToLoad(const Filenames& filenames, const std::string& id)
+  bool InputDataValidation::prepareToLoad(const Filenames& filenames, const std::string& file_id)
   {
-    LOGI << "Loading: " << filenames.getFullPath(id).generic_string();
-
-    if (filenames.getFullPath(id).empty()) {
-      LOGE << "Filename is empty";
-      return false;
+    if (filenames.isEmbedded(file_id))
+    {
+      LOGI << "Loading from Session DB: " << file_id;
     }
+    else
+    {
+      LOGI << "Loading: " << filenames.getFullPath(file_id).generic_string();
 
-    if (!InputDataValidation::fileExists(filenames.getFullPath(id))) {
-      LOGE << "File not found";
-      return false;
+      const auto& full_path = filenames.getFullPath(file_id);
+      const bool is_embedded = filenames.isEmbedded(file_id);
+
+      if (!is_embedded)
+      {
+        if (full_path.empty()) {
+          LOGE << "Filename is empty";
+          return false;
+        }
+
+        if (!InputDataValidation::fileExists(full_path)) {
+          LOGE << "File not found " << full_path.generic_string();
+          return false;
+        }
+      }
     }
 
     return true;
@@ -617,55 +630,106 @@ namespace SmartPeak
 
   bool InputDataValidation::prepareToLoadOneOfTwo(const Filenames& filenames, const std::string& id1, const std::string& id2)
   {
-    LOGI << "Loading: " << 
-      filenames.getFullPath(id1).generic_string() 
-      << " and " <<
-      filenames.getFullPath(id2).generic_string();
+    const auto& full_path_1 = filenames.getFullPath(id1);
+    const auto& full_path_2 = filenames.getFullPath(id2);
+    const bool is_embedded_1 = filenames.isEmbedded(id1);
+    const bool is_embedded_2 = filenames.isEmbedded(id2);
 
-    if (filenames.getFullPath(id1).empty() &&
-      filenames.getFullPath(id2).empty()) {
+    if (full_path_1.empty() && (!is_embedded_1) &&
+        full_path_2.empty() && (!is_embedded_2)) {
       LOGE << "Filenames are both empty";
       return false;
     }
 
-    if (!filenames.getFullPath(id1).empty() &&
-      !InputDataValidation::fileExists(filenames.getFullPath(id1))) {
-      LOGE << "File not found: " << filenames.getFullPath(id1).generic_string();
-      return false;
-    }
+    bool file_1_is_valid = true;
+    bool file_2_is_valid = true;
 
-    if (!filenames.getFullPath(id2).empty() &&
-      !InputDataValidation::fileExists(filenames.getFullPath(id2))) {
-      LOGE << "File not found: " << filenames.getFullPath(id2).generic_string();
-      return false;
+    if (!is_embedded_1 && !full_path_1.empty() &&
+      !InputDataValidation::fileExists(full_path_1)) {
+      LOGE << "File not found: " << full_path_1.generic_string();
+      file_1_is_valid = false;
     }
+    else
+    {
+      if (is_embedded_1)
+      {
+        LOGI << "Loading from Session DB: " << id1;
+      }
+      else if (!full_path_1.empty())
+      {
+        LOGI << "Loading: " << full_path_1.generic_string();
+      }
+    }
+    
 
+    if (!is_embedded_2 && !full_path_2.empty() &&
+      !InputDataValidation::fileExists(full_path_2)) {
+      LOGE << "File not found: " << full_path_2.generic_string();
+      file_2_is_valid = false;
+    }
+    else
+    {
+      if (is_embedded_2)
+      {
+        LOGI << "Loading from Session DB: " << id2;
+      }
+      else if (!full_path_2.empty())
+      {
+        LOGI << "Loading: " << full_path_2.generic_string();
+      }
+    }
+    return (file_1_is_valid || file_2_is_valid);
+  }
+
+  bool InputDataValidation::prepareToStore(const Filenames& filenames, const std::string& file_id)
+  {
+    if (filenames.isEmbedded(file_id))
+    {
+      LOGI << "Storing in Session DB: " << file_id;
+    }
+    else
+    {
+      const auto full_path = filenames.getFullPath(file_id);
+
+      LOGI << "Storing: " << full_path.generic_string();
+
+      if (full_path.empty()) {
+        LOGE << "Filename is empty";
+        return false;
+      }
+    }
     return true;
   }
 
-  bool InputDataValidation::prepareToStore(const Filenames& filenames, const std::string& id)
+  bool InputDataValidation::prepareToStoreOneOfTwo(const Filenames& filenames, const std::string& file_id1, const std::string& file_id2)
   {
-    LOGI << "Storing: " << filenames.getFullPath(id).generic_string();
+    const auto& full_path_1 = filenames.getFullPath(file_id1);
+    const auto& full_path_2 = filenames.getFullPath(file_id2);
+    const bool is_embedded_1 = filenames.isEmbedded(file_id1);
+    const bool is_embedded_2 = filenames.isEmbedded(file_id2);
 
-    if (filenames.getFullPath(id).empty()) {
-      LOGE << "Filename is empty";
-      return false;
-    }
-
-    return true;
-  }
-
-  bool InputDataValidation::prepareToStoreOneOfTwo(const Filenames& filenames, const std::string& id1, const std::string& id2)
-  {
-    LOGI << "Storing: " << 
-      filenames.getFullPath(id1).generic_string()
-      << " and " <<
-      filenames.getFullPath(id2).generic_string();
-
-    if (filenames.getFullPath(id1).empty() &&
-      filenames.getFullPath(id2).empty()) {
+    if (filenames.getFullPath(file_id1).empty() &&
+      filenames.getFullPath(file_id2).empty()) {
       LOGE << "Filenames are both empty";
       return false;
+    }
+
+    if (is_embedded_1)
+    {
+      LOGI << "Storing in Session DB: " << file_id1;
+    }
+    else if (!full_path_1.empty())
+    {
+      LOGI << "Storing: " << full_path_1.generic_string();
+    }
+
+    if (is_embedded_2)
+    {
+      LOGI << "Storing in Session DB: " << file_id2;
+    }
+    else if (!full_path_2.empty())
+    {
+      LOGI << "Storing: " << full_path_2.generic_string();
     }
 
     return true;

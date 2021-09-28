@@ -6,6 +6,7 @@ set(core_executables_list
 	CastValue_test
 	ConsoleHandler_test
 	EventDispatcher_test
+	FeatureFiltersUtils_test
 	Filenames_test  
 	ImEntry_test
 	InjectionHandler_test
@@ -21,10 +22,12 @@ set(core_executables_list
 	SequenceProcessor_test
 	SequenceSegmentHandler_test
 	SequenceSegmentProcessor_test
+	SessionDB_test
 	SessionHandler_test
 	Task_test
 	Utilities_test
 	WorkflowObservable_test
+	WorkflowManager_test
 )
 
 set(io_executables_list

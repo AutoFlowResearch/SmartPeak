@@ -1002,15 +1002,9 @@ namespace SmartPeak
     return true;
   }
 
-  bool StoreSequenceFileSmartPeak::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
+  void StoreSequenceFileAnalyst::getFilenames(Filenames& filenames) const
   {
-    if (application_handler->sequenceHandler_.getSequence().size() == 0)
-    {
-      LOGE << "File cannot be stored without first loading the sequence.";
-      return false;
-    }
-    SequenceParser::writeSequenceFileSmartPeak(application_handler->sequenceHandler_, filename);
-    return true;
+    filenames.addFileName("sequence_file_analyst", "${MAIN}/SequenceFileAnalyst.txt", "Sequence File Analyst");
   }
 
   bool StoreSequenceFileAnalyst::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
@@ -1024,6 +1018,11 @@ namespace SmartPeak
     return true;
   }
 
+  void StoreSequenceFileMasshunter::getFilenames(Filenames& filenames) const
+  {
+    filenames.addFileName("sequence_file_masshunter", "${MAIN}/SequenceFileMasshunter.tsv", "Sequence File MassHunter");
+  }
+
   bool StoreSequenceFileMasshunter::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
   {
     if (application_handler->sequenceHandler_.getSequence().size() == 0)
@@ -1033,6 +1032,11 @@ namespace SmartPeak
     }
     SequenceParser::writeSequenceFileMasshunter(application_handler->sequenceHandler_, filename);
     return true;
+  }
+
+  void StoreSequenceFileXcalibur::getFilenames(Filenames& filenames) const
+  {
+    filenames.addFileName("sequence_file_xcalibur", "${MAIN}/SequenceFileXcalibur.tsv", "Sequence File XCalibur");
   }
 
   bool StoreSequenceFileXcalibur::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
@@ -1045,4 +1049,5 @@ namespace SmartPeak
     SequenceParser::writeSequenceFileXcalibur(application_handler->sequenceHandler_, filename);
     return true;
   }
+
 }

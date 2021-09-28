@@ -33,6 +33,8 @@
 #include <SmartPeak/core/Utilities.h>
 #include <SmartPeak/io/SequenceParser.h>
 #include <SmartPeak/ui/FilePicker.h>
+#include <SmartPeak/ui/CreateSessionWidget.h>
+#include <SmartPeak/ui/SessionFilesWidget.h>
 #include <SmartPeak/ui/GuiAppender.h>
 #include <SmartPeak/ui/Heatmap2DWidget.h>
 #include <SmartPeak/ui/CalibratorsPlotWidget.h>
@@ -52,6 +54,7 @@
 #include <SmartPeak/ui/LogWidget.h>
 #include <SmartPeak/ui/SequenceTableWidget.h>
 #include <SmartPeak/ui/WindowSizesAndPositions.h>
+#include <SmartPeak/ui/LoadSessionWizard.h>
 #include <SmartPeak/core/EventDispatcher.h>
 #include <plog/Log.h>
 #include <plog/Appenders/ConsoleAppender.h>
@@ -79,6 +82,8 @@ void initializeDataDir(
 
 void checkTitles(const std::vector<std::shared_ptr<Widget>> windows);
 
+std::string getMainWindowTitle(const ApplicationHandler& application_handler);
+
 int main(int argc, char** argv)
 // `int argc, char **argv` are required on Win to link against the proper SDL2/OpenGL implementation
 {
@@ -104,25 +109,32 @@ int main(int argc, char** argv)
   event_dispatcher.addSequenceObserver(&session_handler_);
   event_dispatcher.addFeaturesObserver(&session_handler_);
 
-  // widgets
-  FilePicker file_picker_;
-  auto quickInfoText_= std::make_shared<InfoWidget>("Info", application_handler_, 
+  // widgets: pop ups
+  auto file_picker_ = std::make_shared<FilePicker>();
+  auto session_files_widget_create_ = std::make_shared<SessionFilesWidget>(application_handler_, SessionFilesWidget::Mode::ECreation);
+  auto session_files_widget_modify_ = std::make_shared<SessionFilesWidget>(application_handler_, SessionFilesWidget::Mode::EModification);
+  auto create_session_widget_ = std::make_shared<CreateSessionWidget>(application_handler_, session_files_widget_create_);
+  auto run_workflow_widget_ = std::make_shared<RunWorkflowWidget>(application_handler_,
+    session_handler_,
+    workflow_manager_,
+    event_dispatcher,
+    event_dispatcher,
+    event_dispatcher,
+    event_dispatcher);
+  auto about_widget_ = std::make_shared<AboutWidget>();
+  auto report_ = std::make_shared<Report>(application_handler_);
+
+  auto load_session_wizard_ = std::make_shared<LoadSessionWizard>(session_files_widget_modify_);
+
+  // widgets: windows
+  auto quickInfoText_= std::make_shared<InfoWidget>("Info", application_handler_,
                                                             event_dispatcher, 
                                                             event_dispatcher,
                                                             event_dispatcher,
                                                             event_dispatcher,
                                                             event_dispatcher);
-  auto report_ = std::make_shared<Report>(application_handler_);
   auto workflow_ = std::make_shared<WorkflowWidget>("Workflow", application_handler_, workflow_manager_);
   auto statistics_ = std::make_shared<StatisticsWidget>("Statistics", application_handler_, event_dispatcher);
-  auto run_workflow_widget_ = std::make_shared<RunWorkflowWidget>(application_handler_, 
-                                                                  session_handler_, 
-                                                                  workflow_manager_, 
-                                                                  event_dispatcher, 
-                                                                  event_dispatcher,
-                                                                  event_dispatcher,
-                                                                  event_dispatcher);
-  auto about_widget_ = std::make_shared<AboutWidget>();
   auto log_widget_ = std::make_shared<LogWidget>(appender_, "Log");
   auto parameters_table_widget_ = std::make_shared<ParametersTableWidget>(session_handler_, application_handler_, "ParametersMainWindow", "Parameters");
   auto chromatogram_plot_widget_ = std::make_shared<ChromatogramPlotWidget>(session_handler_, application_handler_, "Chromatograms Main Window", "Chromatograms", event_dispatcher);
@@ -258,6 +270,16 @@ int main(int argc, char** argv)
     spectrum_explorer_window_
   };
 
+  std::vector<std::shared_ptr<Widget>> popups = {
+      file_picker_,
+      session_files_widget_create_,
+      session_files_widget_modify_,
+      create_session_widget_,
+      run_workflow_widget_,
+      about_widget_,
+      report_
+  };
+
   // We need titles for all sub windows
   checkTitles(top_windows);
   checkTitles(bottom_windows);
@@ -320,8 +342,6 @@ int main(int argc, char** argv)
   }
 
   // Setup window
-  auto smartpeak_window_title = static_cast<std::ostringstream&&>(
-    std::ostringstream() << "SmartPeak v" << Utilities::getSmartPeakVersion()).str();
   SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
   SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
   SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
@@ -330,7 +350,7 @@ int main(int argc, char** argv)
   SDL_DisplayMode current;
   SDL_GetCurrentDisplayMode(0, &current);
   SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
-  SDL_Window* window = SDL_CreateWindow(smartpeak_window_title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, window_flags);
+  SDL_Window* window = SDL_CreateWindow(getMainWindowTitle(application_handler_).c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, window_flags);
   SDL_GLContext gl_context = SDL_GL_CreateContext(window);
   SDL_GL_SetSwapInterval(1); // Enable vsync
 
@@ -355,6 +375,7 @@ int main(int argc, char** argv)
   bool done = false;
   while (!done)
   {
+    SDL_SetWindowTitle(window, getMainWindowTitle(application_handler_).c_str());
     SDL_Event event;
     while (SDL_PollEvent(&event))
     {
@@ -381,39 +402,26 @@ int main(int argc, char** argv)
         workflow_manager_.updateApplicationHandler(application_handler_);
       }
       workflow_is_done_ = workflow_manager_.isWorkflowDone();
-      file_loading_is_done_ = file_picker_.fileLoadingIsDone();
+      file_loading_is_done_ = file_picker_->fileLoadingIsDone();
 
       // Make the quick info text
-      quickInfoText_->setFileLoadingDone(file_loading_is_done_, file_picker_.errorLoadingFile());
+      quickInfoText_->setFileLoadingDone(file_loading_is_done_, file_picker_->errorLoadingFile());
       quickInfoText_->clearErrorMessages();
       if (exceeding_plot_points_) quickInfoText_->addErrorMessage("Plot rendering limit reached.  Not plotting all selected data.");
       if (exceeding_table_size_) quickInfoText_->addErrorMessage("Table rendering limit reached.  Not showing all selected data.");
       if (ran_integrity_check_ && integrity_check_failed_) quickInfoText_->addErrorMessage("Integrity check failed.  Check the `Information` log.");
       if (ran_integrity_check_ && !integrity_check_failed_) quickInfoText_->addErrorMessage("Integrity check passed.");
-
+      
     // ======================================
     // Popups
     // ======================================
-    if (file_picker_.visible_)
+    for (const auto& popup : popups)
     {
-      ImGui::OpenPopup("Pick a pathname");
-      file_picker_.draw();
-    }
-    if (run_workflow_widget_->visible_)
-    {
-      ImGui::OpenPopup("Run workflow modal");
-      run_workflow_widget_->draw();
-    }
-
-    if (about_widget_->visible_)
-    {
-      ImGui::OpenPopup("About");
-      about_widget_->draw();
-    }
-    if (report_->visible_)
-    {
-      ImGui::OpenPopup("Report dialog");
-      report_->draw();
+      if (popup->visible_)
+      {
+        ImGui::OpenPopup(popup->title_.c_str());
+        popup->draw();
+      }
     }
 
     // ======================================
@@ -424,135 +432,85 @@ int main(int argc, char** argv)
       if (ImGui::BeginMenu("File"))
       {
         ImGui::MenuItem("Session", NULL, false, false);
-        //if (ImGui::MenuItem("New Session", NULL, false, false))
-        //{
-        //  //TODO: Session (see AUT-280)
-        //}
-        //if (ImGui::MenuItem("Load Session", NULL, false, false))
-        //{
-        //  //TODO: Session (see AUT-280)
-        //}
-        if (ImGui::MenuItem("Load session from sequence", NULL, false, workflow_is_done_ && file_loading_is_done_)) {
-          file_picker_.setFilePickerHandler(std::make_shared<CreateSequence>(application_handler_.sequenceHandler_), application_handler_);
-          file_picker_.visible_ = true;
+        if (ImGui::MenuItem("New Session", NULL, false, workflow_is_done_ && file_loading_is_done_)) {
+          create_session_widget_->visible_ = true;
         }
-        showQuickHelpToolTip("load_session_from_sequence");
-        //if (ImGui::MenuItem("Save Session", NULL, false, false))
-        //{
-        //  //TODO: Session (see AUT-280)
-        //}
-        //if (ImGui::MenuItem("Save Session As...", NULL, false, false))
-        //{
-        //  //TODO: Session (see AUT-280)
-        //}
-        ImGui::Separator();
-        ImGui::MenuItem("Text file", NULL, false, false);
-        if (ImGui::BeginMenu("Import File"))
-        {
-          if (ImGui::MenuItem("Transitions")) {
-            file_picker_.setFilePickerHandler(std::make_shared<LoadTransitions>(), application_handler_);
-            file_picker_.visible_ = true;
-          }
-          if (ImGui::MenuItem("Parameters")) {
-            file_picker_.setFilePickerHandler(std::make_shared<LoadParameters>(), application_handler_);
-            file_picker_.visible_ = true;
-          }
-          if (ImGui::MenuItem("Workflow", NULL, false, workflow_is_done_)) {
-            file_picker_.setFilePickerHandler(std::make_shared<LoadWorkflow>(application_handler_.sequenceHandler_), application_handler_);
-            file_picker_.visible_ = true;
-          }
-          if (ImGui::MenuItem("Reference data")) {
-            file_picker_.setFilePickerHandler(std::make_shared<LoadValidationData>(), application_handler_);
-            file_picker_.visible_ = true;
-          }
-          if (ImGui::MenuItem("Quant Method")) {
-            file_picker_.setFilePickerHandler(std::make_shared<LoadQuantitationMethods>(), application_handler_);
-            file_picker_.visible_ = true;
-          }
-          if (ImGui::MenuItem("Standards Conc")) {
-            file_picker_.setFilePickerHandler(std::make_shared<LoadStandardsConcentrations>(), application_handler_);
-            file_picker_.visible_ = true;
-          }
-          if (ImGui::MenuItem("Comp Filters")) {
-            file_picker_.setFilePickerHandler(std::make_shared<LoadFeatureFilters>(), application_handler_);
-            file_picker_.visible_ = true;
-          }
-          if (ImGui::MenuItem("Comp Group Filters")) {
-            file_picker_.setFilePickerHandler(std::make_shared<LoadFeatureFilters>(true), application_handler_);
-            file_picker_.visible_ = true;
-          }
-          if (ImGui::MenuItem("Comp QCs")) {
-            file_picker_.setFilePickerHandler(std::make_shared<LoadFeatureQCs>(), application_handler_);
-            file_picker_.visible_ = true;
-          }
-          if (ImGui::MenuItem("Comp Group QCs")) {
-            file_picker_.setFilePickerHandler(std::make_shared<LoadFeatureQCs>(true), application_handler_);
-            file_picker_.visible_ = true;
-          }
-          if (ImGui::MenuItem("Comp %RSD Filters")) {
-            file_picker_.setFilePickerHandler(std::make_shared<LoadFeatureRSDFilters>(), application_handler_);
-            file_picker_.visible_ = true;
-          }
-          if (ImGui::MenuItem("Comp Group %RSD Filters")) {
-            file_picker_.setFilePickerHandler(std::make_shared<LoadFeatureRSDFilters>(true), application_handler_);
-            file_picker_.visible_ = true;
-          }
-          if (ImGui::MenuItem("Comp %RSD QCs")) {
-            file_picker_.setFilePickerHandler(std::make_shared<LoadFeatureRSDQCs>(), application_handler_);
-            file_picker_.visible_ = true;
-          }
-          if (ImGui::MenuItem("Comp Group %RSD QCs")) {
-            file_picker_.setFilePickerHandler(std::make_shared<LoadFeatureRSDQCs>(true), application_handler_);
-            file_picker_.visible_ = true;
-          }
-          if (ImGui::MenuItem("Comp %Background Filters")) {
-            file_picker_.setFilePickerHandler(std::make_shared<LoadFeatureBackgroundFilters>(), application_handler_);
-            file_picker_.visible_ = true;
-          }
-          if (ImGui::MenuItem("Comp Group %Background Filters")) {
-            file_picker_.setFilePickerHandler(std::make_shared<LoadFeatureBackgroundFilters>(true), application_handler_);
-            file_picker_.visible_ = true;
-          }
-          if (ImGui::MenuItem("Comp %Background QCs")) {
-            file_picker_.setFilePickerHandler(std::make_shared<LoadFeatureBackgroundQCs>(), application_handler_);
-            file_picker_.visible_ = true;
-          }
-          if (ImGui::MenuItem("Comp Group %Background QCs")) {
-            file_picker_.setFilePickerHandler(std::make_shared<LoadFeatureBackgroundQCs>(true), application_handler_);
-            file_picker_.visible_ = true;
-          }
-          ImGui::EndMenu();
+        if (ImGui::MenuItem("Load Session", NULL, false, workflow_is_done_ && file_loading_is_done_)) {
+          file_picker_->open("Select session file",
+            load_session_wizard_,
+            FilePicker::Mode::EFileRead,
+            application_handler_);
         }
-        showQuickHelpToolTip("import_file");
-        
+        if (ImGui::MenuItem("Save Session",
+          NULL,
+          false,
+          workflow_is_done_ && file_loading_is_done_
+          && application_handler_.filenames_.getSessionDB().getDBFilePath() != "")) {
+          SaveSession save_session(application_handler_);
+          save_session.process();
+        }
+        if (ImGui::MenuItem("Save Session As ...", NULL, false, 
+                             workflow_is_done_ && file_loading_is_done_ && application_handler_.sessionIsOpened())) {
+          file_picker_->open("Select session file",
+            std::make_shared<SaveSession>(application_handler_),
+            FilePicker::Mode::EFileCreate,
+            application_handler_,
+            "session.db");
+        }
+        if (ImGui::MenuItem("Edit Session Files", NULL, false, application_handler_.sessionIsOpened())) {
+          session_files_widget_modify_->open(application_handler_.filenames_);
+        }
         if (ImGui::BeginMenu("Export File"))
         {
-          //if (ImGui::MenuItem("Sequence")) {} // TODO: updated sequence file
-          //if (ImGui::MenuItem("Transitions")) {} // TODO: updated transitions file
-          //if (ImGui::MenuItem("Standards Conc")) {} // TODO: updated standards concentration file
-          if (ImGui::MenuItem("Sequence")) {
-            file_picker_.setFilePickerHandler(std::make_shared<StoreSequenceFileSmartPeak>(), application_handler_);
-            file_picker_.visible_ = true;
-          }
-          if (ImGui::MenuItem("Parameters")) {
-            file_picker_.setFilePickerHandler(std::make_shared<StoreParameters>(), application_handler_);
-            file_picker_.visible_ = true;
-          }
-          if (ImGui::MenuItem("Workflow")) {
-            file_picker_.setFilePickerHandler(std::make_shared<StoreWorkflow>(application_handler_.sequenceHandler_), application_handler_);
-            file_picker_.visible_ = true;
-          }
-          if (ImGui::MenuItem("Sequence Analyst")) {
-            file_picker_.setFilePickerHandler(std::make_shared<StoreSequenceFileAnalyst>(), application_handler_);
-            file_picker_.visible_ = true;
-          }
-          if (ImGui::MenuItem("Sequence MassHunter")) {
-            file_picker_.setFilePickerHandler(std::make_shared<StoreSequenceFileMasshunter>(), application_handler_);
-            file_picker_.visible_ = true;
-          }
-          if (ImGui::MenuItem("Sequence Xcalibur")) {
-            file_picker_.setFilePickerHandler(std::make_shared<StoreSequenceFileXcalibur>(), application_handler_);
-            file_picker_.visible_ = true;
+          static std::vector<std::shared_ptr<IFilenamesHandler>> export_processors =
+          {
+            std::make_shared<StoreSequence>(application_handler_.sequenceHandler_),
+            std::make_shared<StoreSequenceFileAnalyst>(),
+            std::make_shared<StoreSequenceFileMasshunter>(),
+            std::make_shared<StoreSequenceFileXcalibur>(),
+            std::make_shared<StoreParameters>(),
+            std::make_shared<StoreWorkflow>(application_handler_.sequenceHandler_),
+            std::make_shared<StoreValidationData>(),
+            std::make_shared<StoreStandardsConcentrations>(),
+            std::make_shared<StoreQuantitationMethods>(),
+            std::make_shared<StoreFeatureFilters>(FeatureFiltersUtilsMode::EFeatureFiltersModeComponent, true),
+            std::make_shared<StoreFeatureFilters>(FeatureFiltersUtilsMode::EFeatureFiltersModeGroup, true),
+            std::make_shared<StoreFeatureQCs>(FeatureFiltersUtilsMode::EFeatureFiltersModeComponent, true),
+            std::make_shared<StoreFeatureQCs>(FeatureFiltersUtilsMode::EFeatureFiltersModeGroup, true),
+            std::make_shared<StoreFeatureRSDFilters>(FeatureFiltersUtilsMode::EFeatureFiltersModeComponent, true),
+            std::make_shared<StoreFeatureRSDFilters>(FeatureFiltersUtilsMode::EFeatureFiltersModeGroup, true),
+            std::make_shared<StoreFeatureRSDQCs>(FeatureFiltersUtilsMode::EFeatureFiltersModeComponent, true),
+            std::make_shared<StoreFeatureRSDQCs>(FeatureFiltersUtilsMode::EFeatureFiltersModeGroup, true),
+            std::make_shared<StoreFeatureBackgroundFilters>(FeatureFiltersUtilsMode::EFeatureFiltersModeComponent, true),
+            std::make_shared<StoreFeatureBackgroundFilters>(FeatureFiltersUtilsMode::EFeatureFiltersModeGroup, true),
+            std::make_shared<StoreFeatureBackgroundQCs>(FeatureFiltersUtilsMode::EFeatureFiltersModeComponent, true),
+            std::make_shared<StoreFeatureBackgroundQCs>(FeatureFiltersUtilsMode::EFeatureFiltersModeGroup, true),
+            std::make_shared<StoreFeatureRSDEstimations>(FeatureFiltersUtilsMode::EFeatureFiltersModeComponent, true),
+            std::make_shared<StoreFeatureRSDEstimations>(FeatureFiltersUtilsMode::EFeatureFiltersModeGroup, true),
+            std::make_shared<StoreFeatureBackgroundEstimations>(FeatureFiltersUtilsMode::EFeatureFiltersModeComponent, true),
+            std::make_shared<StoreFeatureBackgroundEstimations>(FeatureFiltersUtilsMode::EFeatureFiltersModeGroup, true)
+          };
+          for (const auto& export_processor : export_processors)
+          {
+            Filenames filenames;
+            export_processor->getFilenames(filenames);
+            for (const auto& file_id : filenames.getFileIds())
+            {
+              auto file_picker_handler = std::dynamic_pointer_cast<IFilePickerHandler>(export_processor);
+              if (file_picker_handler)
+              {
+                if (ImGui::MenuItem(filenames.getDescription(file_id).c_str(), NULL, false, workflow_is_done_))
+                {
+                  file_picker_->open(filenames.getDescription(file_id),
+                    file_picker_handler,
+                    FilePicker::Mode::EFileCreate,
+                    application_handler_,
+                    filenames.getFullPath(file_id).filename().generic_string()
+                  );
+                  file_picker_->visible_ = true;
+                }
+              }
+            }
           }
           ImGui::EndMenu();
         }
@@ -564,8 +522,8 @@ int main(int argc, char** argv)
       if (ImGui::BeginMenu("View"))
       {
         ImGui::MenuItem("Explorer window", NULL, false, false);
-        if (ImGui::MenuItem("Injections", NULL, &injections_explorer_window_->visible_)) {} // TODO: search field
-        if (ImGui::MenuItem("Transitions", NULL, &transitions_explorer_window_->visible_)) {} // TODO: search field
+        if (ImGui::MenuItem("Injections", NULL, &injections_explorer_window_->visible_)) {}
+        if (ImGui::MenuItem("Transitions", NULL, &transitions_explorer_window_->visible_)) {}
         if (ImGui::MenuItem("Features", NULL, &features_explorer_window_->visible_)) {}
         if (ImGui::MenuItem("Scans", NULL, &spectrum_explorer_window_->visible_)) {}
         ImGui::Separator(); // Primary input
@@ -627,13 +585,32 @@ int main(int argc, char** argv)
       
       if (ImGui::BeginMenu("Actions"))
       {
-        if (ImGui::MenuItem("Run workflow", NULL, &run_workflow_widget_->visible_))
+        if (ImGui::MenuItem("Run workflow"))
         {
-          if (application_handler_.sequenceHandler_.getWorkflow().empty())
+          BuildCommandsFromNames buildCommandsFromNames(application_handler_);
+          buildCommandsFromNames.names_ = application_handler_.sequenceHandler_.getWorkflow();
+          if (!buildCommandsFromNames.process())
           {
-            LOGW << "Workflow has no steps to run. Please set the workflow's steps.";
+            LOGE << "Failed to create Commands, aborting.";
           }
-          initializeDataDirs(application_handler_);
+          else
+          {
+            auto requirements = workflow_manager_.getRequirements(buildCommandsFromNames.commands_);
+            bool missing_requirement = workflow_manager_.isMissingRequirements(application_handler_.filenames_, requirements);
+            if (missing_requirement)
+            {
+              session_files_widget_modify_->open(application_handler_.filenames_, requirements);
+            }
+            else
+            {
+              run_workflow_widget_->visible_ = true;
+              if (application_handler_.sequenceHandler_.getWorkflow().empty())
+              {
+                LOGW << "Workflow has no steps to run. Please set the workflow's steps.";
+              }
+              initializeDataDirs(application_handler_);
+            }
+          }
         }
         showQuickHelpToolTip("run_workflow");
         
@@ -734,7 +711,7 @@ int main(int argc, char** argv)
         feature_matrix_main_window_->table_data_ = session_handler_.feature_pivot_table;
         feature_matrix_main_window_->checked_rows_ = Eigen::Tensor<bool, 1>();
     }
-    
+
     // feature line plot
     if (feature_line_plot_->visible_)
     {
@@ -951,3 +928,17 @@ void checkTitles(const std::vector<std::shared_ptr<Widget>> windows)
     assert(window->title_ != std::string(""));
   }
 }
+
+std::string getMainWindowTitle(const ApplicationHandler& application_handler)
+{
+  std::ostringstream os;
+  static auto smartpeak_version = static_cast<std::ostringstream&&>(
+    std::ostringstream() << "SmartPeak v" << Utilities::getSmartPeakVersion()).str();
+  os << smartpeak_version;
+  if (!application_handler.sessionIsSaved())
+  {
+    os << " (unsaved session)";
+  }
+  return os.str();
+}
+

@@ -38,41 +38,62 @@ namespace SmartPeak
 {
   class FilePicker final : public Widget
   {
+  public:
+
+    enum class Mode
+    {
+      EFileRead,
+      EFileCreate,
+      EDirectory
+    };
+
+    FilePicker() : Widget("Pick a pathname") {};
+
+    void draw() override;
+    std::string getPickedPathname() const;
+    void open(const std::string& title,
+      std::shared_ptr<IFilePickerHandler> file_picker_handler,
+      FilePicker::Mode mode,
+      ApplicationHandler& application_handler,
+      const std::string& default_file_name = "");
+    void runProcessor();
+    bool fileLoadingIsDone() { return loading_is_done_; };
+    bool errorLoadingFile() { return error_loading_file_; };
+
+  protected:
     std::array<std::vector<std::string>, 4> pathname_content_;
     std::filesystem::path current_pathname_ = std::filesystem::current_path();
     std::string picked_pathname_;
-    
+
     std::shared_ptr<IFilePickerHandler> file_picker_handler_ = nullptr;
-    ApplicationHandler *application_handler_ = nullptr;
+    ApplicationHandler* application_handler_ = nullptr;
 
     bool loading_is_done_ = true;
-    bool file_was_loaded_ = true;
     bool error_loading_file_ = false;
-    bool set_button_to_save_ = false;
-    std::atomic_bool files_scanned_ {false};
+    FilePicker::Mode mode_;
+    std::atomic_bool files_scanned_{ false };
     const ImGuiTableSortSpecs* s_current_sort_specs = NULL;
+    std::string selected_filename_;
+    int selected_entry_ = -1;
+    ImGuiTextFilter filter_;
+    std::string open_button_text_ = "Open";
 
     void run_and_join(
       IFilePickerHandler* file_picker_handler,
       const std::string& pathname,
-      bool& loading_is_done,
-      bool& file_was_loaded
+      bool& loading_is_done
     );
-    
+
     ///!  rescan pathname_content_ into content_items when needed
     void updateContents(std::vector<ImEntry>& content_items);
 
-  public:
-    FilePicker() = default;
+    void drawConfirmationPopup();
 
-    void draw() override;
-    std::string getPickedPathname() const;
-    void setFilePickerHandler(std::shared_ptr<IFilePickerHandler> file_picker_handler, ApplicationHandler& application_handler);
-    void runProcessor();
+    void doOpenFile();
+
+    bool isReadyToOpen(const std::string& full_path);
+
     void clearProcessor();
-    bool fileLoadingIsDone() { return loading_is_done_; };
-    bool fileWasLoaded() { return file_was_loaded_; };
-    bool errorLoadingFile() { return error_loading_file_; };
-    void setButtonToSave() { set_button_to_save_ = true; }
+
   };
 }

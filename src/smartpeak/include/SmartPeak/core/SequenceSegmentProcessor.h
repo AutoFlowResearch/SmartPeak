@@ -33,6 +33,7 @@
 #include <SmartPeak/core/Parameters.h>
 #include <SmartPeak/core/SequenceSegmentObservable.h>
 #include <SmartPeak/iface/IFilePickerHandler.h>
+#include <SmartPeak/core/FeatureFiltersUtilsMode.h>
 
 namespace SmartPeak
 {
@@ -54,7 +55,7 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const = 0;
 
     /**
@@ -72,9 +73,11 @@ namespace SmartPeak
       std::vector<size_t>& sampleIndices
     );
 
-
     /* IFilenamesHandler */
     virtual void getFilenames(Filenames& filenames) const override { };
+
+    /* IProcessorDescription */
+    virtual std::vector<std::string> getRequirements() const override { return {}; };
 
     SequenceSegmentObservable* sequence_segment_observable_ = nullptr;
 
@@ -84,15 +87,26 @@ namespace SmartPeak
     // Even though this class is abstract and hence can't be instantiated,
     // derived classes will call the base's constructor
     SequenceSegmentProcessor() = default;
+
+    void processForAllSegments(std::vector<SmartPeak::SequenceSegmentHandler>& sequence_segment_handlers,
+                               SequenceSegmentObservable* sequence_segment_observable,
+                               Filenames& filenames);
+
+    /** 
+      Utility method: most of the loading / storing processors can load / store per sequence
+      But also from one unique file to or from multiple sequence (static filename)
+      this method aims at returning the appropriate filename based on "static filename" behavior.
+    */
+    std::string constructFilename(const std::string& filename, bool static_filename) const;
   };
 
   struct CalculateCalibration : SequenceSegmentProcessor
   {
-    int getID() const override { return 15; }
-    std::string getName() const override { return "CALCULATE_CALIBRATION"; }
-    std::string getDescription() const override { return "Determine the optimal relationship between known sample concentration and measured intensity."; }
-
+    /* IProcessorDescription */
+    virtual std::string getName() const override { return "CALCULATE_CALIBRATION"; }
+    virtual std::string getDescription() const override { return "Determine the optimal relationship between known sample concentration and measured intensity."; }
     virtual ParameterSet getParameterSchema() const override;
+    virtual std::vector<std::string> getRequirements() const override;
 
     /**
       Optimize the calibration curve for all components.
@@ -101,22 +115,24 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const override;
   };
 
   struct LoadStandardsConcentrations : SequenceSegmentProcessor, IFilePickerHandler
   {
-    /**
-    IFilePickerHandler
-    */
+    LoadStandardsConcentrations(bool static_filenames = false)
+      : static_filenames_(static_filenames) {}
+    bool static_filenames_;
+
+    /* IFilePickerHandler */
     bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
 
-    int getID() const override { return -1; }
-    std::string getName() const override { return "LOAD_STANDARDS_CONCENTRATIONS"; }
-    std::string getDescription() const override { return "Load the standards concentrations file that gives the relationship between injection, component, and known concentration from disk."; }
-
+    /* IProcessorDescription */
+    virtual std::string getName() const override { return "LOAD_STANDARDS_CONCENTRATIONS"; }
+    virtual std::string getDescription() const override { return "Load the standards concentrations file that gives the relationship between injection, component, and known concentration from disk."; }
     virtual ParameterSet getParameterSchema() const override;
+    virtual std::vector<std::string> getRequirements() const override;
 
     /**
       Load the standards concentration file.
@@ -125,7 +141,36 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
+    ) const override;
+
+    /* IFilenamesHandler */
+    virtual void getFilenames(Filenames& filenames) const override;
+  };
+
+  struct StoreStandardsConcentrations : SequenceSegmentProcessor, IFilePickerHandler
+  {
+    StoreStandardsConcentrations(bool static_filenames = false)
+      : static_filenames_(static_filenames) {}
+    bool static_filenames_;
+
+    /* IFilePickerHandler */
+    bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
+
+    /* IProcessorDescription */
+    virtual std::string getName() const override { return "LOAD_STANDARDS_CONCENTRATIONS"; }
+    virtual std::string getDescription() const override { return "Load the standards concentrations file that gives the relationship between injection, component, and known concentration from disk."; }
+    virtual ParameterSet getParameterSchema() const override;
+    virtual std::vector<std::string> getRequirements() const override;
+
+    /**
+      Load the standards concentration file.
+    */
+    void process(
+      SequenceSegmentHandler& sequenceSegmentHandler_IO,
+      const SequenceHandler& sequenceHandler_I,
+      const ParameterSet& params_I,
+      Filenames& filenames_I
     ) const override;
 
     /* IFilenamesHandler */
@@ -134,16 +179,18 @@ namespace SmartPeak
 
   struct LoadQuantitationMethods : SequenceSegmentProcessor, IFilePickerHandler
   {
-    /**
-    IFilePickerHandler
-    */
+    LoadQuantitationMethods(bool static_filenames = false)
+      : static_filenames_(static_filenames) {}
+    bool static_filenames_;
+
+    /* IFilePickerHandler */
     bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
 
-    int getID() const override { return 17; }
-    std::string getName() const override { return "LOAD_QUANTITATION_METHODS"; }
-    std::string getDescription() const override { return "Load each transitions calibration model defined in quantitationMethods from disk."; }
-
+    /* IProcessorDescription */
+    virtual std::string getName() const override { return "LOAD_QUANTITATION_METHODS"; }
+    virtual std::string getDescription() const override { return "Load each transitions calibration model defined in quantitationMethods from disk."; }
     virtual ParameterSet getParameterSchema() const override;
+    virtual std::vector<std::string> getRequirements() const override;
 
     /**
       Load the quantitation methods file.
@@ -152,7 +199,7 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const override;
 
     /* IFilenamesHandler */
@@ -161,11 +208,15 @@ namespace SmartPeak
 
   struct StoreQuantitationMethods : SequenceSegmentProcessor
   {
-    int getID() const override { return 16; }
-    std::string getName() const override { return "STORE_QUANTITATION_METHODS"; }
-    std::string getDescription() const override { return "Write each transitions calibration model to disk for later use."; }
+    StoreQuantitationMethods(bool static_filenames = false)
+      : static_filenames_(static_filenames) {}
+    bool static_filenames_;
 
+    /* IProcessorDescription */
+    virtual std::string getName() const override { return "STORE_QUANTITATION_METHODS"; }
+    virtual std::string getDescription() const override { return "Write each transitions calibration model to disk for later use."; }
     virtual ParameterSet getParameterSchema() const override;
+    virtual std::vector<std::string> getRequirements() const override;
 
     /**
       Write the quantitation methods to disk.
@@ -174,7 +225,7 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const override;
 
     /* IFilenamesHandler */
@@ -183,19 +234,19 @@ namespace SmartPeak
 
   struct LoadFeatureFilters : SequenceSegmentProcessor, IFilePickerHandler
   {
-    LoadFeatureFilters(bool component_group = false) : component_group_(component_group) {}
-    bool component_group_;
+    LoadFeatureFilters(int feature_filter_mode = FeatureFiltersUtilsMode::EFeatureFilterComponentAndGroup, bool static_filenames = false)
+      : feature_filter_mode_(feature_filter_mode), static_filenames_(static_filenames) {}
+    int feature_filter_mode_;
+    bool static_filenames_;
 
-    /**
-    IFilePickerHandler
-    */
+    /* IFilePickerHandler */
     bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
 
-    int getID() const override { return -1; }
-    std::string getName() const override { return "LOAD_FEATURE_FILTERS"; }
-    std::string getDescription() const override { return "Load the component and component group filters from file."; }
-
+    /* IProcessorDescription */
+    virtual std::string getName() const override { return "LOAD_FEATURE_FILTERS"; }
+    virtual std::string getDescription() const override { return "Load the component and component group filters from file."; }
     virtual ParameterSet getParameterSchema() const override;
+    virtual std::vector<std::string> getRequirements() const override;
 
     /** Load the component and component group filters from file.
     */
@@ -203,7 +254,7 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const override;
 
     /* IFilenamesHandler */
@@ -212,19 +263,19 @@ namespace SmartPeak
 
   struct LoadFeatureQCs : SequenceSegmentProcessor, IFilePickerHandler
   {
-    LoadFeatureQCs(bool component_group = false) : component_group_(component_group) {}
-    bool component_group_;
+    LoadFeatureQCs(int feature_filter_mode = FeatureFiltersUtilsMode::EFeatureFilterComponentAndGroup, bool static_filenames = false)
+      : feature_filter_mode_(feature_filter_mode), static_filenames_(static_filenames) {}
+    int feature_filter_mode_;
+    bool static_filenames_;
 
-    /**
-    IFilePickerHandler
-    */
+    /* IProcessorDescription */
     bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
 
-    int getID() const override { return -1; }
-    std::string getName() const override { return "LOAD_FEATURE_QCS"; }
-    std::string getDescription() const override { return "Load the component and component group QCs from file."; }
-
+    /* IProcessorDescription */
+    virtual std::string getName() const override { return "LOAD_FEATURE_QCS"; }
+    virtual std::string getDescription() const override { return "Load the component and component group QCs from file."; }
     virtual ParameterSet getParameterSchema() const override;
+    virtual std::vector<std::string> getRequirements() const override;
 
     /** Load the component and component group QCs from file.
     */
@@ -232,20 +283,25 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const override;
 
     /* IFilenamesHandler */
     virtual void getFilenames(Filenames& filenames) const override;
   };
 
-  struct StoreFeatureFilters : SequenceSegmentProcessor
+  struct StoreFeatureFilters : SequenceSegmentProcessor, IFilePickerHandler
   {
-    int getID() const override { return -1; }
-    std::string getName() const override { return "STORE_FEATURE_FILTERS"; }
-    std::string getDescription() const override { return "Store the component and component group filters to disk."; }
+    StoreFeatureFilters(int feature_filter_mode = FeatureFiltersUtilsMode::EFeatureFilterComponentAndGroup, bool static_filenames = false)
+      : feature_filter_mode_(feature_filter_mode), static_filenames_(static_filenames) {}
+    int feature_filter_mode_;
+    bool static_filenames_;
 
+    /* IProcessorDescription */
+    virtual std::string getName() const override { return "STORE_FEATURE_FILTERS"; }
+    virtual std::string getDescription() const override { return "Store the component and component group filters to disk."; }
     virtual ParameterSet getParameterSchema() const override;
+    virtual std::vector<std::string> getRequirements() const override;
 
     /** Store the component and component group filters to disk.
     */
@@ -253,20 +309,28 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const override;
 
     /* IFilenamesHandler */
     virtual void getFilenames(Filenames& filenames) const override;
+
+    /* IProcessorDescription */
+    bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
   };
 
-  struct StoreFeatureQCs : SequenceSegmentProcessor
+  struct StoreFeatureQCs : SequenceSegmentProcessor, IFilePickerHandler
   {
-    int getID() const override { return -1; }
-    std::string getName() const override { return "STORE_FEATURE_QCS"; }
-    std::string getDescription() const override { return "Store the component and component group QCs to disk."; }
+    StoreFeatureQCs(int feature_filter_mode = FeatureFiltersUtilsMode::EFeatureFilterComponentAndGroup, bool static_filenames = false)
+      : feature_filter_mode_(feature_filter_mode), static_filenames_(static_filenames) {}
+    int feature_filter_mode_;
+    bool static_filenames_;
 
+    /* IProcessorDescription */
+    virtual std::string getName() const override { return "STORE_FEATURE_QCS"; }
+    virtual std::string getDescription() const override { return "Store the component and component group QCs to disk."; }
     virtual ParameterSet getParameterSchema() const override;
+    virtual std::vector<std::string> getRequirements() const override;
 
     /** Store the component and component group QCs to disk.
     */
@@ -274,28 +338,31 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const override;
 
     /* IFilenamesHandler */
     virtual void getFilenames(Filenames& filenames) const override;
+
+    /* IProcessorDescription */
+    bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
   };
 
   struct LoadFeatureRSDFilters : SequenceSegmentProcessor, IFilePickerHandler
   {
-    LoadFeatureRSDFilters(bool component_group = false) : component_group_(component_group) {}
-    bool component_group_;
+    LoadFeatureRSDFilters(int feature_filter_mode = FeatureFiltersUtilsMode::EFeatureFilterComponentAndGroup, bool static_filenames = false)
+      : feature_filter_mode_(feature_filter_mode), static_filenames_(static_filenames) {}
+    int feature_filter_mode_;
+    bool static_filenames_;
 
-    /**
-    IFilePickerHandler
-    */
+    /* IFilePickerHandler */
     bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
 
-    int getID() const override { return -1; }
-    std::string getName() const override { return "LOAD_FEATURE_RSD_FILTERS"; }
-    std::string getDescription() const override { return "Load the component and component group percent RSD filters from file."; }
-
+    /* IProcessorDescription */
+    virtual std::string getName() const override { return "LOAD_FEATURE_RSD_FILTERS"; }
+    virtual std::string getDescription() const override { return "Load the component and component group percent RSD filters from file."; }
     virtual ParameterSet getParameterSchema() const override;
+    virtual std::vector<std::string> getRequirements() const override;
 
     /** Load the component and component group percent RSD filters from file.
     */
@@ -303,7 +370,7 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const override;
 
     /* IFilenamesHandler */
@@ -312,19 +379,19 @@ namespace SmartPeak
 
   struct LoadFeatureRSDQCs : SequenceSegmentProcessor, IFilePickerHandler
   {
-    LoadFeatureRSDQCs(bool component_group = false) : component_group_(component_group) {}
-    bool component_group_;
+    LoadFeatureRSDQCs(int feature_filter_mode = FeatureFiltersUtilsMode::EFeatureFilterComponentAndGroup, bool static_filenames = false)
+      : feature_filter_mode_(feature_filter_mode), static_filenames_(static_filenames) {}
+    int feature_filter_mode_;
+    bool static_filenames_;
 
-    /**
-    IFilePickerHandler
-    */
+    /* IFilePickerHandler */
     bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
 
-    int getID() const override { return -1; }
-    std::string getName() const override { return "LOAD_FEATURE_RSD_QCS"; }
-    std::string getDescription() const override { return "Load the component and component group percent RSD QCs from file."; }
-
+    /* IProcessorDescription */
+    virtual std::string getName() const override { return "LOAD_FEATURE_RSD_QCS"; }
+    virtual std::string getDescription() const override { return "Load the component and component group percent RSD QCs from file."; }
     virtual ParameterSet getParameterSchema() const override;
+    virtual std::vector<std::string> getRequirements() const override;
 
     /** Load the component and component group percent RSD QCs from file.
     */
@@ -332,20 +399,24 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const override;
 
     /* IFilenamesHandler */
     virtual void getFilenames(Filenames& filenames) const override;
   };
 
-  struct StoreFeatureRSDFilters : SequenceSegmentProcessor
+  struct StoreFeatureRSDFilters : SequenceSegmentProcessor, IFilePickerHandler
   {
-    int getID() const override { return -1; }
-    std::string getName() const override { return "STORE_FEATURE_RSD_FILTERS"; }
-    std::string getDescription() const override { return "Store the component and component group percent RSD filters to disk."; }
+    StoreFeatureRSDFilters(int feature_filter_mode = FeatureFiltersUtilsMode::EFeatureFilterComponentAndGroup, bool static_filenames = false) : feature_filter_mode_(feature_filter_mode), static_filenames_(static_filenames) {}
+    int feature_filter_mode_;
+    bool static_filenames_;
 
+    /* IProcessorDescription */
+    virtual std::string getName() const override { return "STORE_FEATURE_RSD_FILTERS"; }
+    virtual std::string getDescription() const override { return "Store the component and component group percent RSD filters to disk."; }
     virtual ParameterSet getParameterSchema() const override;
+    virtual std::vector<std::string> getRequirements() const override;
 
     /** Store the component and component group percent RSD filters to disk.
     */
@@ -353,20 +424,28 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const override;
 
     /* IFilenamesHandler */
     virtual void getFilenames(Filenames& filenames) const override;
+
+    /* IProcessorDescription */
+    bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
   };
 
-  struct StoreFeatureRSDQCs : SequenceSegmentProcessor
+  struct StoreFeatureRSDQCs : SequenceSegmentProcessor, IFilePickerHandler
   {
-    int getID() const override { return -1; }
-    std::string getName() const override { return "STORE_FEATURE_RSD_QCS"; }
-    std::string getDescription() const override { return "Store the component and component group percent RSD QCs to disk."; }
+    StoreFeatureRSDQCs(int feature_filter_mode = FeatureFiltersUtilsMode::EFeatureFilterComponentAndGroup, bool static_filenames = false)
+      : feature_filter_mode_(feature_filter_mode), static_filenames_(static_filenames) {}
+    int feature_filter_mode_;
+    bool static_filenames_;
 
+    /* IProcessorDescription */
+    virtual std::string getName() const override { return "STORE_FEATURE_RSD_QCS"; }
+    virtual std::string getDescription() const override { return "Store the component and component group percent RSD QCs to disk."; }
     virtual ParameterSet getParameterSchema() const override;
+    virtual std::vector<std::string> getRequirements() const override;
 
     /** Store the component and component group percent RSD QCs to disk.
     */
@@ -374,28 +453,31 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const override;
 
     /* IFilenamesHandler */
     virtual void getFilenames(Filenames& filenames) const override;
+
+    /* IProcessorDescription */
+    virtual bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
   };
 
   struct LoadFeatureBackgroundFilters : SequenceSegmentProcessor, IFilePickerHandler
   {
-    LoadFeatureBackgroundFilters(bool component_group = false) : component_group_(component_group) {}
-    bool component_group_;
+    LoadFeatureBackgroundFilters(int feature_filter_mode = FeatureFiltersUtilsMode::EFeatureFilterComponentAndGroup, bool static_filenames = false)
+      : feature_filter_mode_(feature_filter_mode), static_filenames_(static_filenames) {}
+    int feature_filter_mode_;
+    bool static_filenames_;
 
-    /**
-    IFilePickerHandler
-    */
+    /* IFilePickerHandler */
     bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
 
-    int getID() const override { return -1; }
-    std::string getName() const override { return "LOAD_FEATURE_BACKGROUND_FILTERS"; }
-    std::string getDescription() const override { return "Load the component and component group percent Background Interference filters from file."; }
-
+    /* IProcessorDescription */
+    virtual std::string getName() const override { return "LOAD_FEATURE_BACKGROUND_FILTERS"; }
+    virtual std::string getDescription() const override { return "Load the component and component group percent Background Interference filters from file."; }
     virtual ParameterSet getParameterSchema() const override;
+    virtual std::vector<std::string> getRequirements() const override;
 
     /** Load the component and component group percent Background Interference filters from file.
     */
@@ -403,7 +485,7 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const override;
 
     /* IFilenamesHandler */
@@ -412,19 +494,19 @@ namespace SmartPeak
 
   struct LoadFeatureBackgroundQCs : SequenceSegmentProcessor, IFilePickerHandler
   {
-    LoadFeatureBackgroundQCs(bool component_group = false) : component_group_(component_group) {}
-    bool component_group_;
+    LoadFeatureBackgroundQCs(int feature_filter_mode = FeatureFiltersUtilsMode::EFeatureFilterComponentAndGroup, bool static_filenames = false)
+      : feature_filter_mode_(feature_filter_mode), static_filenames_(static_filenames) {}
+    int feature_filter_mode_;
+    bool static_filenames_;
 
-    /**
-    IFilePickerHandler
-    */
+    /* IFilePickerHandler */
     bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
 
-    int getID() const override { return -1; }
-    std::string getName() const override { return "LOAD_FEATURE_BACKGROUND_QCS"; }
-    std::string getDescription() const override { return "Load the component and component group percent Background Interference QCs from file."; }
-
+    /* IProcessorDescription */
+    virtual std::string getName() const override { return "LOAD_FEATURE_BACKGROUND_QCS"; }
+    virtual std::string getDescription() const override { return "Load the component and component group percent Background Interference QCs from file."; }
     virtual ParameterSet getParameterSchema() const override;
+    virtual std::vector<std::string> getRequirements() const override;
 
     /** Load the component and component group percent Background Interference QCs from file.
     */
@@ -432,20 +514,25 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const override;
 
     /* IFilenamesHandler */
     virtual void getFilenames(Filenames& filenames) const override;
   };
 
-  struct StoreFeatureBackgroundFilters : SequenceSegmentProcessor
+  struct StoreFeatureBackgroundFilters : SequenceSegmentProcessor, IFilePickerHandler
   {
-    int getID() const override { return -1; }
-    std::string getName() const override { return "STORE_FEATURE_BACKGROUND_FILTERS"; }
-    std::string getDescription() const override { return "Store the component and component group percent Background Interference filters to disk."; }
+    StoreFeatureBackgroundFilters(int feature_filter_mode = FeatureFiltersUtilsMode::EFeatureFilterComponentAndGroup, bool static_filenames = false)
+      : feature_filter_mode_(feature_filter_mode), static_filenames_(static_filenames) {}
+    int feature_filter_mode_;
+    bool static_filenames_;
 
+    /* IProcessorDescription */
+    virtual std::string getName() const override { return "STORE_FEATURE_BACKGROUND_FILTERS"; }
+    virtual std::string getDescription() const override { return "Store the component and component group percent Background Interference filters to disk."; }
     virtual ParameterSet getParameterSchema() const override;
+    virtual std::vector<std::string> getRequirements() const override;
 
     /** Store the component and component group percent Background Interference filters to disk.
     */
@@ -453,20 +540,28 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const override;
 
-    /* IFilenamesHandler */
+    /* IFilePickerHandler */
     virtual void getFilenames(Filenames& filenames) const override;
+
+    /* IProcessorDescription */
+    bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
   };
 
-  struct StoreFeatureBackgroundQCs : SequenceSegmentProcessor
+  struct StoreFeatureBackgroundQCs : SequenceSegmentProcessor, IFilePickerHandler
   {
-    int getID() const override { return -1; }
-    std::string getName() const override { return "STORE_FEATURE_BACKGROUND_QCS"; }
-    std::string getDescription() const override { return "Store the component and component group percent Background Interference QCs to disk."; }
+    StoreFeatureBackgroundQCs(int feature_filter_mode = FeatureFiltersUtilsMode::EFeatureFilterComponentAndGroup, bool static_filenames = false)
+      : feature_filter_mode_(feature_filter_mode), static_filenames_(static_filenames) {}
+    int feature_filter_mode_;
+    bool static_filenames_;
 
+    /* IProcessorDescription */
+    virtual std::string getName() const override { return "STORE_FEATURE_BACKGROUND_QCS"; }
+    virtual std::string getDescription() const override { return "Store the component and component group percent Background Interference QCs to disk."; }
     virtual ParameterSet getParameterSchema() const override;
+    virtual std::vector<std::string> getRequirements() const override;
 
     /** Store the component and component group percent Background Interference QCs to disk.
     */
@@ -474,20 +569,23 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const override;
 
     /* IFilenamesHandler */
     virtual void getFilenames(Filenames& filenames) const override;
+
+    /* IFilePickerHandler */
+    bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
   };
 
   struct EstimateFeatureFilterValues : SequenceSegmentProcessor
   {
-    int getID() const override { return -1; }
-    std::string getName() const override { return "ESTIMATE_FEATURE_FILTER_VALUES"; }
-    std::string getDescription() const override { return "Estimate default FeatureQC parameter values for the feature filters from Standard and QC samples."; }
-
+    /* IProcessorDescription */
+    virtual std::string getName() const override { return "ESTIMATE_FEATURE_FILTER_VALUES"; }
+    virtual std::string getDescription() const override { return "Estimate default FeatureQC parameter values for the feature filters from Standard and QC samples."; }
     virtual ParameterSet getParameterSchema() const override;
+    virtual std::vector<std::string> getRequirements() const override;
 
     /**
       @brief Estimate default FeatureQC parameter values from Standard and QC samples.
@@ -498,17 +596,17 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const override;
   };
 
   struct EstimateFeatureQCValues : SequenceSegmentProcessor
   {
-    int getID() const override { return -1; }
-    std::string getName() const override { return "ESTIMATE_FEATURE_QC_VALUES"; }
-    std::string getDescription() const override { return "Estimate default FeatureQC parameter values for the feature QCs from Standard and QC samples."; }
-
+    /* IProcessorDescription */
+    virtual std::string getName() const override { return "ESTIMATE_FEATURE_QC_VALUES"; }
+    virtual std::string getDescription() const override { return "Estimate default FeatureQC parameter values for the feature QCs from Standard and QC samples."; }
     virtual ParameterSet getParameterSchema() const override;
+    virtual std::vector<std::string> getRequirements() const override;
 
     /**
       @brief Estimate default FeatureQC parameter values from Standard and QC samples.
@@ -519,17 +617,17 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const override;
   };
 
   struct TransferLOQToFeatureFilters : SequenceSegmentProcessor
   {
-    int getID() const override { return -1; }
-    std::string getName() const override { return "TRANSFER_LOQ_TO_FEATURE_FILTERS"; }
-    std::string getDescription() const override { return "Transfer the upper (u)/lower (l) limits of quantitation (LOQ) values from the quantitation methods to the calculated concentration bounds of the feature filters."; }
-
+    /* IProcessorDescription */
+    virtual std::string getName() const override { return "TRANSFER_LOQ_TO_FEATURE_FILTERS"; }
+    virtual std::string getDescription() const override { return "Transfer the upper (u)/lower (l) limits of quantitation (LOQ) values from the quantitation methods to the calculated concentration bounds of the feature filters."; }
     virtual ParameterSet getParameterSchema() const override;
+    virtual std::vector<std::string> getRequirements() const override;
 
     /**
       Transfer the upper (u)/lower (l) limits of quantitation (LOQ) values from the quantitation methods to the calculated concentration bounds of the feature filters
@@ -538,17 +636,17 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const override;
   };
 
   struct TransferLOQToFeatureQCs : SequenceSegmentProcessor
   {
-    int getID() const override { return -1; }
-    std::string getName() const override { return "TRANSFER_LOQ_TO_FEATURE_QCS"; }
-    std::string getDescription() const override { return "Transfer the upper (u)/lower (l) limits of quantitation (LOQ) values from the quantitation methods to the calculated concentration bounds of the feature filters."; }
-
+    /* IProcessorDescription */
+    virtual std::string getName() const override { return "TRANSFER_LOQ_TO_FEATURE_QCS"; }
+    virtual std::string getDescription() const override { return "Transfer the upper (u)/lower (l) limits of quantitation (LOQ) values from the quantitation methods to the calculated concentration bounds of the feature filters."; }
     virtual ParameterSet getParameterSchema() const override;
+    virtual std::vector<std::string> getRequirements() const override;
 
     /**
       Transfer the upper (u)/lower (l) limits of quantitation (LOQ) values from the quantitation methods to the calculated concentration bounds of the feature QCs
@@ -557,17 +655,17 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const override;
   };
 
   struct EstimateFeatureRSDs : SequenceSegmentProcessor
   {
-    int getID() const override { return -1; }
-    std::string getName() const override { return "ESTIMATE_FEATURE_RSDS"; }
-    std::string getDescription() const override { return "Estimate the %RSD for component and component group feature filter attributes from pooled QC samples."; }
-
+    /* IProcessorDescription */
+    virtual std::string getName() const override { return "ESTIMATE_FEATURE_RSDS"; }
+    virtual std::string getDescription() const override { return "Estimate the %RSD for component and component group feature filter attributes from pooled QC samples."; }
     virtual ParameterSet getParameterSchema() const override;
+    virtual std::vector<std::string> getRequirements() const override;
 
     /**
       Estimate the %RSD for component and component group feature filter attributes from pooled QC samples
@@ -578,17 +676,17 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const override;
   };
 
   struct EstimateFeatureBackgroundInterferences : SequenceSegmentProcessor
   {
-    int getID() const override { return -1; }
-    std::string getName() const override { return "ESTIMATE_FEATURE_BACKGROUND_INTERFERENCES"; }
-    std::string getDescription() const override { return "Estimate the %BackgroundInterferences for component and component group feature filter ion intensity attributes from Blank samples."; }
-
+    /* IProcessorDescription */
+    virtual std::string getName() const override { return "ESTIMATE_FEATURE_BACKGROUND_INTERFERENCES"; }
+    virtual std::string getDescription() const override { return "Estimate the %BackgroundInterferences for component and component group feature filter ion intensity attributes from Blank samples."; }
     virtual ParameterSet getParameterSchema() const override;
+    virtual std::vector<std::string> getRequirements() const override;
 
     /**
       Estimate the %BackgroundInterferences for component and component group feature filter ion intensity attributes from Blank samples
@@ -597,18 +695,22 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const override;
   };
 
-
   struct LoadFeatureRSDEstimations : SequenceSegmentProcessor
   {
-    int getID() const override { return -1; }
-    std::string getName() const override { return "LOAD_FEATURE_RSD_ESTIMATIONS"; }
-    std::string getDescription() const override { return "Load the component and component group percent RSD estimations from file."; }
+    LoadFeatureRSDEstimations(int feature_filter_mode = FeatureFiltersUtilsMode::EFeatureFilterComponentAndGroup, bool static_filenames = false)
+      : feature_filter_mode_(feature_filter_mode), static_filenames_(static_filenames) {}
+    int feature_filter_mode_;
+    bool static_filenames_;
 
+    /* IProcessorDescription */
+    virtual std::string getName() const override { return "LOAD_FEATURE_RSD_ESTIMATIONS"; }
+    virtual std::string getDescription() const override { return "Load the component and component group percent RSD estimations from file."; }
     virtual ParameterSet getParameterSchema() const override;
+    virtual std::vector<std::string> getRequirements() const override;
 
     /** Load the component and component group percent RSD estimations from file.
     */
@@ -616,20 +718,25 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const override;
 
     /* IFilenamesHandler */
     virtual void getFilenames(Filenames& filenames) const override;
   };
 
-  struct StoreFeatureRSDEstimations : SequenceSegmentProcessor
+  struct StoreFeatureRSDEstimations : SequenceSegmentProcessor, IFilePickerHandler
   {
-    int getID() const override { return -1; }
-    std::string getName() const override { return "STORE_FEATURE_RSD_ESTIMATIONS"; }
-    std::string getDescription() const override { return "Store the component and component group percent RSD estimations to disk."; }
+    StoreFeatureRSDEstimations(int feature_filter_mode = FeatureFiltersUtilsMode::EFeatureFilterComponentAndGroup, bool static_filenames = false)
+      : feature_filter_mode_(feature_filter_mode), static_filenames_(static_filenames) {}
+    int feature_filter_mode_;
+    bool static_filenames_;
 
+    /* IProcessorDescription */
+    virtual std::string getName() const override { return "STORE_FEATURE_RSD_ESTIMATIONS"; }
+    virtual std::string getDescription() const override { return "Store the component and component group percent RSD estimations to disk."; }
     virtual ParameterSet getParameterSchema() const override;
+    virtual std::vector<std::string> getRequirements() const override;
 
     /** Store the component and component group percent RSD estimations to disk.
     */
@@ -637,20 +744,28 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const override;
 
     /* IFilenamesHandler */
     virtual void getFilenames(Filenames& filenames) const override;
+
+    /* IFilePickerHandler */
+    bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
   };
 
   struct LoadFeatureBackgroundEstimations : SequenceSegmentProcessor
   {
-    int getID() const override { return -1; }
-    std::string getName() const override { return "LOAD_FEATURE_BACKGROUND_ESTIMATIONS"; }
-    std::string getDescription() const override { return "Load the component and component group percent Background Interference estimations from file."; }
+    LoadFeatureBackgroundEstimations(int feature_filter_mode = FeatureFiltersUtilsMode::EFeatureFilterComponentAndGroup, bool static_filenames = false)
+      : feature_filter_mode_(feature_filter_mode), static_filenames_(static_filenames) {}
+    int feature_filter_mode_;
+    bool static_filenames_;
 
+    /* IProcessorDescription */
+    virtual std::string getName() const override { return "LOAD_FEATURE_BACKGROUND_ESTIMATIONS"; }
+    virtual std::string getDescription() const override { return "Load the component and component group percent Background Interference estimations from file."; }
     virtual ParameterSet getParameterSchema() const override;
+    virtual std::vector<std::string> getRequirements() const override;
 
     /** Load the component and component group percent Background Interference estimations from file.
     */
@@ -658,20 +773,25 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const override;
 
     /* IFilenamesHandler */
     virtual void getFilenames(Filenames& filenames) const override;
   };
 
-  struct StoreFeatureBackgroundEstimations : SequenceSegmentProcessor
+  struct StoreFeatureBackgroundEstimations : SequenceSegmentProcessor, IFilePickerHandler
   {
-    int getID() const override { return -1; }
-    std::string getName() const override { return "STORE_FEATURE_BACKGROUND_ESTIMATIONS"; }
-    std::string getDescription() const override { return "Store the component and component group percent Background Interference estimations to disk."; }
+    StoreFeatureBackgroundEstimations(int feature_filter_mode = FeatureFiltersUtilsMode::EFeatureFilterComponentAndGroup, bool static_filenames = false)
+      : feature_filter_mode_(feature_filter_mode), static_filenames_(static_filenames) {}
+    int feature_filter_mode_;
+    bool static_filenames_;
 
+    /* IProcessorDescription */
+    virtual std::string getName() const override { return "STORE_FEATURE_BACKGROUND_ESTIMATIONS"; }
+    virtual std::string getDescription() const override { return "Store the component and component group percent Background Interference estimations to disk."; }
     virtual ParameterSet getParameterSchema() const override;
+    virtual std::vector<std::string> getRequirements() const override;
 
     /** Store the component and component group percent Background Interference estimations to disk.
     */
@@ -679,10 +799,13 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const override;
 
     /* IFilenamesHandler */
     virtual void getFilenames(Filenames& filenames) const override;
+
+    /* IFilePickerHandler */
+    bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
   };
 }

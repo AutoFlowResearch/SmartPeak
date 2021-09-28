@@ -25,12 +25,14 @@
 
 #include <SmartPeak/core/CastValue.h>
 #include <SmartPeak/core/Parameters.h>
+#include <SmartPeak/core/Filenames.h>
+#include <SmartPeak/core/ApplicationHandler.h>
 #include <SmartPeak/ui/ImEntry.h>
-//#include <SmartPeak/ui/Help.h>
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureSelector.h>
 #include <OpenMS/DATASTRUCTURES/Param.h>
+#include <OpenMS/FORMAT/MRMFeatureQCFile.h>
 
 #include <regex>
 #include <string>
@@ -262,7 +264,7 @@ public:
       where the first element is "name", "extension", "size" and "last_write_time", the second element can either be "ascending" or "descending".
       @return List of files found where each string of vectors is a representation of a file's name, size, type and date.
     */
-    static std::array<std::vector<std::string>, 4> getFolderContents(const std::filesystem::path& folder_path);
+    static std::array<std::vector<std::string>, 4> getFolderContents(const std::filesystem::path& folder_path, bool only_directories);
     
     /**
       @brief Get the parent path from a given path, the given path is returned when the parent path isn't existent
@@ -379,5 +381,17 @@ public:
      @param[in,out] str string on which the modification is done.
     */
     static void removeTrailing(std::string& str, std::string to_remove);
+
+    /**
+     @brief Construct filename using the default files organisation.
+     
+     Can be used to create an empty session from a directory.
+    */
+    static Filenames buildFilenamesFromDirectory(ApplicationHandler& application_handler, const std::filesystem::path& path);
+
+    /**
+     @brief return an empty, temporary directory.
+    */
+    static std::filesystem::path createEmptyTempDirectory();
   };
 }

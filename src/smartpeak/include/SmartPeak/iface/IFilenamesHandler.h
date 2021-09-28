@@ -33,12 +33,5 @@ namespace SmartPeak
      @brief add files handled by the processor to the Filnames instance
     */
     virtual void getFilenames(Filenames& filenames) const = 0;
-
-    virtual Filenames prepareFilenames(const Filenames& filenames_I) const
-    {
-      Filenames prepared_filenames(filenames_I);
-      getFilenames(prepared_filenames);
-      return prepared_filenames;
-    }
   };
 }

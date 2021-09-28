@@ -55,8 +55,11 @@ namespace SmartPeak
       SampleGroupHandler& sampleGroupHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const = 0;
+
+    /* IProcessorDescription */
+    virtual std::vector<std::string> getRequirements() const override { return {}; };
 
   protected:
     SampleGroupProcessor() = default;
@@ -64,10 +67,11 @@ namespace SmartPeak
 
   struct SelectDilutions : SampleGroupProcessor
   {
-    int getID() const override { return -1; }
-    std::string getName() const override { return "SELECT_DILUTIONS"; }
-    std::string getDescription() const override { return "Select features from dilution preferences"; }
+    /* IProcessorDescription */
+    virtual std::string getName() const override { return "SELECT_DILUTIONS"; }
+    virtual std::string getDescription() const override { return "Select features from dilution preferences"; }
     virtual ParameterSet getParameterSchema() const override;
+    virtual std::vector<std::string> getRequirements() const override;
 
     /**
       Merge multiple injections of the same sample.
@@ -76,7 +80,7 @@ namespace SmartPeak
       SampleGroupHandler& sampleGroupHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const override;
 
     /* IFilenamesHandler */
@@ -85,10 +89,11 @@ namespace SmartPeak
 
   struct MergeInjections : SampleGroupProcessor
   {
-    int getID() const override { return -1; }
-    std::string getName() const override { return "MERGE_INJECTIONS"; }
-    std::string getDescription() const override { return "Merge multiple injections of the same sample."; }
+    /* IProcessorDescription */
+    virtual std::string getName() const override { return "MERGE_INJECTIONS"; }
+    virtual std::string getDescription() const override { return "Merge multiple injections of the same sample."; }
     virtual ParameterSet getParameterSchema() const override;
+    virtual std::vector<std::string> getRequirements() const override;
 
     /**
       Merge multiple injections of the same sample.
@@ -97,7 +102,7 @@ namespace SmartPeak
       SampleGroupHandler& sampleGroupHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const override;
 
   private:
@@ -137,9 +142,9 @@ namespace SmartPeak
 
   struct LoadFeaturesSampleGroup : SampleGroupProcessor
   {
-    int getID() const override { return -1; }
-    std::string getName() const override { return "LOAD_FEATURES_SAMPLE_GROUP"; }
-    std::string getDescription() const override { return "Load the features for the sample group."; }
+    /* IProcessorDescription */
+    virtual std::string getName() const override { return "LOAD_FEATURES_SAMPLE_GROUP"; }
+    virtual std::string getDescription() const override { return "Load the features for the sample group."; }
     virtual ParameterSet getParameterSchema() const override;
 
     /**
@@ -149,7 +154,7 @@ namespace SmartPeak
       SampleGroupHandler& sampleGroupHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const override;
 
     /* IFilenamesHandler */
@@ -158,9 +163,9 @@ namespace SmartPeak
 
   struct StoreFeaturesSampleGroup : SampleGroupProcessor
   {
-    int getID() const override { return -1; }
-    std::string getName() const override { return "STORE_FEATURES_SAMPLE_GROUP"; }
-    std::string getDescription() const override { return "Store the features for the sample group."; }
+    /* IProcessorDescription */
+    virtual std::string getName() const override { return "STORE_FEATURES_SAMPLE_GROUP"; }
+    virtual std::string getDescription() const override { return "Store the features for the sample group."; }
     virtual ParameterSet getParameterSchema() const override;
 
     /**
@@ -170,7 +175,7 @@ namespace SmartPeak
       SampleGroupHandler& sampleGroupHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const override;
 
     /* IFilenamesHandler */

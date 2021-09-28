@@ -35,7 +35,7 @@ namespace SmartPeak
 
   void RunWorkflowWidget::draw()
   {
-    if (ImGui::BeginPopupModal("Run workflow modal", NULL, ImGuiWindowFlags_None))
+    if (ImGui::BeginPopupModal(title_.c_str(), NULL, ImGuiWindowFlags_None))
     {
       if (   mzML_dir_old_ != application_handler_.mzML_dir_.generic_string()
           || features_in_dir_old_ != application_handler_.features_in_dir_.generic_string()
@@ -55,8 +55,7 @@ namespace SmartPeak
       ImGui::PushID(11);
       if (ImGui::Button("Select"))
       {
-        file_picker_.setFilePickerHandler(std::make_shared<SetRawDataPathname>(), application_handler_);
-        popup_file_picker_ = true;
+        popup_file_picker_ = std::make_tuple("mzML folder", std::make_shared<SetRawDataPathname>());
       }
       ImGui::PopID();
 
@@ -68,8 +67,7 @@ namespace SmartPeak
       ImGui::PushID(22);
       if (ImGui::Button("Select"))
       {
-        file_picker_.setFilePickerHandler(std::make_shared<SetInputFeaturesPathname>(), application_handler_);
-        popup_file_picker_ = true;
+        popup_file_picker_ = std::make_tuple("Input features folder", std::make_shared<SetInputFeaturesPathname>());
       }
       ImGui::PopID();
 
@@ -82,15 +80,15 @@ namespace SmartPeak
       ImGui::PushID(33);
       if (ImGui::Button("Select"))
       {
-        file_picker_.setFilePickerHandler(std::make_shared<SetOutputFeaturesPathname>(), application_handler_);
-        popup_file_picker_ = true;
+        popup_file_picker_ = std::make_tuple("Output features folder", std::make_shared<SetOutputFeaturesPathname>());
       }
       ImGui::PopID();
 
       if (popup_file_picker_)
       {
-        ImGui::OpenPopup("Pick a pathname");
-        popup_file_picker_ = false;
+        const auto& [title, file_handler] = (*popup_file_picker_);
+        file_picker_.open(title, file_handler, FilePicker::Mode::EDirectory, application_handler_);
+        popup_file_picker_ = std::nullopt;
       }
 
       file_picker_.draw();

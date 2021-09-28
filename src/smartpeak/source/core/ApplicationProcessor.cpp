@@ -75,7 +75,7 @@ namespace SmartPeak
     }
   }
 
-  void processCommands(ApplicationHandler& state,
+  void processCommands(ApplicationHandler& application_handler,
     std::vector<ApplicationHandler::Command> commands,
     const std::set<std::string>& injection_names, 
     const std::set<std::string>& sequence_segment_names, 
@@ -122,12 +122,12 @@ namespace SmartPeak
             }
           }
         });
-        ProcessSequence ps(state.sequenceHandler_, sequence_processor_observer);
+        ProcessSequence ps(application_handler.sequenceHandler_, sequence_processor_observer);
         ps.filenames_ = filenames;
         ps.raw_data_processing_methods_ = raw_methods;
         ps.injection_names_ = injection_names;
         notifyStartCommands<decltype(raw_methods)>(observable, i, raw_methods);
-        ps.process();
+        ps.process(application_handler.filenames_);
         notifyEndCommands<decltype(raw_methods)>(observable, i, raw_methods);
       } else if (cmd.type == ApplicationHandler::Command::SequenceSegmentMethod) {
         std::vector<std::shared_ptr<SequenceSegmentProcessor>> seq_seg_methods;
@@ -148,12 +148,12 @@ namespace SmartPeak
             }
           }
         });
-        ProcessSequenceSegments pss(state.sequenceHandler_, sequence_segment_processor_observer);
+        ProcessSequenceSegments pss(application_handler.sequenceHandler_, sequence_segment_processor_observer);
         pss.filenames_ = filenames;
         pss.sequence_segment_processing_methods_ = seq_seg_methods;
         pss.sequence_segment_names_ = sequence_segment_names;
         notifyStartCommands<decltype(seq_seg_methods)>(observable, i, seq_seg_methods);
-        pss.process();
+        pss.process(application_handler.filenames_);
         notifyEndCommands<decltype(seq_seg_methods)>(observable, i, seq_seg_methods);
       } else if (cmd.type == ApplicationHandler::Command::SampleGroupMethod) {
         std::vector<std::shared_ptr<SampleGroupProcessor>> sample_group_methods;
@@ -174,12 +174,12 @@ namespace SmartPeak
             }
           }
         });
-        ProcessSampleGroups psg(state.sequenceHandler_, sample_group_processor_observer);
+        ProcessSampleGroups psg(application_handler.sequenceHandler_, sample_group_processor_observer);
         psg.filenames_ = filenames;
         psg.sample_group_processing_methods_ = sample_group_methods;
         psg.sample_group_names_ = sample_group_names;
         notifyStartCommands<decltype(sample_group_methods)>(observable, i, sample_group_methods);
-        psg.process();
+        psg.process(application_handler.filenames_);
         notifyEndCommands<decltype(sample_group_methods)>(observable, i, sample_group_methods);
       }
       else 
@@ -276,6 +276,250 @@ namespace SmartPeak
       } // if not, no need to log. createCommand already logs an error.
     }
     return success;
+  }
+
+  bool LoadSession::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
+  {
+    application_handler->closeSession();
+    application_handler->filenames_.getSessionDB().setDBFilePath(filename);
+    application_handler->main_dir_ = std::filesystem::path(filename).remove_filename().generic_string();
+    delimiter = ",";
+    checkConsistency = false; // NOTE: Requires a lot of time on large sequences with a large number of components
+    return process();
+  }
+
+  bool LoadSession::process()
+  {
+    LOGD << "START LoadSession";
+
+    if (!filenames_) // if filenames are not provided, we will take it from the DB.
+    {
+      LoadFilenames load_filenames(application_handler_);
+      if (!load_filenames.process())
+      {
+        return false;
+      }
+      filenames_ = application_handler_.filenames_;
+    }
+
+    for (auto& loading_processor : application_handler_.loading_processors_)
+    {
+      // check if we need to use that loading processor
+      Filenames loading_processor_filenames;
+      loading_processor->getFilenames(loading_processor_filenames);
+      bool load_it = false;
+      for (const auto& file_id : loading_processor_filenames.getFileIds())
+      {
+        load_it |= (filenames_->isEmbedded(file_id)
+                || (!filenames_->getFullPath(file_id).empty()));
+      }
+
+      if (load_it)
+      {
+        auto sequence_processor = std::dynamic_pointer_cast<SequenceProcessor>(loading_processor);
+        if (sequence_processor)
+        {
+          sequence_processor->process(*filenames_);
+        }
+        auto raw_data_processor = std::dynamic_pointer_cast<RawDataProcessor>(loading_processor);
+        if (raw_data_processor)
+        {
+          if (!application_handler_.sequenceHandler_.getSequence().empty())
+          {
+            RawDataHandler& rawDataHandler = application_handler_.sequenceHandler_.getSequence()[0].getRawData();
+            raw_data_processor->process(rawDataHandler, {}, *filenames_);
+          }
+          else
+          {
+            LOGE << "No Sequence available, Loading process aborted.";
+            return false;
+          }
+        }
+        auto sequence_segment_processor = std::dynamic_pointer_cast<SequenceSegmentProcessor>(loading_processor);
+        if (sequence_segment_processor)
+        {
+          if (!application_handler_.sequenceHandler_.getSequenceSegments().empty())
+          {
+            SequenceSegmentHandler& sequenceSegmentHandler = application_handler_.sequenceHandler_.getSequenceSegments().at(0);
+            sequence_segment_processor->sequence_segment_observable_ = &application_handler_.sequenceHandler_;
+            sequence_segment_processor->process(sequenceSegmentHandler, SequenceHandler(), {}, *filenames_);
+          }
+          else
+          {
+            LOGE << "No Sequence Segment available, Loading process aborted.";
+            return false;
+          }
+        }
+      }
+    }
+
+    if (checkConsistency)
+    {
+      if (!application_handler_.sequenceHandler_.getSequenceSegments().empty())
+      {
+        InputDataValidation::sampleNamesAreConsistent(application_handler_.sequenceHandler_);
+        InputDataValidation::componentNamesAreConsistent(application_handler_.sequenceHandler_);
+        InputDataValidation::componentNameGroupsAreConsistent(application_handler_.sequenceHandler_);
+        InputDataValidation::heavyComponentsAreConsistent(application_handler_.sequenceHandler_);
+      }
+      else
+      {
+        LOGW << "No Sequence available, cannot check consistency";
+      }
+    }
+
+    application_handler_.sequenceHandler_.notifySequenceUpdated();
+    LOGD << "END LoadSession";
+    return true;
+  }
+
+  bool SaveSession::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
+  {
+    application_handler->filenames_.getSessionDB().setDBFilePath(filename);
+    process();
+    return true;
+  }
+
+  bool SaveSession::process()
+  {
+    LOGD << "START SaveSession";
+
+    StoreFilenames store_filenames(application_handler_);
+    store_filenames.process();
+
+    for (auto& storing_processor : application_handler_.storing_processors_)
+    {
+      bool to_be_saved = false;
+      Filenames filenames;
+      storing_processor->getFilenames(filenames);
+      for (const auto& file_id : filenames.getFileIds())
+      {
+        to_be_saved |= (!application_handler_.isFileSaved(file_id));
+      }
+      if (to_be_saved)
+      {
+        auto sequence_processor = std::dynamic_pointer_cast<SequenceProcessor>(storing_processor);
+        if (sequence_processor)
+        {
+          sequence_processor->process(application_handler_.filenames_);
+        }
+        auto raw_data_processor = std::dynamic_pointer_cast<RawDataProcessor>(storing_processor);
+        if (raw_data_processor)
+        {
+          if (!application_handler_.sequenceHandler_.getSequence().empty())
+          {
+            RawDataHandler& rawDataHandler = application_handler_.sequenceHandler_.getSequence()[0].getRawData();
+            raw_data_processor->process(rawDataHandler, {}, application_handler_.filenames_);
+          }
+          else
+          {
+            LOGE << "No Sequence available, Storing process aborted.";
+          }
+        }
+        auto sequence_segment_processor = std::dynamic_pointer_cast<SequenceSegmentProcessor>(storing_processor);
+        if (sequence_segment_processor)
+        {
+          if (!application_handler_.sequenceHandler_.getSequenceSegments().empty())
+          {
+            SequenceSegmentHandler& sequenceSegmentHandler = application_handler_.sequenceHandler_.getSequenceSegments().at(0);
+            sequence_segment_processor->sequence_segment_observable_ = &application_handler_.sequenceHandler_;
+            sequence_segment_processor->process(sequenceSegmentHandler, SequenceHandler(), {}, application_handler_.filenames_);
+          }
+          else
+          {
+            LOGE << "No Sequence Segment available, Storing process aborted.";
+          }
+        }
+        // update saved state
+        for (const auto& file_id : filenames.getFileIds())
+        {
+          application_handler_.setFileSavedState(file_id, true);
+        }
+      }
+    }
+
+    LOGD << "END SaveSession";
+    return true;
+  }
+
+  bool LoadFilenames::process()
+  {
+    LOGD << "START LoadFilenames";
+    auto filenames = LoadFilenames::loadFilenamesFromDB(application_handler_.filenames_.getSessionDB().getDBFilePath());
+    if (!filenames)
+    {
+      return false;
+    }
+    // reset main dir
+    (*filenames).setTag(Filenames::Tag::MAIN_DIR, application_handler_.main_dir_.generic_string());
+    (*filenames).getSessionDB().setDBFilePath(application_handler_.filenames_.getSessionDB().getDBFilePath());
+    application_handler_.filenames_ = *filenames;
+    LOGD << "END LoadFilenames";
+    return true;
+  }
+
+  std::optional<Filenames> LoadFilenames::loadFilenamesFromDB(const std::filesystem::path& path_db)
+  {
+    if (!std::filesystem::exists(path_db))
+    {
+      LOGE << "Session file does not exist: " << path_db.generic_string();
+      return std::nullopt;
+    }
+    Filenames filenames;
+    filenames.getSessionDB().setDBFilePath(path_db);
+    auto db_context = filenames.getSessionDB().beginRead(
+      "filenames",
+      "file_id",
+      "filename_pattern",
+      "embedded"
+    );
+    if (!db_context)
+    {
+      return std::nullopt;
+    }
+    std::string file_id;
+    std::string name_pattern;
+    int embedded;
+    while (filenames.getSessionDB().read(
+      *db_context,
+      file_id,
+      name_pattern,
+      embedded
+    ))
+    {
+      filenames.addFileName(file_id, name_pattern);
+      filenames.setEmbedded(file_id, embedded != 0);
+    };
+    filenames.getSessionDB().endRead(*db_context);
+    return filenames;
+  }
+
+  bool StoreFilenames::process()
+  {
+    LOGD << "START StoreFilenames";
+    auto db_context = application_handler_.filenames_.getSessionDB().beginWrite(
+      "filenames",
+      "file_id", "TEXT",
+      "filename_pattern", "TEXT",
+      "embedded", "INT"
+    );
+    if (!db_context)
+    {
+      return false;
+    }
+    for (const auto& file_id : application_handler_.filenames_.getFileIds())
+    {
+      int embedded = (application_handler_.filenames_.isEmbedded(file_id) ? 1 : 0);
+      application_handler_.filenames_.getSessionDB().write(
+        *db_context,
+        file_id,
+        application_handler_.filenames_.getNamePattern(file_id).generic_string(),
+        embedded
+      );
+    }
+    application_handler_.filenames_.getSessionDB().endWrite(*db_context);
+    LOGD << "END StoreFilenames";
+    return true;
   }
 
 }

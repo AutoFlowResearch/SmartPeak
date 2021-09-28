@@ -46,20 +46,25 @@ namespace SmartPeak
     return ParameterSet(param_struct);
   }
 
+  std::vector<std::string> SelectDilutions::getRequirements() const
+  {
+    return { "sequence", "traML" }; // TODO add selectDilutions, but at the moment there is no separate Load processor for this file
+  }
+
   void SelectDilutions::getFilenames(Filenames& filenames) const
   {
-    filenames.addFileName("selectDilutions_csv_i", "${MAIN_DIR}/selectDilutions.csv");
+    filenames.addFileName("selectDilutions", "${MAIN_DIR}/selectDilutions.csv", "Dilution selection", false, false);
   };
 
   void SelectDilutions::process(
     SampleGroupHandler& sampleGroupHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
-    const Filenames& filenames_I
+    Filenames& filenames_I
   ) const
   {
     LOGD << "START SelectDilutions";
-    Filenames filenames = prepareFilenames(filenames_I);
+    getFilenames(filenames_I);
 
     ParameterSet params(params_I);
     params.merge(getParameterSchema());
@@ -67,11 +72,11 @@ namespace SmartPeak
     std::map<std::string, int> select_dilution_map;
     try
     {
-      SelectDilutionsParser::read(filenames.getFullPath("selectDilutions_csv_i").generic_string(), select_dilution_map);
+      SelectDilutionsParser::read(filenames_I.getFullPath("selectDilutions").generic_string(), select_dilution_map);
     }
     catch (const std::exception& e)
     {
-      LOGE << "Failed to read select dilutions file [" << filenames.getFullPath("selectDilutions_csv_i").generic_string() << "] : " << e.what();
+      LOGE << "Failed to read select dilutions file [" << filenames_I.getFullPath("selectDilutions").generic_string() << "] : " << e.what();
       return;
     }
 
@@ -138,6 +143,11 @@ namespace SmartPeak
     LOGD << "END SelectDilutions";
   }
 
+  std::vector<std::string> MergeInjections::getRequirements() const
+  {
+    return { "sequence", "traML" };
+  }
+
   ParameterSet MergeInjections::getParameterSchema() const
   {
     std::map<std::string, std::vector<std::map<std::string, std::string>>> param_struct({
@@ -195,11 +205,11 @@ namespace SmartPeak
     SampleGroupHandler& sampleGroupHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
-    const Filenames& filenames_I
+    Filenames& filenames_I
   ) const
   {
     LOGD << "START MergeInjections";
-    Filenames filenames = prepareFilenames(filenames_I);
+    getFilenames(filenames_I);
 
     // Check the parameters
     if (params_I.at("MergeInjections").empty() && params_I.at("MergeInjections").empty()) {
@@ -700,13 +710,13 @@ namespace SmartPeak
   void LoadFeaturesSampleGroup::process(SampleGroupHandler& sampleGroupHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
-    const Filenames& filenames_I
+    Filenames& filenames_I
   ) const
   {
     LOGD << "START LoadFeaturesSampleGroup";
-    Filenames filenames = prepareFilenames(filenames_I);
+    getFilenames(filenames_I);
 
-    if (!InputDataValidation::prepareToLoad(filenames, "featureXMLSampleGroup_i"))
+    if (!InputDataValidation::prepareToLoad(filenames_I, "featureXMLSampleGroup_i"))
     {
       LOGD << "END " << getName();
       return;
@@ -714,7 +724,7 @@ namespace SmartPeak
 
     try {
       OpenMS::FeatureXMLFile featurexml;
-      featurexml.load(filenames.getFullPath("featureXMLSampleGroup_i").generic_string(), sampleGroupHandler_IO.getFeatureMap());
+      featurexml.load(filenames_I.getFullPath("featureXMLSampleGroup_i").generic_string(), sampleGroupHandler_IO.getFeatureMap());
     }
     catch (const std::exception& e) {
       LOGE << e.what();
@@ -738,13 +748,13 @@ namespace SmartPeak
   void StoreFeaturesSampleGroup::process(SampleGroupHandler& sampleGroupHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
-    const Filenames& filenames_I
+    Filenames& filenames_I
   ) const
   {
     LOGD << "START storeFeaturesSampleGroup";
-    Filenames filenames = prepareFilenames(filenames_I);
+    getFilenames(filenames_I);
 
-    if (!InputDataValidation::prepareToStore(filenames, "featureXMLSampleGroup_o"))
+    if (!InputDataValidation::prepareToStore(filenames_I, "featureXMLSampleGroup_o"))
     {
       LOGD << "END " << getName();
       return;
@@ -753,7 +763,7 @@ namespace SmartPeak
     try {
       // Store outfile as featureXML
       OpenMS::FeatureXMLFile featurexml;
-      featurexml.store(filenames.getFullPath("featureXMLSampleGroup_o").generic_string(), sampleGroupHandler_IO.getFeatureMap());
+      featurexml.store(filenames_I.getFullPath("featureXMLSampleGroup_o").generic_string(), sampleGroupHandler_IO.getFeatureMap());
     }
     catch (const std::exception& e) {
       LOGE << e.what();

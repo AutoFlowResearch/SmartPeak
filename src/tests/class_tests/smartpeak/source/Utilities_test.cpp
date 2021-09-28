@@ -32,7 +32,7 @@ using namespace SmartPeak;
 using namespace std;
 namespace fs = std::filesystem;
 
-const unsigned int nb_files_in_data_directory = 65;
+const unsigned int nb_files_in_data_directory = 67;
 
 TEST(utilities, castString)
 {
@@ -447,7 +447,7 @@ TEST(utilities, endsWith)
 TEST(utilities, getFolderContents)
 {
   const std::string pathname = SMARTPEAK_GET_TEST_DATA_PATH("");
-  const std::array<std::vector<std::string>, 4> c = Utilities::getFolderContents(pathname);
+  const std::array<std::vector<std::string>, 4> c = Utilities::getFolderContents(pathname, false);
 
   // number of items in the pathname, taking .gitignore into account
   EXPECT_EQ(c[0].size(), nb_files_in_data_directory);

@@ -23,10 +23,14 @@
 
 #pragma once
 
+#include <SmartPeak/io/SessionDB.h>
+
 #include <string>
 #include <filesystem>
 #include <map>
 #include <vector>
+#include <optional>
+#include <plog/Log.h>
 
 namespace SmartPeak
 {
@@ -50,12 +54,26 @@ namespace SmartPeak
     /**
       @brief Adds file to the Filename
     */
-    void addFileName(const std::string& id, const std::string& name_pattern);
+    void addFileName(const std::string& id, 
+                     const std::string& name_pattern, 
+                     const std::string& description = "", 
+                     bool embeddable = false,
+                     bool default_embedded = false);
 
     /**
       @brief Returns the full path, with root path and variant applied (or the overridden full path).
     */
     std::filesystem::path getFullPath(const std::string& id) const;
+
+    /**
+      @brief Returns name pattern of the file.
+    */
+    std::filesystem::path getNamePattern(const std::string& id) const;
+
+    /**
+      @brief Returns true if the file can be embedded into the session db.
+    */
+    bool isEmbeddable(const std::string& id) const;
 
     /**
       @brief Sets the ful path name, overriding computation using variant and root path.
@@ -77,11 +95,39 @@ namespace SmartPeak
     */
     void setTag(Tag tag, const std::string& value);
 
+    /**
+      @brief get tag value.
+    */
+    std::string getTag(Tag tag) const;
+
+    /**
+      @brief get description of the file.
+    */
+    std::string getDescription(const std::string& file_id) const;
+
+    /**
+      @brief set file as embedded in a database.
+    */
+    void setEmbedded(const std::string& id, bool embedded);
+
+    /**
+      @brief get embedded flag.
+    */
+    bool isEmbedded(const std::string& id) const;
+
+    /**
+      @brief get the session database instance.
+    */
+    SessionDB& getSessionDB() { return session_db_; };
+
   protected:
 
     struct FileName
     {
       std::string name_pattern_;
+      std::string description_;
+      bool embeddable_ = false;
+      bool embedded_ = false;
       std::filesystem::path full_path_;
       bool full_path_override_ = false;
     };
@@ -95,5 +141,7 @@ namespace SmartPeak
     std::map<Tag, std::string> tags_;
 
     static std::map<std::string, Tag> string_to_tag_;
+
+    SessionDB session_db_;
   };
 }

@@ -25,6 +25,8 @@
 #include <SmartPeak/test_config.h>
 #include <SmartPeak/core/SessionHandler.h>
 #include <SmartPeak/core/SequenceProcessor.h>
+#include <SmartPeak/core/ApplicationProcessor.h>
+#include <SmartPeak/core/Utilities.h>
 
 using namespace SmartPeak;
 using namespace std;
@@ -35,10 +37,9 @@ struct TestData {
     const std::string pathname = SMARTPEAK_GET_TEST_DATA_PATH("workflow_csv_files");
     // Load the sequence
     if (load_sequence) {
-      Filenames filenames_;
-      filenames_.setTag(Filenames::Tag::MAIN_DIR, pathname);
-      CreateSequence cs(sequenceHandler);
-      cs.filenames_ = filenames_;
+      application_handler.filenames_ = Utilities::buildFilenamesFromDirectory(application_handler, pathname);
+      LoadSession cs(application_handler);
+      cs.filenames_ = application_handler.filenames_;
       cs.delimiter = ",";
       cs.checkConsistency = false;
       cs.process();
@@ -51,7 +52,7 @@ struct TestData {
       method_filenames.setTag(Filenames::Tag::MZML_INPUT_PATH, pathname + "/mzML");
       method_filenames.setTag(Filenames::Tag::FEATURES_INPUT_PATH, pathname + "/features");
       method_filenames.setTag(Filenames::Tag::FEATURES_OUTPUT_PATH, pathname + "/features");
-      for (auto& injection : sequenceHandler.getSequence()) {
+      for (auto& injection : application_handler.sequenceHandler_.getSequence()) {
         Filenames filenames_ = method_filenames;
         filenames_.setTag(Filenames::Tag::INPUT_MZML_FILENAME, injection.getMetaData().getFilename());
         filenames_.setTag(Filenames::Tag::INPUT_INJECTION_NAME, injection.getMetaData().getInjectionName());
@@ -72,7 +73,7 @@ struct TestData {
       method_filenames.setTag(Filenames::Tag::MZML_INPUT_PATH, pathname + "/mzML");
       method_filenames.setTag(Filenames::Tag::FEATURES_INPUT_PATH, pathname + "/features");
       method_filenames.setTag(Filenames::Tag::FEATURES_OUTPUT_PATH, pathname + "/features");
-      for (auto& injection : sequenceHandler.getSequence()) {
+      for (auto& injection : application_handler.sequenceHandler_.getSequence()) {
         Filenames filenames_ = method_filenames;
         filenames_.setTag(Filenames::Tag::INPUT_MZML_FILENAME, injection.getMetaData().getFilename());
         filenames_.setTag(Filenames::Tag::INPUT_INJECTION_NAME, injection.getMetaData().getInjectionName());
@@ -84,23 +85,24 @@ struct TestData {
     }
   }
   void changeSampleType(const SampleType& sample_type) {
-    for (auto& injection : sequenceHandler.getSequence()) {
+    for (auto& injection : application_handler.sequenceHandler_.getSequence()) {
       injection.getMetaData().setSampleType(sample_type);
     }
   }
-  SequenceHandler sequenceHandler;
+  ApplicationHandler application_handler;
 };
 
 TEST(SessionHandler, setSequenceTable1)
 {
   TestData testData;
   SessionHandler session_handler;
-  session_handler.setSequenceTable(testData.sequenceHandler, session_handler.sequence_table);
+  session_handler.setSequenceTable(testData.application_handler.sequenceHandler_, session_handler.sequence_table);
   EXPECT_EQ(session_handler.sequence_table.headers_.size(), 12);
   EXPECT_STREQ(session_handler.sequence_table.headers_(0).c_str(), "inj#");
   EXPECT_STREQ(session_handler.sequence_table.headers_(session_handler.sequence_table.headers_.size() - 1).c_str(), "acquisition_date_and_time");
   EXPECT_EQ(session_handler.sequence_table.body_.dimension(0), 2);
   EXPECT_EQ(session_handler.sequence_table.body_.dimension(1), 12);
+  const auto debug_to_remove = session_handler.sequence_table.body_(0, 0);
   EXPECT_STREQ(session_handler.sequence_table.body_(0, 0).c_str(), "1");
   EXPECT_STREQ(session_handler.sequence_table.body_(session_handler.sequence_table.body_.dimension(0) - 1, session_handler.sequence_table.body_.dimension(1) - 1).c_str(), "1900-01-01_000000");
 
@@ -119,7 +121,7 @@ TEST(SessionHandler, setTransitionsTable1)
 {
   TestData testData;
   SessionHandler session_handler; 
-  session_handler.setTransitionsTable(testData.sequenceHandler, session_handler.transitions_table);
+  session_handler.setTransitionsTable(testData.application_handler.sequenceHandler_, session_handler.transitions_table);
   EXPECT_EQ(session_handler.transitions_table.headers_.size(), 9);
   EXPECT_STREQ(session_handler.transitions_table.headers_(0).c_str(), "transition_group");
   EXPECT_STREQ(session_handler.transitions_table.headers_(session_handler.transitions_table.headers_.size() - 1).c_str(), "detecting_transition");
@@ -164,7 +166,7 @@ TEST(SessionHandler, setSpectrumExplorer1)
 {
   TestData testData(true, false, true);
   SessionHandler session_handler;
-  session_handler.setSpectrumTable(testData.sequenceHandler, session_handler.spectrum_table);
+  session_handler.setSpectrumTable(testData.application_handler.sequenceHandler_, session_handler.spectrum_table);
   EXPECT_EQ(session_handler.spectrum_table.headers_.size(), 8);
   EXPECT_STREQ(session_handler.spectrum_table.headers_(0).c_str(), "native_id");
   EXPECT_STREQ(session_handler.spectrum_table.headers_(session_handler.spectrum_table.headers_.size() - 1).c_str(), "highest observed m/z");
@@ -195,7 +197,7 @@ TEST(SessionHandler, setQuantMethodTable1)
   TestData testData;
   SessionHandler session_handler;
   SessionHandler::GenericTableData table_data;
-  session_handler.setQuantMethodTable(testData.sequenceHandler, table_data);
+  session_handler.setQuantMethodTable(testData.application_handler.sequenceHandler_, table_data);
   EXPECT_EQ(table_data.headers_.size(), 20);
   EXPECT_STREQ(table_data.headers_(0).c_str(), "component_name");
   EXPECT_STREQ(table_data.headers_(table_data.headers_.size() - 1).c_str(), "transformation_model_param_y_datum_max");
@@ -210,7 +212,7 @@ TEST(SessionHandler, setStdsConcsTable1)
   TestData testData;
   SessionHandler session_handler; 
   SessionHandler::GenericTableData table_data;
-  session_handler.setStdsConcsTable(testData.sequenceHandler, table_data);
+  session_handler.setStdsConcsTable(testData.application_handler.sequenceHandler_, table_data);
   EXPECT_EQ(table_data.headers_.size(), 7);
   EXPECT_STREQ(table_data.headers_(0).c_str(), "sample_name");
   EXPECT_STREQ(table_data.headers_(table_data.headers_.size() - 1).c_str(), "dilution_factor");
@@ -225,7 +227,7 @@ TEST(SessionHandler, setComponentFiltersTable1)
   TestData testData;
   SessionHandler session_handler; 
   SessionHandler::GenericTableData table_data;
-  session_handler.setComponentFiltersTable(testData.sequenceHandler, table_data);
+  session_handler.setComponentFiltersTable(testData.application_handler.sequenceHandler_, table_data);
   EXPECT_EQ(table_data.headers_.size(), 11);
   EXPECT_STREQ(table_data.headers_(0).c_str(), "component_name");
   EXPECT_STREQ(table_data.headers_(table_data.headers_.size() - 1).c_str(), "metaValue_peak_apex_int_u");
@@ -240,7 +242,7 @@ TEST(SessionHandler, setComponentGroupFiltersTable1)
   TestData testData;
   SessionHandler session_handler; 
   SessionHandler::GenericTableData table_data;
-  session_handler.setComponentGroupFiltersTable(testData.sequenceHandler, table_data);
+  session_handler.setComponentGroupFiltersTable(testData.application_handler.sequenceHandler_, table_data);
   EXPECT_EQ(table_data.headers_.size(), 24);
   EXPECT_STREQ(table_data.headers_(0).c_str(), "component_group_name");
   EXPECT_STREQ(table_data.headers_(table_data.headers_.size() - 1).c_str(), "ion_ratio_feature_name");
@@ -255,7 +257,7 @@ TEST(SessionHandler, setComponentQCsTable1)
   TestData testData;
   SessionHandler session_handler;
   SessionHandler::GenericTableData table_data;
-  session_handler.setComponentQCsTable(testData.sequenceHandler, table_data);
+  session_handler.setComponentQCsTable(testData.application_handler.sequenceHandler_, table_data);
   EXPECT_EQ(table_data.headers_.size(), 19);
   EXPECT_STREQ(table_data.headers_(0).c_str(), "component_name");
   EXPECT_STREQ(table_data.headers_(table_data.headers_.size() - 1).c_str(), "metaValue_var_xcorr_shape_weighted_u");
@@ -270,7 +272,7 @@ TEST(SessionHandler, setComponentGroupQCsTable1)
   TestData testData;
   SessionHandler session_handler;
   SessionHandler::GenericTableData table_data;
-  session_handler.setComponentGroupQCsTable(testData.sequenceHandler, table_data);
+  session_handler.setComponentGroupQCsTable(testData.application_handler.sequenceHandler_, table_data);
   EXPECT_EQ(table_data.headers_.size(), 24);
   EXPECT_STREQ(table_data.headers_(0).c_str(), "component_group_name");
   EXPECT_STREQ(table_data.headers_(table_data.headers_.size() - 1).c_str(), "ion_ratio_feature_name");
@@ -285,7 +287,7 @@ TEST(SessionHandler, setComponentRSDFiltersTable1)
   TestData testData;
   SessionHandler session_handler;
   SessionHandler::GenericTableData table_data;
-  session_handler.setComponentRSDFiltersTable(testData.sequenceHandler, table_data);
+  session_handler.setComponentRSDFiltersTable(testData.application_handler.sequenceHandler_, table_data);
   EXPECT_EQ(table_data.headers_.size(), 11);
   EXPECT_STREQ(table_data.headers_(0).c_str(), "component_name");
   EXPECT_STREQ(table_data.headers_(table_data.headers_.size() - 1).c_str(), "metaValue_peak_apex_int_u");
@@ -300,7 +302,7 @@ TEST(SessionHandler, setComponentGroupRSDFiltersTable1)
   TestData testData;
   SessionHandler session_handler;
   SessionHandler::GenericTableData table_data;
-  session_handler.setComponentGroupRSDFiltersTable(testData.sequenceHandler, table_data);
+  session_handler.setComponentGroupRSDFiltersTable(testData.application_handler.sequenceHandler_, table_data);
   EXPECT_EQ(table_data.headers_.size(), 24);
   EXPECT_STREQ(table_data.headers_(0).c_str(), "component_group_name");
   EXPECT_STREQ(table_data.headers_(table_data.headers_.size() - 1).c_str(), "ion_ratio_feature_name");
@@ -315,7 +317,7 @@ TEST(SessionHandler, setComponentRSDQCsTable1)
   TestData testData;
   SessionHandler session_handler;
   SessionHandler::GenericTableData table_data;
-  session_handler.setComponentRSDQCsTable(testData.sequenceHandler, table_data);
+  session_handler.setComponentRSDQCsTable(testData.application_handler.sequenceHandler_, table_data);
   EXPECT_EQ(table_data.headers_.size(), 19);
   EXPECT_STREQ(table_data.headers_(0).c_str(), "component_name");
   EXPECT_STREQ(table_data.headers_(table_data.headers_.size() - 1).c_str(), "metaValue_var_xcorr_shape_weighted_u");
@@ -330,7 +332,7 @@ TEST(SessionHandler, setComponentGroupRSDQCsTable1)
   TestData testData;
   SessionHandler session_handler;
   SessionHandler::GenericTableData table_data;
-  session_handler.setComponentGroupRSDQCsTable(testData.sequenceHandler, table_data);
+  session_handler.setComponentGroupRSDQCsTable(testData.application_handler.sequenceHandler_, table_data);
   EXPECT_EQ(table_data.headers_.size(), 24);
   EXPECT_STREQ(table_data.headers_(0).c_str(), "component_group_name");
   EXPECT_STREQ(table_data.headers_(table_data.headers_.size() - 1).c_str(), "ion_ratio_feature_name");
@@ -345,7 +347,7 @@ TEST(SessionHandler, setComponentBackgroundFiltersTable1)
   TestData testData;
   SessionHandler session_handler;
   SessionHandler::GenericTableData table_data;
-  session_handler.setComponentBackgroundFiltersTable(testData.sequenceHandler, table_data);
+  session_handler.setComponentBackgroundFiltersTable(testData.application_handler.sequenceHandler_, table_data);
   EXPECT_EQ(table_data.headers_.size(), 11);
   EXPECT_STREQ(table_data.headers_(0).c_str(), "component_name");
   EXPECT_STREQ(table_data.headers_(table_data.headers_.size() - 1).c_str(), "metaValue_peak_apex_int_u");
@@ -360,7 +362,7 @@ TEST(SessionHandler, setComponentGroupBackgroundFiltersTable1)
   TestData testData;
   SessionHandler session_handler;
   SessionHandler::GenericTableData table_data;
-  session_handler.setComponentGroupBackgroundFiltersTable(testData.sequenceHandler, table_data);
+  session_handler.setComponentGroupBackgroundFiltersTable(testData.application_handler.sequenceHandler_, table_data);
   EXPECT_EQ(table_data.headers_.size(), 24);
   EXPECT_STREQ(table_data.headers_(0).c_str(), "component_group_name");
   EXPECT_STREQ(table_data.headers_(table_data.headers_.size() - 1).c_str(), "ion_ratio_feature_name");
@@ -375,7 +377,7 @@ TEST(SessionHandler, setComponentBackgroundQCsTable1)
   TestData testData;
   SessionHandler session_handler;
   SessionHandler::GenericTableData table_data;
-  session_handler.setComponentBackgroundQCsTable(testData.sequenceHandler, table_data);
+  session_handler.setComponentBackgroundQCsTable(testData.application_handler.sequenceHandler_, table_data);
   EXPECT_EQ(table_data.headers_.size(), 19);
   EXPECT_STREQ(table_data.headers_(0).c_str(), "component_name");
   EXPECT_STREQ(table_data.headers_(table_data.headers_.size() - 1).c_str(), "metaValue_var_xcorr_shape_weighted_u");
@@ -390,7 +392,7 @@ TEST(SessionHandler, setComponentGroupBackgroundQCsTable1)
   TestData testData;
   SessionHandler session_handler;
   SessionHandler::GenericTableData table_data;
-  session_handler.setComponentGroupBackgroundQCsTable(testData.sequenceHandler, table_data);
+  session_handler.setComponentGroupBackgroundQCsTable(testData.application_handler.sequenceHandler_, table_data);
   EXPECT_EQ(table_data.headers_.size(), 24);
   EXPECT_STREQ(table_data.headers_(0).c_str(), "component_group_name");
   EXPECT_STREQ(table_data.headers_(table_data.headers_.size() - 1).c_str(), "ion_ratio_feature_name");
@@ -407,10 +409,10 @@ TEST(SessionHandler, setComponentRSDEstimationsTable1)
   const ParameterSet params;
   Filenames filenames_;
   EstimateFeatureRSDs processor;
-  processor.process(testData.sequenceHandler.getSequenceSegments().front(), testData.sequenceHandler, params, filenames_);
+  processor.process(testData.application_handler.sequenceHandler_.getSequenceSegments().front(), testData.application_handler.sequenceHandler_, params, filenames_);
   SessionHandler session_handler;
   SessionHandler::GenericTableData table_data;
-  session_handler.setComponentRSDEstimationsTable(testData.sequenceHandler, table_data);
+  session_handler.setComponentRSDEstimationsTable(testData.application_handler.sequenceHandler_, table_data);
   EXPECT_EQ(table_data.headers_.size(), 11);
   EXPECT_STREQ(table_data.headers_(0).c_str(), "component_name");
   EXPECT_STREQ(table_data.headers_(table_data.headers_.size() - 1).c_str(), "metaValue_peak_apex_int_u");
@@ -427,10 +429,10 @@ TEST(SessionHandler, setComponentGroupRSDEstimationsTable1)
   const ParameterSet params;
   Filenames filenames_;
   EstimateFeatureRSDs processor;
-  processor.process(testData.sequenceHandler.getSequenceSegments().front(), testData.sequenceHandler, params, filenames_);
+  processor.process(testData.application_handler.sequenceHandler_.getSequenceSegments().front(), testData.application_handler.sequenceHandler_, params, filenames_);
   SessionHandler session_handler;
   SessionHandler::GenericTableData table_data;
-  session_handler.setComponentGroupRSDEstimationsTable(testData.sequenceHandler, table_data);
+  session_handler.setComponentGroupRSDEstimationsTable(testData.application_handler.sequenceHandler_, table_data);
   EXPECT_EQ(table_data.headers_.size(), 24);
   EXPECT_STREQ(table_data.headers_(0).c_str(), "component_group_name");
   EXPECT_STREQ(table_data.headers_(table_data.headers_.size() - 1).c_str(), "ion_ratio_feature_name");
@@ -447,10 +449,10 @@ TEST(SessionHandler, setComponentBackgroundEstimationsTable1)
   const ParameterSet params;
   Filenames filenames_;
   EstimateFeatureBackgroundInterferences processor;
-  processor.process(testData.sequenceHandler.getSequenceSegments().front(), testData.sequenceHandler, params, filenames_);
+  processor.process(testData.application_handler.sequenceHandler_.getSequenceSegments().front(), testData.application_handler.sequenceHandler_, params, filenames_);
   SessionHandler session_handler;
   SessionHandler::GenericTableData table_data;
-  session_handler.setComponentBackgroundEstimationsTable(testData.sequenceHandler, table_data);
+  session_handler.setComponentBackgroundEstimationsTable(testData.application_handler.sequenceHandler_, table_data);
   EXPECT_EQ(table_data.headers_.size(), 11);
   EXPECT_STREQ(table_data.headers_(0).c_str(), "component_name");
   EXPECT_STREQ(table_data.headers_(table_data.headers_.size() - 1).c_str(), "metaValue_peak_apex_int_u");
@@ -467,10 +469,10 @@ TEST(SessionHandler, setComponentGroupBackgroundEstimationsTable1)
   const ParameterSet params;
   Filenames filenames_;
   EstimateFeatureBackgroundInterferences processor;
-  processor.process(testData.sequenceHandler.getSequenceSegments().front(), testData.sequenceHandler, params, filenames_);
+  processor.process(testData.application_handler.sequenceHandler_.getSequenceSegments().front(), testData.application_handler.sequenceHandler_, params, filenames_);
   SessionHandler session_handler;
   SessionHandler::GenericTableData table_data;
-  session_handler.setComponentGroupBackgroundEstimationsTable(testData.sequenceHandler, table_data);
+  session_handler.setComponentGroupBackgroundEstimationsTable(testData.application_handler.sequenceHandler_, table_data);
   EXPECT_EQ(table_data.headers_.size(), 24);
   EXPECT_STREQ(table_data.headers_(0).c_str(), "component_group_name");
   EXPECT_STREQ(table_data.headers_(table_data.headers_.size() - 1).c_str(), "ion_ratio_feature_name");
@@ -484,7 +486,7 @@ TEST(SessionHandler, sessionHandlerGetters1)
 {
   TestData testData(true, false, true);
   SessionHandler session_handler;
-  session_handler.setMinimalDataAndFilters(testData.sequenceHandler);
+  session_handler.setMinimalDataAndFilters(testData.application_handler.sequenceHandler_);
   // Dynamic headers and body
   EXPECT_EQ(session_handler.getInjectionExplorerHeader().size(), 2);
   EXPECT_STREQ(session_handler.getInjectionExplorerHeader()(0).c_str(), "inj#");
@@ -515,9 +517,9 @@ TEST(SessionHandler, sessionHandlerGetters1)
   EXPECT_EQ(session_handler.getNSelectedFeatureMetaValuesTable(), 0);
   EXPECT_EQ(session_handler.getNSelectedFeatureMetaValuesPlot(), 0);
   // Selected string values
-  EXPECT_TRUE(session_handler.getSelectInjectionNamesWorkflow(testData.sequenceHandler) == std::set<std::string>({"150516_CM1_Level10_2_BatchName_1900-01-01_000000", "150516_CM1_Level1_1_BatchName_1900-01-01_000000"}));
-  EXPECT_TRUE(session_handler.getSelectSequenceSegmentNamesWorkflow(testData.sequenceHandler) == std::set<std::string>({ "segment1" }));
-  EXPECT_TRUE(session_handler.getSelectSampleGroupNamesWorkflow(testData.sequenceHandler) == std::set<std::string>({ "CM" }));
+  EXPECT_TRUE(session_handler.getSelectInjectionNamesWorkflow(testData.application_handler.sequenceHandler_) == std::set<std::string>({"150516_CM1_Level10_2_BatchName_1900-01-01_000000", "150516_CM1_Level1_1_BatchName_1900-01-01_000000"}));
+  EXPECT_TRUE(session_handler.getSelectSequenceSegmentNamesWorkflow(testData.application_handler.sequenceHandler_) == std::set<std::string>({ "segment1" }));
+  EXPECT_TRUE(session_handler.getSelectSampleGroupNamesWorkflow(testData.application_handler.sequenceHandler_) == std::set<std::string>({ "CM" }));
   EXPECT_EQ(session_handler.getSelectSampleNamesTable().size(), 2);
   EXPECT_STREQ(session_handler.getSelectSampleNamesTable()(0).c_str(), "150516_CM1_Level1");
   EXPECT_STREQ(session_handler.getSelectSampleNamesTable()(session_handler.getSelectSampleNamesTable().dimension(0)-1).c_str(), "150516_CM1_Level10");
@@ -556,67 +558,67 @@ TEST(SessionHandler, sessionHandlerGetters1)
   EXPECT_TRUE(session_handler.getSpectrumTableFilters()(0));
   EXPECT_TRUE(session_handler.getSpectrumTableFilters()(session_handler.getSpectrumTableFilters().dimension(0) - 1));
   SessionHandler::GenericTableData table_data;
-  session_handler.setQuantMethodTable(testData.sequenceHandler, table_data);
+  session_handler.setQuantMethodTable(testData.application_handler.sequenceHandler_, table_data);
   EXPECT_EQ(session_handler.getFiltersTable(table_data.body_).size(), 10);
   EXPECT_TRUE(session_handler.getFiltersTable(table_data.body_)(0));
   EXPECT_TRUE(!session_handler.getFiltersTable(table_data.body_)(session_handler.getFiltersTable(table_data.body_).dimension(0) - 1));
   table_data.clear();
-  session_handler.setComponentFiltersTable(testData.sequenceHandler, table_data);
+  session_handler.setComponentFiltersTable(testData.application_handler.sequenceHandler_, table_data);
   EXPECT_EQ(session_handler.getFiltersTable(table_data.body_).size(), 10);
   EXPECT_TRUE(!session_handler.getFiltersTable(table_data.body_)(0));
   EXPECT_TRUE(session_handler.getFiltersTable(table_data.body_)(session_handler.getFiltersTable(table_data.body_).dimension(0) - 1));
   table_data.clear();
-  session_handler.setComponentQCsTable(testData.sequenceHandler, table_data);
+  session_handler.setComponentQCsTable(testData.application_handler.sequenceHandler_, table_data);
   EXPECT_EQ(session_handler.getFiltersTable(table_data.body_).size(), 10);
   EXPECT_TRUE(!session_handler.getFiltersTable(table_data.body_)(0));
   EXPECT_TRUE(session_handler.getFiltersTable(table_data.body_)(session_handler.getFiltersTable(table_data.body_).dimension(0) - 1));
   table_data.clear();
-  session_handler.setComponentGroupFiltersTable(testData.sequenceHandler, table_data);
+  session_handler.setComponentGroupFiltersTable(testData.application_handler.sequenceHandler_, table_data);
   EXPECT_EQ(session_handler.getGroupFiltersTable(table_data.body_).size(), 10);
   EXPECT_TRUE(session_handler.getGroupFiltersTable(table_data.body_)(0));
   EXPECT_TRUE(!session_handler.getGroupFiltersTable(table_data.body_)(session_handler.getGroupFiltersTable(table_data.body_).dimension(0) - 1));
   table_data.clear();
-  session_handler.setComponentGroupQCsTable(testData.sequenceHandler, table_data);
+  session_handler.setComponentGroupQCsTable(testData.application_handler.sequenceHandler_, table_data);
   EXPECT_EQ(session_handler.getGroupFiltersTable(table_data.body_).size(), 10);
   EXPECT_TRUE(session_handler.getGroupFiltersTable(table_data.body_)(0));
   EXPECT_TRUE(!session_handler.getGroupFiltersTable(table_data.body_)(session_handler.getGroupFiltersTable(table_data.body_).dimension(0) - 1));
   table_data.clear();
-  session_handler.setComponentRSDFiltersTable(testData.sequenceHandler, table_data);
+  session_handler.setComponentRSDFiltersTable(testData.application_handler.sequenceHandler_, table_data);
   EXPECT_EQ(session_handler.getFiltersTable(table_data.body_).size(), 10);
   EXPECT_TRUE(!session_handler.getFiltersTable(table_data.body_)(0));
   EXPECT_TRUE(session_handler.getFiltersTable(table_data.body_)(session_handler.getFiltersTable(table_data.body_).dimension(0) - 1));
   table_data.clear();
-  session_handler.setComponentRSDQCsTable(testData.sequenceHandler, table_data);
+  session_handler.setComponentRSDQCsTable(testData.application_handler.sequenceHandler_, table_data);
   EXPECT_EQ(session_handler.getFiltersTable(table_data.body_).size(), 10);
   EXPECT_TRUE(!session_handler.getFiltersTable(table_data.body_)(0));
   EXPECT_TRUE(session_handler.getFiltersTable(table_data.body_)(session_handler.getFiltersTable(table_data.body_).dimension(0) - 1));
   table_data.clear();
-  session_handler.setComponentGroupRSDFiltersTable(testData.sequenceHandler, table_data);
+  session_handler.setComponentGroupRSDFiltersTable(testData.application_handler.sequenceHandler_, table_data);
   EXPECT_EQ(session_handler.getGroupFiltersTable(table_data.body_).size(), 10);
   EXPECT_TRUE(session_handler.getGroupFiltersTable(table_data.body_)(0));
   EXPECT_TRUE(!session_handler.getGroupFiltersTable(table_data.body_)(session_handler.getGroupFiltersTable(table_data.body_).dimension(0) - 1));
   table_data.clear();
-  session_handler.setComponentGroupRSDQCsTable(testData.sequenceHandler, table_data);
+  session_handler.setComponentGroupRSDQCsTable(testData.application_handler.sequenceHandler_, table_data);
   EXPECT_EQ(session_handler.getGroupFiltersTable(table_data.body_).size(), 10);
   EXPECT_TRUE(session_handler.getGroupFiltersTable(table_data.body_)(0));
   EXPECT_TRUE(!session_handler.getGroupFiltersTable(table_data.body_)(session_handler.getGroupFiltersTable(table_data.body_).dimension(0) - 1));
   table_data.clear();
-  session_handler.setComponentBackgroundFiltersTable(testData.sequenceHandler, table_data);
+  session_handler.setComponentBackgroundFiltersTable(testData.application_handler.sequenceHandler_, table_data);
   EXPECT_EQ(session_handler.getFiltersTable(table_data.body_).size(), 10);
   EXPECT_TRUE(!session_handler.getFiltersTable(table_data.body_)(0));
   EXPECT_TRUE(session_handler.getFiltersTable(table_data.body_)(session_handler.getFiltersTable(table_data.body_).dimension(0) - 1));
   table_data.clear();
-  session_handler.setComponentBackgroundQCsTable(testData.sequenceHandler, table_data);
+  session_handler.setComponentBackgroundQCsTable(testData.application_handler.sequenceHandler_, table_data);
   EXPECT_EQ(session_handler.getFiltersTable(table_data.body_).size(), 10);
   EXPECT_TRUE(!session_handler.getFiltersTable(table_data.body_)(0));
   EXPECT_TRUE(session_handler.getFiltersTable(table_data.body_)(session_handler.getFiltersTable(table_data.body_).dimension(0) - 1));
   table_data.clear();
-  session_handler.setComponentGroupBackgroundFiltersTable(testData.sequenceHandler, table_data);
+  session_handler.setComponentGroupBackgroundFiltersTable(testData.application_handler.sequenceHandler_, table_data);
   EXPECT_EQ(session_handler.getGroupFiltersTable(table_data.body_).size(), 10);
   EXPECT_TRUE(session_handler.getGroupFiltersTable(table_data.body_)(0));
   EXPECT_TRUE(!session_handler.getGroupFiltersTable(table_data.body_)(session_handler.getGroupFiltersTable(table_data.body_).dimension(0) - 1));
   table_data.clear();
-  session_handler.setComponentGroupBackgroundQCsTable(testData.sequenceHandler, table_data);
+  session_handler.setComponentGroupBackgroundQCsTable(testData.application_handler.sequenceHandler_, table_data);
   EXPECT_EQ(session_handler.getGroupFiltersTable(table_data.body_).size(), 10);
   EXPECT_TRUE(session_handler.getGroupFiltersTable(table_data.body_)(0));
   EXPECT_TRUE(!session_handler.getGroupFiltersTable(table_data.body_)(session_handler.getGroupFiltersTable(table_data.body_).dimension(0) - 1));
@@ -625,28 +627,28 @@ TEST(SessionHandler, sessionHandlerGetters1)
   const ParameterSet params;
   Filenames filenames_;
   EstimateFeatureRSDs estimateFeatureRSDs;
-  estimateFeatureRSDs.process(testData.sequenceHandler.getSequenceSegments().front(), testData.sequenceHandler, params, filenames_);
+  estimateFeatureRSDs.process(testData.application_handler.sequenceHandler_.getSequenceSegments().front(), testData.application_handler.sequenceHandler_, params, filenames_);
   table_data.clear();
-  session_handler.setComponentRSDEstimationsTable(testData.sequenceHandler, table_data);
+  session_handler.setComponentRSDEstimationsTable(testData.application_handler.sequenceHandler_, table_data);
   EXPECT_EQ(session_handler.getFiltersTable(table_data.body_).size(), 10);
   EXPECT_TRUE(!session_handler.getFiltersTable(table_data.body_)(0));
   EXPECT_TRUE(session_handler.getFiltersTable(table_data.body_)(session_handler.getFiltersTable(table_data.body_).dimension(0) - 1));
   table_data.clear();
-  session_handler.setComponentGroupRSDEstimationsTable(testData.sequenceHandler, table_data);
+  session_handler.setComponentGroupRSDEstimationsTable(testData.application_handler.sequenceHandler_, table_data);
   EXPECT_EQ(session_handler.getGroupFiltersTable(table_data.body_).size(), 10);
   EXPECT_TRUE(session_handler.getGroupFiltersTable(table_data.body_)(0));
   EXPECT_TRUE(!session_handler.getGroupFiltersTable(table_data.body_)(session_handler.getGroupFiltersTable(table_data.body_).dimension(0) - 1));
 
   testData.changeSampleType(SampleType::Blank);
   EstimateFeatureBackgroundInterferences estimateFeatureBackgroundInterferences;
-  estimateFeatureBackgroundInterferences.process(testData.sequenceHandler.getSequenceSegments().front(), testData.sequenceHandler, params, filenames_);
+  estimateFeatureBackgroundInterferences.process(testData.application_handler.sequenceHandler_.getSequenceSegments().front(), testData.application_handler.sequenceHandler_, params, filenames_);
   table_data.clear();
-  session_handler.setComponentBackgroundEstimationsTable(testData.sequenceHandler, table_data);
+  session_handler.setComponentBackgroundEstimationsTable(testData.application_handler.sequenceHandler_, table_data);
   EXPECT_EQ(session_handler.getFiltersTable(table_data.body_).size(), 10);
   EXPECT_TRUE(!session_handler.getFiltersTable(table_data.body_)(0));
   EXPECT_TRUE(session_handler.getFiltersTable(table_data.body_)(session_handler.getFiltersTable(table_data.body_).dimension(0) - 1));
   table_data.clear();
-  session_handler.setComponentGroupBackgroundEstimationsTable(testData.sequenceHandler, table_data);
+  session_handler.setComponentGroupBackgroundEstimationsTable(testData.application_handler.sequenceHandler_, table_data);
   EXPECT_EQ(session_handler.getGroupFiltersTable(table_data.body_).size(), 10);
   EXPECT_TRUE(session_handler.getGroupFiltersTable(table_data.body_)(0));
   EXPECT_TRUE(!session_handler.getGroupFiltersTable(table_data.body_)(session_handler.getGroupFiltersTable(table_data.body_).dimension(0) - 1));
@@ -657,7 +659,7 @@ TEST(SessionHandler, setFeatureTable1)
   TestData testData(true, true);
   SessionHandler session_handler;
   SessionHandler::GenericTableData table_data;
-  session_handler.setFeatureTable(testData.sequenceHandler, table_data);
+  session_handler.setFeatureTable(testData.application_handler.sequenceHandler_, table_data);
   EXPECT_EQ(table_data.headers_.size(), 23);
   EXPECT_STREQ(table_data.headers_(0).c_str(), "sample_name");
   EXPECT_STREQ(table_data.headers_(table_data.headers_.size() - 1).c_str(), "used_");
@@ -665,8 +667,8 @@ TEST(SessionHandler, setFeatureTable1)
   EXPECT_EQ(table_data.body_.dimension(1), 23);
   EXPECT_STREQ(table_data.body_(0, 0).c_str(), "150516_CM1_Level1");
   EXPECT_STREQ(table_data.body_(table_data.body_.dimension(0) - 1, table_data.body_.dimension(1) - 1).c_str(), "true");
-  session_handler.setMinimalDataAndFilters(testData.sequenceHandler);
-  session_handler.setFeatureTable(testData.sequenceHandler, table_data);
+  session_handler.setMinimalDataAndFilters(testData.application_handler.sequenceHandler_);
+  session_handler.setFeatureTable(testData.application_handler.sequenceHandler_, table_data);
   EXPECT_EQ(table_data.headers_.size(), 23);
   EXPECT_STREQ(table_data.headers_(0).c_str(), "sample_name");
   EXPECT_STREQ(table_data.headers_(table_data.headers_.size() - 1).c_str(), "used_");
@@ -680,7 +682,7 @@ TEST(SessionHandler, setFeatureMatrix1)
 {
   TestData testData;
   SessionHandler session_handler;
-  session_handler.setFeatureMatrix(testData.sequenceHandler);
+  session_handler.setFeatureMatrix(testData.application_handler.sequenceHandler_);
 }
 TEST(SessionHandler, getSpectrumScatterPlot1)
 {
@@ -690,7 +692,7 @@ TEST(SessionHandler, getSpectrumScatterPlot1)
   const std::pair<float, float> range = std::make_pair(0, 1800);
   const std::set<std::string> sample_names;
   const std::set<std::string> component_names;
-  session_handler.getChromatogramScatterPlot(testData.sequenceHandler, result, range, sample_names, component_names);
+  session_handler.getChromatogramScatterPlot(testData.application_handler.sequenceHandler_, result, range, sample_names, component_names);
   EXPECT_FALSE(result.points_overflow_);
 }
 TEST(SessionHandler, setSpectrumScatterPlot1)
@@ -702,14 +704,14 @@ TEST(SessionHandler, setSpectrumScatterPlot1)
   const std::set<std::string> sample_names;
   const std::set<std::string> scan_names;
   const std::set<std::string> component_group_names;
-  session_handler.getSpectrumScatterPlot(testData.sequenceHandler, result, range, sample_names, scan_names, component_group_names);
+  session_handler.getSpectrumScatterPlot(testData.application_handler.sequenceHandler_, result, range, sample_names, scan_names, component_group_names);
   EXPECT_FALSE(result.points_overflow_);
 }
 TEST(SessionHandler, setCalibratorsScatterLinePlot1)
 {
   TestData testData;
   SessionHandler session_handler;
-  session_handler.setCalibratorsScatterLinePlot(testData.sequenceHandler);
+  session_handler.setCalibratorsScatterLinePlot(testData.application_handler.sequenceHandler_);
 }
 TEST(SessionHandler, getHeatMap)
 {
@@ -717,7 +719,7 @@ TEST(SessionHandler, getHeatMap)
   SessionHandler session_handler;
   SessionHandler::HeatMapData result;
   std::string feature_name = "calculated_concentration";
-  session_handler.getHeatMap(testData.sequenceHandler, result, feature_name);
+  session_handler.getHeatMap(testData.application_handler.sequenceHandler_, result, feature_name);
   EXPECT_EQ(result.feat_heatmap_col_labels.size(), 0);
   EXPECT_EQ(result.feat_heatmap_data.size(), 0);
   EXPECT_EQ(result.feat_heatmap_row_labels.size(), 0);

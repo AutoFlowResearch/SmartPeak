@@ -29,6 +29,7 @@ namespace SmartPeak
   class AboutWidget final : public Widget
   {
   public:
+    AboutWidget() : Widget("About") {};
     void draw() override;
   };
 }

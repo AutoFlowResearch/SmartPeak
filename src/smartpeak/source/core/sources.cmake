@@ -3,10 +3,12 @@ set(directory source/core)
 
 ### list all filenames of the directory here
 set(sources_list
+	ApplicationHandler.cpp
 	ApplicationProcessor.cpp
 	CastValue.cpp
 	ConsoleHandler.cpp
 	EventDispatcher.cpp
+	FeatureFiltersUtils.cpp
 	FeatureMetadata.cpp
 	Filenames.cpp
 	Helloworld.cpp

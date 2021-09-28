@@ -532,7 +532,7 @@ namespace SmartPeak
     return false;
   }
 
-  std::array<std::vector<std::string>, 4> Utilities::getFolderContents(const std::filesystem::path& folder_path)
+  std::array<std::vector<std::string>, 4> Utilities::getFolderContents(const std::filesystem::path& folder_path, bool only_directories)
   {
     // name, ext, size, date
     std::array<std::vector<std::string>, 4> directory_entries;
@@ -540,24 +540,30 @@ namespace SmartPeak
     
     try {
       for (auto & p : std::filesystem::directory_iterator(folder_path, std::filesystem::directory_options::skip_permission_denied)) {
-        if (!isHiddenEntry(p)) {
+        if (!isHiddenEntry(p))
+        {
           auto last_write_time = std::filesystem::last_write_time(p.path());
           auto sctp = std::chrono::time_point_cast<std::chrono::system_clock::duration>(last_write_time
-                                                                                        - std::filesystem::file_time_type::clock::now()
-                                                                                        + std::chrono::system_clock::now());
+            - std::filesystem::file_time_type::clock::now()
+            + std::chrono::system_clock::now());
           std::time_t cftime = std::chrono::system_clock::to_time_t(sctp);
-          if (p.is_regular_file()) {
+          if (p.is_regular_file() && (!only_directories))
+          {
             entries_temp.push_back(std::make_tuple(p.path().filename().string(), p.file_size(), p.path().extension().string(), cftime));
-          } else if (p.is_directory()) {
+          }
+          else if (p.is_directory())
+          {
             std::tuple<float, uintmax_t> directory_info;
             getDirectoryInfo(p, directory_info);
             entries_temp.push_back(std::make_tuple(p.path().filename().string(), std::get<1>(directory_info), "Directory", cftime));
           }
         }
       }
-    } catch (const std::exception& e) {
+    }
+    catch (const std::exception& e) {
       LOGE << "Utilities::getFolderContents : " << typeid(e).name() << " : " << e.what();
     }
+
     
     if (entries_temp.size() > 1)
     {
@@ -834,4 +840,47 @@ namespace SmartPeak
     auto it = str.find(to_remove);
     if (it != std::string::npos) str.erase(it, str.length());
   }
+
+  Filenames Utilities::buildFilenamesFromDirectory(ApplicationHandler& application_handler, const std::filesystem::path& path)
+  {
+    Filenames filenames;
+    filenames.setTag(Filenames::Tag::MAIN_DIR, path.generic_string());
+    for (const auto& filename_handler : application_handler.loading_processors_)
+    {
+      filename_handler->getFilenames(filenames);
+    }
+    for (auto& file_id : filenames.getFileIds())
+    {
+      filenames.setEmbedded(file_id, false);
+      const auto& full_path = filenames.getFullPath(file_id);
+      if (!std::filesystem::exists(full_path))
+      {
+        LOGI << "Non existing file, will not be used: " << full_path.generic_string();
+        filenames.setFullPath(file_id, "");
+      }
+    }
+    return filenames;
+  }
+
+  std::filesystem::path Utilities::createEmptyTempDirectory()
+  {
+    std::filesystem::path path;
+    uint i;
+    uint max_tries = 1000;
+    while (true)
+    {
+      path = std::tmpnam(nullptr);
+      if (std::filesystem::create_directory(path))
+      {
+        break;
+      }
+      if (i == max_tries)
+      {
+        throw std::runtime_error("could not find non-existing directory");
+      }
+      i++;
+    }
+    return path;
+  }
 }
+
