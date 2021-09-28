@@ -851,6 +851,12 @@ namespace SmartPeak
     for (auto& file_id : filenames.getFileIds())
     {
       filenames.setEmbedded(file_id, false);
+      const auto& full_path = filenames.getFullPath(file_id);
+      if (!std::filesystem::exists(full_path))
+      {
+        LOGI << "Non existing file, will not be used: " << full_path.generic_string();
+        filenames.setFullPath(file_id, "");
+      }
     }
     return filenames;
   }

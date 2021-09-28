@@ -271,9 +271,17 @@ namespace SmartPeak
         }
         else
         {
-          OpenMS::MRMFeatureQCFile featureQCFile;
-          featureQCFile.load(filenames.getFullPath(file_id).generic_string(), features_qc, false);
-          if (notification) notification();
+          const auto full_path = filenames.getFullPath(file_id);
+          if (std::filesystem::exists(full_path))
+          {
+            OpenMS::MRMFeatureQCFile featureQCFile;
+            featureQCFile.load(filenames.getFullPath(file_id).generic_string(), features_qc, false);
+            if (notification) notification();
+          }
+          else
+          {
+            LOGE << "Failed to load " << full_path.generic_string();
+          }
         }
       }
       if ((feature_filter_mode & FeatureFiltersUtilsMode::EFeatureFiltersModeGroup)
@@ -356,9 +364,17 @@ namespace SmartPeak
         }
         else
         {
-          OpenMS::MRMFeatureQCFile featureQCFile;
-          featureQCFile.load(filenames.getFullPath(file_group_id).generic_string(), features_qc, true);
-          if (notification_group) notification_group();
+          const auto full_path = filenames.getFullPath(file_group_id);
+          if (std::filesystem::exists(full_path))
+          {
+            OpenMS::MRMFeatureQCFile featureQCFile;
+            featureQCFile.load(filenames.getFullPath(file_group_id).generic_string(), features_qc, true);
+            if (notification_group) notification_group();
+          }
+          else
+          {
+            LOGE << "Failed to load " << full_path.generic_string();
+          }
         }
       }
     }

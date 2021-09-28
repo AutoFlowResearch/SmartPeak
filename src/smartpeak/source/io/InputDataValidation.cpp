@@ -641,37 +641,44 @@ namespace SmartPeak
       return false;
     }
 
+    bool file_1_is_valid = true;
+    bool file_2_is_valid = true;
+
     if (!is_embedded_1 && !full_path_1.empty() &&
       !InputDataValidation::fileExists(full_path_1)) {
       LOGE << "File not found: " << full_path_1.generic_string();
-      return false;
+      file_1_is_valid = false;
+    }
+    else
+    {
+      if (is_embedded_1)
+      {
+        LOGI << "Loading from Session DB: " << id1;
+      }
+      else if (!full_path_1.empty())
+      {
+        LOGI << "Loading: " << full_path_1.generic_string();
+      }
     }
     
-    if (is_embedded_1)
-    {
-      LOGI << "Loading from Session DB: " << id1;
-    }
-    else if (!full_path_1.empty())
-    {
-      LOGI << "Loading: " << full_path_1.generic_string();
-    }
 
     if (!is_embedded_2 && !full_path_2.empty() &&
       !InputDataValidation::fileExists(full_path_2)) {
       LOGE << "File not found: " << full_path_2.generic_string();
-      return false;
+      file_2_is_valid = false;
     }
-
-    if (is_embedded_2)
+    else
     {
-      LOGI << "Loading from Session DB: " << id2;
+      if (is_embedded_2)
+      {
+        LOGI << "Loading from Session DB: " << id2;
+      }
+      else if (!full_path_2.empty())
+      {
+        LOGI << "Loading: " << full_path_2.generic_string();
+      }
     }
-    else if (!full_path_2.empty())
-    {
-      LOGI << "Loading: " << full_path_2.generic_string();
-    }
-
-    return true;
+    return (file_1_is_valid || file_2_is_valid);
   }
 
   bool InputDataValidation::prepareToStore(const Filenames& filenames, const std::string& file_id)

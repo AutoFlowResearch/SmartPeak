@@ -231,11 +231,15 @@ TEST(InputDataValidation, prepareToLoad)
 TEST(InputDataValidation, prepareToLoadOneOfTwo)
 {
   Filenames filenames;
-  filenames.setFullPath("quantitationMethods", main_dir + "/quantitationMethods_missing.csv");
+  filenames.setFullPath("existing_file", main_dir + "/quantitationMethods_missing.csv");
+  filenames.setFullPath("non_existing_file", main_dir + "/non_existing_file.csv");
   filenames.setFullPath("empty_file", "");
   filenames.setFullPath("another_empty_file", "");
-  EXPECT_TRUE(InputDataValidation::prepareToLoadOneOfTwo(filenames, "quantitationMethods", "empty_file"));
+  EXPECT_TRUE(InputDataValidation::prepareToLoadOneOfTwo(filenames, "existing_file", "empty_file"));
+  EXPECT_TRUE(InputDataValidation::prepareToLoadOneOfTwo(filenames, "empty_file", "existing_file"));
   EXPECT_FALSE(InputDataValidation::prepareToLoadOneOfTwo(filenames, "empty_file", "another_empty_file"));
+  EXPECT_TRUE(InputDataValidation::prepareToLoadOneOfTwo(filenames, "non_existing_file", "existing_file"));
+  EXPECT_TRUE(InputDataValidation::prepareToLoadOneOfTwo(filenames, "existing_file", "non_existing_file"));
 }
 
 TEST(InputDataValidation, prepareToStore)
