@@ -91,9 +91,9 @@ namespace SmartPeak {
       }
       else
       {
-        // Load from directory (backward compatibility - deprecated)
         LOGW << "Loading session from directory - backward compatibility - deprecated, prefer loading from session file.";
         Filenames filenames_main = Utilities::buildFilenamesFromDirectory(application_handler, application_settings.load_session);
+        application_handler.main_dir_ = filenames_main.getTag(Filenames::Tag::MAIN_DIR);
         SmartPeak::LoadSession create_sequence(application_handler);
         create_sequence.filenames_ = filenames_main;
         return create_sequence.process();
