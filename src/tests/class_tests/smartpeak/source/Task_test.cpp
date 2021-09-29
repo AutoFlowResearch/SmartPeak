@@ -108,3 +108,47 @@ TEST_F(TaskFixture, Task_LoadSession)
     auto task = cli::LoadSession{};
     EXPECT_TRUE(!task(am));
 }
+
+TEST(Task, Task_options_invalid_input_file)
+{
+  namespace cli = SmartPeak::cli;
+  std::string seq = std::string{ SMARTPEAK_GET_TEST_DATA_PATH("workflow_csv_files") };
+  std::vector<std::string> args = std::vector<std::string>{
+      "Task_test",
+          "--load-session", seq,
+          "--verbose",
+          "--allow-inconsistent",
+          "--log-dir", ".",
+          "--disable-colors",
+          "--input-files", "non_existing_file_id=\"parameter_file.csv\""
+  };
+  auto pa = cli::Parser{ args };
+  auto as = cli::ApplicationSettings{ pa };
+  auto am = cli::ApplicationManager{ as };
+  auto task = cli::InitializeApplicationSettings{};
+  EXPECT_TRUE(task(am));
+  auto ls = cli::LoadSession{};
+  EXPECT_FALSE(ls(am));
+}
+
+TEST(Task, Task_options_invalid_parameter)
+{
+  namespace cli = SmartPeak::cli;
+  std::string seq = std::string{ SMARTPEAK_GET_TEST_DATA_PATH("workflow_csv_files") };
+  std::vector<std::string> args = std::vector<std::string>{
+      "Task_test",
+          "--load-session", seq,
+          "--verbose",
+          "--allow-inconsistent",
+          "--log-dir", ".",
+          "--disable-colors",
+          "--parameters", "NonExistingFunction:NonExistingPrameter=\"my_value\""
+  };
+  auto pa = cli::Parser{ args };
+  auto as = cli::ApplicationSettings{ pa };
+  auto am = cli::ApplicationManager{ as };
+  auto task = cli::InitializeApplicationSettings{};
+  EXPECT_TRUE(task(am));
+  auto ls = cli::LoadSession{};
+  EXPECT_FALSE(ls(am));
+}

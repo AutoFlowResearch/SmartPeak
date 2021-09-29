@@ -65,9 +65,9 @@ void ApplicationSettings::define_options()
         "An absolute or relative path to an output directory. Overrides the default location which is the current working directory. " 
         "SmartPeak will create given directory if one does not exist.");
     m_parser.set_optional<std::string>("f", "input-files", "",
-        "Override input files. To list the overridable files, use this option with empty value.");
+        "Override input files. Ex: -f parameters=\"parameters2.csv\". To list the overridable files, use this option with empty value.");
     m_parser.set_optional<std::string>("params", "parameters", "",
-        "Override parameters. To list the available parameters, use this option with empty value.");
+        "Override parameters. Ex: '-parameters SequenceProcessor:n_thread=8;MRMFeatureFinderScoring:TransitionGroupPicker:peak_integration=smoothed' . To list the available parameters, use this option with empty value.");
     m_parser.run_and_exit_if_error();
 }
 
