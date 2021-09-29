@@ -388,6 +388,13 @@ public:
      Can be used to create an empty session from a directory.
     */
     static Filenames buildFilenamesFromDirectory(ApplicationHandler& application_handler, const std::filesystem::path& path);
+    
+    /**
+     @brief Returns a unique string based on the current time.
+     
+     @param[out] a unique string in the format : %Y-%m-%d_%H-%M-%S_TIME_SINCE_EPOCHS
+    */
+    static std::string makeUniqueStringFromTime();
 
     /**
      @brief return an empty, temporary directory.

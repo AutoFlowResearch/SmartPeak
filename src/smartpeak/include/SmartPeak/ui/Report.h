@@ -38,6 +38,10 @@ namespace SmartPeak
   {
     std::array<bool, SampleTypeSize>      st_checks_;
     std::array<bool, FeatureMetadataSize> md_checks_;
+    bool                                  all_st_checks_;
+    bool                                  all_st_deactivated_;
+    bool                                  all_md_checks_;
+    bool                                  all_md_deactivated_;
     std::set<SampleType>                  summarySampleTypes_;
     std::vector<FeatureMetadata>          summaryMetaData_;
     ApplicationHandler&                   application_handler_;

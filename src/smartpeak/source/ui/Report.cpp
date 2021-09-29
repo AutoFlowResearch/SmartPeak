@@ -40,6 +40,8 @@ namespace SmartPeak
   {
     std::fill(st_checks_.begin(), st_checks_.end(), false);
     std::fill(md_checks_.begin(), md_checks_.end(), false);
+    all_st_checks_ = false; all_st_deactivated_ = true;
+    all_md_checks_ = false; all_md_deactivated_ = true;
   }
 
   void Report::draw()
@@ -58,9 +60,21 @@ namespace SmartPeak
       ImGui::Text("Sample types");
       ImGui::Separator();
       size_t i = 0;
+
+      if(ImGui::Checkbox("All", &all_st_checks_))
+      {
+        std::fill(st_checks_.begin(), st_checks_.end(), true);
+        all_st_deactivated_ = false;
+      }
+      if (!all_st_checks_ && !all_st_deactivated_)
+      {
+        std::fill(st_checks_.begin(), st_checks_.end(), false);
+      }
+      
       for (const std::pair<SampleType, std::string>& p : sampleTypeToString)
       {
         ImGui::Checkbox(p.second.c_str(), &st_checks_.at(i++));
+        all_st_deactivated_ = true;
       }
       ImGui::EndChild();
       ImGui::PopStyleVar();
@@ -72,9 +86,21 @@ namespace SmartPeak
       ImGui::Text("Metadata");
       ImGui::Separator();
       size_t i = 0;
+      
+      if(ImGui::Checkbox("All", &all_md_checks_))
+      {
+        std::fill(md_checks_.begin(), md_checks_.end(), true);
+        all_md_deactivated_ = false;
+      }
+      if (!all_md_checks_ && !all_md_deactivated_)
+      {
+        std::fill(md_checks_.begin(), md_checks_.end(), false);
+      }
+      
       for (const std::pair<FeatureMetadata, std::string>& p : metadataToString)
       {
         ImGui::Checkbox(p.second.c_str(), &md_checks_.at(i++));
+        all_md_deactivated_ = true;
       }
       ImGui::EndChild();
       ImGui::PopStyleVar();
