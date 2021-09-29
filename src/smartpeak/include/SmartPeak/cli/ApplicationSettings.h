@@ -107,6 +107,7 @@ public:
     std::string log_dir; 
     std::string out_dir;
     std::string input_files;
+    std::string parameters;
 
 public:
     void validate_report() const;

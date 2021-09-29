@@ -374,6 +374,68 @@ namespace SmartPeak
       }
     }
 
+    if (parameters_override_)
+    {
+      if (application_handler_.sequenceHandler_.getSequence().size())
+      {
+        // Construct schema based on the current workflow's command list
+        // TODO: factorize this common code with Parameter's table
+        std::vector<std::string> command_names = application_handler_.sequenceHandler_.getWorkflow();
+        BuildCommandsFromNames buildCommandsFromNames(application_handler_);
+        buildCommandsFromNames.names_ = command_names;
+        buildCommandsFromNames.process();
+        ParameterSet schema_params;
+        for (const auto& command : buildCommandsFromNames.commands_)
+        {
+          schema_params.merge(command.getParameterSchema());
+        }
+        schema_params.merge(ApplicationProcessors::getParameterSchema()); // Application processor will be used also
+        schema_params.setAsSchema(true);
+        parameters_override_->merge(schema_params);
+
+        for (auto& function_parameter_override : *parameters_override_)
+        {
+          for (auto& parameter_override : function_parameter_override.second)
+          {
+            if (!parameter_override.isSchema())
+            {
+              if (!parameter_override.getSchema())
+              {
+                LOGE << "Overridden parameter \"" << function_parameter_override.first << ":" << parameter_override.getName()
+                  << "\": " << "Unused or Unknown";
+                return false;
+              }
+              if (!parameter_override.isValid())
+              {
+                LOGE << "Overridden parameter \"" << function_parameter_override.first << ":" << parameter_override.getName()
+                  << "\", Invalid value: \"" << parameter_override.getValueAsString() << "\"";
+                LOGE << "Expected Type: " << parameter_override.getType();
+                auto constraints = parameter_override.getRestrictionsAsString();
+                if (!constraints.empty())
+                {
+                  LOGE << "Constraints: " << constraints;
+                }
+                return false;
+              }
+              else
+              {
+                // looks ok, override parameter
+                ParameterSet& user_parameters = application_handler_.sequenceHandler_.getSequence().at(0).getRawData().getParameters();
+                Parameter* existing_parameter = user_parameters.findParameter(function_parameter_override.first, parameter_override.getName());
+                if (existing_parameter) // should not be null anyway at this step
+                {
+                  LOGW << "Overridden parameter \"" << function_parameter_override.first << ":" << parameter_override.getName()
+                       << "\", set value: \"" << parameter_override.getValueAsString() << "\"";
+                  existing_parameter->setValueFromString(parameter_override.getValueAsString(), false);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+
     if (checkConsistency)
     {
       if (!application_handler_.sequenceHandler_.getSequenceSegments().empty())

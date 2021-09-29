@@ -64,8 +64,10 @@ void ApplicationSettings::define_options()
     m_parser.set_optional<std::string>("o", "output", ".", 
         "An absolute or relative path to an output directory. Overrides the default location which is the current working directory. " 
         "SmartPeak will create given directory if one does not exist.");
-    m_parser.set_optional<std::string>("f", "input-file", "",
+    m_parser.set_optional<std::string>("f", "input-files", "",
         "Override input files. To list the overridable files, use this option with empty value.");
+    m_parser.set_optional<std::string>("params", "parameters", "",
+        "Override parameters. To list the available parameters, use this option with empty value.");
     m_parser.run_and_exit_if_error();
 }
 
@@ -84,6 +86,7 @@ void ApplicationSettings::load_options()
     log_dir                 = m_parser.get<std::string>("ld");
     out_dir                 = m_parser.get<std::string>("o");
     input_files             = m_parser.get<std::string>("f");
+    parameters              = m_parser.get<std::string>("params");
 }
 
 void ApplicationSettings::process_options()

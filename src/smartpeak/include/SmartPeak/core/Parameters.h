@@ -63,7 +63,7 @@ namespace SmartPeak
         {"type", "int"},
         {"value", "23"},
         {"description", "param1 description"},
-        {"tags", "tag1,tag2,tag3"}
+        {"tags", "tag1,tag2,tag3"},
         {"min","0"}, 
         {"max","10"}
       }

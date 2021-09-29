@@ -90,14 +90,39 @@ namespace SmartPeak {
       }
       else
       {
+
         Filenames filenames_override;
         auto split_options = application_settings.get_split_option(application_settings.input_files);
         for (const auto& split_option : split_options)
         {
           filenames_override.setFullPath(split_option.first, split_option.second);
         }
+        
+        ParameterSet parameters_override;
+        split_options = application_settings.get_split_option(application_settings.parameters);
+        for (const auto& split_option : split_options)
+        {
+          auto key = split_option.first; // key must be FunctionName:ParameterName
+          auto separator_pos = key.find(":");
+          if (separator_pos != key.npos)
+          {
+            std::string function_name = key.substr(0, separator_pos);
+            std::string parameter_name = key.substr((separator_pos + 1), key.size() - (separator_pos + 1));
+            if (!function_name.empty() && !parameter_name.empty())
+            {
+              std::map<std::string, std::string> param_struct = {
+                {"name", parameter_name},
+                { "value", split_option.second }
+              };
+              Parameter param(param_struct);
+              parameters_override.addParameter(function_name, param);
+            }
+          }
+        }
+
         SmartPeak::LoadSession create_sequence(application_handler);
         create_sequence.filenames_override_ = filenames_override;
+        create_sequence.parameters_override_ = parameters_override;
         if (std::filesystem::is_regular_file(application_settings.load_session))
         {
           // Load from session
