@@ -140,7 +140,7 @@ std::map<std::string, std::string> ApplicationSettings::get_split_option(
     {
       std::string key = key_value.substr(0, separator_pos);
       std::string value = key_value.substr((separator_pos + 1), key_value.size() - (separator_pos + 1));
-      if (!key.empty() && !value.empty())
+      if (!key.empty())
       {
         map_options.emplace(key, value);
       }
@@ -153,8 +153,7 @@ void ApplicationSettings::validate_report() const
 {
     auto options = std::vector<std::string>{"FEATUREDB", "PIVOTTABLE", "ALL"};
     std::for_each(report.cbegin(), report.cend(), [&options](const auto& option) {
-        auto it = std::find(options.cbegin(), options.cend(), option);
-        if (it == std::cend(options))
+        if (std::find(options.cbegin(), options.cend(), option) == std::cend(options))
         {
             auto options_str = Utilities::join(options.cbegin(), options.cend(), ", ");
             throw std::invalid_argument(static_cast<std::ostringstream&&>(
