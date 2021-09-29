@@ -17,7 +17,7 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Douglas McCloskey $
+// $Maintainer: Douglas McCloskey, Ahmed Khalil $
 // $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
 // --------------------------------------------------------------------------
 
@@ -61,7 +61,7 @@ namespace SmartPeak
       ImGui::Separator();
       size_t i = 0;
 
-      if(ImGui::Checkbox("All", &all_st_checks_))
+      if (ImGui::Checkbox("All", &all_st_checks_))
       {
         std::fill(st_checks_.begin(), st_checks_.end(), true);
         all_st_deactivated_ = false;
@@ -87,7 +87,7 @@ namespace SmartPeak
       ImGui::Separator();
       size_t i = 0;
       
-      if(ImGui::Checkbox("All", &all_md_checks_))
+      if (ImGui::Checkbox("All", &all_md_checks_))
       {
         std::fill(md_checks_.begin(), md_checks_.end(), true);
         all_md_deactivated_ = false;
