@@ -125,19 +125,28 @@ bool ApplicationSettings::contains_option(
 std::map<std::string, std::string> ApplicationSettings::get_split_option(
   const std::string& option)
 {
-  std::map<std::string, std::string> map_option;
-  auto key_value = option;
-  auto separator_pos = key_value.find("=");
-  if (separator_pos != key_value.npos)
+  std::string escaped_option = option;
+  if ((option.size() > 1) && (option.front() == '\"') && (option.back() == '\"'))
   {
-    std::string key = key_value.substr(0, separator_pos);
-    std::string value = key_value.substr((separator_pos + 1), key_value.size() - (separator_pos + 1));
-    if (!key.empty() && !value.empty())
-    {
-      map_option.emplace(key, value);
-    }
+    escaped_option = option.substr(1, option.size() - 2);
   }
-  return map_option;
+  std::map<std::string, std::string> map_options;
+  std::istringstream iss(escaped_option);
+  std::string key_value;
+  while (std::getline(iss, key_value, ';'))
+  {
+    auto separator_pos = key_value.find("=");
+    if (separator_pos != key_value.npos)
+    {
+      std::string key = key_value.substr(0, separator_pos);
+      std::string value = key_value.substr((separator_pos + 1), key_value.size() - (separator_pos + 1));
+      if (!key.empty() && !value.empty())
+      {
+        map_options.emplace(key, value);
+      }
+    }
+  };
+  return map_options;
 }
 
 void ApplicationSettings::validate_report() const
