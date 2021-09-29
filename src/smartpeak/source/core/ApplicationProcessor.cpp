@@ -304,12 +304,24 @@ namespace SmartPeak
 
     if (filenames_override_)
     {
+      const auto& src = filenames_->getFileIds();
       for (const auto& file_id : filenames_override_->getFileIds())
       {
-        const auto value = filenames_override_->getFullPath(file_id);
-        filenames_->setFullPath(file_id, value);
+        if (std::find(src.begin(), src.end(), file_id) == src.end())
+        {
+          LOGE << "Unknown overriding input file: " << file_id;
+          return false;
+        }
+        else
+        {
+          const auto value = filenames_override_->getFullPath(file_id);
+          LOGW << "Overriding input file: " << file_id << " -> " << "\"" << value.generic_string() << "\"";
+          filenames_->setFullPath(file_id, value);
+        }
       }
     }
+
+    filenames_->log();
 
     for (auto& loading_processor : application_handler_.loading_processors_)
     {

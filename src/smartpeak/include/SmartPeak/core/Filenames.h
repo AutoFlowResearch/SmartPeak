@@ -120,6 +120,11 @@ namespace SmartPeak
     */
     SessionDB& getSessionDB() { return session_db_; };
 
+    /**
+      @brief log content of this instance
+    */
+    void log() const;
+
   protected:
 
     struct FileName

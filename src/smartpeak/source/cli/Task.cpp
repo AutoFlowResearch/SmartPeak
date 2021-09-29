@@ -90,14 +90,12 @@ namespace SmartPeak {
       }
       else
       {
-        // =================================
         Filenames filenames_override;
         auto split_options = application_settings.get_split_option(application_settings.input_files);
         for (const auto& split_option : split_options)
         {
           filenames_override.setFullPath(split_option.first, split_option.second);
         }
-        // =================================
         SmartPeak::LoadSession create_sequence(application_handler);
         create_sequence.filenames_override_ = filenames_override;
         if (std::filesystem::is_regular_file(application_settings.load_session))
