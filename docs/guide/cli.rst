@@ -39,7 +39,7 @@ After running a workflow, SmartPeak offers saving the result of the computation 
 By default all possible reports will be exported, i.e. ``PivotTable`` and ``FeatureDB``. 
 However user can decide which report type to save using ``--report`` option. 
 It is still possible to specify both with this option, e.g. ``--report pivottable featuredb``.
-If ``--output`` path is not given, the files are written to current working directory.
+If ``--output-features`` path is not given, the files are written to current working directory.
 
 .. tabs::
 
@@ -61,7 +61,7 @@ If ``--output`` path is not given, the files are written to current working dire
 Output directory
 ~~~~~~~~~~~~~~~~
 
-In order to save files in specific location, set an ``--output`` path (relative or absolute).
+In order to save files in specific location, set an ``--output-features`` path (relative or absolute), or --reports-out-dir for the reports directories.
 
 .. tabs::
 
@@ -70,14 +70,16 @@ In order to save files in specific location, set an ``--output`` path (relative 
         ./SmartPeakCLI `
             --load-session C:/data/GCMS_SIM_Unknowns/sequence.csv `
             --report featuredb `
-            --output C:/data/reports
+            --reports-out-dir $HOME/data/reports `
+            --output-features $HOME/data/output_features
 
     .. code-tab:: bash
 
         ./SmartPeakCLI \
             --load-session $HOME/data/GCMS_SIM_Unknowns/sequence.csv \
             --report featuredb \
-            --output $HOME/data/reports
+            --reports-out-dir $HOME/data/reports `
+            --output-features $HOME/data/output_features
 
 .. warning::
     Notice that if given a path to non-existing directory, SmartPeak will attempt to create one.
@@ -97,7 +99,8 @@ Values are space separated list, case insensitive.
             --load-session C:/data/GCMS_SIM_Unknowns/sequence.csv `
             --report featuredb `
             --report-sample-types standard blank qc `
-            --output C:/data/reports
+            --reports-out-dir $HOME/data/reports `
+            --output-features $HOME/data/output_features
 
     .. code-tab:: bash
 
@@ -105,7 +108,8 @@ Values are space separated list, case insensitive.
             --load-session $HOME/data/GCMS_SIM_Unknowns/sequence.csv \
             --report featuredb \
             --report-sample-types standard blank qc \
-            --output $HOME/data/reports
+            --reports-out-dir $HOME/data/reports \
+            --output-features $HOME/data/output_features
 
 .. note::
     List of all possible sample types can be found here: :ref:`sample-types`.
@@ -128,7 +132,8 @@ The same rules applies, an example below.
             --load-session C:/data/GCMS_SIM_Unknowns/sequence.csv `
             --report featuredb `
             --report-metadata peak_area logSN RT
-            --output C:/data/reports
+            --reports-out-dir $HOME/data/reports `
+            --output-features $HOME/data/output_features
 
     .. code-tab:: bash
 
@@ -136,7 +141,8 @@ The same rules applies, an example below.
             --load-session $HOME/data/GCMS_SIM_Unknowns/sequence.csv \
             --report featuredb \
             --report-metadata peak_area logSN RT \
-            --output $HOME/data/reports
+            --reports-out-dir $HOME/data/reports \
+            --output-features $HOME/data/output_features
 
 .. note::
     List of all possible values can be found here: :ref:`metadata`.
@@ -166,7 +172,8 @@ The CLI tool allows to modify the list of commands inline with an option ``--wor
                         PICK_MRM_FEATURES `
                         SELECT_FEATURES `
                         STORE_FEATURES `
-            --output C:/data/reports
+            --reports-out-dir $HOME/data/reports `
+            --output-features $HOME/data/output_features
 
     .. code-tab:: bash
 
@@ -181,7 +188,8 @@ The CLI tool allows to modify the list of commands inline with an option ``--wor
                         PICK_MRM_FEATURES \
                         SELECT_FEATURES \
                         STORE_FEATURES \
-            --output $HOME/data/reports
+            --reports-out-dir $HOME/data/reports \
+            --output-features $HOME/data/output_features
 
 .. note::
     The full list of commands with short descriptions is included here: :ref:`workflow-commands`.
@@ -208,7 +216,8 @@ which forces SmartPeak to continue with the workflow even if one or more integri
             --report featuredb `
             --integrity SAMPLE COMP_GROUP `
             --allow-inconsistent `
-            --output C:/data/reports
+            --reports-out-dir $HOME/data/reports `
+            --output-features $HOME/data/output_features
 
     .. code-tab:: bash
 
@@ -217,7 +226,8 @@ which forces SmartPeak to continue with the workflow even if one or more integri
             --report featuredb \
             --integrity SAMPLE COMP_GROUP \
             --allow-inconsistent \
-            --output $HOME/data/reports
+            --reports-out-dir $HOME/data/reports \
+            --output-features $HOME/data/output_features
 
 .. note::
     Refer to list of integrity checks here: :ref:`integrity-checks`.
@@ -235,35 +245,34 @@ Full Command-Line Interface
     This parameter is optional. The default value is ''.
 
     -l    --load-session  (required)
-    The path to sequence.csv file
+    The path to session file, or a directory with structured file organization (prefer session file)
 
     -r    --report
     Specify a report type to export.
     This parameter is optional. The default value is '[ FeatureDB PivotTable ]'.
 
     -rt   --report-sample-types
-    A list of sample types to include in the report. 
-    The full list can be found in documentation https://smartpeak.readthedocs.io   
+    A list of sample types to include in the report. The full list can be found in documentation https://smartpeak.readthedocs.io
     This parameter is optional. The default value is '[ ALL ]'.
 
     -rm   --report-metadata
-    A list of metadata to include in the report. 
-    The full list can be found in documentation https://smartpeak.readthedocs.io
+    A list of metadata to include in the report. The full list can be found in documentation https://smartpeak.readthedocs.io
     This parameter is optional. The default value is '[ ALL ]'.
 
+    -ro   --reports-out-dir
+    An absolute or relative path to an output directory for reports. Overrides the default location which is the current working directory. SmartPeak will create given directory if one does not exist.
+    This parameter is optional. The default value is '.'.
+
     -w    --workflow
-    The workflow sequence as a list of commands, e.g. LOAD_DATA MAP_CHROMATOGRAMS ... 
-    Overrides the workflow settings loaded from the sequence file (with option --load-session)
+    The workflow sequence as a list of commands, e.g. LOAD_DATA MAP_CHROMATOGRAMS ... Overrides the workflow settings loaded from the sequence file (with option --load-session)
     This parameter is optional. The default value is '[ ]'.
 
-    -i    --integrity
-    Specify which integrity checks to run, available are: SAMPLE, COMP, 
-    COMP_GROUP, IS and ALL (runs all listed).
+    -t    --integrity
+    Specify which integrity checks to run, available are: SAMPLE, COMP, COMP_GROUP, IS and ALL (runs all listed).
     This parameter is optional. The default value is '[ NONE ]'.
 
     -a    --allow-inconsistent
-    Given that any integrity checks were specified with '--integrity', 
-    this option allow to run workflow even if one or more check has failed.
+    Given that any integrity checks were specified with '--integrity', this option allow to run workflow even if one or more check has failed.
     This parameter is optional. The default value is '0'.
 
     -v    --verbose
@@ -274,12 +283,30 @@ Full Command-Line Interface
     By default the console output is colored, this flag disables colors.
     This parameter is optional. The default value is '0'.
 
+    -pg   --disable-progressbar
+    Progress bar allows to track the progress of the entire workflow. This option disables the progress bar.
+    This parameter is optional. The default value is '0'.
+
     -ld   --log-dir
-    The path to the log directory. Given directory has to exist. Overrides the default 
-    location for the log file: https://smartpeak.readthedocs.io/en/latest/guide/guistart.html#logs
+    The path to the log directory. Given directory has to exist. Overrides the default location for the log file: https://smartpeak.readthedocs.io/en/latest/guide/guistart.html#logs
     This parameter is optional. The default value is ''.
 
-    -o    --output
-    An absolute or relative path to an output directory. Overrides the default location 
-    which is the current working directory. SmartPeak will create given directory if one does not exist.
-    This parameter is optional. The default value is '.'.
+    -o    --output-features
+    An absolute or relative path to an output directory. Overrides the default location which is the current working directory. SmartPeak will create given directory if one does not exist.
+    This parameter is optional. The default value is './features'.
+
+    -i    --input-features
+    An absolute or relative path to the input features directory. Overrides the default location which is the current working directory.
+    This parameter is optional. The default value is './features'.
+
+    -z    --mzml
+    An absolute or relative path to the mzML directory. Overrides the default location which is the mzML folder under the current working directory. SmartPeak will create given directory if one does not exist.
+    This parameter is optional. The default value is './mzML'.
+
+    -f    --input-file
+    Override input file. Ex: -f featureQCComponents="./featureQCComponents_new.csv".
+    This parameter is optional. The default value is '[ ]'.
+
+    -p    --parameter
+    Override parameter. Ex: '-p MRMFeatureFinderScoring:TransitionGroupPicker:peak_integration=smoothed'.
+    This parameter is optional. The default value is '[ ]'.
