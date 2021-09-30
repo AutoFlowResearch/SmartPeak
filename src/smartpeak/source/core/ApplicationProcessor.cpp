@@ -415,19 +415,7 @@ namespace SmartPeak
     {
       if (application_handler_.sequenceHandler_.getSequence().size())
       {
-        // Construct schema based on the current workflow's command list
-        // TODO: factorize this common code with Parameter's table
-        std::vector<std::string> command_names = application_handler_.sequenceHandler_.getWorkflow();
-        BuildCommandsFromNames buildCommandsFromNames(application_handler_);
-        buildCommandsFromNames.names_ = command_names;
-        buildCommandsFromNames.process();
-        ParameterSet schema_params;
-        for (const auto& command : buildCommandsFromNames.commands_)
-        {
-          schema_params.merge(command.getParameterSchema());
-        }
-        schema_params.merge(ApplicationProcessors::getParameterSchema()); // Application processor will be used also
-        schema_params.setAsSchema(true);
+        auto schema_params = application_handler_.getWorkflowParameterSchema();
         parameters_override_->merge(schema_params);
 
         for (auto& function_parameter_override : *parameters_override_)

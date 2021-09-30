@@ -108,6 +108,11 @@ namespace SmartPeak
     */
     bool isFileSaved(const std::string& file_id) const;
 
+    /**
+    * @brief returns Parameter Schema of the current Workflow
+    */
+    ParameterSet getWorkflowParameterSchema();
+
     std::filesystem::path sequence_pathname_;
     std::filesystem::path main_dir_                = ".";
     std::filesystem::path mzML_dir_;

@@ -193,4 +193,21 @@ namespace SmartPeak
     return saved_files_.at(file_id);
   }
 
+  ParameterSet ApplicationHandler::getWorkflowParameterSchema()
+  {
+    // Construct schema based on the current workflow's command list
+    ParameterSet schema_params;
+    std::vector<std::string> command_names = sequenceHandler_.getWorkflow();
+    BuildCommandsFromNames buildCommandsFromNames(*this);
+    buildCommandsFromNames.names_ = command_names;
+    buildCommandsFromNames.process();
+    for (const auto& command : buildCommandsFromNames.commands_)
+    {
+      schema_params.merge(command.getParameterSchema());
+    }
+    schema_params.merge(ApplicationProcessors::getParameterSchema()); // Application processor will be used also
+    schema_params.setAsSchema(true);
+    return schema_params;
+  }
+
 }
