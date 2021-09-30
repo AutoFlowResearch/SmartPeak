@@ -206,3 +206,43 @@ TEST(Task, Task_options_invalid_parameter)
   auto ls = cli::LoadSession{};
   EXPECT_FALSE(ls(am));
 }
+
+TEST(Task, Task_options_change_output_dirs)
+{
+  namespace cli = SmartPeak::cli;
+  std::string seq = std::string{ SMARTPEAK_GET_TEST_DATA_PATH("workflow_csv_files") };
+  auto feature_output_dir = SmartPeak::Utilities::createEmptyTempDirectory();
+  auto report_output_dir = SmartPeak::Utilities::createEmptyTempDirectory();
+  std::vector<std::string> args = std::vector<std::string>{
+      "Task_test",
+          "--load-session", seq,
+          "--verbose",
+          "--allow-inconsistent",
+          "--log-dir", ".",
+          "--disable-colors",
+          "--workflow", "LOAD_FEATURES", "STORE_FEATURES",
+          "-no-pg",
+          "-o", feature_output_dir.generic_string(),
+          "--reports-out-dir", report_output_dir.generic_string(),
+          "--report", "featuredb",
+          "--report-metadata", "peak_area", "logSN", "RT"
+  };
+  auto pa = cli::Parser{ args };
+  auto as = cli::ApplicationSettings{ pa };
+  auto am = cli::ApplicationManager{ as };
+  auto task = cli::InitializeApplicationSettings{};
+  EXPECT_TRUE(task(am));
+  auto ls = cli::LoadSession{};
+  EXPECT_TRUE(ls(am));
+  auto wr = cli::InitializeWorkflowResources{};
+  EXPECT_TRUE(wr(am));
+  auto ws = cli::InitializeWorkflowSettings{};
+  EXPECT_TRUE(ws(am));
+  auto rw = cli::RunWorkflow{};
+  EXPECT_TRUE(rw(am));
+  EXPECT_TRUE(std::filesystem::exists(feature_output_dir / "150516_CM1_Level1_1_BatchName_1900-01-01_000000.featureXML"));
+  EXPECT_TRUE(std::filesystem::exists(feature_output_dir / "150516_CM1_Level10_2_BatchName_1900-01-01_000000.featureXML"));
+  auto er = cli::ExportReport{};
+  EXPECT_TRUE(er(am));
+  EXPECT_TRUE(std::filesystem::exists(report_output_dir / "FeatureDB.csv"));
+}

@@ -59,7 +59,7 @@ void ApplicationSettings::define_options()
         "Run SmartPeak in verbose mode, display more detailed information");
     m_parser.set_optional<bool>("d", "disable-colors", false, 
         "By default the console output is colored, this flag disables colors.");
-    m_parser.set_optional<bool>("pg", "disable-progressbar", false, 
+    m_parser.set_optional<bool>("no-pg", "disable-progressbar", false, 
         "Progress bar allows to track the progress of the entire workflow. This option disables the progress bar.");
     m_parser.set_optional<std::string>("ld", "log-dir", "", 
         "The path to the log directory. Given directory has to exist. Overrides the default location for the log file: "
@@ -90,7 +90,7 @@ void ApplicationSettings::load_options()
     allow_inconsistent      = m_parser.get<bool>("a");
     verbose                 = m_parser.get<bool>("v");
     disable_colors          = m_parser.get<bool>("d");
-    disable_progressbar     = m_parser.get<bool>("pg");
+    disable_progressbar     = m_parser.get<bool>("no-pg");
     log_dir                 = m_parser.get<std::string>("ld");
     features_out_dir        = m_parser.get<std::string>("o");
     features_in_dir         = m_parser.get<std::string>("i");
