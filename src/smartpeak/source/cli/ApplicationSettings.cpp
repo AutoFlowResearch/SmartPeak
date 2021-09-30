@@ -72,10 +72,10 @@ void ApplicationSettings::define_options()
     m_parser.set_optional<std::string>("z", "mzml", "./mzML",
         "An absolute or relative path to the mzML directory. Overrides the default location which is the mzML folder under the current working directory. "
         "SmartPeak will create given directory if one does not exist.");
-    m_parser.set_optional<std::string>("f", "input-files", "",
-        "Override input files. Ex: -f featureQCComponents=\"./featureQCComponents_new.csv;traML=./traML2.csv\".");
-    m_parser.set_optional<std::string>("p", "parameters", "",
-        "Override parameters. Ex: '-p SequenceProcessor:n_thread=8;MRMFeatureFinderScoring:TransitionGroupPicker:peak_integration=smoothed'.");
+    m_parser.set_optional<std::vector<std::string>>("f", "input-file", {},
+        "Override input file. Ex: -f featureQCComponents=\"./featureQCComponents_new.csv\".");
+    m_parser.set_optional<std::vector<std::string>>("p", "parameter", {},
+        "Override parameter. Ex: '-p MRMFeatureFinderScoring:TransitionGroupPicker:peak_integration=smoothed'.");
     m_parser.run_and_exit_if_error();
 }
 
@@ -94,8 +94,8 @@ void ApplicationSettings::load_options()
     log_dir                 = m_parser.get<std::string>("ld");
     features_out_dir        = m_parser.get<std::string>("o");
     features_in_dir         = m_parser.get<std::string>("i");
-    input_files             = m_parser.get<std::string>("f");
-    parameters              = m_parser.get<std::string>("p");
+    input_files             = m_parser.get<std::vector<std::string>>("f");
+    parameters              = m_parser.get<std::vector<std::string>>("p");
     mzml_dir                = m_parser.get<std::string>("z");
     reports_out_dir         = m_parser.get<std::string>("ro");
 }
@@ -136,31 +136,26 @@ bool ApplicationSettings::contains_option(
     return flag;
 }
 
-std::map<std::string, std::string> ApplicationSettings::get_split_option(
+std::pair<std::string, std::string> ApplicationSettings::get_key_value_from_option(
   const std::string& option)
 {
-  std::string escaped_option = option;
-  if ((option.size() > 1) && (option.front() == '\"') && (option.back() == '\"'))
+  std::pair<std::string, std::string> key_value;
+  auto separator_pos = option.find("=");
+  if (separator_pos != option.npos)
   {
-    escaped_option = option.substr(1, option.size() - 2);
-  }
-  std::map<std::string, std::string> map_options;
-  std::istringstream iss(escaped_option);
-  std::string key_value;
-  while (std::getline(iss, key_value, ';'))
-  {
-    auto separator_pos = key_value.find("=");
-    if (separator_pos != key_value.npos)
+    std::string key = option.substr(0, separator_pos);
+    std::string value = option.substr((separator_pos + 1), option.size() - (separator_pos + 1));
+    if (!key.empty())
     {
-      std::string key = key_value.substr(0, separator_pos);
-      std::string value = key_value.substr((separator_pos + 1), key_value.size() - (separator_pos + 1));
-      if (!key.empty())
+      if ((value.size() > 1) && (value.front() == '\"') && (value.back() == '\"'))
       {
-        map_options.emplace(key, value);
+        value = value.substr(1, value.size() - 2);
       }
+      key_value.first = key;
+      key_value.second = value;
     }
   };
-  return map_options;
+  return key_value;
 }
 
 void ApplicationSettings::validate_report() const

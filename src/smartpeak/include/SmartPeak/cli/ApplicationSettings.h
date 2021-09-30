@@ -87,9 +87,9 @@ struct ApplicationSettings {
         std::string log_msg="");
 
     /**
-     * Returns list of options from one string "key1=value1;key2=value2;..."
+     * Returns a pair key/value from one string "key1=value1"
      */ 
-    static std::map<std::string, std::string> get_split_option(
+    static std::pair<std::string, std::string> get_key_value_from_option(
       const std::string& option);
 
 public:
@@ -107,8 +107,8 @@ public:
     std::string log_dir; 
     std::string features_out_dir;
     std::string features_in_dir;
-    std::string input_files;
-    std::string parameters;
+    std::vector<std::string> input_files;
+    std::vector<std::string> parameters;
     std::string mzml_dir;
     std::string reports_out_dir;
 

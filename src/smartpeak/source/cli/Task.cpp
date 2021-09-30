@@ -92,11 +92,11 @@ namespace SmartPeak {
       {
 
         Filenames filenames_override;
-        auto split_options = application_settings.get_split_option(application_settings.input_files);
-        for (const auto& split_option : split_options)
+        for (const auto& input_file : application_settings.input_files)
         {
-          const std::string& file_id = split_option.first;
-          const std::filesystem::path filename = split_option.second;
+          auto key_value = application_settings.get_key_value_from_option(input_file);
+          const std::string& file_id = key_value.first;
+          const std::filesystem::path filename = key_value.second;
           if (filename.is_relative())
           {
             filenames_override.addFileName(file_id, std::filesystem::path("${MAIN_DIR}/" + filename.generic_string()).lexically_normal().generic_string());
@@ -108,10 +108,10 @@ namespace SmartPeak {
         }
         
         ParameterSet parameters_override;
-        split_options = application_settings.get_split_option(application_settings.parameters);
-        for (const auto& split_option : split_options)
+        for (const auto& parameter : application_settings.parameters)
         {
-          auto key = split_option.first; // key must be FunctionName:ParameterName
+          const auto key_value = application_settings.get_key_value_from_option(parameter);
+          const auto& key = key_value.first; // key must be FunctionName:ParameterName
           auto separator_pos = key.find(":");
           if (separator_pos != key.npos)
           {
@@ -121,7 +121,7 @@ namespace SmartPeak {
             {
               std::map<std::string, std::string> param_struct = {
                 {"name", parameter_name},
-                { "value", split_option.second }
+                { "value", key_value.second }
               };
               Parameter param(param_struct);
               parameters_override.addParameter(function_name, param);

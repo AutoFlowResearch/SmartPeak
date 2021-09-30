@@ -120,7 +120,7 @@ TEST(Task, Task_options_invalid_input_file)
           "--allow-inconsistent",
           "--log-dir", ".",
           "--disable-colors",
-          "--input-files", "non_existing_file_id=\"parameter_file.csv\""
+          "--input-file", "non_existing_file_id=\"parameter_file.csv\""
   };
   auto pa = cli::Parser{ args };
   auto as = cli::ApplicationSettings{ pa };
@@ -142,7 +142,7 @@ TEST(Task, Task_options_invalid_parameter)
           "--allow-inconsistent",
           "--log-dir", ".",
           "--disable-colors",
-          "--parameters", "NonExistingFunction:NonExistingPrameter=\"my_value\""
+          "--parameter", "NonExistingFunction:NonExistingPrameter=\"my_value\""
   };
   auto pa = cli::Parser{ args };
   auto as = cli::ApplicationSettings{ pa };

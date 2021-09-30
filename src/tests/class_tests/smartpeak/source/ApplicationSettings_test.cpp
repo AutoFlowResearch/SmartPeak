@@ -272,40 +272,22 @@ TEST_F(ApplicationSettingsFixture, ApplicationSettings_validate_integrity)
     EXPECT_THROW(application_settings.validate_integrity(), std::invalid_argument);
 }
 
-TEST_F(ApplicationSettingsFixture, ApplicationSettings_get_split_option)
+TEST_F(ApplicationSettingsFixture, ApplicationSettings_get_key_value_from_option)
 {
   auto& application_settings = get_application_settings();
 
   // one value
-  auto split_options_1 = application_settings.get_split_option("key1=value1");
-  std::map<std::string, std::string> expected_split_options_1 =
-  {
-    { std::string("key1"), std::string("value1") }
-  };
+  auto split_options_1 = application_settings.get_key_value_from_option("key1=value1");
+  std::pair<std::string, std::string> expected_split_options_1 = { std::string("key1"), std::string("value1") };
   EXPECT_EQ(split_options_1, expected_split_options_1);
 
-  // multiple values
-  auto split_options_2 = application_settings.get_split_option("key1=value1;key2=value2");
-  std::map<std::string, std::string> expected_split_options_2 =
-  {
-    { std::string("key1"), std::string("value1") },
-    { std::string("key2"), std::string("value2") },
-  };
-  EXPECT_EQ(split_options_2, expected_split_options_2);
-
   // empty
-  auto split_options_3 = application_settings.get_split_option("");
-  std::map<std::string, std::string> expected_split_options_3 =
-  {
-  };
+  auto split_options_3 = application_settings.get_key_value_from_option("");
+  std::pair<std::string, std::string> expected_split_options_3 = { };
   EXPECT_EQ(split_options_3, expected_split_options_3);
 
   // surrounding quotes
-  auto split_options_4 = application_settings.get_split_option("\"key1=value1;key2=value2\"");
-  std::map<std::string, std::string> expected_split_options_4 =
-  {
-    { std::string("key1"), std::string("value1") },
-    { std::string("key2"), std::string("value2") },
-  };
+  auto split_options_4 = application_settings.get_key_value_from_option("key1=\"value1\"");
+  std::pair<std::string, std::string> expected_split_options_4 = { std::string("key1"), std::string("value1") };
   EXPECT_EQ(split_options_4, expected_split_options_4);
 }
