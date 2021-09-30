@@ -92,7 +92,7 @@ namespace SmartPeak
 
     std::optional<Filenames>    filenames_;           /// Pathnames to load - if not set, read it from session
     std::optional<Filenames>    filenames_override_;  /// Pathnames override
-    std::optional<ParameterSet> parameters_override_; /// Pathnames override
+    std::optional<ParameterSet> parameters_override_; /// Parameters override
     std::string      delimiter = ",";                 /// String delimiter of the imported file
     bool             checkConsistency = true;         /// Check consistency of data contained in files
 
@@ -105,6 +105,10 @@ namespace SmartPeak
     /* IProcessorDescription */
     virtual std::string getName() const override { return "LOAD_SESSION"; }
     virtual std::string getDescription() const override { return "Load an existing session"; }
+
+  protected:
+    bool overrideFilenames();
+    bool overrideParameters();
   };
 
   struct SaveSession : ApplicationProcessor, IFilePickerHandler

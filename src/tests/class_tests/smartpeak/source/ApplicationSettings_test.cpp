@@ -97,8 +97,10 @@ TEST_F(ApplicationSettingsFixture, ApplicationSettings_define_options)
     EXPECT_TRUE(option_exists<std::vector<std::string>>("rm"));
     EXPECT_TRUE(option_exists<std::vector<std::string>>("w"));
     EXPECT_TRUE(option_exists<std::vector<std::string>>("t"));
-    EXPECT_TRUE(option_exists<std::vector<std::string>>("o"));
-    EXPECT_TRUE(option_exists<std::vector<std::string>>("i"));
+    EXPECT_TRUE(option_exists<std::string>("o"));
+    EXPECT_TRUE(option_exists<std::string>("i"));
+    EXPECT_TRUE(option_exists<std::vector<std::string>>("p"));
+    EXPECT_TRUE(option_exists<std::vector<std::string>>("f"));
     EXPECT_TRUE(option_exists<bool>("a"));
     EXPECT_TRUE(option_exists<bool>("v"));
     EXPECT_TRUE(option_exists<bool>("d"));

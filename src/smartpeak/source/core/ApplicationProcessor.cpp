@@ -302,24 +302,9 @@ namespace SmartPeak
       filenames_ = application_handler_.filenames_;
     }
 
-    if (filenames_override_)
+    if (!overrideFilenames())
     {
-      filenames_override_->setTag(Filenames::Tag::MAIN_DIR, filenames_->getTag(Filenames::Tag::MAIN_DIR));
-      const auto& src = filenames_->getFileIds();
-      for (const auto& file_id : filenames_override_->getFileIds())
-      {
-        if (std::find(src.begin(), src.end(), file_id) == src.end())
-        {
-          LOGE << "Unknown overriding input file: " << file_id;
-          return false;
-        }
-        else
-        {
-          const auto value = filenames_override_->getFullPath(file_id);
-          LOGW << "Overriding input file: " << file_id << " -> " << "\"" << value.generic_string() << "\"";
-          filenames_->setFullPath(file_id, value);
-        }
-      }
+      return false;
     }
 
     filenames_->log();
@@ -375,6 +360,57 @@ namespace SmartPeak
       }
     }
 
+    if (!overrideParameters())
+    {
+      return false;
+    }
+
+    if (checkConsistency)
+    {
+      if (!application_handler_.sequenceHandler_.getSequenceSegments().empty())
+      {
+        InputDataValidation::sampleNamesAreConsistent(application_handler_.sequenceHandler_);
+        InputDataValidation::componentNamesAreConsistent(application_handler_.sequenceHandler_);
+        InputDataValidation::componentNameGroupsAreConsistent(application_handler_.sequenceHandler_);
+        InputDataValidation::heavyComponentsAreConsistent(application_handler_.sequenceHandler_);
+      }
+      else
+      {
+        LOGW << "No Sequence available, cannot check consistency";
+      }
+    }
+
+    application_handler_.sequenceHandler_.notifySequenceUpdated();
+    LOGD << "END LoadSession";
+    return true;
+  }
+
+  bool LoadSession::overrideFilenames()
+  {
+    if (filenames_override_)
+    {
+      filenames_override_->setTag(Filenames::Tag::MAIN_DIR, filenames_->getTag(Filenames::Tag::MAIN_DIR));
+      const auto& src = filenames_->getFileIds();
+      for (const auto& file_id : filenames_override_->getFileIds())
+      {
+        if (std::find(src.begin(), src.end(), file_id) == src.end())
+        {
+          LOGE << "Unknown overriding input file: " << file_id;
+          return false;
+        }
+        else
+        {
+          const auto value = filenames_override_->getFullPath(file_id);
+          LOGW << "Overriding input file: " << file_id << " -> " << "\"" << value.generic_string() << "\"";
+          filenames_->setFullPath(file_id, value);
+        }
+      }
+    }
+    return true;
+  }
+
+  bool LoadSession::overrideParameters()
+  {
     if (parameters_override_)
     {
       if (application_handler_.sequenceHandler_.getSequence().size())
@@ -426,7 +462,7 @@ namespace SmartPeak
                 if (existing_parameter) // should not be null anyway at this step
                 {
                   LOGW << "Overridden parameter \"" << function_parameter_override.first << ":" << parameter_override.getName()
-                       << "\", set value: \"" << parameter_override.getValueAsString() << "\"";
+                    << "\", set value: \"" << parameter_override.getValueAsString() << "\"";
                   existing_parameter->setValueFromString(parameter_override.getValueAsString(), false);
                 }
               }
@@ -435,25 +471,6 @@ namespace SmartPeak
         }
       }
     }
-
-
-    if (checkConsistency)
-    {
-      if (!application_handler_.sequenceHandler_.getSequenceSegments().empty())
-      {
-        InputDataValidation::sampleNamesAreConsistent(application_handler_.sequenceHandler_);
-        InputDataValidation::componentNamesAreConsistent(application_handler_.sequenceHandler_);
-        InputDataValidation::componentNameGroupsAreConsistent(application_handler_.sequenceHandler_);
-        InputDataValidation::heavyComponentsAreConsistent(application_handler_.sequenceHandler_);
-      }
-      else
-      {
-        LOGW << "No Sequence available, cannot check consistency";
-      }
-    }
-
-    application_handler_.sequenceHandler_.notifySequenceUpdated();
-    LOGD << "END LoadSession";
     return true;
   }
 

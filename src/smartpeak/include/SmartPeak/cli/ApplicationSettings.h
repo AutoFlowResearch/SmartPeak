@@ -24,7 +24,6 @@
 #include <iostream>
 #include <algorithm>
 #include <vector>
-#include <map>
 
 #include <SmartPeak/cli/Parser.h>
 
