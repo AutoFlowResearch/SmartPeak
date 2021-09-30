@@ -241,15 +241,27 @@ namespace SmartPeak {
       auto& application_handler = application_manager.get_application_handler();
 
       // Initialize directories:
-      auto main_dir = application_handler.main_dir_;
-      if (!application_settings.out_dir.empty() && application_settings.out_dir != ".")
+
+      std::filesystem::path mzml_dir = application_settings.mzml_dir;
+      if (mzml_dir.is_relative())
       {
-        main_dir = application_settings.out_dir;
-        LOG_DEBUG << "Output feature directory: " << main_dir.generic_string();
+        mzml_dir = (application_handler.main_dir_ / mzml_dir).lexically_normal();
       }
-      application_handler.mzML_dir_ = application_handler.main_dir_ / "mzML";
-      application_handler.features_in_dir_ = application_handler.main_dir_ / "features";
-      application_handler.features_out_dir_ = main_dir / "features";
+      application_handler.mzML_dir_ = mzml_dir;
+
+      std::filesystem::path features_out_dir = application_settings.features_out_dir;
+      if (features_out_dir.is_relative())
+      {
+        features_out_dir = (application_handler.main_dir_ / features_out_dir).lexically_normal();
+      }
+      application_handler.features_out_dir_ = features_out_dir;
+
+      std::filesystem::path features_in_dir = application_settings.features_in_dir;
+      if (features_in_dir.is_relative())
+      {
+        features_in_dir = (application_handler.main_dir_ / features_in_dir).lexically_normal();
+      }
+      application_handler.features_in_dir_ = features_in_dir;
 
       auto paths = {
           application_handler.mzML_dir_,
@@ -447,9 +459,9 @@ namespace SmartPeak {
         _extract_report_metadata(application_settings, report_metadata);
 
         auto main_dir = application_handler.main_dir_;
-        if (!application_settings.out_dir.empty() && application_settings.out_dir != ".")
+        if (!application_settings.features_out_dir.empty() && application_settings.features_out_dir != ".")
         {
-          main_dir = application_settings.out_dir;
+          main_dir = application_settings.features_out_dir;
         }
 
         if (feature_db)

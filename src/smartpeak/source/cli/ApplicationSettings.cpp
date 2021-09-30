@@ -47,7 +47,7 @@ void ApplicationSettings::define_options()
     m_parser.set_optional<std::vector<std::string>>("w", "workflow", std::vector<std::string>{}, 
         "The workflow sequence as a list of commands, e.g. LOAD_DATA MAP_CHROMATOGRAMS ... "
         "Overrides the workflow settings loaded from the sequence file (with option --load-session)");
-    m_parser.set_optional<std::vector<std::string>>("i", "integrity", std::vector<std::string>{ "NONE" }, 
+    m_parser.set_optional<std::vector<std::string>>("t", "integrity", std::vector<std::string>{ "NONE" }, 
         "Specify which integrity checks to run, available are: SAMPLE, COMP, COMP_GROUP, IS and ALL (runs all listed).");
     m_parser.set_optional<bool>("a", "allow-inconsistent", false, 
         "Given that any integrity checks were specified with '--integrity', "
@@ -56,18 +56,23 @@ void ApplicationSettings::define_options()
         "Run SmartPeak in verbose mode, display more detailed information");
     m_parser.set_optional<bool>("d", "disable-colors", false, 
         "By default the console output is colored, this flag disables colors.");
-    m_parser.set_optional<bool>("p", "disable-progressbar", false, 
+    m_parser.set_optional<bool>("pg", "disable-progressbar", false, 
         "Progress bar allows to track the progress of the entire workflow. This option disables the progress bar.");
     m_parser.set_optional<std::string>("ld", "log-dir", "", 
         "The path to the log directory. Given directory has to exist. Overrides the default location for the log file: "
         "https://smartpeak.readthedocs.io/en/latest/guide/guistart.html#logs");
-    m_parser.set_optional<std::string>("o", "output", ".", 
+    m_parser.set_optional<std::string>("o", "output-features", "./features", 
         "An absolute or relative path to an output directory. Overrides the default location which is the current working directory. " 
+        "SmartPeak will create given directory if one does not exist.");
+    m_parser.set_optional<std::string>("i", "input-features", "./features",
+        "An absolute or relative path to the input features directory. Overrides the default location which is the current working directory. ");
+    m_parser.set_optional<std::string>("z", "mzml", "./mzML",
+        "An absolute or relative path to the mzML directory. Overrides the default location which is the mzML folder under the current working directory. "
         "SmartPeak will create given directory if one does not exist.");
     m_parser.set_optional<std::string>("f", "input-files", "",
         "Override input files. Ex: -f featureQCComponents=\"./featureQCComponents_new.csv;traML=./traML2.csv\".");
-    m_parser.set_optional<std::string>("params", "parameters", "",
-        "Override parameters. Ex: '-params SequenceProcessor:n_thread=8;MRMFeatureFinderScoring:TransitionGroupPicker:peak_integration=smoothed'.");
+    m_parser.set_optional<std::string>("p", "parameters", "",
+        "Override parameters. Ex: '-p SequenceProcessor:n_thread=8;MRMFeatureFinderScoring:TransitionGroupPicker:peak_integration=smoothed'.");
     m_parser.run_and_exit_if_error();
 }
 
@@ -78,15 +83,17 @@ void ApplicationSettings::load_options()
     report_sample_types     = m_parser.get<std::vector<std::string>>("rt");
     report_metadata         = m_parser.get<std::vector<std::string>>("rm");
     workflow                = m_parser.get<std::vector<std::string>>("w");
-    integrity               = m_parser.get<std::vector<std::string>>("i");
+    integrity               = m_parser.get<std::vector<std::string>>("t");
     allow_inconsistent      = m_parser.get<bool>("a");
     verbose                 = m_parser.get<bool>("v");
     disable_colors          = m_parser.get<bool>("d");
-    disable_progressbar     = m_parser.get<bool>("p");
+    disable_progressbar     = m_parser.get<bool>("pg");
     log_dir                 = m_parser.get<std::string>("ld");
-    out_dir                 = m_parser.get<std::string>("o");
+    features_out_dir        = m_parser.get<std::string>("o");
+    features_in_dir         = m_parser.get<std::string>("i");
     input_files             = m_parser.get<std::string>("f");
-    parameters              = m_parser.get<std::string>("params");
+    parameters              = m_parser.get<std::string>("p");
+    mzml_dir                = m_parser.get<std::string>("z");
 }
 
 void ApplicationSettings::process_options()

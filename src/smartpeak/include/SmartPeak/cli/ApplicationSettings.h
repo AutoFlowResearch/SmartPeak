@@ -105,9 +105,11 @@ public:
     bool disable_colors;
     bool disable_progressbar;
     std::string log_dir; 
-    std::string out_dir;
+    std::string features_out_dir;
+    std::string features_in_dir;
     std::string input_files;
     std::string parameters;
+    std::string mzml_dir;
 
 public:
     void validate_report() const;
