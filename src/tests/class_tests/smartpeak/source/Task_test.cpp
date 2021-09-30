@@ -109,6 +109,33 @@ TEST_F(TaskFixture, Task_LoadSession)
     EXPECT_TRUE(!task(am));
 }
 
+TEST(Task, Task_options_change_input_file)
+{
+  namespace cli = SmartPeak::cli;
+  std::string seq = std::string{ SMARTPEAK_GET_TEST_DATA_PATH("workflow_csv_files") };
+  std::vector<std::string> args = std::vector<std::string>{
+      "Task_test",
+          "--load-session", seq,
+          "--verbose",
+          "--allow-inconsistent",
+          "--log-dir", ".",
+          "--disable-colors",
+          "--input-file", std::string("parameters=\"") + SMARTPEAK_GET_TEST_DATA_PATH("parameters_n_thread_42.csv") + std::string("\"")
+  };
+  auto pa = cli::Parser{ args };
+  auto as = cli::ApplicationSettings{ pa };
+  auto am = cli::ApplicationManager{ as };
+  auto task = cli::InitializeApplicationSettings{};
+  EXPECT_TRUE(task(am));
+  auto ls = cli::LoadSession{};
+  EXPECT_TRUE(ls(am));
+  ASSERT_GT(am.get_application_handler().sequenceHandler_.getSequence().size(), 0);
+  auto parameters = am.get_application_handler().sequenceHandler_.getSequence().at(0).getRawData().getParameters();
+  auto parameter = parameters.findParameter("SequenceProcessor", "n_thread");
+  ASSERT_NE(parameter, nullptr);
+  ASSERT_EQ(parameter->getValueAsString(), "42");
+}
+
 TEST(Task, Task_options_invalid_input_file)
 {
   namespace cli = SmartPeak::cli;
@@ -129,6 +156,33 @@ TEST(Task, Task_options_invalid_input_file)
   EXPECT_TRUE(task(am));
   auto ls = cli::LoadSession{};
   EXPECT_FALSE(ls(am));
+}
+
+TEST(Task, Task_options_change_parameter)
+{
+  namespace cli = SmartPeak::cli;
+  std::string seq = std::string{ SMARTPEAK_GET_TEST_DATA_PATH("workflow_csv_files") };
+  std::vector<std::string> args = std::vector<std::string>{
+      "Task_test",
+          "--load-session", seq,
+          "--verbose",
+          "--allow-inconsistent",
+          "--log-dir", ".",
+          "--disable-colors",
+          "--parameter", "SequenceProcessor:n_thread=42"
+  };
+  auto pa = cli::Parser{ args };
+  auto as = cli::ApplicationSettings{ pa };
+  auto am = cli::ApplicationManager{ as };
+  auto task = cli::InitializeApplicationSettings{};
+  EXPECT_TRUE(task(am));
+  auto ls = cli::LoadSession{};
+  EXPECT_TRUE(ls(am));
+  ASSERT_GT(am.get_application_handler().sequenceHandler_.getSequence().size(), 0);
+  auto parameters = am.get_application_handler().sequenceHandler_.getSequence().at(0).getRawData().getParameters();
+  auto parameter = parameters.findParameter("SequenceProcessor", "n_thread");
+  ASSERT_NE(parameter, nullptr);
+  ASSERT_EQ(parameter->getValueAsString(), "42");
 }
 
 TEST(Task, Task_options_invalid_parameter)

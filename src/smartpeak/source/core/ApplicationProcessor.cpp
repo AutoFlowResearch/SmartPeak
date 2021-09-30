@@ -459,11 +459,15 @@ namespace SmartPeak
                 // looks ok, override parameter
                 ParameterSet& user_parameters = application_handler_.sequenceHandler_.getSequence().at(0).getRawData().getParameters();
                 Parameter* existing_parameter = user_parameters.findParameter(function_parameter_override.first, parameter_override.getName());
-                if (existing_parameter) // should not be null anyway at this step
+                LOGW << "Overridden parameter \"" << function_parameter_override.first << ":" << parameter_override.getName()
+                  << "\", set value: \"" << parameter_override.getValueAsString() << "\"";
+                if (existing_parameter)
                 {
-                  LOGW << "Overridden parameter \"" << function_parameter_override.first << ":" << parameter_override.getName()
-                    << "\", set value: \"" << parameter_override.getValueAsString() << "\"";
                   existing_parameter->setValueFromString(parameter_override.getValueAsString(), false);
+                }
+                else
+                {
+                  user_parameters.addParameter(function_parameter_override.first, parameter_override);
                 }
               }
             }
