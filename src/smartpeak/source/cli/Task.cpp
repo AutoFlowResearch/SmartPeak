@@ -95,7 +95,16 @@ namespace SmartPeak {
         auto split_options = application_settings.get_split_option(application_settings.input_files);
         for (const auto& split_option : split_options)
         {
-          filenames_override.setFullPath(split_option.first, split_option.second);
+          const std::string& file_id = split_option.first;
+          const std::filesystem::path filename = split_option.second;
+          if (filename.is_relative())
+          {
+            filenames_override.addFileName(file_id, std::filesystem::path("${MAIN_DIR}/" + filename.generic_string()).lexically_normal().generic_string());
+          }
+          else
+          {
+            filenames_override.addFileName(file_id, filename.generic_string());
+          }
         }
         
         ParameterSet parameters_override;
@@ -463,7 +472,8 @@ namespace SmartPeak {
         {
           reports_out_dir = (application_handler.main_dir_ / reports_out_dir).lexically_normal();
         }
-        if (!std::filesystem::create_directories(std::filesystem::path(reports_out_dir)))
+        if (!std::filesystem::exists(std::filesystem::path(reports_out_dir)) &&
+            !std::filesystem::create_directories(std::filesystem::path(reports_out_dir)))
         {
           LOGE << "Failed to create output report directory: " << reports_out_dir.generic_string();
         }

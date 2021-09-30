@@ -304,6 +304,7 @@ namespace SmartPeak
 
     if (filenames_override_)
     {
+      filenames_override_->setTag(Filenames::Tag::MAIN_DIR, filenames_->getTag(Filenames::Tag::MAIN_DIR));
       const auto& src = filenames_->getFileIds();
       for (const auto& file_id : filenames_override_->getFileIds())
       {
