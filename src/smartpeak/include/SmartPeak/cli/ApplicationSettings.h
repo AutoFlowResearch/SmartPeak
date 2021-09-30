@@ -110,6 +110,7 @@ public:
     std::string input_files;
     std::string parameters;
     std::string mzml_dir;
+    std::string reports_out_dir;
 
 public:
     void validate_report() const;

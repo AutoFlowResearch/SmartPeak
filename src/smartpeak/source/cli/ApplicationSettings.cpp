@@ -44,7 +44,10 @@ void ApplicationSettings::define_options()
     m_parser.set_optional<std::vector<std::string>>("rm", "report-metadata", std::vector<std::string>{ "ALL" }, 
         "A list of metadata to include in the report. "
         "The full list can be found in documentation https://smartpeak.readthedocs.io");
-    m_parser.set_optional<std::vector<std::string>>("w", "workflow", std::vector<std::string>{}, 
+    m_parser.set_optional<std::string>("ro", "reports-out-dir", ".",
+      "An absolute or relative path to an output directory for reports. Overrides the default location which is the current working directory. "
+      "SmartPeak will create given directory if one does not exist.");
+    m_parser.set_optional<std::vector<std::string>>("w", "workflow", std::vector<std::string>{},
         "The workflow sequence as a list of commands, e.g. LOAD_DATA MAP_CHROMATOGRAMS ... "
         "Overrides the workflow settings loaded from the sequence file (with option --load-session)");
     m_parser.set_optional<std::vector<std::string>>("t", "integrity", std::vector<std::string>{ "NONE" }, 
@@ -94,6 +97,7 @@ void ApplicationSettings::load_options()
     input_files             = m_parser.get<std::string>("f");
     parameters              = m_parser.get<std::string>("p");
     mzml_dir                = m_parser.get<std::string>("z");
+    reports_out_dir         = m_parser.get<std::string>("ro");
 }
 
 void ApplicationSettings::process_options()

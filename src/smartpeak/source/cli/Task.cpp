@@ -458,16 +458,20 @@ namespace SmartPeak {
         _extract_report_sampletypes(application_settings, report_sample_types);
         _extract_report_metadata(application_settings, report_metadata);
 
-        auto main_dir = application_handler.main_dir_;
-        if (!application_settings.features_out_dir.empty() && application_settings.features_out_dir != ".")
+        std::filesystem::path reports_out_dir = application_settings.reports_out_dir;
+        if (reports_out_dir.is_relative())
         {
-          main_dir = application_settings.features_out_dir;
+          reports_out_dir = (application_handler.main_dir_ / reports_out_dir).lexically_normal();
+        }
+        if (!std::filesystem::create_directories(std::filesystem::path(reports_out_dir)))
+        {
+          LOGE << "Failed to create output report directory: " << reports_out_dir.generic_string();
         }
 
         if (feature_db)
         {
           auto& sequance_handler = application_handler.sequenceHandler_;
-          const auto filepath = main_dir / "FeatureDB.csv";
+          const auto filepath = reports_out_dir / "FeatureDB.csv";
           SequenceParser::writeDataTableFromMetaValue(
             sequance_handler, filepath,
             report_metadata, report_sample_types);
@@ -475,7 +479,7 @@ namespace SmartPeak {
         if (pivot_table)
         {
           auto& sequance_handler = application_handler.sequenceHandler_;
-          const auto filepath = main_dir / "PivotTable.csv";
+          const auto filepath = reports_out_dir / "PivotTable.csv";
           SequenceParser::writeDataMatrixFromMetaValue(
             sequance_handler, filepath,
             report_metadata, report_sample_types);
