@@ -59,6 +59,7 @@ namespace SmartPeak {
     mz_error_Da,
     average_accuracy,
     absolute_difference,
+    dilution_factor,
     SIZE_OF_FeatureMetadata/*,
     accuracy,
     n_features,
@@ -67,7 +68,7 @@ namespace SmartPeak {
 
   // Returns the string representation that a FeatureMetadata would have in OpenMS
   extern const std::map<FeatureMetadata, std::string> metadataToString;
-  extern const std::map<FeatureMetadata, std::string> metadatafloatToString;
+  extern const std::map<FeatureMetadata, std::string> metadataFloatToString;
 
   constexpr size_t FeatureMetadataSize {
     static_cast<std::underlying_type_t<FeatureMetadata>>(FeatureMetadata::SIZE_OF_FeatureMetadata) - 1

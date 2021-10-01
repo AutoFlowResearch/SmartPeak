@@ -424,7 +424,7 @@ namespace SmartPeak
   {
     // initialize our map of feature names to values
     std::map<std::string, std::map<std::set<std::string>, float>> features_to_values;
-    for (const auto& m : metadatafloatToString) {
+    for (const auto& m : metadataFloatToString) {
       features_to_values.emplace(m.second, std::map<std::set<std::string>, float>());
     }
 

@@ -56,12 +56,13 @@ namespace SmartPeak {
     { FeatureMetadata::mz_error_ppm,                "mz_error_ppm"                },
     { FeatureMetadata::mz_error_Da,                 "mz_error_Da"                 },
     { FeatureMetadata::average_accuracy,            "average_accuracy"            },
-    { FeatureMetadata::absolute_difference,         "absolute_difference"         }/*,
+    { FeatureMetadata::absolute_difference,         "absolute_difference"         },
+    { FeatureMetadata::dilution_factor,             "dilution_factor"             }/*,
     { FeatureMetadata::accuracy,                    "accuracy"                    },
     { FeatureMetadata::n_features,                  "n_features"                  },
     { FeatureMetadata::validation,                  "validation"                  }*/
   };
-  const std::map<FeatureMetadata, std::string> metadatafloatToString{
+  const std::map<FeatureMetadata, std::string> metadataFloatToString{
     { FeatureMetadata::asymmetry_factor,            "asymmetry_factor"            },
     { FeatureMetadata::baseline_delta_to_height,    "baseline_delta_2_height"     },
     { FeatureMetadata::calculated_concentration,    "calculated_concentration"    },
@@ -83,7 +84,8 @@ namespace SmartPeak {
     { FeatureMetadata::mz_error_ppm,                "mz_error_ppm"                },
     { FeatureMetadata::mz_error_Da,                 "mz_error_Da"                 },
     { FeatureMetadata::average_accuracy,            "average_accuracy"            },
-    { FeatureMetadata::absolute_difference,         "absolute_difference"         }/*,
+    { FeatureMetadata::absolute_difference,         "absolute_difference"         },
+    { FeatureMetadata::dilution_factor,             "dilution_factor"             }/*,
     { FeatureMetadata::accuracy,                    "accuracy"                    },
     { FeatureMetadata::n_features,                  "n_features"                  },
     { FeatureMetadata::validation,                  "validation"                  }*/
