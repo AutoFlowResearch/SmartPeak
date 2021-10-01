@@ -1,6 +1,18 @@
 SmartPeak Changelog
 ===================
 
+v1.14.0 (2020-09-30)
+--------------------
+
+Features
+~~~~~~~~
+- Implementation of user sessions `(#423) <https://github.com/AutoFlowResearch/SmartPeak/pull/423>`_
+
+Fix
+~~~
+- Fixed some metadata not appearing in PivotTable `(#424) <https://github.com/AutoFlowResearch/SmartPeak/pull/424>`_
+- Fixed failure to load featureQCComponents.csv when featureQCComponentGroups.csv is not provided `(#423) <https://github.com/AutoFlowResearch/SmartPeak/pull/423>`_
+
 v1.13.0 (2020-09-13)
 --------------------
 
