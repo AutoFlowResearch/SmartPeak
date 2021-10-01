@@ -225,7 +225,8 @@ TEST(Task, Task_options_change_output_dirs)
           "-o", feature_output_dir.generic_string(),
           "--reports-out-dir", report_output_dir.generic_string(),
           "--report", "featuredb",
-          "--report-metadata", "peak_area", "logSN", "RT"
+          "--report-metadata", "peak_area", "logSN", "RT",
+          "--parameter", "SequenceProcessor:n_thread=1"
   };
   auto pa = cli::Parser{ args };
   auto as = cli::ApplicationSettings{ pa };
