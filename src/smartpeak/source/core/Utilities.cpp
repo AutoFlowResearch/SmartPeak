@@ -862,25 +862,30 @@ namespace SmartPeak
     return filenames;
   }
 
+  std::string Utilities::makeUniqueStringFromTime()
+  {
+    const std::time_t time_now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+    auto time_in_epochs = std::chrono::system_clock::now().time_since_epoch();
+    char time_str[32];
+    strftime(time_str, 32, "%Y-%m-%d_%H-%M-%S_", std::localtime(&time_now));
+    return std::string(time_str + std::to_string(time_in_epochs.count()));
+  }
+
   std::filesystem::path Utilities::createEmptyTempDirectory()
   {
-    std::filesystem::path path;
-    uint i;
-    uint max_tries = 1000;
-    while (true)
+    std::filesystem::path tmp_dir_path;
+    auto path_to_tmp_dir = std::filesystem::path(std::string("tmp_").append(makeUniqueStringFromTime()));
+    tmp_dir_path = std::filesystem::temp_directory_path();
+    std::filesystem::current_path(tmp_dir_path);
+    if (std::filesystem::create_directory(path_to_tmp_dir))
     {
-      path = std::tmpnam(nullptr);
-      if (std::filesystem::create_directory(path))
-      {
-        break;
-      }
-      if (i == max_tries)
-      {
-        throw std::runtime_error("could not find non-existing directory");
-      }
-      i++;
+      tmp_dir_path /= path_to_tmp_dir;
     }
-    return path;
+    else
+    {
+      throw std::runtime_error("could not find non-existing directory");
+    }
+    return tmp_dir_path;
   }
 }
 
