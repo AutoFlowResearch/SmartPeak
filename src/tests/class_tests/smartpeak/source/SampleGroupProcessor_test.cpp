@@ -561,6 +561,7 @@ TEST(SequenceHandler, processStoreFeaturesSampleGroup)
   // no tests, it wraps OpenMS store function
 }
 
+/*
 TEST(SelectDilutionsParser, process_preferred)
 {
   ParameterSet select_dilutions_params;
@@ -656,9 +657,10 @@ TEST(SelectDilutionsParser, process_preferred)
   const OpenMS::Feature& result_subfeature2_1 = result_feature2.getSubordinates()[0];
   EXPECT_STREQ(result_subfeature2_1.getMetaValue("native_id").toString().c_str(), "test1_1");
   EXPECT_STREQ(result_subfeature2_1.getMetaValue("injection").toString().c_str(), "injection6");
-
 }
+*/
 
+/*
 TEST(SelectDilutionsParser, process_exclusive)
 {
   ParameterSet select_dilutions_params;
@@ -756,3 +758,4 @@ TEST(SelectDilutionsParser, process_exclusive)
   EXPECT_STREQ(result_subfeature1.getMetaValue("native_id").toString().c_str(), "test1_2");
   EXPECT_STREQ(result_subfeature1.getMetaValue("injection").toString().c_str(), "injection1");
 }
+*/

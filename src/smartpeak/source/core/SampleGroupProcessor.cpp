@@ -31,118 +31,6 @@
 
 namespace SmartPeak
 {
-  ParameterSet SelectDilutions::getParameterSchema() const
-  {
-    std::map<std::string, std::vector<std::map<std::string, std::string>>> param_struct({
-    {"SelectDilutions", {
-      {
-        {"name", "selection_method"},
-        {"type", "string"},
-        {"value", "preferred"},
-        {"description", "'preferred' will use provided preferred component, but if not present we will use features from other dilutions. 'exclusive' will exclude all features that does not correspond to the dilution set in the select dilution file."},
-        {"valid_strings", "['preferred','exclusive']"}
-      }
-    }} });
-    return ParameterSet(param_struct);
-  }
-
-  std::vector<std::string> SelectDilutions::getRequirements() const
-  {
-    return { "sequence", "traML" }; // TODO add selectDilutions, but at the moment there is no separate Load processor for this file
-  }
-
-  void SelectDilutions::getFilenames(Filenames& filenames) const
-  {
-    filenames.addFileName("selectDilutions", "${MAIN_DIR}/selectDilutions.csv", "Dilution selection", false, false);
-  };
-
-  void SelectDilutions::process(
-    SampleGroupHandler& sampleGroupHandler_IO,
-    const SequenceHandler& sequenceHandler_I,
-    const ParameterSet& params_I,
-    Filenames& filenames_I
-  ) const
-  {
-    LOGD << "START SelectDilutions";
-    getFilenames(filenames_I);
-
-    ParameterSet params(params_I);
-    params.merge(getParameterSchema());
-
-    std::map<std::string, int> select_dilution_map;
-    try
-    {
-      SelectDilutionsParser::read(filenames_I.getFullPath("selectDilutions").generic_string(), select_dilution_map);
-    }
-    catch (const std::exception& e)
-    {
-      LOGE << "Failed to read select dilutions file [" << filenames_I.getFullPath("selectDilutions").generic_string() << "] : " << e.what();
-      throw e;
-    }
-
-    std::map<std::string, std::set<int>> existing_dilutions_map;
-    for (const std::size_t& index : sampleGroupHandler_IO.getSampleIndices())
-    {
-      auto& injection = sequenceHandler_I.getSequence().at(index);
-      for (const auto& feature : injection.getRawData().getFeatureMap())
-      {
-        for (const auto& sub_feature : feature.getSubordinates())
-        {
-          const auto& native_id = sub_feature.getMetaValue("native_id");
-          existing_dilutions_map.emplace(native_id, std::set<int>());
-          existing_dilutions_map[native_id].insert(injection.getMetaData().dilution_factor);
-        }
-      }
-    }
-
-    OpenMS::FeatureMap new_feature_map;
-    for (const std::size_t& index : sampleGroupHandler_IO.getSampleIndices())
-    {
-      auto& injection = sequenceHandler_I.getSequence().at(index);
-      for (const auto& feature : injection.getRawData().getFeatureMap())
-      {
-        auto new_feature = feature;
-        new_feature.getSubordinates().clear();
-        for (const auto& sub_feature : feature.getSubordinates())
-        {
-          bool add_feature = true;
-          const auto& native_id = sub_feature.getMetaValue("native_id");
-          if (select_dilution_map.count(native_id))
-          {
-            const auto preferred_dilution = select_dilution_map.at(native_id);
-            const auto injection_dilution = injection.getMetaData().dilution_factor;
-            if (!(std::abs(injection_dilution-preferred_dilution)<1e-6))
-            {
-              const auto select_method_param = params.findParameter("SelectDilutions", "selection_method");
-              assert(select_method_param != nullptr); // parameter merging will ensure that it cannot be null
-              const std::string& method = select_method_param->getValueAsString();
-              if (method == "preferred")
-              {
-                // if there is no other feature is listed with the preferred dilution, we will use that one
-                const auto& existing_dilutions = existing_dilutions_map[native_id];
-                add_feature = (std::find(existing_dilutions.begin(), existing_dilutions.end(), preferred_dilution) == existing_dilutions.end());
-              }
-              else // (method == "exclusive")
-              {
-                add_feature = false;
-              }
-            }
-          }
-          if (add_feature)
-          {
-            new_feature.getSubordinates().push_back(sub_feature);
-          }
-        }
-        if (!new_feature.getSubordinates().empty())
-        {
-          new_feature_map.push_back(new_feature);
-        }
-      }
-    }
-    sampleGroupHandler_IO.setFeatureMap(new_feature_map);
-    LOGD << "END SelectDilutions";
-  }
-
   std::vector<std::string> MergeInjections::getRequirements() const
   {
     return { "sequence", "traML" };
@@ -192,6 +80,18 @@ namespace SmartPeak
         {"description", "The name of the FeatureMap attribute to use. Examples include peak_apex_int, peak_area, and intensity."}
       },
       {
+        {"name", "select_preferred_dilutions"},
+        {"type", "bool"},
+        {"value", "false"},
+        {"description", "Select features from dilution preferences."}
+      },
+      {
+        {"name", "select_preferred_dilutions_file"},
+        {"type", "string"},
+        {"value", "selectDilutions.csv"},
+        {"description", "File listing preferred dilutions. csv file, with component_name and dilution_factor columns."}
+      },
+      {
         {"name", "merge_subordinates"},
         {"type", "bool"},
         {"value", "true"},
@@ -211,10 +111,9 @@ namespace SmartPeak
     LOGD << "START MergeInjections";
     getFilenames(filenames_I);
 
-    // Check the parameters
-    if (params_I.at("MergeInjections").empty() && params_I.at("MergeInjections").empty()) {
-      throw std::invalid_argument("Parameters not found");
-    }
+    // Complete user parameters with schema
+    ParameterSet params(params_I);
+    params.merge(getParameterSchema());
 
     // Extract out the parameters
     std::string scan_polarity_merge_rule; // Sum, Min, Max, Mean, WeightedMean
@@ -224,7 +123,7 @@ namespace SmartPeak
     std::string mass_range_merge_feature_name;
     std::string dilution_series_merge_feature_name;
     bool merge_subordinates = true; // whether to merge at the feature level or at the subordinate level
-    for (const auto& mi_params : params_I.at("MergeInjections")) {
+    for (const auto& mi_params : params.at("MergeInjections")) {
       if (mi_params.getName() == "scan_polarity_merge_rule") {
         if (mi_params.getValueAsString() == "Sum" || mi_params.getValueAsString() == "Min" || mi_params.getValueAsString() == "Max" || mi_params.getValueAsString() == "Mean" || mi_params.getValueAsString() == "WeightedMean") {
           scan_polarity_merge_rule = mi_params.getValueAsString();
@@ -238,7 +137,7 @@ namespace SmartPeak
         if (mi_params.getValueAsString() == "Sum" || mi_params.getValueAsString() == "Min" || mi_params.getValueAsString() == "Max" || mi_params.getValueAsString() == "Mean" || mi_params.getValueAsString() == "WeightedMean") {
           mass_range_merge_rule = mi_params.getValueAsString();
         }
-        else 
+        else
         {
           LOGD << "Incorrect value for 'mass_range_merge_rule'.  Options are 'Sum', 'Min', 'Max', 'Mean', or 'WeightedMean'.";
         }
@@ -247,7 +146,7 @@ namespace SmartPeak
         if (mi_params.getValueAsString() == "Sum" || mi_params.getValueAsString() == "Min" || mi_params.getValueAsString() == "Max" || mi_params.getValueAsString() == "Mean" || mi_params.getValueAsString() == "WeightedMean") {
           dilution_series_merge_rule = mi_params.getValueAsString();
         }
-        else 
+        else
         {
           LOGD << "Incorrect value for 'dilution_series_merge_rule'.  Options are 'Sum', 'Min', 'Max', 'Mean', or 'WeightedMean'.";
         }
@@ -272,7 +171,7 @@ namespace SmartPeak
         }
       }
     }
-    if (scan_polarity_merge_rule.empty() || mass_range_merge_rule.empty() || dilution_series_merge_rule.empty() || 
+    if (scan_polarity_merge_rule.empty() || mass_range_merge_rule.empty() || dilution_series_merge_rule.empty() ||
       scan_polarity_merge_feature_name.empty() || mass_range_merge_feature_name.empty() || dilution_series_merge_feature_name.empty()) {
       throw std::invalid_argument("Parameters not found");
     }
@@ -292,15 +191,25 @@ namespace SmartPeak
     // a map of a set of injection names with a value of the feature metadata value
     std::map<componentKeyType, std::map<std::string, std::map<std::set<std::string>, float>>> component_to_feature_to_injection_to_values;
     getComponentsToFeaturesToInjectionsToValues(sampleGroupHandler_IO, sequenceHandler_I, merge_subordinates, component_to_feature_to_injection_to_values);
-    
+
+    // Select preferred dilution
+    if (!selectDilutions(params, filenames_I, sequenceHandler_I, component_to_feature_to_injection_to_values))
+    {
+      return;
+    }
+
     // Merge the components and features in order and in place
     // pass 1: dilutions
     std::set<std::string> scan_polarities_keys_tup = scan_polarities;
     std::set<std::pair<float, float>> scan_mass_ranges_keys_tup = scan_mass_ranges;
     std::set<float> dilution_factors_keys_tup({-1});
-    mergeComponentsToFeaturesToInjectionsToValues(dilution_series_merge_feature_name, dilution_series_merge_rule, 
-      scan_polarities_keys_tup, scan_mass_ranges_keys_tup, dilution_factors_keys_tup, 
-      merge_keys_to_injection_name, component_to_feature_to_injection_to_values);
+    mergeComponentsToFeaturesToInjectionsToValues(dilution_series_merge_feature_name,
+                                                  dilution_series_merge_rule, 
+                                                  scan_polarities_keys_tup,
+                                                  scan_mass_ranges_keys_tup,
+                                                  dilution_factors_keys_tup, 
+                                                  merge_keys_to_injection_name,
+                                                  component_to_feature_to_injection_to_values);
 
     // pass 2: mass ranges
     scan_mass_ranges_keys_tup = std::set<std::pair<float, float>>({std::make_pair(-1,-1)});
@@ -334,6 +243,103 @@ namespace SmartPeak
 
     LOGI << "MergeInjections output size: " << fmap.size();
     LOGD << "END MergeInjections";
+  }
+
+  bool MergeInjections::selectDilutions(
+    const ParameterSet& params,
+    const Filenames& filenames_I,
+    const SequenceHandler& sequenceHandler_I,
+    std::map<componentKeyType, std::map<std::string, std::map<std::set<std::string>, float>>>& component_to_feature_to_injection_to_values)
+  {
+    if (params.at("MergeInjections").findParameter("select_preferred_dilutions")->getValueAsString() == "true")
+    {
+      std::map<std::string, int> select_dilution_map;
+      std::filesystem::path dilution_file = params.at("MergeInjections").findParameter("select_preferred_dilutions_file")->getValueAsString();
+      if (dilution_file.is_relative())
+      {
+        dilution_file = (std::filesystem::path(filenames_I.getTag(Filenames::Tag::MAIN_DIR)) / dilution_file).lexically_normal();
+      }
+      try
+      {
+        SelectDilutionsParser::read(dilution_file.generic_string(), select_dilution_map);
+      }
+      catch (const std::exception& e)
+      {
+        LOGE << "Failed to read select dilutions file [" << dilution_file.generic_string() << "] : " << e.what();
+        return false;
+      }
+      std::map<componentKeyType, std::map<std::string, std::map<std::set<std::string>, float>>> new_component_to_feature_to_injection_to_values;
+      for (const auto& component_to_feature_to_injection_to_value : component_to_feature_to_injection_to_values)
+      {
+        const auto& component_key = component_to_feature_to_injection_to_value.first;
+        const auto& component_name = component_key.second;
+        if (select_dilution_map.count(component_name))
+        {
+          float preferred_dilution = select_dilution_map.at(component_name);
+          const auto& feature_map = component_to_feature_to_injection_to_value.second;
+          // 1st pass: get selected injections
+          std::set<std::set<std::string>> selected_injections;
+          for (const auto& feature : feature_map)
+          {
+            const auto& feature_name = feature.first;
+            const auto& injections_set_to_value = feature.second;
+            for (const auto& injections_set : injections_set_to_value)
+            {
+              std::set<std::string> selected_injections_set;
+              for (const auto& injection_name : injections_set.first)
+              {
+                // look for dilution of this injection
+                for (const auto& sample : sequenceHandler_I.getSequence())
+                {
+                  if (sample.getMetaData().getInjectionName() == injection_name)
+                  {
+                    float dilution = sample.getMetaData().dilution_factor;
+                    if (std::abs(dilution - preferred_dilution) < 1e-6)
+                    {
+                      selected_injections_set.insert(injection_name);
+                    }
+                  }
+                }
+              }
+              if (!selected_injections_set.empty())
+              {
+                selected_injections.insert(selected_injections_set);
+              }
+            }
+          }
+          // 2nd pass: reconstruct the injection map
+          std::map<std::string, std::map<std::set<std::string>, float>> new_feature_map;
+          if (selected_injections.empty())
+          {
+            // if we haven't found preferred injection among this map, we just let it as it was.
+            new_feature_map = feature_map;
+          }
+          else
+          {
+            for (const auto& feature : feature_map)
+            {
+              const auto& injections_set_to_value = feature.second;
+              std::map<std::set<std::string>, float> new_injections_set_to_value;
+              for (const auto& injections_set : injections_set_to_value)
+              {
+                if (selected_injections.count(injections_set.first))
+                {
+                  new_injections_set_to_value.insert(injections_set);
+                }
+              }
+              new_feature_map.emplace(feature.first, new_injections_set_to_value);
+            }
+          }
+          new_component_to_feature_to_injection_to_values.emplace(component_key, new_feature_map);
+        }
+        else
+        {
+          new_component_to_feature_to_injection_to_values.insert(component_to_feature_to_injection_to_value);
+        }
+      }
+      component_to_feature_to_injection_to_values = std::move(new_component_to_feature_to_injection_to_values);
+    }
+    return true;
   }
 
   void MergeInjections::getMergeKeysToInjections(const SampleGroupHandler& sampleGroupHandler_IO,
@@ -413,6 +419,7 @@ namespace SmartPeak
       merge_keys_to_injection_name.at(key).push_back(injection_names_prev_merge);
     }
   }
+
   void MergeInjections::getComponentsToFeaturesToInjectionsToValues(const SampleGroupHandler& sampleGroupHandler_IO,
                                                                     const SequenceHandler& sequenceHandler_I,
                                                                     const bool& merge_subordinates,
@@ -420,7 +427,7 @@ namespace SmartPeak
   {
     // initialize our map of feature names to values
     std::map<std::string, std::map<std::set<std::string>, float>> features_to_values;
-    for (const auto& m : metadatafloatToString) {
+    for (const auto& m : metadataFloatToString) {
       features_to_values.emplace(m.second, std::map<std::set<std::string>, float>());
     }
 
