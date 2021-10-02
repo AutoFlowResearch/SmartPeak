@@ -288,7 +288,7 @@ Full Command-Line Interface
     This parameter is optional. The default value is '0'.
 
     -ld   --log-dir
-    The path to the log directory. Given directory has to exist. Overrides the default location for the log file: https://smartpeak.readthedocs.io/en/latest/guide/guistart.html#logs
+    The path to the log directory. The given directory has to exist. Overrides the default location for the log file: https://smartpeak.readthedocs.io/en/latest/guide/guistart.html#logs
     This parameter is optional. The default value is ''.
 
     -o    --output-features
