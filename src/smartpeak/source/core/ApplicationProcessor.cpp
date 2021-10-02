@@ -302,6 +302,13 @@ namespace SmartPeak
       filenames_ = application_handler_.filenames_;
     }
 
+    if (!overrideFilenames())
+    {
+      return false;
+    }
+
+    filenames_->log();
+
     for (auto& loading_processor : application_handler_.loading_processors_)
     {
       // check if we need to use that loading processor
@@ -353,6 +360,11 @@ namespace SmartPeak
       }
     }
 
+    if (!overrideParameters())
+    {
+      return false;
+    }
+
     if (checkConsistency)
     {
       if (!application_handler_.sequenceHandler_.getSequenceSegments().empty())
@@ -370,6 +382,87 @@ namespace SmartPeak
 
     application_handler_.sequenceHandler_.notifySequenceUpdated();
     LOGD << "END LoadSession";
+    return true;
+  }
+
+  bool LoadSession::overrideFilenames()
+  {
+    if (filenames_override_)
+    {
+      filenames_override_->setTag(Filenames::Tag::MAIN_DIR, filenames_->getTag(Filenames::Tag::MAIN_DIR));
+      const auto& src = filenames_->getFileIds();
+      for (const auto& file_id : filenames_override_->getFileIds())
+      {
+        if (std::find(src.begin(), src.end(), file_id) == src.end())
+        {
+          LOGE << "Unknown overriding input file: " << file_id;
+          return false;
+        }
+        else
+        {
+          const auto value = filenames_override_->getFullPath(file_id);
+          LOGW << "Overriding input file: " << file_id << " -> " << "\"" << value.generic_string() << "\"";
+          filenames_->setFullPath(file_id, value);
+        }
+      }
+    }
+    return true;
+  }
+
+  bool LoadSession::overrideParameters()
+  {
+    if (parameters_override_)
+    {
+      if (application_handler_.sequenceHandler_.getSequence().size())
+      {
+        auto schema_params = application_handler_.getWorkflowParameterSchema();
+        parameters_override_->merge(schema_params);
+
+        for (auto& function_parameter_override : *parameters_override_)
+        {
+          for (auto& parameter_override : function_parameter_override.second)
+          {
+            if (!parameter_override.isSchema())
+            {
+              if (!parameter_override.getSchema())
+              {
+                LOGE << "Overridden parameter \"" << function_parameter_override.first << ":" << parameter_override.getName()
+                  << "\": " << "Unused or Unknown";
+                return false;
+              }
+              if (!parameter_override.isValid())
+              {
+                LOGE << "Overridden parameter \"" << function_parameter_override.first << ":" << parameter_override.getName()
+                  << "\", Invalid value: \"" << parameter_override.getValueAsString() << "\"";
+                LOGE << "Expected Type: " << parameter_override.getType();
+                auto constraints = parameter_override.getRestrictionsAsString();
+                if (!constraints.empty())
+                {
+                  LOGE << "Constraints: " << constraints;
+                }
+                return false;
+              }
+              else
+              {
+                // looks ok, override parameter
+                ParameterSet& user_parameters = application_handler_.sequenceHandler_.getSequence().at(0).getRawData().getParameters();
+                Parameter* existing_parameter = user_parameters.findParameter(function_parameter_override.first, parameter_override.getName());
+                LOGW << "Overridden parameter \"" << function_parameter_override.first << ":" << parameter_override.getName()
+                  << "\", set value: \"" << parameter_override.getValueAsString() << "\"";
+                if (existing_parameter)
+                {
+                  existing_parameter->setValueFromString(parameter_override.getValueAsString(), false);
+                }
+                else
+                {
+                  user_parameters.addParameter(function_parameter_override.first, parameter_override);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
     return true;
   }
 

@@ -189,9 +189,6 @@ namespace SmartPeak
     file_names_.at(file_id).embedded_ = embedded;
   }
 
-  /**
-    @brief get embedded flag.
-  */
   bool Filenames::isEmbedded(const std::string& file_id) const
   {
     if (file_names_.count(file_id))
@@ -204,4 +201,20 @@ namespace SmartPeak
     }
   }
 
+  void Filenames::log() const
+  {
+    LOGI << "Input Files Setup:";
+    for (const auto& file_id : getFileIds())
+    {
+      const auto full_path = getFullPath(file_id);
+      if (full_path.empty())
+      {
+        LOGI << file_id << ": Not used";
+      }
+      else
+      {
+        LOGI << file_id << ": " << "\"" << full_path.generic_string() << "\"";
+      }
+    }
+  }
 }

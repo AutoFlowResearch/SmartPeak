@@ -67,20 +67,7 @@ namespace SmartPeak
     if (application_handler_.sequenceHandler_.getSequence().size() > 0)
     {
       parameters_ = application_handler_.sequenceHandler_.getSequence().at(0).getRawData().getParameters();
-      std::vector<std::string> command_names = application_handler_.sequenceHandler_.getWorkflow();
-      BuildCommandsFromNames buildCommandsFromNames(application_handler_);
-      buildCommandsFromNames.names_ = command_names;
-      buildCommandsFromNames.process();
-
-      // Construct schema based on the current workflow's command list
-      ParameterSet schema_params;
-      for (const auto& command : buildCommandsFromNames.commands_)
-      {
-        schema_params.merge(command.getParameterSchema());
-      }
-      schema_params.merge(ApplicationProcessors::getParameterSchema()); // Application processor will be used also
-      schema_params.setAsSchema(true);
-
+      auto schema_params = application_handler_.getWorkflowParameterSchema();
       // Construct parameters merging schema and user defined
       parameters_.merge(schema_params);
     }

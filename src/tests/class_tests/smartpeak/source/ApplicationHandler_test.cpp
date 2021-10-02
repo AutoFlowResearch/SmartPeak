@@ -92,3 +92,9 @@ TEST_F(ApplicationHandlerFixture, setFileSavedState)
   ah_.setFileSavedState("test", true);
   EXPECT_TRUE(ah_.isFileSaved("test"));
 }
+
+TEST_F(ApplicationHandlerFixture, getWorkflowParameterSchema)
+{
+  auto schema_params = ah_.getWorkflowParameterSchema();
+  EXPECT_EQ(schema_params.size(), 1);
+}

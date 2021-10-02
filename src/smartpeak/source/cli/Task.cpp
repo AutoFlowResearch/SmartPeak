@@ -88,20 +88,63 @@ namespace SmartPeak {
         LOGE << "Session not found: " << application_settings.load_session;
         return false;
       }
-      else if (std::filesystem::is_regular_file(application_settings.load_session))
-      {
-        // Load from session
-        SmartPeak::LoadSession create_sequence(application_handler);
-        return create_sequence.onFilePicked(application_settings.load_session, &application_handler);
-      }
       else
       {
-        LOGW << "Loading session from directory - backward compatibility - deprecated, prefer loading from session file.";
-        Filenames filenames_main = Utilities::buildFilenamesFromDirectory(application_handler, application_settings.load_session);
-        application_handler.main_dir_ = filenames_main.getTag(Filenames::Tag::MAIN_DIR);
+
+        Filenames filenames_override;
+        for (const auto& input_file : application_settings.input_files)
+        {
+          auto key_value = application_settings.get_key_value_from_option(input_file);
+          const std::string& file_id = key_value.first;
+          const std::filesystem::path filename = key_value.second;
+          if (filename.is_relative())
+          {
+            filenames_override.addFileName(file_id, std::filesystem::path("${MAIN_DIR}/" + filename.generic_string()).lexically_normal().generic_string());
+          }
+          else
+          {
+            filenames_override.addFileName(file_id, filename.generic_string());
+          }
+        }
+        
+        ParameterSet parameters_override;
+        for (const auto& parameter : application_settings.parameters)
+        {
+          const auto key_value = application_settings.get_key_value_from_option(parameter);
+          const auto& key = key_value.first; // key must be FunctionName:ParameterName
+          auto separator_pos = key.find(":");
+          if (separator_pos != key.npos)
+          {
+            std::string function_name = key.substr(0, separator_pos);
+            std::string parameter_name = key.substr((separator_pos + 1), key.size() - (separator_pos + 1));
+            if (!function_name.empty() && !parameter_name.empty())
+            {
+              std::map<std::string, std::string> param_struct = {
+                {"name", parameter_name},
+                { "value", key_value.second }
+              };
+              Parameter param(param_struct);
+              parameters_override.addParameter(function_name, param);
+            }
+          }
+        }
+
         SmartPeak::LoadSession create_sequence(application_handler);
-        create_sequence.filenames_ = filenames_main;
-        return create_sequence.process();
+        create_sequence.filenames_override_ = filenames_override;
+        create_sequence.parameters_override_ = parameters_override;
+        if (std::filesystem::is_regular_file(application_settings.load_session))
+        {
+          // Load from session
+          return create_sequence.onFilePicked(application_settings.load_session, &application_handler);
+        }
+        else
+        {
+          LOGW << "Loading session from directory - backward compatibility - deprecated, prefer loading from session file.";
+          Filenames filenames_main = Utilities::buildFilenamesFromDirectory(application_handler, application_settings.load_session);
+          application_handler.main_dir_ = filenames_main.getTag(Filenames::Tag::MAIN_DIR);
+          create_sequence.filenames_ = filenames_main;
+          return create_sequence.process();
+        }
       }
     }
 
@@ -207,15 +250,27 @@ namespace SmartPeak {
       auto& application_handler = application_manager.get_application_handler();
 
       // Initialize directories:
-      auto main_dir = application_handler.main_dir_;
-      if (!application_settings.out_dir.empty() && application_settings.out_dir != ".")
+
+      std::filesystem::path mzml_dir = application_settings.mzml_dir;
+      if (mzml_dir.is_relative())
       {
-        main_dir = application_settings.out_dir;
-        LOG_DEBUG << "Output feature directory: " << main_dir.generic_string();
+        mzml_dir = (application_handler.main_dir_ / mzml_dir).lexically_normal();
       }
-      application_handler.mzML_dir_ = application_handler.main_dir_ / "mzML";
-      application_handler.features_in_dir_ = application_handler.main_dir_ / "features";
-      application_handler.features_out_dir_ = main_dir / "features";
+      application_handler.mzML_dir_ = mzml_dir;
+
+      std::filesystem::path features_out_dir = application_settings.features_out_dir;
+      if (features_out_dir.is_relative())
+      {
+        features_out_dir = (application_handler.main_dir_ / features_out_dir).lexically_normal();
+      }
+      application_handler.features_out_dir_ = features_out_dir;
+
+      std::filesystem::path features_in_dir = application_settings.features_in_dir;
+      if (features_in_dir.is_relative())
+      {
+        features_in_dir = (application_handler.main_dir_ / features_in_dir).lexically_normal();
+      }
+      application_handler.features_in_dir_ = features_in_dir;
 
       auto paths = {
           application_handler.mzML_dir_,
@@ -412,16 +467,21 @@ namespace SmartPeak {
         _extract_report_sampletypes(application_settings, report_sample_types);
         _extract_report_metadata(application_settings, report_metadata);
 
-        auto main_dir = application_handler.main_dir_;
-        if (!application_settings.out_dir.empty() && application_settings.out_dir != ".")
+        std::filesystem::path reports_out_dir = application_settings.reports_out_dir;
+        if (reports_out_dir.is_relative())
         {
-          main_dir = application_settings.out_dir;
+          reports_out_dir = (application_handler.main_dir_ / reports_out_dir).lexically_normal();
+        }
+        if (!std::filesystem::exists(std::filesystem::path(reports_out_dir)) &&
+            !std::filesystem::create_directories(std::filesystem::path(reports_out_dir)))
+        {
+          LOGE << "Failed to create output report directory: " << reports_out_dir.generic_string();
         }
 
         if (feature_db)
         {
           auto& sequance_handler = application_handler.sequenceHandler_;
-          const auto filepath = main_dir / "FeatureDB.csv";
+          const auto filepath = reports_out_dir / "FeatureDB.csv";
           SequenceParser::writeDataTableFromMetaValue(
             sequance_handler, filepath,
             report_metadata, report_sample_types);
@@ -429,7 +489,7 @@ namespace SmartPeak {
         if (pivot_table)
         {
           auto& sequance_handler = application_handler.sequenceHandler_;
-          const auto filepath = main_dir / "PivotTable.csv";
+          const auto filepath = reports_out_dir / "PivotTable.csv";
           SequenceParser::writeDataMatrixFromMetaValue(
             sequance_handler, filepath,
             report_metadata, report_sample_types);

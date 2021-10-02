@@ -85,6 +85,12 @@ struct ApplicationSettings {
         const std::string& option, 
         std::string log_msg="");
 
+    /**
+     * Returns a pair key/value from one string "key1=value1"
+     */ 
+    static std::pair<std::string, std::string> get_key_value_from_option(
+      const std::string& option);
+
 public:
     /* options */
     std::string load_session;
@@ -98,7 +104,12 @@ public:
     bool disable_colors;
     bool disable_progressbar;
     std::string log_dir; 
-    std::string out_dir;
+    std::string features_out_dir;
+    std::string features_in_dir;
+    std::vector<std::string> input_files;
+    std::vector<std::string> parameters;
+    std::string mzml_dir;
+    std::string reports_out_dir;
 
 public:
     void validate_report() const;
