@@ -245,7 +245,7 @@ Full Command-Line Interface
     This parameter is optional. The default value is ''.
 
     -l    --load-session  (required)
-    The path to session file, or a directory with structured file organization (prefer session file)
+    The path to a session file, or to a directory with a structured file organization (session file is preferred)
 
     -r    --report
     Specify a report type to export.
