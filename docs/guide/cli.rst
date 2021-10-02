@@ -284,7 +284,7 @@ Full Command-Line Interface
     This parameter is optional. The default value is '0'.
 
     -pg   --disable-progressbar
-    Progress bar allows to track the progress of the entire workflow. This option disables the progress bar.
+    Progress bar allows tracks the progress of the entire workflow. This option disables the progress bar.
     This parameter is optional. The default value is '0'.
 
     -ld   --log-dir
