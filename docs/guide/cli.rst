@@ -260,7 +260,7 @@ Full Command-Line Interface
     This parameter is optional. The default value is '[ ALL ]'.
 
     -ro   --reports-out-dir
-    An absolute or relative path to an output directory for reports. Overrides the default location which is the current working directory. SmartPeak will create given directory if one does not exist.
+    An absolute or relative path to an output directory for reports. Overrides the default location which is the current working directory. SmartPeak will create the given directory if one does not exist.
     This parameter is optional. The default value is '.'.
 
     -w    --workflow
