@@ -256,7 +256,7 @@ Full Command-Line Interface
     This parameter is optional. The default value is '[ ALL ]'.
 
     -rm   --report-metadata
-    A list of metadata to include in the report. The full list can be found in documentation https://smartpeak.readthedocs.io
+    A list of metadata to include in the report. The full list can be found in the documentation https://smartpeak.readthedocs.io
     This parameter is optional. The default value is '[ ALL ]'.
 
     -ro   --reports-out-dir
