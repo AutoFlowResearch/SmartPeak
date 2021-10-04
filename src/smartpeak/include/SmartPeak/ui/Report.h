@@ -23,10 +23,11 @@
 
 #pragma once
 
-#include <SmartPeak/ui/Widget.h>
 #include <SmartPeak/core/ApplicationHandler.h>
 #include <SmartPeak/core/FeatureMetadata.h>
 #include <SmartPeak/core/SampleType.h>
+#include <SmartPeak/ui/Widget.h>
+#include <SmartPeak/ui/FilePicker.h>
 #include <array>
 #include <set>
 #include <string>
@@ -61,5 +62,23 @@ namespace SmartPeak
     Report(ApplicationHandler& application_handler);
 
     void draw() override;
+
+  protected:
+    struct ReportFilePickerHandler : IFilePickerHandler
+    {
+      ReportFilePickerHandler(const Report& report, const std::string title) :
+        report_(report), title_(title) { };
+      /**
+      IFilePickerHandler
+      */
+      bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
+    protected:
+      const Report& report_;
+      const std::string title_;
+    };
+
+    std::shared_ptr<ReportFilePickerHandler> feature_db_file_picker_handler_;
+    std::shared_ptr<ReportFilePickerHandler> pivot_table_file_picker_handler_;
+    FilePicker report_file_picker_;
   };
 }
