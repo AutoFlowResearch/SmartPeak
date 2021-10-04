@@ -279,6 +279,7 @@ namespace SmartPeak
 
   void FilePicker::drawConfirmationPopup()
   {
+    bool do_open_file = false;
     if (ImGui::BeginPopupModal("Overwrite confirmation", NULL, ImGuiWindowFlags_AlwaysAutoResize))
     {
       ImGui::Text("Overwrite file:");
@@ -297,8 +298,8 @@ namespace SmartPeak
           LOGE << e.what();
           // let's continue ...
         }
-        doOpenFile();
         ImGui::CloseCurrentPopup();
+        do_open_file = true;
       }
       ImGui::SameLine();
       if (ImGui::Button("Cancel"))
@@ -306,6 +307,11 @@ namespace SmartPeak
         ImGui::CloseCurrentPopup();
       }
       ImGui::EndPopup();
+    }
+
+    if (do_open_file)
+    {
+      doOpenFile();
     }
   }
 

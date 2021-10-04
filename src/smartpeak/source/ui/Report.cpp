@@ -34,6 +34,20 @@
 
 namespace SmartPeak
 {
+
+  bool Report::ReportFilePickerHandler::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
+  {
+    report_.run_and_join(
+      SequenceParser::writeDataTableFromMetaValue,
+      title_,
+      application_handler->sequenceHandler_,
+      filename,
+      report_.summaryMetaData_,
+      report_.summarySampleTypes_
+    );
+    return true;
+  }
+
   Report::Report(ApplicationHandler& application_handler) :
     Widget("Create Report"),
     application_handler_(application_handler)
@@ -42,6 +56,8 @@ namespace SmartPeak
     std::fill(md_checks_.begin(), md_checks_.end(), false);
     all_st_checks_ = false; all_st_deactivated_ = true;
     all_md_checks_ = false; all_md_deactivated_ = true;
+    feature_db_file_picker_handler_ = std::make_shared<ReportFilePickerHandler>(*this, "Feature DB report");
+    pivot_table_file_picker_handler_ = std::make_shared<ReportFilePickerHandler>(*this, "Pivot Table");
   }
 
   void Report::draw()
@@ -49,6 +65,8 @@ namespace SmartPeak
     if (!ImGui::BeginPopupModal(title_.c_str(), NULL, ImGuiWindowFlags_NoResize)) {
       return;
     }
+
+    report_file_picker_.draw();
 
     ImGui::BeginChild("ReportContent", ImVec2(600, 400));
 
@@ -110,20 +128,17 @@ namespace SmartPeak
 
     ImGui::Separator();
 
-    if (ImGui::Button("Create FeatureDB.csv"))
+    if (ImGui::Button("Create Feature DB"))
     {
       const bool checkboxes_check = initializeMetadataAndSampleTypes();
       if (checkboxes_check)
       {
-        const auto pathname = application_handler_.main_dir_ / "FeatureDB.csv";
-        run_and_join(
-          SequenceParser::writeDataTableFromMetaValue,
-          "FeatureDB.csv",
-          application_handler_.sequenceHandler_,
-          pathname,
-          summaryMetaData_,
-          summarySampleTypes_
-        );
+        report_file_picker_.open(
+          "Create Feature DB",
+          feature_db_file_picker_handler_,
+          FilePicker::Mode::EFileCreate,
+          application_handler_,
+          "FeatureDB.csv");
       }
       else
       {
@@ -133,20 +148,17 @@ namespace SmartPeak
 
     ImGui::SameLine();
 
-    if (ImGui::Button("Create PivotTable.csv"))
+    if (ImGui::Button("Create Pivot Table"))
     {
       const bool checkboxes_check = initializeMetadataAndSampleTypes();
       if (checkboxes_check)
       {
-        const auto pathname = application_handler_.main_dir_ / "PivotTable.csv";
-        run_and_join(
-          SequenceParser::writeDataMatrixFromMetaValue,
-          "PivotTable.csv",
-          application_handler_.sequenceHandler_,
-          pathname,
-          summaryMetaData_,
-          summarySampleTypes_
-        );
+        report_file_picker_.open(
+          "Create Pivot Table",
+          pivot_table_file_picker_handler_,
+          FilePicker::Mode::EFileCreate,
+          application_handler_,
+          "PivotTable.csv");
       }
       else
       {
