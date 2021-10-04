@@ -390,11 +390,10 @@ int main(int argc, char** argv)
     ImGui::NewFrame();
 
     { // keeping this block to easily collapse/expand the bulk of the loop
-      // Intialize the window sizes
-
-      session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
 
       event_dispatcher.dispatchEvents();
+
+      session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
 
       win_size_and_pos.setXAndYSizes(io.DisplaySize.x, io.DisplaySize.y);
       if ((!workflow_is_done_) && workflow_manager_.isWorkflowDone()) // workflow just finished
