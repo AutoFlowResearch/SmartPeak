@@ -117,6 +117,17 @@ public:
       const std::set<std::string>& component_names
     );
 
+    static void makeGroupDataTableFromMetaValue(
+      const SequenceHandler& sequenceHandler,
+      std::vector<std::vector<std::string>>& rows_out,
+      std::vector<std::string>& headers_out,
+      const std::vector<std::string>& meta_data,
+      const std::set<SampleType>& sample_types,
+      const std::set<std::string>& sample_names,
+      const std::set<std::string>& component_group_names,
+      const std::set<std::string>& component_names
+    );
+
     static bool writeDataTableFromMetaValue(
       const SequenceHandler& sequenceHandler,
       const std::filesystem::path& filename,

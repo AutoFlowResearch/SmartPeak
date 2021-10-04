@@ -764,6 +764,103 @@ namespace SmartPeak
     }
   }
 
+  void SequenceParser::makeGroupDataTableFromMetaValue(
+    const SequenceHandler& sequenceHandler,
+    std::vector<std::vector<std::string>>& rows_out,
+    std::vector<std::string>& headers_out,
+    const std::vector<std::string>& meta_data,
+    const std::set<SampleType>& sample_types,
+    const std::set<std::string>& sample_names,
+    const std::set<std::string>& component_group_names,
+    const std::set<std::string>& component_names) {
+    std::vector<std::string> headers = {
+      "sample_group_name", "component_group_name", "used_"
+    };
+    headers.insert(headers.end(), meta_data.cbegin(), meta_data.cend());
+    headers_out = headers;
+
+    const std::string delimiter{ "_____" };
+
+    rows_out.clear();
+    for (const SampleGroupHandler& sample_handler : sequenceHandler.getSampleGroups())
+    {
+      auto feature_map = sample_handler.getFeatureMap();
+      
+      if (sample_names.size() > 0 && sample_names.count(sample_handler.getSampleGroupName()) == 0)
+        continue;
+
+      /*
+      const MetaDataHandler& mdh = sampleHandler.getMetaData();
+      if (sample_types.count(mdh.getSampleType()) == 0)
+        continue;
+      if (sample_names.size() > 0 && sample_names.count(mdh.getSampleName()) == 0)
+        continue;
+      */
+      for (const OpenMS::Feature& feature : feature_map)
+      {
+        if (!feature.metaValueExists(s_PeptideRef) || feature.getMetaValue(s_PeptideRef).isEmpty()) {
+          LOGV << "component_group_name is absent or empty. Skipping this feature";
+          continue;
+        }
+        const std::string component_group_name = feature.getMetaValue(s_PeptideRef);
+        if (component_group_names.size() > 0 && component_group_names.count(component_group_name) == 0)
+          continue;
+
+        // Case #1: Features only
+        if (feature.getSubordinates().size() <= 0) {
+          std::vector<std::string> row;
+          row.push_back(sample_handler.getSampleGroupName());
+          row.push_back(component_group_name);
+          row.push_back(feature.metaValueExists("used_") ? feature.getMetaValue("used_").toString() : "");
+          for (const std::string& meta_value_name : meta_data)
+          {
+            CastValue datum = SequenceHandler::getMetaValue(feature, feature, meta_value_name);
+            if (datum.getTag() == CastValue::Type::FLOAT && datum.f_ != 0.0) {
+              // NOTE: to_string() rounds at 1e-6. Therefore, some precision might be lost.
+              row.push_back(std::to_string(datum.f_));
+            }
+            else
+            {
+              row.push_back("");
+            }
+          }
+          rows_out.push_back(row);
+        }
+
+        // Case #2: Features and subordinates
+        for (const OpenMS::Feature& subordinate : feature.getSubordinates())
+        {
+          std::vector<std::string> row;
+          row.push_back(sample_handler.getSampleGroupName());
+          row.push_back(component_group_name);
+          if (!subordinate.metaValueExists(s_native_id) ||
+            subordinate.getMetaValue(s_native_id).isEmpty() ||
+            subordinate.getMetaValue(s_native_id).toString().empty()) {
+            LOGV << "component_name is absent or empty. Skipping this subordinate";
+            continue;
+          }
+          const std::string component_name = subordinate.getMetaValue(s_native_id);
+          if (component_names.size() > 0 && component_names.count(component_name) == 0)
+            continue;
+          row.push_back(subordinate.metaValueExists("used_") ? subordinate.getMetaValue("used_").toString() : "");
+          for (const std::string& meta_value_name : meta_data)
+          {
+            CastValue datum = SequenceHandler::getMetaValue(feature, subordinate, meta_value_name);
+            if (datum.getTag() == CastValue::Type::FLOAT && datum.f_ != 0.0) {
+              // NOTE: to_string() rounds at 1e-6. Therefore, some precision might be lost.
+              row.push_back(std::to_string(datum.f_));
+            }
+            else
+            {
+              row.push_back("");
+            }
+          }
+          rows_out.push_back(row);
+        }
+      }
+    }
+  }
+
   bool SequenceParser::writeDataTableFromMetaValue(
     const SequenceHandler& sequenceHandler,
     const std::filesystem::path& filename,
@@ -780,7 +877,8 @@ namespace SmartPeak
     for (const FeatureMetadata& m : meta_data) {
       meta_data_strings.push_back(metadataToString.at(m));
     }
-    makeDataTableFromMetaValue(sequenceHandler, rows, headers, meta_data_strings, sample_types, std::set<std::string>(), std::set<std::string>(), std::set<std::string>());
+    //makeDataTableFromMetaValue(sequenceHandler, rows, headers, meta_data_strings, sample_types, std::set<std::string>(), std::set<std::string>(), std::set<std::string>());
+    makeGroupDataTableFromMetaValue(sequenceHandler, rows, headers, meta_data_strings, sample_types, std::set<std::string>(), std::set<std::string>(), std::set<std::string>());
 
     CSVWriter writer(filename.generic_string(), ",");
     const size_t cnt = writer.writeDataInRow(headers.cbegin(), headers.cend());
