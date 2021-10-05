@@ -192,6 +192,18 @@ namespace SmartPeak
         {"description", "The name of the FeatureMap attribute to use. Examples include peak_apex_int, peak_area, and intensity."}
       },
       {
+        {"name", "select_preferred_dilutions"},
+        {"type", "bool"},
+        {"value", "false"},
+        {"description", "Select features from dilution preferences."}
+      },
+      {
+        {"name", "select_preferred_dilutions_file"},
+        {"type", "string"},
+        {"value", "selectDilutions.csv"},
+        {"description", "File listing preferred dilutions. csv file, with component_name and dilution_factor columns."}
+      },
+      {
         {"name", "merge_subordinates"},
         {"type", "bool"},
         {"value", "true"},
@@ -211,12 +223,9 @@ namespace SmartPeak
     LOGD << "START MergeInjections";
     getFilenames(filenames_I);
 
-    // Check the parameters
-    if (params_I.at("MergeInjections").empty() && params_I.at("MergeInjections").empty()) {
-      LOGE << "Parameters not found for MergeInjections. Returning";
-      LOGD << "END MergeInjections";
-      return;
-    }
+    // Complete user parameters with schema
+    ParameterSet params(params_I);
+    params.merge(getParameterSchema());
 
     // Extract out the parameters
     std::string scan_polarity_merge_rule; // Sum, Min, Max, Mean, WeightedMean
@@ -226,7 +235,7 @@ namespace SmartPeak
     std::string mass_range_merge_feature_name;
     std::string dilution_series_merge_feature_name;
     bool merge_subordinates = true; // whether to merge at the feature level or at the subordinate level
-    for (const auto& mi_params : params_I.at("MergeInjections")) {
+    for (const auto& mi_params : params.at("MergeInjections")) {
       if (mi_params.getName() == "scan_polarity_merge_rule") {
         if (mi_params.getValueAsString() == "Sum" || mi_params.getValueAsString() == "Min" || mi_params.getValueAsString() == "Max" || mi_params.getValueAsString() == "Mean" || mi_params.getValueAsString() == "WeightedMean") {
           scan_polarity_merge_rule = mi_params.getValueAsString();
@@ -236,45 +245,45 @@ namespace SmartPeak
           LOGD << "Incorrect value for 'scan_polarity_merge_rule'.  Options are 'Sum', 'Min', 'Max', 'Mean', or 'WeightedMean'.";
         }
       }
-      if (mi_params.getName() == "mass_range_merge_rule") {
-        if (mi_params.getValueAsString() == "Sum" || mi_params.getValueAsString() == "Min" || mi_params.getValueAsString() == "Max" || mi_params.getValueAsString() == "Mean" || mi_params.getValueAsString() == "WeightedMean") {
-          mass_range_merge_rule = mi_params.getValueAsString();
-        }
-        else 
-        {
-          LOGD << "Incorrect value for 'mass_range_merge_rule'.  Options are 'Sum', 'Min', 'Max', 'Mean', or 'WeightedMean'.";
-        }
-      }
-      if (mi_params.getName() == "dilution_series_merge_rule") {
-        if (mi_params.getValueAsString() == "Sum" || mi_params.getValueAsString() == "Min" || mi_params.getValueAsString() == "Max" || mi_params.getValueAsString() == "Mean" || mi_params.getValueAsString() == "WeightedMean") {
-          dilution_series_merge_rule = mi_params.getValueAsString();
-        }
-        else 
-        {
-          LOGD << "Incorrect value for 'dilution_series_merge_rule'.  Options are 'Sum', 'Min', 'Max', 'Mean', or 'WeightedMean'.";
-        }
-      }
-      if (mi_params.getName() == "scan_polarity_merge_feature_name") {
-        scan_polarity_merge_feature_name = mi_params.getValueAsString();
-      }
-      if (mi_params.getName() == "mass_range_merge_feature_name") {
-        mass_range_merge_feature_name = mi_params.getValueAsString();
-      }
-      if (mi_params.getName() == "dilution_series_merge_feature_name") {
-        dilution_series_merge_feature_name = mi_params.getValueAsString();
-      }
-      if (mi_params.getName() == "merge_subordinates") {
-        try {
-          std::string value = mi_params.getValueAsString();
-          std::transform(value.begin(), value.end(), value.begin(), ::tolower);
-          merge_subordinates = (value == "true") ? true : false;
-        }
-        catch (const std::exception& e) {
-          LOGE << e.what();
-        }
-      }
+if (mi_params.getName() == "mass_range_merge_rule") {
+  if (mi_params.getValueAsString() == "Sum" || mi_params.getValueAsString() == "Min" || mi_params.getValueAsString() == "Max" || mi_params.getValueAsString() == "Mean" || mi_params.getValueAsString() == "WeightedMean") {
+    mass_range_merge_rule = mi_params.getValueAsString();
+  }
+  else
+  {
+    LOGD << "Incorrect value for 'mass_range_merge_rule'.  Options are 'Sum', 'Min', 'Max', 'Mean', or 'WeightedMean'.";
+  }
+}
+if (mi_params.getName() == "dilution_series_merge_rule") {
+  if (mi_params.getValueAsString() == "Sum" || mi_params.getValueAsString() == "Min" || mi_params.getValueAsString() == "Max" || mi_params.getValueAsString() == "Mean" || mi_params.getValueAsString() == "WeightedMean") {
+    dilution_series_merge_rule = mi_params.getValueAsString();
+  }
+  else
+  {
+    LOGD << "Incorrect value for 'dilution_series_merge_rule'.  Options are 'Sum', 'Min', 'Max', 'Mean', or 'WeightedMean'.";
+  }
+}
+if (mi_params.getName() == "scan_polarity_merge_feature_name") {
+  scan_polarity_merge_feature_name = mi_params.getValueAsString();
+}
+if (mi_params.getName() == "mass_range_merge_feature_name") {
+  mass_range_merge_feature_name = mi_params.getValueAsString();
+}
+if (mi_params.getName() == "dilution_series_merge_feature_name") {
+  dilution_series_merge_feature_name = mi_params.getValueAsString();
+}
+if (mi_params.getName() == "merge_subordinates") {
+  try {
+    std::string value = mi_params.getValueAsString();
+    std::transform(value.begin(), value.end(), value.begin(), ::tolower);
+    merge_subordinates = (value == "true") ? true : false;
+  }
+  catch (const std::exception& e) {
+    LOGE << e.what();
+  }
+}
     }
-    if (scan_polarity_merge_rule.empty() || mass_range_merge_rule.empty() || dilution_series_merge_rule.empty() || 
+    if (scan_polarity_merge_rule.empty() || mass_range_merge_rule.empty() || dilution_series_merge_rule.empty() ||
       scan_polarity_merge_feature_name.empty() || mass_range_merge_feature_name.empty() || dilution_series_merge_feature_name.empty()) {
       LOGE << "Missing parameters for MergeInjections. Not merging.";
       LOGD << "END MergeInjections";
@@ -296,15 +305,73 @@ namespace SmartPeak
     // a map of a set of injection names with a value of the feature metadata value
     std::map<componentKeyType, std::map<std::string, std::map<std::set<std::string>, float>>> component_to_feature_to_injection_to_values;
     getComponentsToFeaturesToInjectionsToValues(sampleGroupHandler_IO, sequenceHandler_I, merge_subordinates, component_to_feature_to_injection_to_values);
-    
+
+    // ==============================================================
+    // Apply selected dilutions
+    std::map<std::string, int> select_dilution_map;
+    std::filesystem::path dilution_file = params.at("MergeInjections").findParameter("select_preferred_dilutions_file")->getValueAsString();
+    if (dilution_file.is_relative())
+    {
+      dilution_file = (std::filesystem::path(filenames_I.getTag(Filenames::Tag::MAIN_DIR)) / dilution_file).lexically_normal();
+    }
+    try
+    {
+      SelectDilutionsParser::read(dilution_file.generic_string(), select_dilution_map);
+    }
+    catch (const std::exception& e)
+    {
+      LOGE << "Failed to read select dilutions file [" << dilution_file.generic_string() << "] : " << e.what();
+      return;
+    }
+    std::map<componentKeyType, std::map<std::string, std::map<std::set<std::string>, float>>> component_to_feature_to_injection_to_values_selected;
+    for (const auto& component_to_feature_to_injection_to_value : component_to_feature_to_injection_to_values)
+    {
+      const auto& component_key = component_to_feature_to_injection_to_value.first;
+      const auto& component_name = component_key.second;
+      bool keep_feature = true;
+      if (select_dilution_map.count(component_name))
+      {
+        float preferred_dilution = select_dilution_map.at(component_name);
+        const auto& feature_map = component_to_feature_to_injection_to_value.second;
+        for (const auto& feature : feature_map)
+        {
+          const auto& feature_name = feature.first;
+          const auto& injections_to_value = feature.second;
+          for (const auto& injection_name : injections_to_value)
+          {
+            int break_here = 42;
+            // look for dilution of this injection
+            for (const auto& sample : sequenceHandler_I.getSequence())
+            {
+              float dilution = sample.getMetaData().dilution_factor;
+              if (!std::abs(dilution - preferred_dilution) < 1e-6)
+              {
+                keep_feature = false;
+              }
+            }
+          }
+        }
+      }
+      if (keep_feature)
+      {
+        component_to_feature_to_injection_to_values_selected.insert(component_to_feature_to_injection_to_value);
+      }
+    }
+    component_to_feature_to_injection_to_values = std::move(component_to_feature_to_injection_to_values_selected);
+    // ==============================================================
+
     // Merge the components and features in order and in place
     // pass 1: dilutions
     std::set<std::string> scan_polarities_keys_tup = scan_polarities;
     std::set<std::pair<float, float>> scan_mass_ranges_keys_tup = scan_mass_ranges;
     std::set<float> dilution_factors_keys_tup({-1});
-    mergeComponentsToFeaturesToInjectionsToValues(dilution_series_merge_feature_name, dilution_series_merge_rule, 
-      scan_polarities_keys_tup, scan_mass_ranges_keys_tup, dilution_factors_keys_tup, 
-      merge_keys_to_injection_name, component_to_feature_to_injection_to_values);
+    mergeComponentsToFeaturesToInjectionsToValues(dilution_series_merge_feature_name,
+                                                  dilution_series_merge_rule, 
+                                                  scan_polarities_keys_tup,
+                                                  scan_mass_ranges_keys_tup,
+                                                  dilution_factors_keys_tup, 
+                                                  merge_keys_to_injection_name,
+                                                  component_to_feature_to_injection_to_values);
 
     // pass 2: mass ranges
     scan_mass_ranges_keys_tup = std::set<std::pair<float, float>>({std::make_pair(-1,-1)});
@@ -417,6 +484,7 @@ namespace SmartPeak
       merge_keys_to_injection_name.at(key).push_back(injection_names_prev_merge);
     }
   }
+
   void MergeInjections::getComponentsToFeaturesToInjectionsToValues(const SampleGroupHandler& sampleGroupHandler_IO,
                                                                     const SequenceHandler& sequenceHandler_I,
                                                                     const bool& merge_subordinates,
