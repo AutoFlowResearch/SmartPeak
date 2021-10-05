@@ -591,6 +591,14 @@ if (mi_params.getName() == "merge_subordinates") {
               //LOGD << "Feature name: " << feature_name << " was not found in the FeatureMap."; // This will polute the log
               continue;
             }
+            // ====================================== 
+            // TO REMOVE
+            bool debug_it = false;
+            if (component_to_feature_to_injection_to_value.first.second == std::string("trp-L.trp-L_1.Heavy"))
+            {
+              debug_it = true;
+            }
+            // ======================================
             if (merge_keys_to_injection_names.count(key) <= 0) continue;
 
             // Find the total value for weighting
@@ -659,6 +667,14 @@ if (mi_params.getName() == "merge_subordinates") {
               ++cnt;
             }
 
+            // ====================================== 
+            // TO REMOVE
+            if (debug_it)
+            {
+              debug_it = false;
+            }
+            // ======================================
+            // 
             // Make the merged feature
             if (weights.size() <= 0) continue; // Note: we use the weights to check instead of the injections as the weights will be empty if no features exist for any of the injections
             component_to_feature_to_injection_to_value.second.at(feature_name).insert_or_assign(injections, merged_value);

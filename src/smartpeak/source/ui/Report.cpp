@@ -38,7 +38,7 @@ namespace SmartPeak
   bool Report::ReportFilePickerHandler::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
   {
     report_.run_and_join(
-      SequenceParser::writeDataTableFromMetaValue,
+      writer_method_,
       title_,
       application_handler->sequenceHandler_,
       filename,
@@ -56,8 +56,9 @@ namespace SmartPeak
     std::fill(md_checks_.begin(), md_checks_.end(), false);
     all_st_checks_ = false; all_st_deactivated_ = true;
     all_md_checks_ = false; all_md_deactivated_ = true;
-    feature_db_file_picker_handler_ = std::make_shared<ReportFilePickerHandler>(*this, "Feature DB report");
-    pivot_table_file_picker_handler_ = std::make_shared<ReportFilePickerHandler>(*this, "Pivot Table");
+    feature_db_file_picker_handler_ = std::make_shared<ReportFilePickerHandler>(*this, "Feature DB report", SequenceParser::writeDataTableFromMetaValue);
+    pivot_table_file_picker_handler_ = std::make_shared<ReportFilePickerHandler>(*this, "Pivot Table", SequenceParser::writeDataTableFromMetaValue);
+    group_feature_db_file_picker_handler_ = std::make_shared<ReportFilePickerHandler>(*this, "Group Feature DB report", SequenceParser::writeGroupDataTableFromMetaValue);
   }
 
   void Report::draw()
@@ -166,7 +167,24 @@ namespace SmartPeak
       }
     }
 
-    ImGui::SameLine();
+    if (ImGui::Button("Create Group Feature DB"))
+    {
+      const bool checkboxes_check = initializeMetadataAndSampleTypes();
+      if (checkboxes_check)
+      {
+        report_file_picker_.open(
+          "Create Feature DB",
+          group_feature_db_file_picker_handler_,
+          FilePicker::Mode::EFileCreate,
+          application_handler_,
+          "GroupFeatureDB.csv");
+      }
+      else
+      {
+        LOGE << "Select at least one Sample Type and at least one Metadata";
+      }
+    }
+
     if (ImGui::Button("Close"))
     {
       LOGI << "Report window is closed.";

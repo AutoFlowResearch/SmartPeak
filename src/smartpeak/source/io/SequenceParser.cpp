@@ -711,6 +711,15 @@ namespace SmartPeak
           const std::string component_name = subordinate.getMetaValue(s_native_id);
           if (component_names.size() > 0 && component_names.count(component_name) == 0)
             continue;
+
+          // ====================================== 
+          // TO REMOVE
+          if (component_name != std::string("trp-L.trp-L_1.Heavy") || subordinate.getMetaValue("used_").toString()=="false")
+          {
+            continue;
+          }
+          // ======================================
+
           row.push_back(mdh.getReplicateGroupName());
           row.push_back(component_name);
           row.push_back(mdh.batch_name);
@@ -774,7 +783,7 @@ namespace SmartPeak
     const std::set<std::string>& component_group_names,
     const std::set<std::string>& component_names) {
     std::vector<std::string> headers = {
-      "sample_group_name", "component_group_name", "used_"
+      "sample_group_name", "component_group_name", "component_name", "used_"
     };
     headers.insert(headers.end(), meta_data.cbegin(), meta_data.cend());
     headers_out = headers;
@@ -811,6 +820,7 @@ namespace SmartPeak
           std::vector<std::string> row;
           row.push_back(sample_handler.getSampleGroupName());
           row.push_back(component_group_name);
+          row.push_back("");
           row.push_back(feature.metaValueExists("used_") ? feature.getMetaValue("used_").toString() : "");
           for (const std::string& meta_value_name : meta_data)
           {
@@ -842,6 +852,7 @@ namespace SmartPeak
           const std::string component_name = subordinate.getMetaValue(s_native_id);
           if (component_names.size() > 0 && component_names.count(component_name) == 0)
             continue;
+          row.push_back(component_name);
           row.push_back(subordinate.metaValueExists("used_") ? subordinate.getMetaValue("used_").toString() : "");
           for (const std::string& meta_value_name : meta_data)
           {
@@ -877,7 +888,40 @@ namespace SmartPeak
     for (const FeatureMetadata& m : meta_data) {
       meta_data_strings.push_back(metadataToString.at(m));
     }
-    //makeDataTableFromMetaValue(sequenceHandler, rows, headers, meta_data_strings, sample_types, std::set<std::string>(), std::set<std::string>(), std::set<std::string>());
+    makeDataTableFromMetaValue(sequenceHandler, rows, headers, meta_data_strings, sample_types, std::set<std::string>(), std::set<std::string>(), std::set<std::string>());
+
+    CSVWriter writer(filename.generic_string(), ",");
+    const size_t cnt = writer.writeDataInRow(headers.cbegin(), headers.cend());
+
+    if (cnt < headers.size()) {
+      LOGD << "END writeDataTableFromMetaValue";
+      return false;
+    }
+
+    for (const std::vector<std::string>& line : rows) {
+      writer.writeDataInRow(line.cbegin(), line.cend());
+    }
+
+    LOGD << "END writeDataTableFromMetaValue";
+    return true;
+  }
+
+  bool SequenceParser::writeGroupDataTableFromMetaValue(
+    const SequenceHandler& sequenceHandler,
+    const std::filesystem::path& filename,
+    const std::vector<FeatureMetadata>& meta_data,
+    const std::set<SampleType>& sample_types
+  )
+  {
+    LOGD << "START writeDataTableFromMetaValue";
+    LOGI << "Storing: " << filename.generic_string();
+
+    std::vector<std::vector<std::string>> rows;
+    std::vector<std::string> headers;
+    std::vector<std::string> meta_data_strings;
+    for (const FeatureMetadata& m : meta_data) {
+      meta_data_strings.push_back(metadataToString.at(m));
+    }
     makeGroupDataTableFromMetaValue(sequenceHandler, rows, headers, meta_data_strings, sample_types, std::set<std::string>(), std::set<std::string>(), std::set<std::string>());
 
     CSVWriter writer(filename.generic_string(), ",");
