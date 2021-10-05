@@ -308,56 +308,74 @@ if (mi_params.getName() == "merge_subordinates") {
 
     // ==============================================================
     // Apply selected dilutions
-    std::map<std::string, int> select_dilution_map;
-    std::filesystem::path dilution_file = params.at("MergeInjections").findParameter("select_preferred_dilutions_file")->getValueAsString();
-    if (dilution_file.is_relative())
+    if (params.at("MergeInjections").findParameter("select_preferred_dilutions")->getValueAsString() == "true")
     {
-      dilution_file = (std::filesystem::path(filenames_I.getTag(Filenames::Tag::MAIN_DIR)) / dilution_file).lexically_normal();
-    }
-    try
-    {
-      SelectDilutionsParser::read(dilution_file.generic_string(), select_dilution_map);
-    }
-    catch (const std::exception& e)
-    {
-      LOGE << "Failed to read select dilutions file [" << dilution_file.generic_string() << "] : " << e.what();
-      return;
-    }
-    std::map<componentKeyType, std::map<std::string, std::map<std::set<std::string>, float>>> component_to_feature_to_injection_to_values_selected;
-    for (const auto& component_to_feature_to_injection_to_value : component_to_feature_to_injection_to_values)
-    {
-      const auto& component_key = component_to_feature_to_injection_to_value.first;
-      const auto& component_name = component_key.second;
-      bool keep_feature = true;
-      if (select_dilution_map.count(component_name))
+      std::map<std::string, int> select_dilution_map;
+      std::filesystem::path dilution_file = params.at("MergeInjections").findParameter("select_preferred_dilutions_file")->getValueAsString();
+      if (dilution_file.is_relative())
       {
-        float preferred_dilution = select_dilution_map.at(component_name);
-        const auto& feature_map = component_to_feature_to_injection_to_value.second;
-        for (const auto& feature : feature_map)
+        dilution_file = (std::filesystem::path(filenames_I.getTag(Filenames::Tag::MAIN_DIR)) / dilution_file).lexically_normal();
+      }
+      try
+      {
+        SelectDilutionsParser::read(dilution_file.generic_string(), select_dilution_map);
+      }
+      catch (const std::exception& e)
+      {
+        LOGE << "Failed to read select dilutions file [" << dilution_file.generic_string() << "] : " << e.what();
+        return;
+      }
+      std::map<componentKeyType, std::map<std::string, std::map<std::set<std::string>, float>>> new_component_to_feature_to_injection_to_values;
+      for (const auto& component_to_feature_to_injection_to_value : component_to_feature_to_injection_to_values)
+      {
+        const auto& component_key = component_to_feature_to_injection_to_value.first;
+        const auto& component_name = component_key.second;
+        if (select_dilution_map.count(component_name))
         {
-          const auto& feature_name = feature.first;
-          const auto& injections_to_value = feature.second;
-          for (const auto& injection_name : injections_to_value)
+          float preferred_dilution = select_dilution_map.at(component_name);
+          const auto& feature_map = component_to_feature_to_injection_to_value.second;
+          std::map<std::string, std::map<std::set<std::string>, float>> new_feature_map;
+          for (const auto& feature : feature_map)
           {
-            int break_here = 42;
-            // look for dilution of this injection
-            for (const auto& sample : sequenceHandler_I.getSequence())
+            const auto& feature_name = feature.first;
+            const auto& injections_set_to_value = feature.second;
+            std::map<std::set<std::string>, float> new_injections_to_value;
+            for (const auto& injections_set : injections_set_to_value)
             {
-              float dilution = sample.getMetaData().dilution_factor;
-              if (!std::abs(dilution - preferred_dilution) < 1e-6)
+              std::set<std::string> new_injections_set;
+              for (const auto& injection_name : injections_set.first)
               {
-                keep_feature = false;
+                // look for dilution of this injection
+                for (const auto& sample : sequenceHandler_I.getSequence())
+                {
+                  if (sample.getMetaData().getInjectionName() == injection_name)
+                  {
+                    float dilution = sample.getMetaData().dilution_factor;
+                    if (std::abs(dilution - preferred_dilution) < 1e-6)
+                    {
+                      new_injections_set.insert(injection_name);
+                    }
+                  }
+                }
               }
+              if (new_injections_set.empty())
+              {
+                // if we haven't found preferred injection among this set, we just let it as it was.
+                new_injections_set = injections_set.first;
+              }
+              new_injections_to_value.emplace(new_injections_set, injections_set.second);
             }
+            new_feature_map.emplace(feature_name, new_injections_to_value);
           }
+          new_component_to_feature_to_injection_to_values.emplace(component_key, new_feature_map);
+        }
+        else
+        {
+          new_component_to_feature_to_injection_to_values.insert(component_to_feature_to_injection_to_value);
         }
       }
-      if (keep_feature)
-      {
-        component_to_feature_to_injection_to_values_selected.insert(component_to_feature_to_injection_to_value);
-      }
+      component_to_feature_to_injection_to_values = std::move(new_component_to_feature_to_injection_to_values);
     }
-    component_to_feature_to_injection_to_values = std::move(component_to_feature_to_injection_to_values_selected);
     // ==============================================================
 
     // Merge the components and features in order and in place
