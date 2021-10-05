@@ -334,15 +334,15 @@ if (mi_params.getName() == "merge_subordinates") {
         {
           float preferred_dilution = select_dilution_map.at(component_name);
           const auto& feature_map = component_to_feature_to_injection_to_value.second;
-          std::map<std::string, std::map<std::set<std::string>, float>> new_feature_map;
+          // 1st pass: get selected injections
+          std::set<std::set<std::string>> selected_injections;
           for (const auto& feature : feature_map)
           {
             const auto& feature_name = feature.first;
             const auto& injections_set_to_value = feature.second;
-            std::map<std::set<std::string>, float> new_injections_to_value;
             for (const auto& injections_set : injections_set_to_value)
             {
-              std::set<std::string> new_injections_set;
+              std::set<std::string> selected_injections_set;
               for (const auto& injection_name : injections_set.first)
               {
                 // look for dilution of this injection
@@ -353,19 +353,39 @@ if (mi_params.getName() == "merge_subordinates") {
                     float dilution = sample.getMetaData().dilution_factor;
                     if (std::abs(dilution - preferred_dilution) < 1e-6)
                     {
-                      new_injections_set.insert(injection_name);
+                      selected_injections_set.insert(injection_name);
                     }
                   }
                 }
               }
-              if (new_injections_set.empty())
+              if (!selected_injections_set.empty())
               {
-                // if we haven't found preferred injection among this set, we just let it as it was.
-                new_injections_set = injections_set.first;
+                selected_injections.insert(selected_injections_set);
               }
-              new_injections_to_value.emplace(new_injections_set, injections_set.second);
             }
-            new_feature_map.emplace(feature_name, new_injections_to_value);
+          }
+          // 2nd pass: reconstruct the injection map
+          std::map<std::string, std::map<std::set<std::string>, float>> new_feature_map;
+          if (selected_injections.empty())
+          {
+            // if we haven't found preferred injection among this map, we just let it as it was.
+            new_feature_map = feature_map;
+          }
+          else
+          {
+            for (const auto& feature : feature_map)
+            {
+              const auto& injections_set_to_value = feature.second;
+              std::map<std::set<std::string>, float> new_injections_set_to_value;
+              for (const auto& injections_set : injections_set_to_value)
+              {
+                if (selected_injections.count(injections_set.first))
+                {
+                  new_injections_set_to_value.insert(injections_set);
+                }
+              }
+              new_feature_map.emplace(feature.first, new_injections_set_to_value);
+            }
           }
           new_component_to_feature_to_injection_to_values.emplace(component_key, new_feature_map);
         }
