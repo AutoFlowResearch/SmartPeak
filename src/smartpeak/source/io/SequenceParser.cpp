@@ -711,15 +711,6 @@ namespace SmartPeak
           const std::string component_name = subordinate.getMetaValue(s_native_id);
           if (component_names.size() > 0 && component_names.count(component_name) == 0)
             continue;
-
-          // ====================================== 
-          // TO REMOVE
-          if (component_name != std::string("trp-L.trp-L_1.Heavy") || subordinate.getMetaValue("used_").toString()=="false")
-          {
-            continue;
-          }
-          // ======================================
-
           row.push_back(mdh.getReplicateGroupName());
           row.push_back(component_name);
           row.push_back(mdh.batch_name);

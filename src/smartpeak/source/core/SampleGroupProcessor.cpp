@@ -245,43 +245,43 @@ namespace SmartPeak
           LOGD << "Incorrect value for 'scan_polarity_merge_rule'.  Options are 'Sum', 'Min', 'Max', 'Mean', or 'WeightedMean'.";
         }
       }
-if (mi_params.getName() == "mass_range_merge_rule") {
-  if (mi_params.getValueAsString() == "Sum" || mi_params.getValueAsString() == "Min" || mi_params.getValueAsString() == "Max" || mi_params.getValueAsString() == "Mean" || mi_params.getValueAsString() == "WeightedMean") {
-    mass_range_merge_rule = mi_params.getValueAsString();
-  }
-  else
-  {
-    LOGD << "Incorrect value for 'mass_range_merge_rule'.  Options are 'Sum', 'Min', 'Max', 'Mean', or 'WeightedMean'.";
-  }
-}
-if (mi_params.getName() == "dilution_series_merge_rule") {
-  if (mi_params.getValueAsString() == "Sum" || mi_params.getValueAsString() == "Min" || mi_params.getValueAsString() == "Max" || mi_params.getValueAsString() == "Mean" || mi_params.getValueAsString() == "WeightedMean") {
-    dilution_series_merge_rule = mi_params.getValueAsString();
-  }
-  else
-  {
-    LOGD << "Incorrect value for 'dilution_series_merge_rule'.  Options are 'Sum', 'Min', 'Max', 'Mean', or 'WeightedMean'.";
-  }
-}
-if (mi_params.getName() == "scan_polarity_merge_feature_name") {
-  scan_polarity_merge_feature_name = mi_params.getValueAsString();
-}
-if (mi_params.getName() == "mass_range_merge_feature_name") {
-  mass_range_merge_feature_name = mi_params.getValueAsString();
-}
-if (mi_params.getName() == "dilution_series_merge_feature_name") {
-  dilution_series_merge_feature_name = mi_params.getValueAsString();
-}
-if (mi_params.getName() == "merge_subordinates") {
-  try {
-    std::string value = mi_params.getValueAsString();
-    std::transform(value.begin(), value.end(), value.begin(), ::tolower);
-    merge_subordinates = (value == "true") ? true : false;
-  }
-  catch (const std::exception& e) {
-    LOGE << e.what();
-  }
-}
+      if (mi_params.getName() == "mass_range_merge_rule") {
+        if (mi_params.getValueAsString() == "Sum" || mi_params.getValueAsString() == "Min" || mi_params.getValueAsString() == "Max" || mi_params.getValueAsString() == "Mean" || mi_params.getValueAsString() == "WeightedMean") {
+          mass_range_merge_rule = mi_params.getValueAsString();
+        }
+        else
+        {
+          LOGD << "Incorrect value for 'mass_range_merge_rule'.  Options are 'Sum', 'Min', 'Max', 'Mean', or 'WeightedMean'.";
+        }
+      }
+      if (mi_params.getName() == "dilution_series_merge_rule") {
+        if (mi_params.getValueAsString() == "Sum" || mi_params.getValueAsString() == "Min" || mi_params.getValueAsString() == "Max" || mi_params.getValueAsString() == "Mean" || mi_params.getValueAsString() == "WeightedMean") {
+          dilution_series_merge_rule = mi_params.getValueAsString();
+        }
+        else
+        {
+          LOGD << "Incorrect value for 'dilution_series_merge_rule'.  Options are 'Sum', 'Min', 'Max', 'Mean', or 'WeightedMean'.";
+        }
+      }
+      if (mi_params.getName() == "scan_polarity_merge_feature_name") {
+        scan_polarity_merge_feature_name = mi_params.getValueAsString();
+      }
+      if (mi_params.getName() == "mass_range_merge_feature_name") {
+        mass_range_merge_feature_name = mi_params.getValueAsString();
+      }
+      if (mi_params.getName() == "dilution_series_merge_feature_name") {
+        dilution_series_merge_feature_name = mi_params.getValueAsString();
+      }
+      if (mi_params.getName() == "merge_subordinates") {
+        try {
+          std::string value = mi_params.getValueAsString();
+          std::transform(value.begin(), value.end(), value.begin(), ::tolower);
+          merge_subordinates = (value == "true") ? true : false;
+        }
+        catch (const std::exception& e) {
+          LOGE << e.what();
+        }
+      }
     }
     if (scan_polarity_merge_rule.empty() || mass_range_merge_rule.empty() || dilution_series_merge_rule.empty() ||
       scan_polarity_merge_feature_name.empty() || mass_range_merge_feature_name.empty() || dilution_series_merge_feature_name.empty()) {
@@ -591,14 +591,6 @@ if (mi_params.getName() == "merge_subordinates") {
               //LOGD << "Feature name: " << feature_name << " was not found in the FeatureMap."; // This will polute the log
               continue;
             }
-            // ====================================== 
-            // TO REMOVE
-            bool debug_it = false;
-            if (component_to_feature_to_injection_to_value.first.second == std::string("trp-L.trp-L_1.Heavy"))
-            {
-              debug_it = true;
-            }
-            // ======================================
             if (merge_keys_to_injection_names.count(key) <= 0) continue;
 
             // Find the total value for weighting
@@ -667,14 +659,6 @@ if (mi_params.getName() == "merge_subordinates") {
               ++cnt;
             }
 
-            // ====================================== 
-            // TO REMOVE
-            if (debug_it)
-            {
-              debug_it = false;
-            }
-            // ======================================
-            // 
             // Make the merged feature
             if (weights.size() <= 0) continue; // Note: we use the weights to check instead of the injections as the weights will be empty if no features exist for any of the injections
             component_to_feature_to_injection_to_value.second.at(feature_name).insert_or_assign(injections, merged_value);
