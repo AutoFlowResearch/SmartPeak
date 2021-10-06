@@ -162,6 +162,25 @@ public:
       const std::set<SampleType>& sample_types
     );
 
+    static void makeGroupDataMatrixFromMetaValue(
+      const SequenceHandler& sequenceHandler,
+      Eigen::Tensor<float, 2>& data_out,
+      Eigen::Tensor<std::string, 1>& columns_out,
+      Eigen::Tensor<std::string, 2>& rows_out,
+      const std::vector<std::string>& meta_data,
+      const std::set<SampleType>& sample_types,
+      const std::set<std::string>& sample_names,
+      const std::set<std::string>& component_group_names,
+      const std::set<std::string>& component_names
+    );
+
+    static bool writeGroupDataMatrixFromMetaValue(
+      const SequenceHandler& sequenceHandler,
+      const std::filesystem::path& filename,
+      const std::vector<FeatureMetadata>& meta_data,
+      const std::set<SampleType>& sample_types
+    );
+
     private:
       template<typename delimiter>
       static void readSequenceFile(SequenceHandler& sequenceHandler, const std::filesystem::path& pathname);

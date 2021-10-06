@@ -56,8 +56,7 @@ namespace SmartPeak {
     { FeatureMetadata::mz_error_ppm,                "mz_error_ppm"                },
     { FeatureMetadata::mz_error_Da,                 "mz_error_Da"                 },
     { FeatureMetadata::average_accuracy,            "average_accuracy"            },
-    { FeatureMetadata::absolute_difference,         "absolute_difference"         },
-    { FeatureMetadata::dilution_factor,             "dilution_factor"             }/*,
+    { FeatureMetadata::absolute_difference,         "absolute_difference"         }/*,
     { FeatureMetadata::accuracy,                    "accuracy"                    },
     { FeatureMetadata::n_features,                  "n_features"                  },
     { FeatureMetadata::validation,                  "validation"                  }*/
@@ -84,8 +83,7 @@ namespace SmartPeak {
     { FeatureMetadata::mz_error_ppm,                "mz_error_ppm"                },
     { FeatureMetadata::mz_error_Da,                 "mz_error_Da"                 },
     { FeatureMetadata::average_accuracy,            "average_accuracy"            },
-    { FeatureMetadata::absolute_difference,         "absolute_difference"         },
-    { FeatureMetadata::dilution_factor,             "dilution_factor"             }/*,
+    { FeatureMetadata::absolute_difference,         "absolute_difference"         }/*,
     { FeatureMetadata::accuracy,                    "accuracy"                    },
     { FeatureMetadata::n_features,                  "n_features"                  },
     { FeatureMetadata::validation,                  "validation"                  }*/

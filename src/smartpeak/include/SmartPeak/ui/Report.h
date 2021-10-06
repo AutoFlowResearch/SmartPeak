@@ -85,6 +85,7 @@ namespace SmartPeak
     std::shared_ptr<ReportFilePickerHandler> feature_db_file_picker_handler_;
     std::shared_ptr<ReportFilePickerHandler> pivot_table_file_picker_handler_;
     std::shared_ptr<ReportFilePickerHandler> group_feature_db_file_picker_handler_;
+    std::shared_ptr<ReportFilePickerHandler> group_pivot_table_file_picker_handler_;
     FilePicker report_file_picker_;
   };
 }

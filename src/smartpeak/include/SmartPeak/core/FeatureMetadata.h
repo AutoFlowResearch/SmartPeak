@@ -59,7 +59,6 @@ namespace SmartPeak {
     mz_error_Da,
     average_accuracy,
     absolute_difference,
-    dilution_factor,
     SIZE_OF_FeatureMetadata/*,
     accuracy,
     n_features,
