@@ -294,7 +294,7 @@ namespace SmartPeak
     std::set<std::string> scan_polarities;
     std::set<std::pair<float, float>> scan_mass_ranges;
     std::set<float> dilution_factors;
-    std::map<mergeKeyType, std::vector<std::set<std::string>>> merge_keys_to_injection_name;
+    std::map<mergeKeyType, std::set<std::string>> merge_keys_to_injection_name;
     getMergeKeysToInjections(sampleGroupHandler_IO, sequenceHandler_I, scan_polarities, scan_mass_ranges, dilution_factors, merge_keys_to_injection_name);
 
     // Determine the ordering of merge
@@ -303,7 +303,7 @@ namespace SmartPeak
     // Organize the injection `FeatureMaps` into a map of std::pair<PeptideRef, native_id> with a value of
     // a map of `feature_name` with a value of
     // a map of a set of injection names with a value of the feature metadata value
-    std::map<componentKeyType, std::map<std::string, std::map<std::set<std::string>, float>>> component_to_feature_to_injection_to_values;
+    std::map<componentKeyType, std::map<std::string, std::map<std::string, float>>> component_to_feature_to_injection_to_values;
     getComponentsToFeaturesToInjectionsToValues(sampleGroupHandler_IO, sequenceHandler_I, merge_subordinates, component_to_feature_to_injection_to_values);
 
     // ==============================================================
@@ -325,7 +325,7 @@ namespace SmartPeak
         LOGE << "Failed to read select dilutions file [" << dilution_file.generic_string() << "] : " << e.what();
         return;
       }
-      std::map<componentKeyType, std::map<std::string, std::map<std::set<std::string>, float>>> new_component_to_feature_to_injection_to_values;
+      std::map<componentKeyType, std::map<std::string, std::map<std::string, float>>> new_component_to_feature_to_injection_to_values;
       for (const auto& component_to_feature_to_injection_to_value : component_to_feature_to_injection_to_values)
       {
         const auto& component_key = component_to_feature_to_injection_to_value.first;
@@ -335,37 +335,35 @@ namespace SmartPeak
           float preferred_dilution = select_dilution_map.at(component_name);
           const auto& feature_map = component_to_feature_to_injection_to_value.second;
           // 1st pass: get selected injections
-          std::set<std::set<std::string>> selected_injections;
+          std::set<std::string> selected_injections;
           for (const auto& feature : feature_map)
           {
             const auto& feature_name = feature.first;
-            const auto& injections_set_to_value = feature.second;
-            for (const auto& injections_set : injections_set_to_value)
+            const auto& injections_to_value = feature.second;
+            for (const auto& injection_to_value : injections_to_value)
             {
+              const auto& injection_name = injection_to_value.first;
               std::set<std::string> selected_injections_set;
-              for (const auto& injection_name : injections_set.first)
+              // look for dilution of this injection
+              for (const auto& sample : sequenceHandler_I.getSequence())
               {
-                // look for dilution of this injection
-                for (const auto& sample : sequenceHandler_I.getSequence())
+                if (sample.getMetaData().getInjectionName() == injection_name)
                 {
-                  if (sample.getMetaData().getInjectionName() == injection_name)
+                  float dilution = sample.getMetaData().dilution_factor;
+                  if (std::abs(dilution - preferred_dilution) < 1e-6)
                   {
-                    float dilution = sample.getMetaData().dilution_factor;
-                    if (std::abs(dilution - preferred_dilution) < 1e-6)
-                    {
-                      selected_injections_set.insert(injection_name);
-                    }
+                    selected_injections_set.insert(injection_name);
                   }
                 }
               }
               if (!selected_injections_set.empty())
               {
-                selected_injections.insert(selected_injections_set);
+                selected_injections.insert(injection_name);
               }
             }
           }
           // 2nd pass: reconstruct the injection map
-          std::map<std::string, std::map<std::set<std::string>, float>> new_feature_map;
+          std::map<std::string, std::map<std::string, float>> new_feature_map;
           if (selected_injections.empty())
           {
             // if we haven't found preferred injection among this map, we just let it as it was.
@@ -376,12 +374,12 @@ namespace SmartPeak
             for (const auto& feature : feature_map)
             {
               const auto& injections_set_to_value = feature.second;
-              std::map<std::set<std::string>, float> new_injections_set_to_value;
-              for (const auto& injections_set : injections_set_to_value)
+              std::map<std::string, float> new_injections_set_to_value;
+              for (const auto& injection : injections_set_to_value)
               {
-                if (selected_injections.count(injections_set.first))
+                if (selected_injections.count(injection.first))
                 {
-                  new_injections_set_to_value.insert(injections_set);
+                  new_injections_set_to_value.insert(injection);
                 }
               }
               new_feature_map.emplace(feature.first, new_injections_set_to_value);
@@ -450,7 +448,7 @@ namespace SmartPeak
                                                  std::set<std::string>& scan_polarities,
                                                  std::set<std::pair<float, float>>& scan_mass_ranges,
                                                  std::set<float>& dilution_factors,
-                                                 std::map<mergeKeyType, std::vector<std::set<std::string>>>& merge_keys_to_injection_name)
+                                                 std::map<mergeKeyType, std::set<std::string>>& merge_keys_to_injection_name)
   {
     for (const std::size_t& index : sampleGroupHandler_IO.getSampleIndices())
     {
@@ -458,29 +456,30 @@ namespace SmartPeak
       const auto key = std::make_tuple(injection_metadata.scan_polarity,
                                        std::make_pair(injection_metadata.scan_mass_low, injection_metadata.scan_mass_high),
                                        injection_metadata.dilution_factor);
-      merge_keys_to_injection_name.emplace(key, std::vector<std::set<std::string>>());
-      std::set<std::string> value({ injection_metadata.getInjectionName() });
-      merge_keys_to_injection_name.at(key).push_back(value);
+      merge_keys_to_injection_name.emplace(key, std::set<std::string>());
+      std::string value(injection_metadata.getInjectionName());
+      merge_keys_to_injection_name.at(key).insert(value);
       scan_polarities.insert(injection_metadata.scan_polarity);
       scan_mass_ranges.insert(std::make_pair(injection_metadata.scan_mass_low, injection_metadata.scan_mass_high));
       dilution_factors.insert(injection_metadata.dilution_factor);
     }
   }
+
   void MergeInjections::orderMergeKeysToInjections(std::set<std::string>& scan_polarities,
                                                    const std::set<std::pair<float, float>>& scan_mass_ranges,
                                                    const std::set<float>& dilution_factors,
-                                                   std::map<mergeKeyType, std::vector<std::set<std::string>>>& merge_keys_to_injection_name)
+                                                   std::map<mergeKeyType, std::set<std::string>>& merge_keys_to_injection_name)
   {
     // pass 1: dilutions
     for (const auto& scan_polarity : scan_polarities) {
       for (const auto& scan_mass_range : scan_mass_ranges) {
         const auto key = std::make_tuple(scan_polarity, scan_mass_range, -1);
-        merge_keys_to_injection_name.emplace(key, std::vector<std::set<std::string>>());
+        merge_keys_to_injection_name.emplace(key, std::set<std::string>());
         for (const auto& dilution_factor : dilution_factors) {
           const auto key_tmp = std::make_tuple(scan_polarity, scan_mass_range, dilution_factor);
           if (merge_keys_to_injection_name.count(key_tmp) <= 0) continue;
-          for (const auto& injection_name_set : merge_keys_to_injection_name.at(key_tmp)) {
-            merge_keys_to_injection_name.at(key).push_back(injection_name_set);
+          for (const auto& injection_name : merge_keys_to_injection_name.at(key_tmp)) {
+            merge_keys_to_injection_name.at(key).insert(injection_name);
           }
         }
       }
@@ -489,49 +488,45 @@ namespace SmartPeak
     // pass 2: mass ranges
     for (const auto& scan_polarity : scan_polarities) {
       const auto key = std::make_tuple(scan_polarity, std::make_pair(-1, -1), -1);
-      merge_keys_to_injection_name.emplace(key, std::vector<std::set<std::string>>());
+      merge_keys_to_injection_name.emplace(key, std::set<std::string>());
       for (const auto& scan_mass_range : scan_mass_ranges) {
         const auto key_tmp = std::make_tuple(scan_polarity, scan_mass_range, -1);
         if (merge_keys_to_injection_name.count(key_tmp) <= 0) continue;
         // merge the injection name sets from the previous merge
         std::set<std::string> injection_names_prev_merge;
-        for (const auto& injection_name_set : merge_keys_to_injection_name.at(key_tmp)) {
-          for (const auto& injection_name : injection_name_set) {
-            injection_names_prev_merge.insert(injection_name);
-          }
+        for (const auto& injection_name : merge_keys_to_injection_name.at(key_tmp)) {
+          injection_names_prev_merge.insert(injection_name);
         }
         // add the new injections set to the merge list
-        merge_keys_to_injection_name.at(key).push_back(injection_names_prev_merge);
+        merge_keys_to_injection_name.at(key).insert(injection_names_prev_merge.begin(), injection_names_prev_merge.end());
       }
     }
 
     // pass 3: scan polarities
     const auto key = std::make_tuple("", std::make_pair(-1, -1), -1);
-    merge_keys_to_injection_name.emplace(key, std::vector<std::set<std::string>>());
+    merge_keys_to_injection_name.emplace(key, std::set<std::string>());
     for (const auto& scan_polarity : scan_polarities) {
       const auto key_tmp = std::make_tuple(scan_polarity, std::make_pair(-1, -1), -1);
       if (merge_keys_to_injection_name.count(key_tmp) <= 0) continue;
       // merge the injection name sets from the previous merge
       std::set<std::string> injection_names_prev_merge;
-      for (const auto& injection_name_set : merge_keys_to_injection_name.at(key_tmp)) {
-        for (const auto& injection_name : injection_name_set) {
-          injection_names_prev_merge.insert(injection_name);
-        }
+      for (const auto& injection_name : merge_keys_to_injection_name.at(key_tmp)) {
+        injection_names_prev_merge.insert(injection_name);
       }
       // add the new injections set to the merge list
-      merge_keys_to_injection_name.at(key).push_back(injection_names_prev_merge);
+      merge_keys_to_injection_name.at(key).insert(injection_names_prev_merge.begin(), injection_names_prev_merge.end());
     }
   }
 
   void MergeInjections::getComponentsToFeaturesToInjectionsToValues(const SampleGroupHandler& sampleGroupHandler_IO,
                                                                     const SequenceHandler& sequenceHandler_I,
                                                                     const bool& merge_subordinates,
-                                                                    std::map<componentKeyType, std::map<std::string, std::map<std::set<std::string>, float>>>& component_to_feature_to_injection_to_values)
+                                                                    std::map<componentKeyType, std::map<std::string, std::map<std::string, float>>>& component_to_feature_to_injection_to_values)
   {
     // initialize our map of feature names to values
-    std::map<std::string, std::map<std::set<std::string>, float>> features_to_values;
+    std::map<std::string, std::map<std::string, float>> features_to_values;
     for (const auto& m : metadataFloatToString) {
-      features_to_values.emplace(m.second, std::map<std::set<std::string>, float>());
+      features_to_values.emplace(m.second, std::map<std::string, float>());
     }
 
     // construct the map
@@ -552,7 +547,7 @@ namespace SmartPeak
               //LOGD << "Feature name: " << f_to_v.first << " was not found in the FeatureMap."; // This will polute the log
               continue;
             }
-            component_to_feature_to_injection_to_values.at(component).at(f_to_v.first).emplace(std::set<std::string>({ injection_name }), datum.f_);
+            component_to_feature_to_injection_to_values.at(component).at(f_to_v.first).emplace(injection_name, datum.f_);
           }
         }
         // Subordinate level merge
@@ -567,7 +562,7 @@ namespace SmartPeak
                 //LOGD << "Feature name: " << f_to_v.first << " was not found in the FeatureMap."; // This will polute the log
                 continue;
               }
-              component_to_feature_to_injection_to_values.at(component).at(f_to_v.first).emplace(std::set<std::string>({ injection_name }), datum.f_);
+              component_to_feature_to_injection_to_values.at(component).at(f_to_v.first).emplace(injection_name, datum.f_);
             }
           }
         }
@@ -579,8 +574,8 @@ namespace SmartPeak
                                                                       const std::set<std::string>& scan_polarities,
                                                                       const std::set<std::pair<float, float>>& scan_mass_ranges,
                                                                       const std::set<float>& dilution_factors,
-                                                                      const std::map<mergeKeyType, std::vector<std::set<std::string>>>& merge_keys_to_injection_names,
-                                                                      std::map<componentKeyType, std::map<std::string, std::map<std::set<std::string>, float>>>& component_to_feature_to_injection_to_values)
+                                                                      const std::map<mergeKeyType, std::set<std::string>>& merge_keys_to_injection_names,
+                                                                      std::map<componentKeyType, std::map<std::string, std::map<std::string, float>>>& component_to_feature_to_injection_to_values)
   {
     for (const auto& scan_polarity : scan_polarities) {
       for (const auto& scan_mass_range : scan_mass_ranges) {
@@ -595,7 +590,7 @@ namespace SmartPeak
 
             // Find the total value for weighting
             float total_value = 0;
-            for (const std::set<std::string>& injection_names_set : merge_keys_to_injection_names.at(key)) {
+            for (const std::string& injection_names_set : merge_keys_to_injection_names.at(key)) {
               if (component_to_feature_to_injection_to_value.second.at(feature_name).count(injection_names_set) <= 0) continue;
               total_value += component_to_feature_to_injection_to_value.second.at(feature_name).at(injection_names_set);
             }
@@ -604,25 +599,23 @@ namespace SmartPeak
             float merged_value = 0;
             std::vector<float> weights;
             std::set<std::string> injections;
-            std::set<std::string> max_or_min_injections;
+            std::string max_or_min_injections;
             int cnt = 0;
-            for (const std::set<std::string>& injection_names_set : merge_keys_to_injection_names.at(key)) {
+            for (const std::string& injection_names : merge_keys_to_injection_names.at(key)) {
 
               // record the injections
               // Note: this is done before checking if the feature exists to ensure that all injections are propogated to the next iteration
-              for (const std::string& inj : injection_names_set) {
-                injections.insert(inj);
-              }
+              injections.insert(injection_names);
 
               // check if the feature is in the FeatureMap
-              if (component_to_feature_to_injection_to_value.second.at(feature_name).count(injection_names_set) <= 0) continue;
-              float value = component_to_feature_to_injection_to_value.second.at(feature_name).at(injection_names_set);
+              if (component_to_feature_to_injection_to_value.second.at(feature_name).count(injection_names) <= 0) continue;
+              float value = component_to_feature_to_injection_to_value.second.at(feature_name).at(injection_names);
               weights.push_back(value / total_value); // add to the weights
 
               // initializations
               if (cnt == 0) 
               {
-                max_or_min_injections = injection_names_set;
+                max_or_min_injections = injection_names;
                 if (merge_rule == "Min" || merge_rule == "Max") 
                 {
                   merged_value = value;
@@ -638,14 +631,14 @@ namespace SmartPeak
               {
                 if (value < merged_value) {
                   merged_value = value;
-                  max_or_min_injections = injection_names_set;
+                  max_or_min_injections = injection_names;
                 }
               }
               else if (merge_rule == "Max") 
               {
                 if (value > merged_value) {
                   merged_value = value;
-                  max_or_min_injections = injection_names_set;
+                  max_or_min_injections = injection_names;
                 }
               }
               else if (merge_rule == "Mean") 
@@ -661,7 +654,10 @@ namespace SmartPeak
 
             // Make the merged feature
             if (weights.size() <= 0) continue; // Note: we use the weights to check instead of the injections as the weights will be empty if no features exist for any of the injections
-            component_to_feature_to_injection_to_value.second.at(feature_name).insert_or_assign(injections, merged_value);
+            for (const auto& injection : injections)
+            {
+              component_to_feature_to_injection_to_value.second.at(feature_name).insert_or_assign(injection, merged_value);
+            }
 
             // Repeat for all other features
             for (auto& feature_to_injection_to_value : component_to_feature_to_injection_to_value.second) {
@@ -676,9 +672,9 @@ namespace SmartPeak
               else 
               {
                 int cnt = 0;
-                for (const std::set<std::string>& injection_names_set : merge_keys_to_injection_names.at(key)) {
-                  if (feature_to_injection_to_value.second.count(injection_names_set) <= 0) continue;
-                  float value = feature_to_injection_to_value.second.at(injection_names_set);
+                for (const std::string& injection_names : merge_keys_to_injection_names.at(key)) {
+                  if (feature_to_injection_to_value.second.count(injection_names) <= 0) continue;
+                  float value = feature_to_injection_to_value.second.at(injection_names);
                   if (merge_rule == "Sum") merged_value += value;
                   else if (merge_rule == "Mean") merged_value += (value / weights.size());
                   else if (merge_rule == "WeightedMean") merged_value += (value * weights.at(cnt));
@@ -687,16 +683,20 @@ namespace SmartPeak
               }
 
               // Make the merged feature
-              feature_to_injection_to_value.second.insert_or_assign(injections, merged_value);
+              for (const auto& injection : injections)
+              {
+                feature_to_injection_to_value.second.insert_or_assign(injection, merged_value);
+              }
             }
           }
         }
       }
     }
   }
+
   void MergeInjections::makeFeatureMap(const bool& merge_subordinates,
                                        std::set<std::string>& injection_names_set,
-                                       const std::map<componentKeyType, std::map<std::string, std::map<std::set<std::string>, float>>>& component_to_feature_to_injection_to_values,
+                                       const std::map<componentKeyType, std::map<std::string, std::map<std::string, float>>>& component_to_feature_to_injection_to_values,
                                        OpenMS::FeatureMap& feature_map)
   {
     OpenMS::Feature f, s;
@@ -733,61 +733,65 @@ namespace SmartPeak
 
       // Get the metadata
       for (const auto& feature_to_injection_to_value : component_to_feature_to_injection_to_value.second) {
-        if (feature_to_injection_to_value.second.count(injection_names_set) <= 0) continue;
-        float value = feature_to_injection_to_value.second.at(injection_names_set);
-        if (!merge_subordinates) {
-          if (feature_to_injection_to_value.first == "RT") 
+        for (const auto& injection_name : injection_names_set)
+        {
+          if (feature_to_injection_to_value.second.count(injection_name) <= 0) continue;
+          float value = feature_to_injection_to_value.second.at(injection_name);
+          if (!merge_subordinates)
           {
-            f.setRT(value);
+            if (feature_to_injection_to_value.first == "RT")
+            {
+              f.setRT(value);
+            }
+            else if (feature_to_injection_to_value.first == "Intensity")
+            {
+              f.setIntensity(value);
+            }
+            else if (feature_to_injection_to_value.first == "peak_area")
+            {
+              f.setIntensity(value);
+            }
+            else if (feature_to_injection_to_value.first == "mz")
+            {
+              f.setMZ(value);
+            }
+            else if (feature_to_injection_to_value.first == "charge")
+            {
+              f.setCharge(static_cast<int>(value));
+            }
+            else
+            {
+              f.setMetaValue(feature_to_injection_to_value.first, value);
+            }
           }
-          else if (feature_to_injection_to_value.first == "Intensity") 
+          else if (merge_subordinates)
           {
-            f.setIntensity(value);
-          }
-          else if (feature_to_injection_to_value.first == "peak_area") 
-          {
-            f.setIntensity(value);
-          }
-          else if (feature_to_injection_to_value.first == "mz") 
-          {
-            f.setMZ(value);
-          }
-          else if (feature_to_injection_to_value.first == "charge") 
-          {
-            f.setCharge(static_cast<int>(value));
-          }
-          else 
-          {
-            f.setMetaValue(feature_to_injection_to_value.first, value);
+            if (feature_to_injection_to_value.first == "RT")
+            {
+              s.setRT(value);
+            }
+            else if (feature_to_injection_to_value.first == "Intensity")
+            {
+              s.setIntensity(value);
+            }
+            else if (feature_to_injection_to_value.first == "peak_area")
+            {
+              s.setIntensity(value);
+            }
+            else if (feature_to_injection_to_value.first == "mz")
+            {
+              s.setMZ(value);
+            }
+            else if (feature_to_injection_to_value.first == "charge")
+            {
+              s.setCharge(static_cast<int>(value));
+            }
+            else
+            {
+              s.setMetaValue(feature_to_injection_to_value.first, value);
+            }
           }
         }
-        else if (merge_subordinates) 
-        {
-          if (feature_to_injection_to_value.first == "RT") 
-          {
-            s.setRT(value);
-          }
-          else if (feature_to_injection_to_value.first == "Intensity") 
-          {
-            s.setIntensity(value);
-          }
-          else if (feature_to_injection_to_value.first == "peak_area") 
-          {
-            s.setIntensity(value);
-          }
-          else if (feature_to_injection_to_value.first == "mz") 
-          {
-            s.setMZ(value);
-          }
-          else if (feature_to_injection_to_value.first == "charge") 
-          {
-            s.setCharge(static_cast<int>(value));
-          }
-          else 
-          {
-            s.setMetaValue(feature_to_injection_to_value.first, value);
-          }
-        }             
       }
     }
 
