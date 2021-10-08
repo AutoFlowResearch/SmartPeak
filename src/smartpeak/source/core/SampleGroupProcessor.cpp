@@ -195,8 +195,65 @@ namespace SmartPeak
     std::map<componentKeyType, std::map<std::string, std::map<std::set<std::string>, float>>> component_to_feature_to_injection_to_values;
     getComponentsToFeaturesToInjectionsToValues(sampleGroupHandler_IO, sequenceHandler_I, merge_subordinates, component_to_feature_to_injection_to_values);
 
-    // ==============================================================
-    // Apply selected dilutions
+    // Select preferred dilution
+    if (!selectDilutions(params, filenames_I, sequenceHandler_I, component_to_feature_to_injection_to_values))
+    {
+      return;
+    }
+
+    // Merge the components and features in order and in place
+    // pass 1: dilutions
+    std::set<std::string> scan_polarities_keys_tup = scan_polarities;
+    std::set<std::pair<float, float>> scan_mass_ranges_keys_tup = scan_mass_ranges;
+    std::set<float> dilution_factors_keys_tup({-1});
+    mergeComponentsToFeaturesToInjectionsToValues(dilution_series_merge_feature_name,
+                                                  dilution_series_merge_rule, 
+                                                  scan_polarities_keys_tup,
+                                                  scan_mass_ranges_keys_tup,
+                                                  dilution_factors_keys_tup, 
+                                                  merge_keys_to_injection_name,
+                                                  component_to_feature_to_injection_to_values);
+
+    // pass 2: mass ranges
+    scan_mass_ranges_keys_tup = std::set<std::pair<float, float>>({std::make_pair(-1,-1)});
+    mergeComponentsToFeaturesToInjectionsToValues(scan_polarity_merge_feature_name,
+                                                  mass_range_merge_rule,
+                                                  scan_polarities_keys_tup,
+                                                  scan_mass_ranges_keys_tup,
+                                                  dilution_factors_keys_tup,
+                                                  merge_keys_to_injection_name,
+                                                  component_to_feature_to_injection_to_values);
+
+    // pass 3: scan polarities
+    scan_polarities_keys_tup = std::set<std::string>({ "" });
+    mergeComponentsToFeaturesToInjectionsToValues(scan_polarity_merge_feature_name,
+                                                  scan_polarity_merge_rule,
+                                                  scan_polarities_keys_tup,
+                                                  scan_mass_ranges_keys_tup,
+                                                  dilution_factors_keys_tup,
+                                                  merge_keys_to_injection_name,
+                                                  component_to_feature_to_injection_to_values);
+
+    // Make the final merged feature
+    std::set<std::string> injection_names_set;
+    for (const std::size_t& index : sampleGroupHandler_IO.getSampleIndices()) {
+      injection_names_set.insert(sequenceHandler_I.getSequence().at(index).getMetaData().getInjectionName() );
+    }
+    OpenMS::FeatureMap fmap;
+    makeFeatureMap(merge_subordinates, injection_names_set, component_to_feature_to_injection_to_values, fmap);
+
+    sampleGroupHandler_IO.setFeatureMap(fmap);
+
+    LOGI << "MergeInjections output size: " << fmap.size();
+    LOGD << "END MergeInjections";
+  }
+
+  bool MergeInjections::selectDilutions(
+    const ParameterSet& params,
+    const Filenames& filenames_I,
+    const SequenceHandler& sequenceHandler_I,
+    std::map<componentKeyType, std::map<std::string, std::map<std::set<std::string>, float>>>& component_to_feature_to_injection_to_values)
+  {
     if (params.at("MergeInjections").findParameter("select_preferred_dilutions")->getValueAsString() == "true")
     {
       std::map<std::string, int> select_dilution_map;
@@ -212,7 +269,7 @@ namespace SmartPeak
       catch (const std::exception& e)
       {
         LOGE << "Failed to read select dilutions file [" << dilution_file.generic_string() << "] : " << e.what();
-        return;
+        return false;
       }
       std::map<componentKeyType, std::map<std::string, std::map<std::set<std::string>, float>>> new_component_to_feature_to_injection_to_values;
       for (const auto& component_to_feature_to_injection_to_value : component_to_feature_to_injection_to_values)
@@ -285,53 +342,7 @@ namespace SmartPeak
       }
       component_to_feature_to_injection_to_values = std::move(new_component_to_feature_to_injection_to_values);
     }
-    // ==============================================================
-
-    // Merge the components and features in order and in place
-    // pass 1: dilutions
-    std::set<std::string> scan_polarities_keys_tup = scan_polarities;
-    std::set<std::pair<float, float>> scan_mass_ranges_keys_tup = scan_mass_ranges;
-    std::set<float> dilution_factors_keys_tup({-1});
-    mergeComponentsToFeaturesToInjectionsToValues(dilution_series_merge_feature_name,
-                                                  dilution_series_merge_rule, 
-                                                  scan_polarities_keys_tup,
-                                                  scan_mass_ranges_keys_tup,
-                                                  dilution_factors_keys_tup, 
-                                                  merge_keys_to_injection_name,
-                                                  component_to_feature_to_injection_to_values);
-
-    // pass 2: mass ranges
-    scan_mass_ranges_keys_tup = std::set<std::pair<float, float>>({std::make_pair(-1,-1)});
-    mergeComponentsToFeaturesToInjectionsToValues(scan_polarity_merge_feature_name,
-                                                  mass_range_merge_rule,
-                                                  scan_polarities_keys_tup,
-                                                  scan_mass_ranges_keys_tup,
-                                                  dilution_factors_keys_tup,
-                                                  merge_keys_to_injection_name,
-                                                  component_to_feature_to_injection_to_values);
-
-    // pass 3: scan polarities
-    scan_polarities_keys_tup = std::set<std::string>({ "" });
-    mergeComponentsToFeaturesToInjectionsToValues(scan_polarity_merge_feature_name,
-                                                  scan_polarity_merge_rule,
-                                                  scan_polarities_keys_tup,
-                                                  scan_mass_ranges_keys_tup,
-                                                  dilution_factors_keys_tup,
-                                                  merge_keys_to_injection_name,
-                                                  component_to_feature_to_injection_to_values);
-
-    // Make the final merged feature
-    std::set<std::string> injection_names_set;
-    for (const std::size_t& index : sampleGroupHandler_IO.getSampleIndices()) {
-      injection_names_set.insert(sequenceHandler_I.getSequence().at(index).getMetaData().getInjectionName() );
-    }
-    OpenMS::FeatureMap fmap;
-    makeFeatureMap(merge_subordinates, injection_names_set, component_to_feature_to_injection_to_values, fmap);
-
-    sampleGroupHandler_IO.setFeatureMap(fmap);
-
-    LOGI << "MergeInjections output size: " << fmap.size();
-    LOGD << "END MergeInjections";
+    return true;
   }
 
   void MergeInjections::getMergeKeysToInjections(const SampleGroupHandler& sampleGroupHandler_IO,

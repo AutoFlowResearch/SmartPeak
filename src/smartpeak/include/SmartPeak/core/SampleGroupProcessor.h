@@ -88,6 +88,12 @@ namespace SmartPeak
     typedef std::tuple<std::string, std::pair<float, float>, float> mergeKeyType;
     typedef std::pair<std::string, std::string> componentKeyType;
 
+    static bool selectDilutions(
+      const ParameterSet& params,
+      const Filenames& filenames_I,
+      const SequenceHandler& sequenceHandler_I,
+      std::map<componentKeyType, std::map<std::string, std::map<std::set<std::string>, float>>>& component_to_feature_to_injection_to_values);
+
     static void getMergeKeysToInjections(const SampleGroupHandler& sampleGroupHandler_IO,
       const SequenceHandler& sequenceHandler_I, 
       std::set<std::string>& scan_polarities,
