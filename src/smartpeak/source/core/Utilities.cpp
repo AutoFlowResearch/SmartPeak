@@ -1,7 +1,7 @@
 // --------------------------------------------------------------------------
 //   SmartPeak -- Fast and Accurate CE-, GC- and LC-MS(/MS) Data Processing
 // --------------------------------------------------------------------------
-// Copyright The SmartPeak Team -- Novo Nordisk Foundation 
+// Copyright The SmartPeak Team -- Novo Nordisk Foundation
 // Center for Biosustainability, Technical University of Denmark 2018-2021.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -805,7 +805,7 @@ namespace SmartPeak
     std::istringstream entry_date_ss(directory_entry.entry_contents[3]);
     entry_date_ss >> std::get_time(&entry_date_tm, "%Y-%m-%d %T");
     
-    entry_date_tm.tm_isdst = current_time_tm->tm_isdst;    
+    entry_date_tm.tm_isdst = current_time_tm->tm_isdst;
     time_t entry_date_time = std::mktime(&entry_date_tm);
         
     if (entry_date_tm.tm_mday == current_time_tm->tm_mday
@@ -833,5 +833,31 @@ namespace SmartPeak
   {
     auto it = str.find(to_remove);
     if (it != std::string::npos) str.erase(it, str.length());
+  }
+
+  std::string Utilities::makeUniqueStringFromTime()
+  {
+    const std::time_t time_now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+    auto time_in_epochs = std::chrono::system_clock::now().time_since_epoch();
+    char time_str[32];
+    strftime(time_str, 32, "%Y-%m-%d_%H-%M-%S_", std::localtime(&time_now));
+    return std::string(time_str + std::to_string(time_in_epochs.count()));
+  }
+
+  std::filesystem::path Utilities::createEmptyTempDirectory()
+  {
+    std::filesystem::path tmp_dir_path;
+    auto path_to_tmp_dir = std::filesystem::path(std::string("tmp_").append(makeUniqueStringFromTime()));
+    tmp_dir_path = std::filesystem::temp_directory_path();
+    std::filesystem::current_path(tmp_dir_path);
+    if (std::filesystem::create_directory(path_to_tmp_dir))
+    {
+      tmp_dir_path /= path_to_tmp_dir;
+    }
+    else
+    {
+      throw std::runtime_error("could not find non-existing directory");
+    }
+    return tmp_dir_path;
   }
 }

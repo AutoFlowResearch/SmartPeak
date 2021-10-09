@@ -131,22 +131,25 @@ namespace SmartPeak
           int feature_index = 0;
           for (int j = 0; j < graph_viz_data_.x_data_scatter_.size(); ++j) {
             // Corresponding serie names are supposed to start with same name as the scatter name
-            if (graph_viz_data_.series_names_scatter_.at(j).rfind(serie_name_scatter) == 0)
+            if (!run_on_server)
             {
-              assert(graph_viz_data_.x_data_scatter_.at(j).size() == graph_viz_data_.y_data_scatter_.at(j).size());
-              ImPlot::PushStyleVar(ImPlotStyleVar_Marker, plot_marker);
-              std::string legend_text = serie_name_scatter;
-              if (!compact_view_)
+              if (graph_viz_data_.series_names_scatter_.at(j).rfind(serie_name_scatter) == 0) // TODO:substitute rfind due to inefficiency
               {
-                legend_text = graph_viz_data_.series_names_scatter_.at(j) + "::" + std::to_string(feature_index);
+                assert(graph_viz_data_.x_data_scatter_.at(j).size() == graph_viz_data_.y_data_scatter_.at(j).size());
+                ImPlot::PushStyleVar(ImPlotStyleVar_Marker, plot_marker);
+                std::string legend_text = serie_name_scatter;
+                if (!compact_view_)
+                {
+                  legend_text = graph_viz_data_.series_names_scatter_.at(j) + "::" + std::to_string(feature_index);
+                }
+                ImPlot::PlotScatter(legend_text.c_str(),
+                                    graph_viz_data_.x_data_scatter_.at(j).data(),
+                                    graph_viz_data_.y_data_scatter_.at(j).data(),
+                                    graph_viz_data_.x_data_scatter_.at(j).size());
+                plot_marker <<= 1;
+                if (plot_marker > ImPlotMarker_Asterisk) plot_marker = ImPlotMarker_Circle;
+                ++feature_index;
               }
-              ImPlot::PlotScatter(legend_text.c_str(), 
-                                  graph_viz_data_.x_data_scatter_.at(j).data(), 
-                                  graph_viz_data_.y_data_scatter_.at(j).data(),
-                                  graph_viz_data_.x_data_scatter_.at(j).size());
-              plot_marker <<= 1;
-              if (plot_marker > ImPlotMarker_Asterisk) plot_marker = ImPlotMarker_Circle;
-              ++feature_index;
             }
           }
           ++i;
@@ -265,6 +268,55 @@ namespace SmartPeak
       }
     }
     return result;
+  }
+
+  void GraphicDataVizWidget::updateServerGraphVizData()
+  {
+    int max_plots = 20;
+    std::set<std::string> user_selected;
+    for (const auto& sample_name : getSelectedSampleNames()) {
+      for (const auto& component_name : getSelectedTransitions()) {
+        auto series_name = sample_name + "::" + component_name;
+        user_selected.insert(series_name);
+      }
+    }
+    
+    if (graph_viz_data_.series_names_area_.size() != server_graph_data_.series_names_area_.size()) {
+      graph_viz_data_.series_names_area_.resize(server_graph_data_.series_names_area_.size());
+      graph_viz_data_.x_data_area_.resize(server_graph_data_.x_data_area_.size());
+      graph_viz_data_.y_data_area_.resize(server_graph_data_.y_data_area_.size());
+      graph_viz_data_.z_data_area_.resize(server_graph_data_.z_data_area_.size());
+      
+      graph_viz_data_.series_names_scatter_.resize(server_graph_data_.series_names_scatter_.size());
+      graph_viz_data_.x_data_scatter_.resize(server_graph_data_.x_data_scatter_.size());
+      graph_viz_data_.y_data_scatter_.resize(server_graph_data_.y_data_scatter_.size());
+      
+      graph_viz_data_.x_axis_title_ = server_graph_data_.x_axis_title_;
+      graph_viz_data_.y_axis_title_ = server_graph_data_.y_axis_title_;
+      graph_viz_data_.z_axis_title_ = server_graph_data_.z_axis_title_;
+      
+      graph_viz_data_.x_min_ = server_graph_data_.x_min_;
+      graph_viz_data_.x_max_ = server_graph_data_.x_max_;
+      graph_viz_data_.y_min_ = server_graph_data_.y_min_;
+      graph_viz_data_.y_max_ = server_graph_data_.y_max_;
+      
+      graph_viz_data_.nb_points_ = server_graph_data_.nb_points_;
+      graph_viz_data_.max_nb_points_ = server_graph_data_.max_nb_points_;
+      //graph_viz_data_.max_nb_points_ = 1000000;
+    }
+    
+    for (size_t i = 0; i < server_graph_data_.series_names_area_.size() && user_selected.size() < max_plots; i++) {
+      if (user_selected.count(server_graph_data_.series_names_area_[i]) != 0) {
+        graph_viz_data_.series_names_area_[i] = server_graph_data_.series_names_area_[i];
+        graph_viz_data_.x_data_area_[i] = server_graph_data_.x_data_area_[i];
+        graph_viz_data_.y_data_area_[i] = server_graph_data_.y_data_area_[i];
+      }
+      if (user_selected.count(graph_viz_data_.series_names_area_[i]) == 0) {
+        graph_viz_data_.series_names_area_[i].clear();
+        graph_viz_data_.x_data_area_[i].clear();
+        graph_viz_data_.y_data_area_[i].clear();
+      }
+    }
   }
   
 }

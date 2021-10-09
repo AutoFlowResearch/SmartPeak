@@ -42,7 +42,9 @@ namespace SmartPeak
        ((input_scan_names_ != scan_names) || (input_sample_names_ != sample_names))) // user select different items
     {
       // get the whole graph area
-      session_handler_.getChromatogramTIC(sequence_handler_, graph_viz_data_, std::make_pair(0, 1800), sample_names, scan_names);
+      if (!SmartPeak::run_on_server) {
+        session_handler_.getChromatogramTIC(sequence_handler_, graph_viz_data_, std::make_pair(0, 1800), sample_names, scan_names);
+      }
       updateRanges();
       input_sample_names_ = sample_names;
       input_scan_names_ = scan_names;
@@ -50,7 +52,9 @@ namespace SmartPeak
     }
     else if (input_range_ != current_range_) // user zoom in/out
     {
-      session_handler_.getChromatogramTIC(sequence_handler_, graph_viz_data_, current_range_, sample_names, scan_names);
+      if (!SmartPeak::run_on_server) {
+        session_handler_.getChromatogramTIC(sequence_handler_, graph_viz_data_, current_range_, sample_names, scan_names);
+      }
       input_range_ = current_range_;
     }
     graph_viz_data_.y_min_ = 0.0f; // bottom line will start from 0.0

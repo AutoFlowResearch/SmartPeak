@@ -1,7 +1,7 @@
 // --------------------------------------------------------------------------
 //   SmartPeak -- Fast and Accurate CE-, GC- and LC-MS(/MS) Data Processing
 // --------------------------------------------------------------------------
-// Copyright The SmartPeak Team -- Novo Nordisk Foundation 
+// Copyright The SmartPeak Team -- Novo Nordisk Foundation
 // Center for Biosustainability, Technical University of Denmark 2018-2021.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -331,13 +331,13 @@ public:
 
     /**
     * @brief Constructs an absolute filepath to an application logs.
-    * 
+    *
     * Default locations of logs:
     *   - Windows: C:\Users\<user>\AppData\Local\SmartPeak
     *   - Linux and MacOS: ~/.SmartPeak
     * User can change default location and specify directory where the logs are stored by
     * setting SMARTPEAK_LOGS env variable. If directory specified by the path doesn't exist, the function will create one.
-    * 
+    *
     * @param[in] filename Log filename
     * @returns The absolute path to log file and boolean flag whether the path to directory was created
     */
@@ -366,7 +366,7 @@ public:
 
     /**
      * Converts an input string to upper case string.
-     * 
+     *
      * @param[in] str input string
      * @return formated string
     */
@@ -379,5 +379,17 @@ public:
      @param[in,out] str string on which the modification is done.
     */
     static void removeTrailing(std::string& str, std::string to_remove);
+    
+    /**
+     @brief Returns a unique string based on the current time.
+     
+     @param[out] a unique string in the format : %Y-%m-%d_%H-%M-%S_TIME_SINCE_EPOCHS
+    */
+    static std::string makeUniqueStringFromTime();
+
+    /**
+     @brief return an empty, temporary directory.
+    */
+    static std::filesystem::path createEmptyTempDirectory();
   };
 }

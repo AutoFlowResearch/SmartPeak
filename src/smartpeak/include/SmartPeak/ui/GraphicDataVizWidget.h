@@ -52,6 +52,8 @@ namespace SmartPeak
 
     void draw() override;
     
+    void setGraphVizData(SessionHandler::GraphVizData& graph_data) { server_graph_data_ = graph_data; }
+    
   protected:
     virtual void setMarkerPosition(const std::optional<float>& marker_position);
     virtual std::optional<float> getMarkerPosition() const;
@@ -61,6 +63,7 @@ namespace SmartPeak
     virtual void updateData() = 0;
     virtual std::tuple<float, float, float, float> plotLimits() const;
     virtual void updateRanges();
+    virtual void updateServerGraphVizData();
     
     // Utility methods
     std::set<std::string> getSelectedSampleNames() const;
@@ -76,6 +79,7 @@ namespace SmartPeak
     bool show_legend_ = true;
     bool compact_view_ = true;
     SessionHandler::GraphVizData graph_viz_data_;
+    SessionHandler::GraphVizData server_graph_data_;
     bool refresh_needed_ = false;
     std::pair<float, float> slider_min_max_ = { 0.0f, 0.0f };
     std::pair<float, float> current_range_ = { 0.0f, 0.0f };

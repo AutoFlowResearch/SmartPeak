@@ -70,6 +70,7 @@
 using namespace SmartPeak;
 
 bool SmartPeak::enable_quick_help = true;
+bool SmartPeak::run_on_server = false;
 
 void initializeDataDirs(ApplicationHandler& state);
 
@@ -86,6 +87,9 @@ int main(int argc, char** argv)
 // `int argc, char **argv` are required on Win to link against the proper SDL2/OpenGL implementation
 {
 
+  std::thread run_workflow_;
+  
+  
   // to disable buttons, display info, and update the session cache
   bool workflow_is_done_ = true;
   bool remote_execution_done_ = false;
@@ -614,8 +618,9 @@ int main(int argc, char** argv)
         ImGui::Separator();
         ImGui::MenuItem("Main window (Plots)", NULL, false, false);
         // TODO work on generalization of visualization.
-        if (application_handler_.sequenceHandler_.getSequence().size() > 0 && 
-            application_handler_.sequenceHandler_.getSequence().at(0).getRawData().getChromatogramMap().getChromatograms().size() > 0)
+        if ((application_handler_.sequenceHandler_.getSequence().size() > 0 &&
+             application_handler_.sequenceHandler_.getSequence().at(0).getRawData().getChromatogramMap().getChromatograms().size() > 0) ||
+             run_on_server)
         {
           if (ImGui::MenuItem("Chromatogram", NULL, &chromatogram_plot_widget_->visible_)) {}
         }
@@ -713,15 +718,15 @@ int main(int argc, char** argv)
         for (int i=0; i<2; ++i) {
           WorkflowClientS workflow_client(grpc::CreateChannel(server_dialogue_->server_ip_address_, grpc::InsecureChannelCredentials()));
           LogStreamClientS logstream_client(grpc::CreateChannel(server_dialogue_->server_ip_address_, grpc::InsecureChannelCredentials()));
+
+          SmartPeak::SessionHandler::GraphVizData graph_data;
+          std::string workflow_status = workflow_client.runWorkflow(server_dialogue_->sequence_file_path_, graph_data);
+          chromatogram_tic_plot_widget_->setGraphVizData(graph_data);
+          chromatogram_plot_widget_->setGraphVizData(graph_data);
           
-          //WorkflowClientA workflow_client(grpc::CreateChannel(server_dialogue_->server_ip_address_, grpc::InsecureChannelCredentials()));
-          //LogStreamClientA logstream_client(grpc::CreateChannel(server_dialogue_->server_ip_address_, grpc::InsecureChannelCredentials()));
-          
-          std::string workflow_status = workflow_client.runWorkflow(server_dialogue_->sequence_file_path_);
           logstream_client.getLogstream();
-          
           std::cout << ">>> GUI workflow_status : " << workflow_status << std::endl;
-          std::this_thread::sleep_for(std::chrono::seconds(3));
+          std::this_thread::sleep_for(std::chrono::seconds(2));
         }
         server_dialogue_->fields_set_ = false;
       }

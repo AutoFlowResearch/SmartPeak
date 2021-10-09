@@ -35,12 +35,12 @@ class Workflow final {
   class StubInterface {
    public:
     virtual ~StubInterface() {}
-    virtual ::grpc::Status runWorkflow(::grpc::ClientContext* context, const ::SmartPeakServer::WorkflowParameters& request, ::SmartPeakServer::WorkflowStatus* response) = 0;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::SmartPeakServer::WorkflowStatus>> AsyncrunWorkflow(::grpc::ClientContext* context, const ::SmartPeakServer::WorkflowParameters& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::SmartPeakServer::WorkflowStatus>>(AsyncrunWorkflowRaw(context, request, cq));
+    virtual ::grpc::Status runWorkflow(::grpc::ClientContext* context, const ::SmartPeakServer::WorkflowParameters& request, ::SmartPeakServer::WorkflowResult* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::SmartPeakServer::WorkflowResult>> AsyncrunWorkflow(::grpc::ClientContext* context, const ::SmartPeakServer::WorkflowParameters& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::SmartPeakServer::WorkflowResult>>(AsyncrunWorkflowRaw(context, request, cq));
     }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::SmartPeakServer::WorkflowStatus>> PrepareAsyncrunWorkflow(::grpc::ClientContext* context, const ::SmartPeakServer::WorkflowParameters& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::SmartPeakServer::WorkflowStatus>>(PrepareAsyncrunWorkflowRaw(context, request, cq));
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::SmartPeakServer::WorkflowResult>> PrepareAsyncrunWorkflow(::grpc::ClientContext* context, const ::SmartPeakServer::WorkflowParameters& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::SmartPeakServer::WorkflowResult>>(PrepareAsyncrunWorkflowRaw(context, request, cq));
     }
     std::unique_ptr< ::grpc::ClientReaderInterface< ::SmartPeakServer::LogStream>> getLogStream(::grpc::ClientContext* context, const ::SmartPeakServer::InquireLogs& request) {
       return std::unique_ptr< ::grpc::ClientReaderInterface< ::SmartPeakServer::LogStream>>(getLogStreamRaw(context, request));
@@ -54,16 +54,16 @@ class Workflow final {
     class async_interface {
      public:
       virtual ~async_interface() {}
-      virtual void runWorkflow(::grpc::ClientContext* context, const ::SmartPeakServer::WorkflowParameters* request, ::SmartPeakServer::WorkflowStatus* response, std::function<void(::grpc::Status)>) = 0;
-      virtual void runWorkflow(::grpc::ClientContext* context, const ::SmartPeakServer::WorkflowParameters* request, ::SmartPeakServer::WorkflowStatus* response, ::grpc::ClientUnaryReactor* reactor) = 0;
+      virtual void runWorkflow(::grpc::ClientContext* context, const ::SmartPeakServer::WorkflowParameters* request, ::SmartPeakServer::WorkflowResult* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void runWorkflow(::grpc::ClientContext* context, const ::SmartPeakServer::WorkflowParameters* request, ::SmartPeakServer::WorkflowResult* response, ::grpc::ClientUnaryReactor* reactor) = 0;
       virtual void getLogStream(::grpc::ClientContext* context, const ::SmartPeakServer::InquireLogs* request, ::grpc::ClientReadReactor< ::SmartPeakServer::LogStream>* reactor) = 0;
     };
     typedef class async_interface experimental_async_interface;
     virtual class async_interface* async() { return nullptr; }
     class async_interface* experimental_async() { return async(); }
   private:
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::SmartPeakServer::WorkflowStatus>* AsyncrunWorkflowRaw(::grpc::ClientContext* context, const ::SmartPeakServer::WorkflowParameters& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::SmartPeakServer::WorkflowStatus>* PrepareAsyncrunWorkflowRaw(::grpc::ClientContext* context, const ::SmartPeakServer::WorkflowParameters& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::SmartPeakServer::WorkflowResult>* AsyncrunWorkflowRaw(::grpc::ClientContext* context, const ::SmartPeakServer::WorkflowParameters& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::SmartPeakServer::WorkflowResult>* PrepareAsyncrunWorkflowRaw(::grpc::ClientContext* context, const ::SmartPeakServer::WorkflowParameters& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientReaderInterface< ::SmartPeakServer::LogStream>* getLogStreamRaw(::grpc::ClientContext* context, const ::SmartPeakServer::InquireLogs& request) = 0;
     virtual ::grpc::ClientAsyncReaderInterface< ::SmartPeakServer::LogStream>* AsyncgetLogStreamRaw(::grpc::ClientContext* context, const ::SmartPeakServer::InquireLogs& request, ::grpc::CompletionQueue* cq, void* tag) = 0;
     virtual ::grpc::ClientAsyncReaderInterface< ::SmartPeakServer::LogStream>* PrepareAsyncgetLogStreamRaw(::grpc::ClientContext* context, const ::SmartPeakServer::InquireLogs& request, ::grpc::CompletionQueue* cq) = 0;
@@ -71,12 +71,12 @@ class Workflow final {
   class Stub final : public StubInterface {
    public:
     Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options = ::grpc::StubOptions());
-    ::grpc::Status runWorkflow(::grpc::ClientContext* context, const ::SmartPeakServer::WorkflowParameters& request, ::SmartPeakServer::WorkflowStatus* response) override;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::SmartPeakServer::WorkflowStatus>> AsyncrunWorkflow(::grpc::ClientContext* context, const ::SmartPeakServer::WorkflowParameters& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::SmartPeakServer::WorkflowStatus>>(AsyncrunWorkflowRaw(context, request, cq));
+    ::grpc::Status runWorkflow(::grpc::ClientContext* context, const ::SmartPeakServer::WorkflowParameters& request, ::SmartPeakServer::WorkflowResult* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::SmartPeakServer::WorkflowResult>> AsyncrunWorkflow(::grpc::ClientContext* context, const ::SmartPeakServer::WorkflowParameters& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::SmartPeakServer::WorkflowResult>>(AsyncrunWorkflowRaw(context, request, cq));
     }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::SmartPeakServer::WorkflowStatus>> PrepareAsyncrunWorkflow(::grpc::ClientContext* context, const ::SmartPeakServer::WorkflowParameters& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::SmartPeakServer::WorkflowStatus>>(PrepareAsyncrunWorkflowRaw(context, request, cq));
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::SmartPeakServer::WorkflowResult>> PrepareAsyncrunWorkflow(::grpc::ClientContext* context, const ::SmartPeakServer::WorkflowParameters& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::SmartPeakServer::WorkflowResult>>(PrepareAsyncrunWorkflowRaw(context, request, cq));
     }
     std::unique_ptr< ::grpc::ClientReader< ::SmartPeakServer::LogStream>> getLogStream(::grpc::ClientContext* context, const ::SmartPeakServer::InquireLogs& request) {
       return std::unique_ptr< ::grpc::ClientReader< ::SmartPeakServer::LogStream>>(getLogStreamRaw(context, request));
@@ -90,8 +90,8 @@ class Workflow final {
     class async final :
       public StubInterface::async_interface {
      public:
-      void runWorkflow(::grpc::ClientContext* context, const ::SmartPeakServer::WorkflowParameters* request, ::SmartPeakServer::WorkflowStatus* response, std::function<void(::grpc::Status)>) override;
-      void runWorkflow(::grpc::ClientContext* context, const ::SmartPeakServer::WorkflowParameters* request, ::SmartPeakServer::WorkflowStatus* response, ::grpc::ClientUnaryReactor* reactor) override;
+      void runWorkflow(::grpc::ClientContext* context, const ::SmartPeakServer::WorkflowParameters* request, ::SmartPeakServer::WorkflowResult* response, std::function<void(::grpc::Status)>) override;
+      void runWorkflow(::grpc::ClientContext* context, const ::SmartPeakServer::WorkflowParameters* request, ::SmartPeakServer::WorkflowResult* response, ::grpc::ClientUnaryReactor* reactor) override;
       void getLogStream(::grpc::ClientContext* context, const ::SmartPeakServer::InquireLogs* request, ::grpc::ClientReadReactor< ::SmartPeakServer::LogStream>* reactor) override;
      private:
       friend class Stub;
@@ -104,8 +104,8 @@ class Workflow final {
    private:
     std::shared_ptr< ::grpc::ChannelInterface> channel_;
     class async async_stub_{this};
-    ::grpc::ClientAsyncResponseReader< ::SmartPeakServer::WorkflowStatus>* AsyncrunWorkflowRaw(::grpc::ClientContext* context, const ::SmartPeakServer::WorkflowParameters& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientAsyncResponseReader< ::SmartPeakServer::WorkflowStatus>* PrepareAsyncrunWorkflowRaw(::grpc::ClientContext* context, const ::SmartPeakServer::WorkflowParameters& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::SmartPeakServer::WorkflowResult>* AsyncrunWorkflowRaw(::grpc::ClientContext* context, const ::SmartPeakServer::WorkflowParameters& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::SmartPeakServer::WorkflowResult>* PrepareAsyncrunWorkflowRaw(::grpc::ClientContext* context, const ::SmartPeakServer::WorkflowParameters& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientReader< ::SmartPeakServer::LogStream>* getLogStreamRaw(::grpc::ClientContext* context, const ::SmartPeakServer::InquireLogs& request) override;
     ::grpc::ClientAsyncReader< ::SmartPeakServer::LogStream>* AsyncgetLogStreamRaw(::grpc::ClientContext* context, const ::SmartPeakServer::InquireLogs& request, ::grpc::CompletionQueue* cq, void* tag) override;
     ::grpc::ClientAsyncReader< ::SmartPeakServer::LogStream>* PrepareAsyncgetLogStreamRaw(::grpc::ClientContext* context, const ::SmartPeakServer::InquireLogs& request, ::grpc::CompletionQueue* cq) override;
@@ -118,7 +118,7 @@ class Workflow final {
    public:
     Service();
     virtual ~Service();
-    virtual ::grpc::Status runWorkflow(::grpc::ServerContext* context, const ::SmartPeakServer::WorkflowParameters* request, ::SmartPeakServer::WorkflowStatus* response);
+    virtual ::grpc::Status runWorkflow(::grpc::ServerContext* context, const ::SmartPeakServer::WorkflowParameters* request, ::SmartPeakServer::WorkflowResult* response);
     virtual ::grpc::Status getLogStream(::grpc::ServerContext* context, const ::SmartPeakServer::InquireLogs* request, ::grpc::ServerWriter< ::SmartPeakServer::LogStream>* writer);
   };
   template <class BaseClass>
@@ -133,11 +133,11 @@ class Workflow final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status runWorkflow(::grpc::ServerContext* /*context*/, const ::SmartPeakServer::WorkflowParameters* /*request*/, ::SmartPeakServer::WorkflowStatus* /*response*/) override {
+    ::grpc::Status runWorkflow(::grpc::ServerContext* /*context*/, const ::SmartPeakServer::WorkflowParameters* /*request*/, ::SmartPeakServer::WorkflowResult* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    void RequestrunWorkflow(::grpc::ServerContext* context, ::SmartPeakServer::WorkflowParameters* request, ::grpc::ServerAsyncResponseWriter< ::SmartPeakServer::WorkflowStatus>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+    void RequestrunWorkflow(::grpc::ServerContext* context, ::SmartPeakServer::WorkflowParameters* request, ::grpc::ServerAsyncResponseWriter< ::SmartPeakServer::WorkflowResult>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
       ::grpc::Service::RequestAsyncUnary(0, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
@@ -169,25 +169,25 @@ class Workflow final {
    public:
     WithCallbackMethod_runWorkflow() {
       ::grpc::Service::MarkMethodCallback(0,
-          new ::grpc::internal::CallbackUnaryHandler< ::SmartPeakServer::WorkflowParameters, ::SmartPeakServer::WorkflowStatus>(
+          new ::grpc::internal::CallbackUnaryHandler< ::SmartPeakServer::WorkflowParameters, ::SmartPeakServer::WorkflowResult>(
             [this](
-                   ::grpc::CallbackServerContext* context, const ::SmartPeakServer::WorkflowParameters* request, ::SmartPeakServer::WorkflowStatus* response) { return this->runWorkflow(context, request, response); }));}
+                   ::grpc::CallbackServerContext* context, const ::SmartPeakServer::WorkflowParameters* request, ::SmartPeakServer::WorkflowResult* response) { return this->runWorkflow(context, request, response); }));}
     void SetMessageAllocatorFor_runWorkflow(
-        ::grpc::MessageAllocator< ::SmartPeakServer::WorkflowParameters, ::SmartPeakServer::WorkflowStatus>* allocator) {
+        ::grpc::MessageAllocator< ::SmartPeakServer::WorkflowParameters, ::SmartPeakServer::WorkflowResult>* allocator) {
       ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(0);
-      static_cast<::grpc::internal::CallbackUnaryHandler< ::SmartPeakServer::WorkflowParameters, ::SmartPeakServer::WorkflowStatus>*>(handler)
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::SmartPeakServer::WorkflowParameters, ::SmartPeakServer::WorkflowResult>*>(handler)
               ->SetMessageAllocator(allocator);
     }
     ~WithCallbackMethod_runWorkflow() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status runWorkflow(::grpc::ServerContext* /*context*/, const ::SmartPeakServer::WorkflowParameters* /*request*/, ::SmartPeakServer::WorkflowStatus* /*response*/) override {
+    ::grpc::Status runWorkflow(::grpc::ServerContext* /*context*/, const ::SmartPeakServer::WorkflowParameters* /*request*/, ::SmartPeakServer::WorkflowResult* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     virtual ::grpc::ServerUnaryReactor* runWorkflow(
-      ::grpc::CallbackServerContext* /*context*/, const ::SmartPeakServer::WorkflowParameters* /*request*/, ::SmartPeakServer::WorkflowStatus* /*response*/)  { return nullptr; }
+      ::grpc::CallbackServerContext* /*context*/, const ::SmartPeakServer::WorkflowParameters* /*request*/, ::SmartPeakServer::WorkflowResult* /*response*/)  { return nullptr; }
   };
   template <class BaseClass>
   class WithCallbackMethod_getLogStream : public BaseClass {
@@ -225,7 +225,7 @@ class Workflow final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status runWorkflow(::grpc::ServerContext* /*context*/, const ::SmartPeakServer::WorkflowParameters* /*request*/, ::SmartPeakServer::WorkflowStatus* /*response*/) override {
+    ::grpc::Status runWorkflow(::grpc::ServerContext* /*context*/, const ::SmartPeakServer::WorkflowParameters* /*request*/, ::SmartPeakServer::WorkflowResult* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -259,7 +259,7 @@ class Workflow final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status runWorkflow(::grpc::ServerContext* /*context*/, const ::SmartPeakServer::WorkflowParameters* /*request*/, ::SmartPeakServer::WorkflowStatus* /*response*/) override {
+    ::grpc::Status runWorkflow(::grpc::ServerContext* /*context*/, const ::SmartPeakServer::WorkflowParameters* /*request*/, ::SmartPeakServer::WorkflowResult* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -302,7 +302,7 @@ class Workflow final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status runWorkflow(::grpc::ServerContext* /*context*/, const ::SmartPeakServer::WorkflowParameters* /*request*/, ::SmartPeakServer::WorkflowStatus* /*response*/) override {
+    ::grpc::Status runWorkflow(::grpc::ServerContext* /*context*/, const ::SmartPeakServer::WorkflowParameters* /*request*/, ::SmartPeakServer::WorkflowResult* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -339,10 +339,10 @@ class Workflow final {
     WithStreamedUnaryMethod_runWorkflow() {
       ::grpc::Service::MarkMethodStreamed(0,
         new ::grpc::internal::StreamedUnaryHandler<
-          ::SmartPeakServer::WorkflowParameters, ::SmartPeakServer::WorkflowStatus>(
+          ::SmartPeakServer::WorkflowParameters, ::SmartPeakServer::WorkflowResult>(
             [this](::grpc::ServerContext* context,
                    ::grpc::ServerUnaryStreamer<
-                     ::SmartPeakServer::WorkflowParameters, ::SmartPeakServer::WorkflowStatus>* streamer) {
+                     ::SmartPeakServer::WorkflowParameters, ::SmartPeakServer::WorkflowResult>* streamer) {
                        return this->StreamedrunWorkflow(context,
                          streamer);
                   }));
@@ -351,12 +351,12 @@ class Workflow final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable regular version of this method
-    ::grpc::Status runWorkflow(::grpc::ServerContext* /*context*/, const ::SmartPeakServer::WorkflowParameters* /*request*/, ::SmartPeakServer::WorkflowStatus* /*response*/) override {
+    ::grpc::Status runWorkflow(::grpc::ServerContext* /*context*/, const ::SmartPeakServer::WorkflowParameters* /*request*/, ::SmartPeakServer::WorkflowResult* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     // replace default version of method with streamed unary
-    virtual ::grpc::Status StreamedrunWorkflow(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::SmartPeakServer::WorkflowParameters,::SmartPeakServer::WorkflowStatus>* server_unary_streamer) = 0;
+    virtual ::grpc::Status StreamedrunWorkflow(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::SmartPeakServer::WorkflowParameters,::SmartPeakServer::WorkflowResult>* server_unary_streamer) = 0;
   };
   typedef WithStreamedUnaryMethod_runWorkflow<Service > StreamedUnaryService;
   template <class BaseClass>

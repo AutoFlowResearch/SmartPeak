@@ -27,6 +27,7 @@
 #include <memory>
 #include <filesystem>
 #include <chrono>
+#include <cassert>
 
 #include <SmartPeak/io/SequenceParser.h>
 #include <SmartPeak/io/InputDataValidation.h>
@@ -54,39 +55,17 @@
 namespace SmartPeak {
   namespace serv {
   
-    class InstanceParameters {
+    static bool contains_option(
+      const std::vector<std::string>& list,
+      const std::string& option,
+      std::string log_msg="");
+
+    class ServerManager {
     public:
       /**
-      * Initializes InstanceParameters object.
-      */
-      InstanceParameters() {}
-
-      virtual ~InstanceParameters() = default;
-      
-      static bool contains_option(
-          const std::vector<std::string>& list,
-          const std::string& option,
-          std::string log_msg="");
-
-      std::string sequence_file;
-      std::vector<std::string> report { "FEATUREDB", "PIVOTTABLE", "ALL" };
-      std::vector<std::string> report_sample_types { "ALL" };
-      std::vector<std::string> report_metadata { "ALL" };
-      std::vector<std::string> workflow;
-      std::vector<std::string> integrity { "NONE" };
-      std::string log_dir;
-      std::string out_dir;
-    };
-
-
-    class ApplicationManager {
-    public:
-      /**
-       * Constructs the ApplicationManager object.
-       * @param application_settings reference to ApplicationSettings instance
+       * Constructs the ServerManager object.
        */
-      explicit ApplicationManager(InstanceParameters& application_settings)
-        : application_settings_{application_settings}
+      ServerManager()
       {
         application_handler_.sequenceHandler_.addTransitionsObserver(&event_dispatcher_);
         application_handler_.sequenceHandler_.addSequenceObserver(&event_dispatcher_);
@@ -96,12 +75,9 @@ namespace SmartPeak {
             event_dispatcher_, event_dispatcher_, event_dispatcher_, event_dispatcher_);
       }
 
-      virtual ~ApplicationManager() = default;
+      virtual ~ServerManager() = default;
 
     public:
-      inline InstanceParameters& get_application_settings() { return application_settings_; }
-      inline const InstanceParameters& get_application_settings() const { return application_settings_; }
-
       inline ApplicationHandler& get_application_handler() { return application_handler_; }
       inline const ApplicationHandler& get_application_handler() const { return application_handler_; }
 
@@ -120,9 +96,16 @@ namespace SmartPeak {
       inline ProgressInfo& get_progress_info() { return *progress_info_ptr_; }
       inline const ProgressInfo& get_progress_info() const { return *progress_info_ptr_; }
       
-
+      std::string               sequence_file;
+      std::vector<std::string>  report { "FEATUREDB", "PIVOTTABLE", "ALL" };
+      std::vector<std::string>  report_sample_types { "ALL" };
+      std::vector<std::string>  report_metadata { "ALL" };
+      std::vector<std::string>  workflow;
+      std::vector<std::string>  integrity { "NONE" };
+      std::string               log_dir;
+      std::string               out_dir;
+      
     private:
-      InstanceParameters& application_settings_;
       ApplicationHandler application_handler_;
       SessionHandler session_handler_;
       WorkflowManager workflow_manager_;
@@ -133,15 +116,15 @@ namespace SmartPeak {
     };
 
     void _extract_report_sampletypes(
-      const InstanceParameters& application_settings,
+      const std::vector<std::string>& application_settings,
       std::set<SmartPeak::SampleType>& report_sample_types);
 
     void _extract_report_metadata(
-      const InstanceParameters& application_settings,
+      const std::vector<std::string>& application_settings,
       std::vector<SmartPeak::FeatureMetadata>& report_metadata);
   
     std::tuple<bool, std::vector<SmartPeak::GuiAppender::GuiAppenderRecord>>
-      handleWorkflowRequest(std::string& sequence_file, bool is_logger_init);
+      handleWorkflowRequest(ServerManager* application_manager, bool is_logger_init);
   
     bool handleLogger(SmartPeak::ConsoleHandler* logger);
   }

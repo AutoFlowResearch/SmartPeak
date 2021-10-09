@@ -3,7 +3,7 @@ syntax = "proto3";
 package SmartPeakServer;
 
 service Workflow {
-  rpc runWorkflow (WorkflowParameters) returns (WorkflowStatus) {}
+  rpc runWorkflow (WorkflowParameters) returns (WorkflowResult) {}
   rpc getLogStream (InquireLogs) returns (stream LogStream) {}
 }
 
@@ -20,11 +20,35 @@ message WorkflowParameters {
   string integrity = 5; 
 }
 
-message WorkflowStatus {
+message SingleAxisData {
+  repeated float axis_data = 1;
+}
+
+message GraphData {
+  repeated string series_names_area = 1;
+  repeated SingleAxisData x_data = 2;
+  repeated SingleAxisData y_data = 3;
+  repeated SingleAxisData z_data = 4;
+  repeated string series_names_scatter = 5;
+  repeated SingleAxisData x_data_scatter = 6;
+  repeated SingleAxisData y_data_scatter = 7;
+  string x_axis_title = 8;
+  string y_axis_title = 9;
+  string z_axis_title = 10;
+  float x_min = 11;
+  float x_max = 12;
+  float y_min = 13;
+  float y_max = 14;
+  int32 nb_points = 15;
+  int32 max_nb_points = 16;
+}
+
+message WorkflowResult {
   int32 progress_in_percent = 1;
   string status_code = 2;
   string session_id = 3;
   string path_to_results = 4;
+  GraphData graph_data = 5;
 }
 
 message InquireLogs {

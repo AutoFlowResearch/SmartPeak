@@ -27,7 +27,7 @@
 namespace SmartPeak {
   namespace serv {
 
-    bool InstanceParameters::contains_option(
+    bool contains_option(
         const std::vector<std::string>& list,
         const std::string& option,
         std::string log_msg)
@@ -46,12 +46,12 @@ namespace SmartPeak {
     }
 
     void _extract_report_sampletypes(
-        const InstanceParameters& application_settings,
+        const std::vector<std::string>& selected_report_sample_types,
         std::set<SmartPeak::SampleType>& report_sample_types)
     {
       auto& available_types = SmartPeak::sampleTypeToString;
-      auto& types = application_settings.report_sample_types;
-      if (InstanceParameters::contains_option(
+      auto& types = selected_report_sample_types;
+      if (contains_option(
               types, "ALL", "Detected report-sample-types option: "))
       {
         std::transform(available_types.cbegin(), available_types.cend(),
@@ -75,12 +75,12 @@ namespace SmartPeak {
     }
 
     void _extract_report_metadata(
-        const InstanceParameters& application_settings,
+        const std::vector<std::string>& selected_report_metadata,
         std::vector<SmartPeak::FeatureMetadata>& report_metadata)
     {
       auto& available_metadata = SmartPeak::metadataToString;
-      auto& meta = application_settings.report_metadata;
-      if (InstanceParameters::contains_option(
+      auto& meta = selected_report_metadata;
+      if (contains_option(
               meta, "ALL", "Detected report-metadata option: "))
       {
         std::transform(available_metadata.cbegin(), available_metadata.cend(),
@@ -103,26 +103,23 @@ namespace SmartPeak {
     }
 
     std::tuple<bool, std::vector<SmartPeak::GuiAppender::GuiAppenderRecord>>
-      handleWorkflowRequest(std::string& sequence_file, bool is_logger_init)
+      handleWorkflowRequest(ServerManager* application_manager, bool is_logger_init)
     {
       bool job_done = false;
-      std::cout << ">>> SERVER received : " << sequence_file << std::endl;
-      auto application_settings = InstanceParameters();
-      application_settings.sequence_file = sequence_file;
-      auto application_manager = ApplicationManager{application_settings};
-      
+      std::cout << ">>> SERVER received : " << application_manager->sequence_file << std::endl;
+        LOGI << ">>> SERVER received : " << application_manager->sequence_file;
+        
       try
       {
-        auto& application_settings = application_manager.get_application_settings();
-        auto& application_handler = application_manager.get_application_handler();
+        auto& application_handler = application_manager->get_application_handler();
         auto create_sequence = SmartPeak::CreateSequence{application_handler.sequenceHandler_};
-        create_sequence.onFilePicked(application_settings.sequence_file, &application_handler);
+        create_sequence.onFilePicked(application_manager->sequence_file, &application_handler);
         
         // init-dirs
         auto main_dir = application_handler.main_dir_;
-        if (!application_settings.out_dir.empty() && application_settings.out_dir != ".")
+        if (!application_manager->out_dir.empty() && application_manager->out_dir != ".")
         {
-          main_dir = application_settings.out_dir;
+          main_dir = application_manager->out_dir;
           LOG_DEBUG << "Output feature directory: " << main_dir.generic_string();
         }
         application_handler.mzML_dir_           = application_handler.main_dir_ / "mzML";
@@ -158,9 +155,9 @@ namespace SmartPeak {
         SmartPeak::BuildCommandsFromNames buildCommandsFromNames{application_handler};
         {
           buildCommandsFromNames.names_ = application_handler.sequenceHandler_.getWorkflow();
-          if (!application_settings.workflow.empty())
+          if (!application_manager->workflow.empty())
           {
-            buildCommandsFromNames.names_ = application_settings.workflow;
+            buildCommandsFromNames.names_ = application_manager->workflow;
             auto workflow_string = std::string{};
             for (const auto& cmd : buildCommandsFromNames.names_) workflow_string += "\t" + cmd + " \n";
             LOG_WARNING << "Override workflow with: \n" << workflow_string;
@@ -170,7 +167,7 @@ namespace SmartPeak {
         {
           LOG_ERROR << "Failed to create workflow commands, abort.";
         }
-        application_manager.set_workflow_commands(buildCommandsFromNames.commands_);
+        application_manager->set_workflow_commands(buildCommandsFromNames.commands_);
         for (auto& cmd : buildCommandsFromNames.commands_)
         {
           for (auto& p : cmd.dynamic_filenames)
@@ -183,10 +180,10 @@ namespace SmartPeak {
         }
         
         // RunInC-impl.
-        auto& session_handler = application_manager.get_session_handler();
-        auto& workflow_manager = application_manager.get_workflow_manager();
-        auto& event_dispatcher = application_manager.get_event_dispatcher();
-        auto& progress_info = application_manager.get_progress_info();
+        auto& session_handler = application_manager->get_session_handler();
+        auto& workflow_manager = application_manager->get_workflow_manager();
+        auto& event_dispatcher = application_manager->get_event_dispatcher();
+        auto& progress_info = application_manager->get_progress_info();
         {
           //event_dispatcher.addApplicationProcessorObserver(this);
           //event_dispatcher.addSequenceProcessorObserver(this);
@@ -201,7 +198,7 @@ namespace SmartPeak {
 
           workflow_manager.addWorkflow(
             application_handler, injection_names, sequence_segment_names,
-            sample_group_names, application_manager.get_workflow_commands(),
+            sample_group_names, application_manager->get_workflow_commands(),
             &event_dispatcher, &event_dispatcher, &event_dispatcher, &event_dispatcher, true);
 
           if (false)
@@ -229,13 +226,13 @@ namespace SmartPeak {
 
           auto report_sample_types = std::set<SmartPeak::SampleType>{};
           auto report_metadata = std::vector<SmartPeak::FeatureMetadata>{};
-          _extract_report_sampletypes(application_settings, report_sample_types);
-          _extract_report_metadata(application_settings, report_metadata);
+          _extract_report_sampletypes(application_manager->report_sample_types, report_sample_types);
+          _extract_report_metadata(application_manager->report_metadata, report_metadata);
 
           auto main_dir = application_handler.main_dir_;
-          if (!application_settings.out_dir.empty() && application_settings.out_dir != ".")
+          if (!application_manager->out_dir.empty() && application_manager->out_dir != ".")
           {
-            main_dir = application_settings.out_dir;
+            main_dir = application_manager->out_dir;
           }
 
           if (feature_db)

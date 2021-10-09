@@ -34,21 +34,62 @@ struct WorkflowParametersDefaultTypeInternal {
   };
 };
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT WorkflowParametersDefaultTypeInternal _WorkflowParameters_default_instance_;
-constexpr WorkflowStatus::WorkflowStatus(
+constexpr SingleAxisData::SingleAxisData(
+  ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized)
+  : axis_data_()
+  , _axis_data_cached_byte_size_(){}
+struct SingleAxisDataDefaultTypeInternal {
+  constexpr SingleAxisDataDefaultTypeInternal()
+    : _instance(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized{}) {}
+  ~SingleAxisDataDefaultTypeInternal() {}
+  union {
+    SingleAxisData _instance;
+  };
+};
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT SingleAxisDataDefaultTypeInternal _SingleAxisData_default_instance_;
+constexpr GraphData::GraphData(
+  ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized)
+  : series_names_area_()
+  , x_data_()
+  , y_data_()
+  , z_data_()
+  , series_names_scatter_()
+  , x_data_scatter_()
+  , y_data_scatter_()
+  , x_axis_title_(&::PROTOBUF_NAMESPACE_ID::internal::fixed_address_empty_string)
+  , y_axis_title_(&::PROTOBUF_NAMESPACE_ID::internal::fixed_address_empty_string)
+  , z_axis_title_(&::PROTOBUF_NAMESPACE_ID::internal::fixed_address_empty_string)
+  , x_min_(0)
+  , x_max_(0)
+  , y_min_(0)
+  , y_max_(0)
+  , nb_points_(0)
+  , max_nb_points_(0){}
+struct GraphDataDefaultTypeInternal {
+  constexpr GraphDataDefaultTypeInternal()
+    : _instance(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized{}) {}
+  ~GraphDataDefaultTypeInternal() {}
+  union {
+    GraphData _instance;
+  };
+};
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT GraphDataDefaultTypeInternal _GraphData_default_instance_;
+constexpr WorkflowResult::WorkflowResult(
   ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized)
   : status_code_(&::PROTOBUF_NAMESPACE_ID::internal::fixed_address_empty_string)
   , session_id_(&::PROTOBUF_NAMESPACE_ID::internal::fixed_address_empty_string)
   , path_to_results_(&::PROTOBUF_NAMESPACE_ID::internal::fixed_address_empty_string)
+  , graph_data_(nullptr)
   , progress_in_percent_(0){}
-struct WorkflowStatusDefaultTypeInternal {
-  constexpr WorkflowStatusDefaultTypeInternal()
+struct WorkflowResultDefaultTypeInternal {
+  constexpr WorkflowResultDefaultTypeInternal()
     : _instance(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized{}) {}
-  ~WorkflowStatusDefaultTypeInternal() {}
+  ~WorkflowResultDefaultTypeInternal() {}
   union {
-    WorkflowStatus _instance;
+    WorkflowResult _instance;
   };
 };
-PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT WorkflowStatusDefaultTypeInternal _WorkflowStatus_default_instance_;
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT WorkflowResultDefaultTypeInternal _WorkflowResult_default_instance_;
 constexpr InquireLogs::InquireLogs(
   ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized)
   : nr_lines_(0){}
@@ -74,7 +115,7 @@ struct LogStreamDefaultTypeInternal {
 };
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT LogStreamDefaultTypeInternal _LogStream_default_instance_;
 }  // namespace SmartPeakServer
-static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_workflow_2eproto[4];
+static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_workflow_2eproto[6];
 static const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* file_level_enum_descriptors_workflow_2eproto[1];
 static constexpr ::PROTOBUF_NAMESPACE_ID::ServiceDescriptor const** file_level_service_descriptors_workflow_2eproto = nullptr;
 
@@ -90,14 +131,42 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_workflow_2eproto::offsets[] PR
   PROTOBUF_FIELD_OFFSET(::SmartPeakServer::WorkflowParameters, report_sample_types_),
   PROTOBUF_FIELD_OFFSET(::SmartPeakServer::WorkflowParameters, integrity_),
   ~0u,  // no _has_bits_
-  PROTOBUF_FIELD_OFFSET(::SmartPeakServer::WorkflowStatus, _internal_metadata_),
+  PROTOBUF_FIELD_OFFSET(::SmartPeakServer::SingleAxisData, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  PROTOBUF_FIELD_OFFSET(::SmartPeakServer::WorkflowStatus, progress_in_percent_),
-  PROTOBUF_FIELD_OFFSET(::SmartPeakServer::WorkflowStatus, status_code_),
-  PROTOBUF_FIELD_OFFSET(::SmartPeakServer::WorkflowStatus, session_id_),
-  PROTOBUF_FIELD_OFFSET(::SmartPeakServer::WorkflowStatus, path_to_results_),
+  PROTOBUF_FIELD_OFFSET(::SmartPeakServer::SingleAxisData, axis_data_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::SmartPeakServer::GraphData, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::SmartPeakServer::GraphData, series_names_area_),
+  PROTOBUF_FIELD_OFFSET(::SmartPeakServer::GraphData, x_data_),
+  PROTOBUF_FIELD_OFFSET(::SmartPeakServer::GraphData, y_data_),
+  PROTOBUF_FIELD_OFFSET(::SmartPeakServer::GraphData, z_data_),
+  PROTOBUF_FIELD_OFFSET(::SmartPeakServer::GraphData, series_names_scatter_),
+  PROTOBUF_FIELD_OFFSET(::SmartPeakServer::GraphData, x_data_scatter_),
+  PROTOBUF_FIELD_OFFSET(::SmartPeakServer::GraphData, y_data_scatter_),
+  PROTOBUF_FIELD_OFFSET(::SmartPeakServer::GraphData, x_axis_title_),
+  PROTOBUF_FIELD_OFFSET(::SmartPeakServer::GraphData, y_axis_title_),
+  PROTOBUF_FIELD_OFFSET(::SmartPeakServer::GraphData, z_axis_title_),
+  PROTOBUF_FIELD_OFFSET(::SmartPeakServer::GraphData, x_min_),
+  PROTOBUF_FIELD_OFFSET(::SmartPeakServer::GraphData, x_max_),
+  PROTOBUF_FIELD_OFFSET(::SmartPeakServer::GraphData, y_min_),
+  PROTOBUF_FIELD_OFFSET(::SmartPeakServer::GraphData, y_max_),
+  PROTOBUF_FIELD_OFFSET(::SmartPeakServer::GraphData, nb_points_),
+  PROTOBUF_FIELD_OFFSET(::SmartPeakServer::GraphData, max_nb_points_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::SmartPeakServer::WorkflowResult, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::SmartPeakServer::WorkflowResult, progress_in_percent_),
+  PROTOBUF_FIELD_OFFSET(::SmartPeakServer::WorkflowResult, status_code_),
+  PROTOBUF_FIELD_OFFSET(::SmartPeakServer::WorkflowResult, session_id_),
+  PROTOBUF_FIELD_OFFSET(::SmartPeakServer::WorkflowResult, path_to_results_),
+  PROTOBUF_FIELD_OFFSET(::SmartPeakServer::WorkflowResult, graph_data_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::SmartPeakServer::InquireLogs, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -113,14 +182,18 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_workflow_2eproto::offsets[] PR
 };
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::SmartPeakServer::WorkflowParameters)},
-  { 10, -1, sizeof(::SmartPeakServer::WorkflowStatus)},
-  { 19, -1, sizeof(::SmartPeakServer::InquireLogs)},
-  { 25, -1, sizeof(::SmartPeakServer::LogStream)},
+  { 10, -1, sizeof(::SmartPeakServer::SingleAxisData)},
+  { 16, -1, sizeof(::SmartPeakServer::GraphData)},
+  { 37, -1, sizeof(::SmartPeakServer::WorkflowResult)},
+  { 47, -1, sizeof(::SmartPeakServer::InquireLogs)},
+  { 53, -1, sizeof(::SmartPeakServer::LogStream)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::SmartPeakServer::_WorkflowParameters_default_instance_),
-  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::SmartPeakServer::_WorkflowStatus_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::SmartPeakServer::_SingleAxisData_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::SmartPeakServer::_GraphData_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::SmartPeakServer::_WorkflowResult_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::SmartPeakServer::_InquireLogs_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::SmartPeakServer::_LogStream_default_instance_),
 };
@@ -132,21 +205,36 @@ const char descriptor_table_protodef_workflow_2eproto[] PROTOBUF_SECTION_VARIABL
   "owParameters.ExportReport\022\027\n\017report_meta"
   "data\030\003 \001(\t\022\033\n\023report_sample_types\030\004 \001(\t\022"
   "\021\n\tintegrity\030\005 \001(\t\"6\n\014ExportReport\022\007\n\003AL"
-  "L\020\000\022\r\n\tFEATUREDB\020\001\022\016\n\nPIVOTTABLE\020\002\"o\n\016Wo"
-  "rkflowStatus\022\033\n\023progress_in_percent\030\001 \001("
-  "\005\022\023\n\013status_code\030\002 \001(\t\022\022\n\nsession_id\030\003 \001"
-  "(\t\022\027\n\017path_to_results\030\004 \001(\t\"\037\n\013InquireLo"
-  "gs\022\020\n\010nr_lines\030\001 \001(\005\"\035\n\tLogStream\022\020\n\010log"
-  "_line\030\001 \001(\t2\257\001\n\010Workflow\022U\n\013runWorkflow\022"
-  "#.SmartPeakServer.WorkflowParameters\032\037.S"
-  "martPeakServer.WorkflowStatus\"\000\022L\n\014getLo"
-  "gStream\022\034.SmartPeakServer.InquireLogs\032\032."
-  "SmartPeakServer.LogStream\"\0000\001b\006proto3"
+  "L\020\000\022\r\n\tFEATUREDB\020\001\022\016\n\nPIVOTTABLE\020\002\"#\n\016Si"
+  "ngleAxisData\022\021\n\taxis_data\030\001 \003(\002\"\361\003\n\tGrap"
+  "hData\022\031\n\021series_names_area\030\001 \003(\t\022/\n\006x_da"
+  "ta\030\002 \003(\0132\037.SmartPeakServer.SingleAxisDat"
+  "a\022/\n\006y_data\030\003 \003(\0132\037.SmartPeakServer.Sing"
+  "leAxisData\022/\n\006z_data\030\004 \003(\0132\037.SmartPeakSe"
+  "rver.SingleAxisData\022\034\n\024series_names_scat"
+  "ter\030\005 \003(\t\0227\n\016x_data_scatter\030\006 \003(\0132\037.Smar"
+  "tPeakServer.SingleAxisData\0227\n\016y_data_sca"
+  "tter\030\007 \003(\0132\037.SmartPeakServer.SingleAxisD"
+  "ata\022\024\n\014x_axis_title\030\010 \001(\t\022\024\n\014y_axis_titl"
+  "e\030\t \001(\t\022\024\n\014z_axis_title\030\n \001(\t\022\r\n\005x_min\030\013"
+  " \001(\002\022\r\n\005x_max\030\014 \001(\002\022\r\n\005y_min\030\r \001(\002\022\r\n\005y_"
+  "max\030\016 \001(\002\022\021\n\tnb_points\030\017 \001(\005\022\025\n\rmax_nb_p"
+  "oints\030\020 \001(\005\"\237\001\n\016WorkflowResult\022\033\n\023progre"
+  "ss_in_percent\030\001 \001(\005\022\023\n\013status_code\030\002 \001(\t"
+  "\022\022\n\nsession_id\030\003 \001(\t\022\027\n\017path_to_results\030"
+  "\004 \001(\t\022.\n\ngraph_data\030\005 \001(\0132\032.SmartPeakSer"
+  "ver.GraphData\"\037\n\013InquireLogs\022\020\n\010nr_lines"
+  "\030\001 \001(\005\"\035\n\tLogStream\022\020\n\010log_line\030\001 \001(\t2\257\001"
+  "\n\010Workflow\022U\n\013runWorkflow\022#.SmartPeakSer"
+  "ver.WorkflowParameters\032\037.SmartPeakServer"
+  ".WorkflowResult\"\000\022L\n\014getLogStream\022\034.Smar"
+  "tPeakServer.InquireLogs\032\032.SmartPeakServe"
+  "r.LogStream\"\0000\001b\006proto3"
   ;
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_workflow_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_workflow_2eproto = {
-  false, false, 637, descriptor_table_protodef_workflow_2eproto, "workflow.proto", 
-  &descriptor_table_workflow_2eproto_once, nullptr, 0, 4,
+  false, false, 1223, descriptor_table_protodef_workflow_2eproto, "workflow.proto", 
+  &descriptor_table_workflow_2eproto_once, nullptr, 0, 6,
   schemas, file_default_instances, TableStruct_workflow_2eproto::offsets,
   file_level_metadata_workflow_2eproto, file_level_enum_descriptors_workflow_2eproto, file_level_service_descriptors_workflow_2eproto,
 };
@@ -527,119 +615,467 @@ void WorkflowParameters::InternalSwap(WorkflowParameters* other) {
 
 // ===================================================================
 
-class WorkflowStatus::_Internal {
+class SingleAxisData::_Internal {
  public:
 };
 
-WorkflowStatus::WorkflowStatus(::PROTOBUF_NAMESPACE_ID::Arena* arena)
-  : ::PROTOBUF_NAMESPACE_ID::Message(arena) {
+SingleAxisData::SingleAxisData(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena),
+  axis_data_(arena) {
   SharedCtor();
   RegisterArenaDtor(arena);
-  // @@protoc_insertion_point(arena_constructor:SmartPeakServer.WorkflowStatus)
+  // @@protoc_insertion_point(arena_constructor:SmartPeakServer.SingleAxisData)
 }
-WorkflowStatus::WorkflowStatus(const WorkflowStatus& from)
-  : ::PROTOBUF_NAMESPACE_ID::Message() {
+SingleAxisData::SingleAxisData(const SingleAxisData& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message(),
+      axis_data_(from.axis_data_) {
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  status_code_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  if (!from._internal_status_code().empty()) {
-    status_code_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_status_code(), 
-      GetArena());
-  }
-  session_id_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  if (!from._internal_session_id().empty()) {
-    session_id_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_session_id(), 
-      GetArena());
-  }
-  path_to_results_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  if (!from._internal_path_to_results().empty()) {
-    path_to_results_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_path_to_results(), 
-      GetArena());
-  }
-  progress_in_percent_ = from.progress_in_percent_;
-  // @@protoc_insertion_point(copy_constructor:SmartPeakServer.WorkflowStatus)
+  // @@protoc_insertion_point(copy_constructor:SmartPeakServer.SingleAxisData)
 }
 
-void WorkflowStatus::SharedCtor() {
-status_code_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-session_id_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-path_to_results_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-progress_in_percent_ = 0;
+void SingleAxisData::SharedCtor() {
 }
 
-WorkflowStatus::~WorkflowStatus() {
-  // @@protoc_insertion_point(destructor:SmartPeakServer.WorkflowStatus)
+SingleAxisData::~SingleAxisData() {
+  // @@protoc_insertion_point(destructor:SmartPeakServer.SingleAxisData)
   SharedDtor();
   _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
-void WorkflowStatus::SharedDtor() {
+void SingleAxisData::SharedDtor() {
   GOOGLE_DCHECK(GetArena() == nullptr);
-  status_code_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  session_id_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  path_to_results_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
 
-void WorkflowStatus::ArenaDtor(void* object) {
-  WorkflowStatus* _this = reinterpret_cast< WorkflowStatus* >(object);
+void SingleAxisData::ArenaDtor(void* object) {
+  SingleAxisData* _this = reinterpret_cast< SingleAxisData* >(object);
   (void)_this;
 }
-void WorkflowStatus::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+void SingleAxisData::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
 }
-void WorkflowStatus::SetCachedSize(int size) const {
+void SingleAxisData::SetCachedSize(int size) const {
   _cached_size_.Set(size);
 }
 
-void WorkflowStatus::Clear() {
-// @@protoc_insertion_point(message_clear_start:SmartPeakServer.WorkflowStatus)
+void SingleAxisData::Clear() {
+// @@protoc_insertion_point(message_clear_start:SmartPeakServer.SingleAxisData)
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  status_code_.ClearToEmpty();
-  session_id_.ClearToEmpty();
-  path_to_results_.ClearToEmpty();
-  progress_in_percent_ = 0;
+  axis_data_.Clear();
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
-const char* WorkflowStatus::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+const char* SingleAxisData::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   while (!ctx->Done(&ptr)) {
     ::PROTOBUF_NAMESPACE_ID::uint32 tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     CHK_(ptr);
     switch (tag >> 3) {
-      // int32 progress_in_percent = 1;
+      // repeated float axis_data = 1;
       case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
-          progress_in_percent_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::PackedFloatParser(_internal_mutable_axis_data(), ptr, ctx);
           CHK_(ptr);
+        } else if (static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 13) {
+          _internal_add_axis_data(::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr));
+          ptr += sizeof(float);
         } else goto handle_unusual;
         continue;
-      // string status_code = 2;
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->SetLastTag(tag);
+          goto success;
+        }
+        ptr = UnknownFieldParse(tag,
+            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+            ptr, ctx);
+        CHK_(ptr != nullptr);
+        continue;
+      }
+    }  // switch
+  }  // while
+success:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto success;
+#undef CHK_
+}
+
+::PROTOBUF_NAMESPACE_ID::uint8* SingleAxisData::_InternalSerialize(
+    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:SmartPeakServer.SingleAxisData)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // repeated float axis_data = 1;
+  if (this->_internal_axis_data_size() > 0) {
+    target = stream->WriteFixedPacked(1, _internal_axis_data(), target);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:SmartPeakServer.SingleAxisData)
+  return target;
+}
+
+size_t SingleAxisData::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:SmartPeakServer.SingleAxisData)
+  size_t total_size = 0;
+
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // repeated float axis_data = 1;
+  {
+    unsigned int count = static_cast<unsigned int>(this->_internal_axis_data_size());
+    size_t data_size = 4UL * count;
+    if (data_size > 0) {
+      total_size += 1 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+            static_cast<::PROTOBUF_NAMESPACE_ID::int32>(data_size));
+    }
+    int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(data_size);
+    _axis_data_cached_byte_size_.store(cached_size,
+                                    std::memory_order_relaxed);
+    total_size += data_size;
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
+        _internal_metadata_, total_size, &_cached_size_);
+  }
+  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void SingleAxisData::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:SmartPeakServer.SingleAxisData)
+  GOOGLE_DCHECK_NE(&from, this);
+  const SingleAxisData* source =
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<SingleAxisData>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:SmartPeakServer.SingleAxisData)
+    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:SmartPeakServer.SingleAxisData)
+    MergeFrom(*source);
+  }
+}
+
+void SingleAxisData::MergeFrom(const SingleAxisData& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:SmartPeakServer.SingleAxisData)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  axis_data_.MergeFrom(from.axis_data_);
+}
+
+void SingleAxisData::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:SmartPeakServer.SingleAxisData)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void SingleAxisData::CopyFrom(const SingleAxisData& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:SmartPeakServer.SingleAxisData)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool SingleAxisData::IsInitialized() const {
+  return true;
+}
+
+void SingleAxisData::InternalSwap(SingleAxisData* other) {
+  using std::swap;
+  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
+  axis_data_.InternalSwap(&other->axis_data_);
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata SingleAxisData::GetMetadata() const {
+  return GetMetadataStatic();
+}
+
+
+// ===================================================================
+
+class GraphData::_Internal {
+ public:
+};
+
+GraphData::GraphData(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena),
+  series_names_area_(arena),
+  x_data_(arena),
+  y_data_(arena),
+  z_data_(arena),
+  series_names_scatter_(arena),
+  x_data_scatter_(arena),
+  y_data_scatter_(arena) {
+  SharedCtor();
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:SmartPeakServer.GraphData)
+}
+GraphData::GraphData(const GraphData& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message(),
+      series_names_area_(from.series_names_area_),
+      x_data_(from.x_data_),
+      y_data_(from.y_data_),
+      z_data_(from.z_data_),
+      series_names_scatter_(from.series_names_scatter_),
+      x_data_scatter_(from.x_data_scatter_),
+      y_data_scatter_(from.y_data_scatter_) {
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  x_axis_title_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  if (!from._internal_x_axis_title().empty()) {
+    x_axis_title_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_x_axis_title(), 
+      GetArena());
+  }
+  y_axis_title_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  if (!from._internal_y_axis_title().empty()) {
+    y_axis_title_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_y_axis_title(), 
+      GetArena());
+  }
+  z_axis_title_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  if (!from._internal_z_axis_title().empty()) {
+    z_axis_title_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_z_axis_title(), 
+      GetArena());
+  }
+  ::memcpy(&x_min_, &from.x_min_,
+    static_cast<size_t>(reinterpret_cast<char*>(&max_nb_points_) -
+    reinterpret_cast<char*>(&x_min_)) + sizeof(max_nb_points_));
+  // @@protoc_insertion_point(copy_constructor:SmartPeakServer.GraphData)
+}
+
+void GraphData::SharedCtor() {
+x_axis_title_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+y_axis_title_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+z_axis_title_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+::memset(reinterpret_cast<char*>(this) + static_cast<size_t>(
+    reinterpret_cast<char*>(&x_min_) - reinterpret_cast<char*>(this)),
+    0, static_cast<size_t>(reinterpret_cast<char*>(&max_nb_points_) -
+    reinterpret_cast<char*>(&x_min_)) + sizeof(max_nb_points_));
+}
+
+GraphData::~GraphData() {
+  // @@protoc_insertion_point(destructor:SmartPeakServer.GraphData)
+  SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+void GraphData::SharedDtor() {
+  GOOGLE_DCHECK(GetArena() == nullptr);
+  x_axis_title_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  y_axis_title_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  z_axis_title_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+
+void GraphData::ArenaDtor(void* object) {
+  GraphData* _this = reinterpret_cast< GraphData* >(object);
+  (void)_this;
+}
+void GraphData::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
+void GraphData::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+
+void GraphData::Clear() {
+// @@protoc_insertion_point(message_clear_start:SmartPeakServer.GraphData)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  series_names_area_.Clear();
+  x_data_.Clear();
+  y_data_.Clear();
+  z_data_.Clear();
+  series_names_scatter_.Clear();
+  x_data_scatter_.Clear();
+  y_data_scatter_.Clear();
+  x_axis_title_.ClearToEmpty();
+  y_axis_title_.ClearToEmpty();
+  z_axis_title_.ClearToEmpty();
+  ::memset(&x_min_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&max_nb_points_) -
+      reinterpret_cast<char*>(&x_min_)) + sizeof(max_nb_points_));
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* GraphData::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  while (!ctx->Done(&ptr)) {
+    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    CHK_(ptr);
+    switch (tag >> 3) {
+      // repeated string series_names_area = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
+          ptr -= 1;
+          do {
+            ptr += 1;
+            auto str = _internal_add_series_names_area();
+            ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+            CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "SmartPeakServer.GraphData.series_names_area"));
+            CHK_(ptr);
+            if (!ctx->DataAvailable(ptr)) break;
+          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<10>(ptr));
+        } else goto handle_unusual;
+        continue;
+      // repeated .SmartPeakServer.SingleAxisData x_data = 2;
       case 2:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 18)) {
-          auto str = _internal_mutable_status_code();
-          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
-          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "SmartPeakServer.WorkflowStatus.status_code"));
-          CHK_(ptr);
+          ptr -= 1;
+          do {
+            ptr += 1;
+            ptr = ctx->ParseMessage(_internal_add_x_data(), ptr);
+            CHK_(ptr);
+            if (!ctx->DataAvailable(ptr)) break;
+          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<18>(ptr));
         } else goto handle_unusual;
         continue;
-      // string session_id = 3;
+      // repeated .SmartPeakServer.SingleAxisData y_data = 3;
       case 3:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 26)) {
-          auto str = _internal_mutable_session_id();
+          ptr -= 1;
+          do {
+            ptr += 1;
+            ptr = ctx->ParseMessage(_internal_add_y_data(), ptr);
+            CHK_(ptr);
+            if (!ctx->DataAvailable(ptr)) break;
+          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<26>(ptr));
+        } else goto handle_unusual;
+        continue;
+      // repeated .SmartPeakServer.SingleAxisData z_data = 4;
+      case 4:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 34)) {
+          ptr -= 1;
+          do {
+            ptr += 1;
+            ptr = ctx->ParseMessage(_internal_add_z_data(), ptr);
+            CHK_(ptr);
+            if (!ctx->DataAvailable(ptr)) break;
+          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<34>(ptr));
+        } else goto handle_unusual;
+        continue;
+      // repeated string series_names_scatter = 5;
+      case 5:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 42)) {
+          ptr -= 1;
+          do {
+            ptr += 1;
+            auto str = _internal_add_series_names_scatter();
+            ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+            CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "SmartPeakServer.GraphData.series_names_scatter"));
+            CHK_(ptr);
+            if (!ctx->DataAvailable(ptr)) break;
+          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<42>(ptr));
+        } else goto handle_unusual;
+        continue;
+      // repeated .SmartPeakServer.SingleAxisData x_data_scatter = 6;
+      case 6:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 50)) {
+          ptr -= 1;
+          do {
+            ptr += 1;
+            ptr = ctx->ParseMessage(_internal_add_x_data_scatter(), ptr);
+            CHK_(ptr);
+            if (!ctx->DataAvailable(ptr)) break;
+          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<50>(ptr));
+        } else goto handle_unusual;
+        continue;
+      // repeated .SmartPeakServer.SingleAxisData y_data_scatter = 7;
+      case 7:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 58)) {
+          ptr -= 1;
+          do {
+            ptr += 1;
+            ptr = ctx->ParseMessage(_internal_add_y_data_scatter(), ptr);
+            CHK_(ptr);
+            if (!ctx->DataAvailable(ptr)) break;
+          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<58>(ptr));
+        } else goto handle_unusual;
+        continue;
+      // string x_axis_title = 8;
+      case 8:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 66)) {
+          auto str = _internal_mutable_x_axis_title();
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
-          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "SmartPeakServer.WorkflowStatus.session_id"));
+          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "SmartPeakServer.GraphData.x_axis_title"));
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
-      // string path_to_results = 4;
-      case 4:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 34)) {
-          auto str = _internal_mutable_path_to_results();
+      // string y_axis_title = 9;
+      case 9:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 74)) {
+          auto str = _internal_mutable_y_axis_title();
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
-          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "SmartPeakServer.WorkflowStatus.path_to_results"));
+          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "SmartPeakServer.GraphData.y_axis_title"));
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // string z_axis_title = 10;
+      case 10:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 82)) {
+          auto str = _internal_mutable_z_axis_title();
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "SmartPeakServer.GraphData.z_axis_title"));
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // float x_min = 11;
+      case 11:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 93)) {
+          x_min_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      // float x_max = 12;
+      case 12:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 101)) {
+          x_max_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      // float y_min = 13;
+      case 13:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 109)) {
+          y_min_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      // float y_max = 14;
+      case 14:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 117)) {
+          y_max_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      // int32 nb_points = 15;
+      case 15:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 120)) {
+          nb_points_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // int32 max_nb_points = 16;
+      case 16:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 128)) {
+          max_nb_points_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
@@ -665,9 +1101,539 @@ failure:
 #undef CHK_
 }
 
-::PROTOBUF_NAMESPACE_ID::uint8* WorkflowStatus::_InternalSerialize(
+::PROTOBUF_NAMESPACE_ID::uint8* GraphData::_InternalSerialize(
     ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
-  // @@protoc_insertion_point(serialize_to_array_start:SmartPeakServer.WorkflowStatus)
+  // @@protoc_insertion_point(serialize_to_array_start:SmartPeakServer.GraphData)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // repeated string series_names_area = 1;
+  for (int i = 0, n = this->_internal_series_names_area_size(); i < n; i++) {
+    const auto& s = this->_internal_series_names_area(i);
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      s.data(), static_cast<int>(s.length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "SmartPeakServer.GraphData.series_names_area");
+    target = stream->WriteString(1, s, target);
+  }
+
+  // repeated .SmartPeakServer.SingleAxisData x_data = 2;
+  for (unsigned int i = 0,
+      n = static_cast<unsigned int>(this->_internal_x_data_size()); i < n; i++) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(2, this->_internal_x_data(i), target, stream);
+  }
+
+  // repeated .SmartPeakServer.SingleAxisData y_data = 3;
+  for (unsigned int i = 0,
+      n = static_cast<unsigned int>(this->_internal_y_data_size()); i < n; i++) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(3, this->_internal_y_data(i), target, stream);
+  }
+
+  // repeated .SmartPeakServer.SingleAxisData z_data = 4;
+  for (unsigned int i = 0,
+      n = static_cast<unsigned int>(this->_internal_z_data_size()); i < n; i++) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(4, this->_internal_z_data(i), target, stream);
+  }
+
+  // repeated string series_names_scatter = 5;
+  for (int i = 0, n = this->_internal_series_names_scatter_size(); i < n; i++) {
+    const auto& s = this->_internal_series_names_scatter(i);
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      s.data(), static_cast<int>(s.length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "SmartPeakServer.GraphData.series_names_scatter");
+    target = stream->WriteString(5, s, target);
+  }
+
+  // repeated .SmartPeakServer.SingleAxisData x_data_scatter = 6;
+  for (unsigned int i = 0,
+      n = static_cast<unsigned int>(this->_internal_x_data_scatter_size()); i < n; i++) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(6, this->_internal_x_data_scatter(i), target, stream);
+  }
+
+  // repeated .SmartPeakServer.SingleAxisData y_data_scatter = 7;
+  for (unsigned int i = 0,
+      n = static_cast<unsigned int>(this->_internal_y_data_scatter_size()); i < n; i++) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(7, this->_internal_y_data_scatter(i), target, stream);
+  }
+
+  // string x_axis_title = 8;
+  if (this->x_axis_title().size() > 0) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_x_axis_title().data(), static_cast<int>(this->_internal_x_axis_title().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "SmartPeakServer.GraphData.x_axis_title");
+    target = stream->WriteStringMaybeAliased(
+        8, this->_internal_x_axis_title(), target);
+  }
+
+  // string y_axis_title = 9;
+  if (this->y_axis_title().size() > 0) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_y_axis_title().data(), static_cast<int>(this->_internal_y_axis_title().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "SmartPeakServer.GraphData.y_axis_title");
+    target = stream->WriteStringMaybeAliased(
+        9, this->_internal_y_axis_title(), target);
+  }
+
+  // string z_axis_title = 10;
+  if (this->z_axis_title().size() > 0) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_z_axis_title().data(), static_cast<int>(this->_internal_z_axis_title().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "SmartPeakServer.GraphData.z_axis_title");
+    target = stream->WriteStringMaybeAliased(
+        10, this->_internal_z_axis_title(), target);
+  }
+
+  // float x_min = 11;
+  if (!(this->x_min() <= 0 && this->x_min() >= 0)) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(11, this->_internal_x_min(), target);
+  }
+
+  // float x_max = 12;
+  if (!(this->x_max() <= 0 && this->x_max() >= 0)) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(12, this->_internal_x_max(), target);
+  }
+
+  // float y_min = 13;
+  if (!(this->y_min() <= 0 && this->y_min() >= 0)) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(13, this->_internal_y_min(), target);
+  }
+
+  // float y_max = 14;
+  if (!(this->y_max() <= 0 && this->y_max() >= 0)) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(14, this->_internal_y_max(), target);
+  }
+
+  // int32 nb_points = 15;
+  if (this->nb_points() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(15, this->_internal_nb_points(), target);
+  }
+
+  // int32 max_nb_points = 16;
+  if (this->max_nb_points() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(16, this->_internal_max_nb_points(), target);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:SmartPeakServer.GraphData)
+  return target;
+}
+
+size_t GraphData::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:SmartPeakServer.GraphData)
+  size_t total_size = 0;
+
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // repeated string series_names_area = 1;
+  total_size += 1 *
+      ::PROTOBUF_NAMESPACE_ID::internal::FromIntSize(series_names_area_.size());
+  for (int i = 0, n = series_names_area_.size(); i < n; i++) {
+    total_size += ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+      series_names_area_.Get(i));
+  }
+
+  // repeated .SmartPeakServer.SingleAxisData x_data = 2;
+  total_size += 1UL * this->_internal_x_data_size();
+  for (const auto& msg : this->x_data_) {
+    total_size +=
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(msg);
+  }
+
+  // repeated .SmartPeakServer.SingleAxisData y_data = 3;
+  total_size += 1UL * this->_internal_y_data_size();
+  for (const auto& msg : this->y_data_) {
+    total_size +=
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(msg);
+  }
+
+  // repeated .SmartPeakServer.SingleAxisData z_data = 4;
+  total_size += 1UL * this->_internal_z_data_size();
+  for (const auto& msg : this->z_data_) {
+    total_size +=
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(msg);
+  }
+
+  // repeated string series_names_scatter = 5;
+  total_size += 1 *
+      ::PROTOBUF_NAMESPACE_ID::internal::FromIntSize(series_names_scatter_.size());
+  for (int i = 0, n = series_names_scatter_.size(); i < n; i++) {
+    total_size += ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+      series_names_scatter_.Get(i));
+  }
+
+  // repeated .SmartPeakServer.SingleAxisData x_data_scatter = 6;
+  total_size += 1UL * this->_internal_x_data_scatter_size();
+  for (const auto& msg : this->x_data_scatter_) {
+    total_size +=
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(msg);
+  }
+
+  // repeated .SmartPeakServer.SingleAxisData y_data_scatter = 7;
+  total_size += 1UL * this->_internal_y_data_scatter_size();
+  for (const auto& msg : this->y_data_scatter_) {
+    total_size +=
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(msg);
+  }
+
+  // string x_axis_title = 8;
+  if (this->x_axis_title().size() > 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->_internal_x_axis_title());
+  }
+
+  // string y_axis_title = 9;
+  if (this->y_axis_title().size() > 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->_internal_y_axis_title());
+  }
+
+  // string z_axis_title = 10;
+  if (this->z_axis_title().size() > 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->_internal_z_axis_title());
+  }
+
+  // float x_min = 11;
+  if (!(this->x_min() <= 0 && this->x_min() >= 0)) {
+    total_size += 1 + 4;
+  }
+
+  // float x_max = 12;
+  if (!(this->x_max() <= 0 && this->x_max() >= 0)) {
+    total_size += 1 + 4;
+  }
+
+  // float y_min = 13;
+  if (!(this->y_min() <= 0 && this->y_min() >= 0)) {
+    total_size += 1 + 4;
+  }
+
+  // float y_max = 14;
+  if (!(this->y_max() <= 0 && this->y_max() >= 0)) {
+    total_size += 1 + 4;
+  }
+
+  // int32 nb_points = 15;
+  if (this->nb_points() != 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+        this->_internal_nb_points());
+  }
+
+  // int32 max_nb_points = 16;
+  if (this->max_nb_points() != 0) {
+    total_size += 2 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+        this->_internal_max_nb_points());
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
+        _internal_metadata_, total_size, &_cached_size_);
+  }
+  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void GraphData::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:SmartPeakServer.GraphData)
+  GOOGLE_DCHECK_NE(&from, this);
+  const GraphData* source =
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<GraphData>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:SmartPeakServer.GraphData)
+    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:SmartPeakServer.GraphData)
+    MergeFrom(*source);
+  }
+}
+
+void GraphData::MergeFrom(const GraphData& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:SmartPeakServer.GraphData)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  series_names_area_.MergeFrom(from.series_names_area_);
+  x_data_.MergeFrom(from.x_data_);
+  y_data_.MergeFrom(from.y_data_);
+  z_data_.MergeFrom(from.z_data_);
+  series_names_scatter_.MergeFrom(from.series_names_scatter_);
+  x_data_scatter_.MergeFrom(from.x_data_scatter_);
+  y_data_scatter_.MergeFrom(from.y_data_scatter_);
+  if (from.x_axis_title().size() > 0) {
+    _internal_set_x_axis_title(from._internal_x_axis_title());
+  }
+  if (from.y_axis_title().size() > 0) {
+    _internal_set_y_axis_title(from._internal_y_axis_title());
+  }
+  if (from.z_axis_title().size() > 0) {
+    _internal_set_z_axis_title(from._internal_z_axis_title());
+  }
+  if (!(from.x_min() <= 0 && from.x_min() >= 0)) {
+    _internal_set_x_min(from._internal_x_min());
+  }
+  if (!(from.x_max() <= 0 && from.x_max() >= 0)) {
+    _internal_set_x_max(from._internal_x_max());
+  }
+  if (!(from.y_min() <= 0 && from.y_min() >= 0)) {
+    _internal_set_y_min(from._internal_y_min());
+  }
+  if (!(from.y_max() <= 0 && from.y_max() >= 0)) {
+    _internal_set_y_max(from._internal_y_max());
+  }
+  if (from.nb_points() != 0) {
+    _internal_set_nb_points(from._internal_nb_points());
+  }
+  if (from.max_nb_points() != 0) {
+    _internal_set_max_nb_points(from._internal_max_nb_points());
+  }
+}
+
+void GraphData::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:SmartPeakServer.GraphData)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void GraphData::CopyFrom(const GraphData& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:SmartPeakServer.GraphData)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool GraphData::IsInitialized() const {
+  return true;
+}
+
+void GraphData::InternalSwap(GraphData* other) {
+  using std::swap;
+  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
+  series_names_area_.InternalSwap(&other->series_names_area_);
+  x_data_.InternalSwap(&other->x_data_);
+  y_data_.InternalSwap(&other->y_data_);
+  z_data_.InternalSwap(&other->z_data_);
+  series_names_scatter_.InternalSwap(&other->series_names_scatter_);
+  x_data_scatter_.InternalSwap(&other->x_data_scatter_);
+  y_data_scatter_.InternalSwap(&other->y_data_scatter_);
+  x_axis_title_.Swap(&other->x_axis_title_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  y_axis_title_.Swap(&other->y_axis_title_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  z_axis_title_.Swap(&other->z_axis_title_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  ::PROTOBUF_NAMESPACE_ID::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(GraphData, max_nb_points_)
+      + sizeof(GraphData::max_nb_points_)
+      - PROTOBUF_FIELD_OFFSET(GraphData, x_min_)>(
+          reinterpret_cast<char*>(&x_min_),
+          reinterpret_cast<char*>(&other->x_min_));
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata GraphData::GetMetadata() const {
+  return GetMetadataStatic();
+}
+
+
+// ===================================================================
+
+class WorkflowResult::_Internal {
+ public:
+  static const ::SmartPeakServer::GraphData& graph_data(const WorkflowResult* msg);
+};
+
+const ::SmartPeakServer::GraphData&
+WorkflowResult::_Internal::graph_data(const WorkflowResult* msg) {
+  return *msg->graph_data_;
+}
+WorkflowResult::WorkflowResult(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena) {
+  SharedCtor();
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:SmartPeakServer.WorkflowResult)
+}
+WorkflowResult::WorkflowResult(const WorkflowResult& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  status_code_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  if (!from._internal_status_code().empty()) {
+    status_code_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_status_code(), 
+      GetArena());
+  }
+  session_id_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  if (!from._internal_session_id().empty()) {
+    session_id_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_session_id(), 
+      GetArena());
+  }
+  path_to_results_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  if (!from._internal_path_to_results().empty()) {
+    path_to_results_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_path_to_results(), 
+      GetArena());
+  }
+  if (from._internal_has_graph_data()) {
+    graph_data_ = new ::SmartPeakServer::GraphData(*from.graph_data_);
+  } else {
+    graph_data_ = nullptr;
+  }
+  progress_in_percent_ = from.progress_in_percent_;
+  // @@protoc_insertion_point(copy_constructor:SmartPeakServer.WorkflowResult)
+}
+
+void WorkflowResult::SharedCtor() {
+status_code_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+session_id_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+path_to_results_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+::memset(reinterpret_cast<char*>(this) + static_cast<size_t>(
+    reinterpret_cast<char*>(&graph_data_) - reinterpret_cast<char*>(this)),
+    0, static_cast<size_t>(reinterpret_cast<char*>(&progress_in_percent_) -
+    reinterpret_cast<char*>(&graph_data_)) + sizeof(progress_in_percent_));
+}
+
+WorkflowResult::~WorkflowResult() {
+  // @@protoc_insertion_point(destructor:SmartPeakServer.WorkflowResult)
+  SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+void WorkflowResult::SharedDtor() {
+  GOOGLE_DCHECK(GetArena() == nullptr);
+  status_code_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  session_id_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  path_to_results_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  if (this != internal_default_instance()) delete graph_data_;
+}
+
+void WorkflowResult::ArenaDtor(void* object) {
+  WorkflowResult* _this = reinterpret_cast< WorkflowResult* >(object);
+  (void)_this;
+}
+void WorkflowResult::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
+void WorkflowResult::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+
+void WorkflowResult::Clear() {
+// @@protoc_insertion_point(message_clear_start:SmartPeakServer.WorkflowResult)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  status_code_.ClearToEmpty();
+  session_id_.ClearToEmpty();
+  path_to_results_.ClearToEmpty();
+  if (GetArena() == nullptr && graph_data_ != nullptr) {
+    delete graph_data_;
+  }
+  graph_data_ = nullptr;
+  progress_in_percent_ = 0;
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* WorkflowResult::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  while (!ctx->Done(&ptr)) {
+    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    CHK_(ptr);
+    switch (tag >> 3) {
+      // int32 progress_in_percent = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+          progress_in_percent_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // string status_code = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 18)) {
+          auto str = _internal_mutable_status_code();
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "SmartPeakServer.WorkflowResult.status_code"));
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // string session_id = 3;
+      case 3:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 26)) {
+          auto str = _internal_mutable_session_id();
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "SmartPeakServer.WorkflowResult.session_id"));
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // string path_to_results = 4;
+      case 4:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 34)) {
+          auto str = _internal_mutable_path_to_results();
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "SmartPeakServer.WorkflowResult.path_to_results"));
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // .SmartPeakServer.GraphData graph_data = 5;
+      case 5:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 42)) {
+          ptr = ctx->ParseMessage(_internal_mutable_graph_data(), ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->SetLastTag(tag);
+          goto success;
+        }
+        ptr = UnknownFieldParse(tag,
+            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+            ptr, ctx);
+        CHK_(ptr != nullptr);
+        continue;
+      }
+    }  // switch
+  }  // while
+success:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto success;
+#undef CHK_
+}
+
+::PROTOBUF_NAMESPACE_ID::uint8* WorkflowResult::_InternalSerialize(
+    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:SmartPeakServer.WorkflowResult)
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
@@ -682,7 +1648,7 @@ failure:
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
       this->_internal_status_code().data(), static_cast<int>(this->_internal_status_code().length()),
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
-      "SmartPeakServer.WorkflowStatus.status_code");
+      "SmartPeakServer.WorkflowResult.status_code");
     target = stream->WriteStringMaybeAliased(
         2, this->_internal_status_code(), target);
   }
@@ -692,7 +1658,7 @@ failure:
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
       this->_internal_session_id().data(), static_cast<int>(this->_internal_session_id().length()),
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
-      "SmartPeakServer.WorkflowStatus.session_id");
+      "SmartPeakServer.WorkflowResult.session_id");
     target = stream->WriteStringMaybeAliased(
         3, this->_internal_session_id(), target);
   }
@@ -702,21 +1668,29 @@ failure:
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
       this->_internal_path_to_results().data(), static_cast<int>(this->_internal_path_to_results().length()),
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
-      "SmartPeakServer.WorkflowStatus.path_to_results");
+      "SmartPeakServer.WorkflowResult.path_to_results");
     target = stream->WriteStringMaybeAliased(
         4, this->_internal_path_to_results(), target);
+  }
+
+  // .SmartPeakServer.GraphData graph_data = 5;
+  if (this->has_graph_data()) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(
+        5, _Internal::graph_data(this), target, stream);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
   }
-  // @@protoc_insertion_point(serialize_to_array_end:SmartPeakServer.WorkflowStatus)
+  // @@protoc_insertion_point(serialize_to_array_end:SmartPeakServer.WorkflowResult)
   return target;
 }
 
-size_t WorkflowStatus::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:SmartPeakServer.WorkflowStatus)
+size_t WorkflowResult::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:SmartPeakServer.WorkflowResult)
   size_t total_size = 0;
 
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
@@ -744,6 +1718,13 @@ size_t WorkflowStatus::ByteSizeLong() const {
         this->_internal_path_to_results());
   }
 
+  // .SmartPeakServer.GraphData graph_data = 5;
+  if (this->has_graph_data()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+        *graph_data_);
+  }
+
   // int32 progress_in_percent = 1;
   if (this->progress_in_percent() != 0) {
     total_size += 1 +
@@ -760,23 +1741,23 @@ size_t WorkflowStatus::ByteSizeLong() const {
   return total_size;
 }
 
-void WorkflowStatus::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:SmartPeakServer.WorkflowStatus)
+void WorkflowResult::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:SmartPeakServer.WorkflowResult)
   GOOGLE_DCHECK_NE(&from, this);
-  const WorkflowStatus* source =
-      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<WorkflowStatus>(
+  const WorkflowResult* source =
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<WorkflowResult>(
           &from);
   if (source == nullptr) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:SmartPeakServer.WorkflowStatus)
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:SmartPeakServer.WorkflowResult)
     ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
   } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:SmartPeakServer.WorkflowStatus)
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:SmartPeakServer.WorkflowResult)
     MergeFrom(*source);
   }
 }
 
-void WorkflowStatus::MergeFrom(const WorkflowStatus& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:SmartPeakServer.WorkflowStatus)
+void WorkflowResult::MergeFrom(const WorkflowResult& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:SmartPeakServer.WorkflowResult)
   GOOGLE_DCHECK_NE(&from, this);
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
@@ -791,39 +1772,47 @@ void WorkflowStatus::MergeFrom(const WorkflowStatus& from) {
   if (from.path_to_results().size() > 0) {
     _internal_set_path_to_results(from._internal_path_to_results());
   }
+  if (from.has_graph_data()) {
+    _internal_mutable_graph_data()->::SmartPeakServer::GraphData::MergeFrom(from._internal_graph_data());
+  }
   if (from.progress_in_percent() != 0) {
     _internal_set_progress_in_percent(from._internal_progress_in_percent());
   }
 }
 
-void WorkflowStatus::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:SmartPeakServer.WorkflowStatus)
+void WorkflowResult::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:SmartPeakServer.WorkflowResult)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-void WorkflowStatus::CopyFrom(const WorkflowStatus& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:SmartPeakServer.WorkflowStatus)
+void WorkflowResult::CopyFrom(const WorkflowResult& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:SmartPeakServer.WorkflowResult)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-bool WorkflowStatus::IsInitialized() const {
+bool WorkflowResult::IsInitialized() const {
   return true;
 }
 
-void WorkflowStatus::InternalSwap(WorkflowStatus* other) {
+void WorkflowResult::InternalSwap(WorkflowResult* other) {
   using std::swap;
   _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
   status_code_.Swap(&other->status_code_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
   session_id_.Swap(&other->session_id_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
   path_to_results_.Swap(&other->path_to_results_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
-  swap(progress_in_percent_, other->progress_in_percent_);
+  ::PROTOBUF_NAMESPACE_ID::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(WorkflowResult, progress_in_percent_)
+      + sizeof(WorkflowResult::progress_in_percent_)
+      - PROTOBUF_FIELD_OFFSET(WorkflowResult, graph_data_)>(
+          reinterpret_cast<char*>(&graph_data_),
+          reinterpret_cast<char*>(&other->graph_data_));
 }
 
-::PROTOBUF_NAMESPACE_ID::Metadata WorkflowStatus::GetMetadata() const {
+::PROTOBUF_NAMESPACE_ID::Metadata WorkflowResult::GetMetadata() const {
   return GetMetadataStatic();
 }
 
@@ -1223,8 +2212,14 @@ PROTOBUF_NAMESPACE_OPEN
 template<> PROTOBUF_NOINLINE ::SmartPeakServer::WorkflowParameters* Arena::CreateMaybeMessage< ::SmartPeakServer::WorkflowParameters >(Arena* arena) {
   return Arena::CreateMessageInternal< ::SmartPeakServer::WorkflowParameters >(arena);
 }
-template<> PROTOBUF_NOINLINE ::SmartPeakServer::WorkflowStatus* Arena::CreateMaybeMessage< ::SmartPeakServer::WorkflowStatus >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::SmartPeakServer::WorkflowStatus >(arena);
+template<> PROTOBUF_NOINLINE ::SmartPeakServer::SingleAxisData* Arena::CreateMaybeMessage< ::SmartPeakServer::SingleAxisData >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::SmartPeakServer::SingleAxisData >(arena);
+}
+template<> PROTOBUF_NOINLINE ::SmartPeakServer::GraphData* Arena::CreateMaybeMessage< ::SmartPeakServer::GraphData >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::SmartPeakServer::GraphData >(arena);
+}
+template<> PROTOBUF_NOINLINE ::SmartPeakServer::WorkflowResult* Arena::CreateMaybeMessage< ::SmartPeakServer::WorkflowResult >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::SmartPeakServer::WorkflowResult >(arena);
 }
 template<> PROTOBUF_NOINLINE ::SmartPeakServer::InquireLogs* Arena::CreateMaybeMessage< ::SmartPeakServer::InquireLogs >(Arena* arena) {
   return Arena::CreateMessageInternal< ::SmartPeakServer::InquireLogs >(arena);

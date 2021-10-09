@@ -1653,14 +1653,15 @@ namespace SmartPeak
     {
       LOGD << "Making the chromatogram data for plotting";
       // Set the axes titles and min/max defaults
-      result.reset("Time (sec)", "Intensity (au)", {}, 6000);
-      for (const auto& injection : sequence_handler.getSequence()) {
+      if (run_on_server) result.reset("Time (sec)", "Intensity (au)", {}, 6000000);
+      else result.reset("Time (sec)", "Intensity (au)", {}, 6000);
+      auto sequence = sequence_handler.getSequence();
+      for (const auto& injection : sequence) {
         if (sample_names.count(injection.getMetaData().getSampleName()) == 0) continue;
         // Extract out the raw data for plotting
         for (const auto& chromatogram : injection.getRawData().getChromatogramMap().getChromatograms()) {
           if (component_names.count(chromatogram.getNativeID()) == 0) continue;
           std::vector<float> x_data, y_data;
-          //for (const auto& point : chromatogram) {
           for (auto point = chromatogram.PosBegin(chrom_time_range.first); point != chromatogram.PosEnd(chrom_time_range.second); ++point) {
             x_data.push_back(point->getRT());
             y_data.push_back(point->getIntensity());

@@ -30,6 +30,8 @@
 
 namespace SmartPeak
 {
+  extern bool run_on_server;
+
   class SessionHandler : 
     public ISequenceObserver,
     public ITransitionsObserver,
@@ -135,7 +137,7 @@ namespace SmartPeak
     @brief Graph Visualization Data structure
     */
     struct GraphVizData
-    {
+    {      
       std::vector<std::string> series_names_area_;
       std::vector<std::vector<float>> x_data_area_;
       std::vector<std::vector<float>> y_data_area_;
@@ -152,9 +154,9 @@ namespace SmartPeak
       float y_max_ = 0.0f;
       bool points_overflow_ = false; // true if all points were added and false if points were omitted due to performance concern
       int nb_points_ = 0;
-      int max_nb_points_ = 0;
+      size_t max_nb_points_ = 0;
 
-      void reset(const std::string& x_axis_title, const std::string& y_axis_title, const std::optional<std::string>& z_axis_title, int max_nb_points)
+      void reset(const std::string& x_axis_title, const std::string& y_axis_title, const std::optional<std::string>& z_axis_title, size_t max_nb_points)
       {
         x_axis_title_ = x_axis_title;
         y_axis_title_ = y_axis_title;

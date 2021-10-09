@@ -30,27 +30,79 @@
 
 // client-side
 class WorkflowClientS {
- public:
+  public:
   WorkflowClientS(std::shared_ptr<grpc::Channel> channel)
       : stub_(SmartPeakServer::Workflow::NewStub(channel)) {}
 
-  std::string runWorkflow(const std::string& sequence_file_path) {
+  std::string runWorkflow(const std::string& sequence_file_path, SmartPeak::SessionHandler::GraphVizData& result) {
 
-  SmartPeakServer::WorkflowParameters workflow_parameters;
-  workflow_parameters.set_sequence_file(sequence_file_path);
-  SmartPeakServer::WorkflowStatus workflow_status;
-
-  grpc::ClientContext context;
+    SmartPeakServer::WorkflowParameters workflow_parameters;
+    workflow_parameters.set_sequence_file(sequence_file_path);
+    SmartPeakServer::WorkflowResult workflow_status;
+    grpc::ClientContext context;
+    
     context.AddMetadata("smartpeak_version", SmartPeak::Utilities::getSmartPeakVersion());
-  grpc::Status status = stub_->runWorkflow(&context, workflow_parameters, &workflow_status);
+    grpc::Status status = stub_->runWorkflow(&context, workflow_parameters, &workflow_status);
+    
+    auto graph_data = workflow_status.graph_data();
+    
+    result.series_names_area_.resize(graph_data.series_names_area_size(), "");
+    for (size_t i = 0; i < graph_data.series_names_area_size(); ++i) {
+      result.series_names_area_[i]  = graph_data.series_names_area(i);
+    }
+    
+    assert(graph_data.x_data_size()==graph_data.y_data_size());
+    result.x_data_area_.resize(graph_data.x_data_size());
+    result.y_data_area_.resize(graph_data.y_data_size());
+    for (size_t i = 0; i < graph_data.x_data_size(); ++i) {
+      ::SmartPeakServer::SingleAxisData x_data = graph_data.x_data(i);
+      ::SmartPeakServer::SingleAxisData y_data = graph_data.y_data(i);
+      result.x_data_area_[i].resize(x_data.axis_data_size(), 0);
+      result.y_data_area_[i].resize(y_data.axis_data_size(), 0);
+      assert(x_data.axis_data_size()==y_data.axis_data_size());
+      for (size_t j = 0; j < x_data.axis_data_size(); ++j) {
+        result.x_data_area_[i][j] = x_data.axis_data(j);
+        result.y_data_area_[i][j] = y_data.axis_data(j);
+      }
+    }
+    
+    result.series_names_scatter_.resize(graph_data.series_names_scatter_size(), "");
+    for (size_t i = 0; i < graph_data.series_names_scatter_size(); ++i) {
+      result.series_names_scatter_[i]  = graph_data.series_names_scatter(i);
+    }
+    
+    assert(graph_data.x_data_scatter_size()==graph_data.y_data_scatter_size());
+    result.x_data_scatter_.resize(graph_data.x_data_scatter_size());
+    result.y_data_scatter_.resize(graph_data.y_data_scatter_size());
+    for (size_t i = 0; i < graph_data.x_data_scatter_size(); ++i) {
+      ::SmartPeakServer::SingleAxisData x_data = graph_data.x_data_scatter(i);
+      ::SmartPeakServer::SingleAxisData y_data = graph_data.y_data_scatter(i);
+      result.x_data_scatter_[i].resize(x_data.axis_data_size(), 0);
+      result.y_data_scatter_[i].resize(y_data.axis_data_size(), 0);
+      assert(x_data.axis_data_size()==y_data.axis_data_size());
+      for (size_t j = 0; j < x_data.axis_data_size(); ++j) {
+        result.x_data_scatter_[i][j] = x_data.axis_data(j);
+        result.y_data_scatter_[i][j] = y_data.axis_data(j);
+      }
+    }
+    
+    result.x_axis_title_ = graph_data.x_axis_title();
+    result.y_axis_title_ = graph_data.y_axis_title();
+    
+    result.x_min_ = graph_data.x_min();
+    result.x_max_ = graph_data.x_max();
+    result.y_min_ = graph_data.y_min();
+    result.y_max_ = graph_data.y_max();
+    
+    result.nb_points_ = graph_data.nb_points();
+    result.max_nb_points_ = graph_data.max_nb_points();
 
-  if (status.ok()) {
-    return workflow_status.status_code();
-  } else {
-    std::cout << status.error_code() << ": " << status.error_message()
-              << std::endl;
-    return "RPC failed";
-  }
+    if (status.ok()) {
+      return workflow_status.status_code();
+    } else {
+      std::cout << status.error_code() << ": " << status.error_message() << std::endl;
+      return "RPC failed";
+    }
 }
 
  private:
@@ -65,7 +117,7 @@ class WorkflowClientA {
   std::string runWorkflow(const std::string& sequence_file_path) {
     SmartPeakServer::WorkflowParameters workflow_parameters; // request
     workflow_parameters.set_sequence_file(sequence_file_path);
-    SmartPeakServer::WorkflowStatus workflow_status; // reply
+    SmartPeakServer::WorkflowResult workflow_status; // reply
 
     grpc::ClientContext context;
     grpc::CompletionQueue cq;
@@ -73,30 +125,78 @@ class WorkflowClientA {
 
     context.AddMetadata("smartpeak_version", SmartPeak::Utilities::getSmartPeakVersion());
 
-    std::unique_ptr<grpc::ClientAsyncResponseReader<SmartPeakServer::WorkflowStatus> > rpc(
-            stub_->PrepareAsyncrunWorkflow(&context, workflow_parameters, &cq));
-
-    rpc->StartCall();
-
-    rpc->Finish(&workflow_status, &status, (void*)1);
+    AsyncClientCall* call = new AsyncClientCall;
+    call->response_reader = stub_->AsyncrunWorkflow(&call->context, workflow_parameters, &cq_);
+}
+  
+  void AsyncCompleteRpc() {
     void* got_tag;
     bool ok = false;
 
-    GPR_ASSERT(cq.Next(&got_tag, &ok));
-    GPR_ASSERT(got_tag == (void*)1);
-    GPR_ASSERT(ok);
-
-  if (status.ok()) {
-    return workflow_status.status_code();
-  } else {
-    std::cout << status.error_code() << ": " << status.error_message()
-              << std::endl;
-    return "RPC failed";
+    while (cq_.Next(&got_tag, &ok)) {
+      ResponseHandler* responseHandler = static_cast<ResponseHandler*>(got_tag);
+      std::cout << "Tag received: " << responseHandler << std::endl;
+      std::cout << "Next returned: " << ok << std::endl;
+      responseHandler->HandleResponse(ok);
+    }
   }
-}
 
  private:
+  class ResponseHandler {
+      public:
+        virtual bool HandleResponse(bool eventStatus) = 0;
+      };
+  
+  class AsyncClientCall: public ResponseHandler {
+      enum CallStatus {CREATE, PROCESS, FINISH};
+      CallStatus callStatus_;
+    public:
+
+      AsyncClientCall(): callStatus_(CREATE) {}
+
+    SmartPeakServer::WorkflowResult reply;
+      grpc::ClientContext context;
+      grpc::Status status;
+      
+      std::unique_ptr<grpc::ClientAsyncResponseReader<SmartPeakServer::WorkflowResult>> response_reader;
+
+      bool HandleResponse(bool responseStatus) override {
+        switch (callStatus_) {
+        case CREATE:
+          if (responseStatus) {
+            //response_reader->Read(&reply, (void*)this);
+            response_reader->StartCall();
+            callStatus_ = PROCESS;
+          } else {
+            //response_reader->Finish(&status, (void*)this);
+            response_reader->Finish(&reply, &status, (void*)this);
+            callStatus_ = FINISH;
+          }
+          break;
+        case PROCESS:
+          if (responseStatus) {
+            std::cout << ">>> GUI received : " << this << " : " << reply.status_code() << std::endl;
+            //response_reader->Read(&reply, (void*)this);
+            response_reader->ReadInitialMetadata((void*)this);
+          } else {
+            //response_reader->Finish(&status, (void*)this);
+            response_reader->Finish(&reply, &status, (void*)this);
+            callStatus_ = FINISH;
+          }
+          break;
+        case FINISH:
+          if (status.ok()) {
+            std::cout << ">>> GUI : Server Response Completed: " << this << " CallData: " << this << std::endl;
+          } else {
+            std::cout << ">>> GUI : RPC failed" << std::endl;
+          }
+          delete this;
+        }
+      }
+    };
+  
   std::unique_ptr<SmartPeakServer::Workflow::Stub> stub_;
+  grpc::CompletionQueue cq_;
 };
 
 class LogStreamClientS {
@@ -169,7 +269,6 @@ class LogStreamClientA {
     };
 
   class AsyncClientCall: public ResponseHandler {
-//    enum CallStatus {CREATE, PROCESS, PROCESSED, FINISH};
     enum CallStatus {CREATE, PROCESS, FINISH};
     CallStatus callStatus_;
   public:
@@ -227,18 +326,98 @@ public:
     console_handler_->set_log_directory(std::filesystem::path(logfilepath).parent_path().string());
     console_handler_->use_colors(false);
     console_handler_->set_severity(plog::debug);
-    console_handler_->initialize("Start SmartPeak version " + SmartPeak::Utilities::getSmartPeakVersion());
+    console_handler_->initialize("Starting SmartPeak Server version " + SmartPeak::Utilities::getSmartPeakVersion());
     is_logger_init_ = true;
   }
   
   virtual ::grpc::Status runWorkflow(::grpc::ServerContext* context,
                                      const ::SmartPeakServer::WorkflowParameters* request,
-                                     ::SmartPeakServer::WorkflowStatus* response) override {
+                                     ::SmartPeakServer::WorkflowResult* response) override {
 
-    std::string sequence_file = "";
-    sequence_file = request->sequence_file();
-    auto [job_done, log_records] = SmartPeak::serv::handleWorkflowRequest(sequence_file, is_logger_init_);
+    server_manager_.sequence_file = request->sequence_file();
+    auto [job_done, log_records] = SmartPeak::serv::handleWorkflowRequest(&server_manager_, is_logger_init_);
+    const auto app_hand = server_manager_.get_application_handler();
+    const auto seq_hand = app_hand.sequenceHandler_;
+    
+    SmartPeak::SessionHandler::GraphVizData result;
+    
+    std::set<std::string> sample_names, component_names;
+    for (const auto& injection : seq_hand.getSequence()) {
+      sample_names.insert(injection.getMetaData().getSampleName());
+      for (const auto& chromatogram : injection.getRawData().getChromatogramMap().getChromatograms()) {
+        component_names.insert(chromatogram.getNativeID());
+      }
+    }
+    
+    server_manager_.get_session_handler().getChromatogramScatterPlot(seq_hand, result, std::make_pair(0,2000), sample_names, component_names);
+    
+    ::SmartPeakServer::GraphData graph_data;
+    for (size_t i = 0; i < result.series_names_area_.size(); ++i) {
+      graph_data.add_series_names_area();
+      graph_data.set_series_names_area(i, result.series_names_area_[i]);
+    }
+    
+    assert(result.x_data_area_.size()==result.y_data_area_.size());
+    for (size_t i = 0; i < result.x_data_area_.size(); ++i) {
+      ::SmartPeakServer::SingleAxisData* x_data = graph_data.add_x_data();
+      ::SmartPeakServer::SingleAxisData* y_data = graph_data.add_y_data();
+      for (size_t j = 0; j < result.x_data_area_.at(i).size(); ++j) {
+        x_data->add_axis_data(result.x_data_area_[i][j]);
+        y_data->add_axis_data(result.y_data_area_[i][j]);
+      }
+    }
+    
+    for (size_t i = 0; i < result.series_names_scatter_.size(); ++i) {
+      graph_data.add_series_names_scatter();
+      graph_data.set_series_names_scatter(i, result.series_names_scatter_[i]);
+    }
+    
+    assert(result.x_data_scatter_.size()==result.x_data_scatter_.size());
+    for (size_t i = 0; i < result.x_data_scatter_.size(); ++i) {
+      ::SmartPeakServer::SingleAxisData* x_data_scatter = graph_data.add_x_data_scatter();
+      ::SmartPeakServer::SingleAxisData* y_data_scatter = graph_data.add_y_data_scatter();
+      for (size_t j = 0; j < result.x_data_scatter_.at(i).size(); ++j) {
+        x_data_scatter->add_axis_data(result.x_data_scatter_[i][j]);
+        y_data_scatter->add_axis_data(result.y_data_scatter_[i][j]);
+      }
+    }
+    
+    graph_data.set_x_axis_title(result.x_axis_title_);
+    graph_data.set_y_axis_title(result.y_axis_title_);
+    
+    graph_data.set_x_min(result.x_min_);
+    graph_data.set_x_max(result.x_max_);
+    graph_data.set_y_min(result.y_min_);
+    graph_data.set_y_max(result.y_max_);
+    
+    graph_data.set_nb_points(result.nb_points_);
+    graph_data.set_max_nb_points(result.max_nb_points_);
+    
+    assert(graph_data.series_names_area_size()==result.series_names_area_.size());
+    assert(graph_data.x_data_size()==result.x_data_area_.size());
+    assert(graph_data.y_data_size()==result.y_data_area_.size());
+    assert(graph_data.z_data_size()==result.z_data_area_.size());
+    assert(graph_data.series_names_scatter_size()==result.series_names_scatter_.size());
+    assert(graph_data.x_data_scatter_size()==result.x_data_scatter_.size());
+    assert(graph_data.y_data_scatter_size()==result.y_data_scatter_.size());
+    assert(graph_data.x_axis_title()==result.x_axis_title_);
+    assert(graph_data.y_axis_title()==result.y_axis_title_);
+    assert(graph_data.x_min()==result.x_min_);
+    assert(graph_data.x_max()==result.x_max_);
+    assert(graph_data.y_min()==result.y_min_);
+    assert(graph_data.y_max()==result.y_max_);
+    assert(graph_data.nb_points()==result.nb_points_);
+    assert(graph_data.max_nb_points()==result.max_nb_points_);
+    
+    response->set_allocated_graph_data(new ::SmartPeakServer::GraphData(graph_data));
+    
     response->set_status_code( job_done ? "YES" : "NO" );
+    
+    // makeUniqueStringFromTime :
+    // - folder to where results are saved
+    // - session_<makeUniqueStringFromTime>.json
+    response->set_session_id(SmartPeak::Utilities::makeUniqueStringFromTime());
+    response->set_path_to_results("/path/to/results/"); //exported reports
     return grpc::Status::OK;
   }
   
@@ -256,6 +435,7 @@ public:
       logline.set_log_line(logline_str);
       writer->Write(logline);
     }
+    
     return grpc::Status::OK;
   }
   
@@ -265,6 +445,7 @@ private:
   std::unique_ptr<grpc::Server> server_;
   bool is_logger_init_;
   SmartPeak::ConsoleHandler* console_handler_;
+  SmartPeak::serv::ServerManager server_manager_;
 };
 
 void runSyncServer(std::string server_address) {
@@ -287,6 +468,7 @@ struct CallData {
   SmartPeakServer::Workflow::AsyncService* service;
   grpc::ServerCompletionQueue* cq;
   SmartPeak::ConsoleHandler* console_handler_;
+  SmartPeak::serv::ServerManager* server_manager_;
   std::vector<SmartPeak::GuiAppender::GuiAppenderRecord> log_records;
   
   CallData(SmartPeakServer::Workflow::AsyncService* service, grpc::ServerCompletionQueue* cq) : service(service), cq(cq) {
@@ -329,7 +511,9 @@ class RunWorkflowCall final : public Call {
           
         std::string sequence_file = "";
         sequence_file = request_.sequence_file();
-        auto [job_done, log_records] = SmartPeak::serv::handleWorkflowRequest(sequence_file, is_logger_init);
+        data_->server_manager_->sequence_file = sequence_file;
+        
+        auto [job_done, log_records] = SmartPeak::serv::handleWorkflowRequest(data_->server_manager_, is_logger_init);
         data_->log_records = log_records;
         response_.set_status_code(job_done?"OK":"FAILED");
         responder_.Finish(response_, grpc::Status::OK, this);
@@ -351,9 +535,9 @@ class RunWorkflowCall final : public Call {
  private:
   CallData* data_;
   grpc::ServerContext ctx_;
-  grpc::ServerAsyncResponseWriter<::SmartPeakServer::WorkflowStatus> responder_;
+  grpc::ServerAsyncResponseWriter<::SmartPeakServer::WorkflowResult> responder_;
   ::SmartPeakServer::WorkflowParameters request_;
-  ::SmartPeakServer::WorkflowStatus response_;
+  ::SmartPeakServer::WorkflowResult response_;
   enum CallStatus { REQUEST, FINISH };
   CallStatus status_;
   bool is_logger_init;

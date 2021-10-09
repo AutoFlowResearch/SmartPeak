@@ -73,6 +73,7 @@ namespace SmartPeak
       sequence_file_path_ = sequence_file_path;
       if (!server_ip_address_.empty() && !sequence_file_path_.empty()) fields_set_ = true;
       visible_ = false;
+      SmartPeak::run_on_server = true;
       ImGui::CloseCurrentPopup();
     }
     ImGui::PopID();

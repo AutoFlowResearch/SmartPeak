@@ -17,7 +17,7 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Bertrand Boudaud $
+// $Maintainer: Bertrand Boudaud, Ahmed Khalil $
 // $Authors: Bertrand Boudaud $
 // --------------------------------------------------------------------------
 
@@ -33,8 +33,12 @@ namespace SmartPeak
     if ((refresh_needed_) || // data changed
        ((input_component_names_ != component_names) || (input_sample_names_ != sample_names))) // user select different items
     {
+      updateServerGraphVizData();
+      
       // we may recompute the RT window, get the whole graph area
-      session_handler_.getChromatogramScatterPlot(sequence_handler_, graph_viz_data_, std::make_pair(0, 1800), sample_names, component_names);
+      if (!SmartPeak::run_on_server) {
+        session_handler_.getChromatogramScatterPlot(sequence_handler_, graph_viz_data_, std::make_pair(0, 1800), sample_names, component_names);
+      }
       updateRanges();
       input_sample_names_ = sample_names;
       input_component_names_ = component_names;
@@ -42,7 +46,9 @@ namespace SmartPeak
     }
     else if (input_range_ != current_range_) // user zoom in/out
     {
-      session_handler_.getChromatogramScatterPlot(sequence_handler_, graph_viz_data_, current_range_, sample_names, component_names);
+      if (!SmartPeak::run_on_server) {
+        session_handler_.getChromatogramScatterPlot(sequence_handler_, graph_viz_data_, current_range_, sample_names, component_names);
+      }
       input_range_ = current_range_;
     }
   };
