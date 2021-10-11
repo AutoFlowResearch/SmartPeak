@@ -75,7 +75,7 @@ namespace SmartPeak
     {
       auto exported_plot = std::make_unique<PlotExporter>(
         file_picker_.getPickedPathname().empty() ? application_handler_.main_dir_.string() : file_picker_.getPickedPathname(),
-        graph_viz_data_, selected_format);
+        graph_viz_data_, selected_format, PlotExporter::PlotType::CURVE);
       if (!exported_plot->plot()) show_installation_guide_ = true;
     }
     ImGui::Spacing();
