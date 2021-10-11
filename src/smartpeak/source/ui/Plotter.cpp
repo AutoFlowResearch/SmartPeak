@@ -220,18 +220,18 @@ namespace SmartPeak {
          auto total_size = (size_t)heatmap_data_.feat_heatmap_data.size();
          
          data_vals_file << "# MAT " << (nr_plots_)++ << std::endl;
-         for (int j = 0; j < col_size; j++){
+         for (int j = 0; j < col_size; j++) {
            std::string col_label = heatmap_data_.feat_heatmap_col_labels(j);
            std::replace_if(col_label.begin(), col_label.end(), [](auto x){return x == '_';}, '-');
            data_vals_file << "," << col_label;
          }
          data_vals_file << std::endl;
          
-         for (int i = row_size-1; i >= 0; i--){
+         for (int i = row_size-1; i >= 0; i--) {
            std::string row_label = heatmap_data_.feat_heatmap_row_labels(i);
            std::replace_if(row_label.begin(), row_label.end(), [](auto x){return x == '_';}, '-');
            data_vals_file << row_label;
-           for (int j = 0; j < col_size; j++){
+           for (int j = 0; j < col_size; j++) {
              data_vals_file << "," << heatmap_data_.feat_heatmap_data(i,j) << " ";
            }
            data_vals_file << std::endl;
