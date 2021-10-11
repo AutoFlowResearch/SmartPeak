@@ -33,7 +33,7 @@ TEST(PlotExporter, plot)
   auto main_path = std::filesystem::temp_directory_path();
   std::filesystem::current_path(main_path);
   std::filesystem::create_directory("plots");
-  std::string gnuplot_path = "/usr/local/bin/gnuplot";
+  std::string gnuplot_path = "gnuplot";
   std::string seperator = "/";
 #ifdef _WIN32
   gnuplot_path = "C:\\ProgramData\\chocolatey\\bin\\gnuplot.exe";
@@ -129,7 +129,7 @@ TEST(PlotExporter, plot)
   heatmap_svg->setGNUPLOTPath(gnuplot_path);
   EXPECT_TRUE(heatmap_svg->plot());
   EXPECT_TRUE(std::filesystem::exists(main_path / "smartpeak-exported-plot.svg"));
-  EXPECT_TRUE(std::filesystem::file_size(main_path / "smartpeak-exported-plot.svg") > 25000 );
+  EXPECT_TRUE(std::filesystem::file_size(main_path / "smartpeak-exported-plot.svg") > 2500 );
   
   std::filesystem::remove_all(main_path);
 }
