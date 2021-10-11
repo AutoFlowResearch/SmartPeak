@@ -1,6 +1,32 @@
 SmartPeak Changelog
 ===================
 
+v1.15.0 (2020-10-11)
+--------------------
+
+Features
+~~~~~~~~
+- "Select All" button when generating Report `(#427) <https://github.com/AutoFlowResearch/SmartPeak/pull/427>`_
+- Added options to SmartPeakCLI `(#429) <https://github.com/AutoFlowResearch/SmartPeak/pull/429>`_
+    - --input-file (-f): Override input file.
+    - --parameter (-p): Override parameter.
+    - --mzml (-z): Overrides the default location for the mzML directory.
+    - --reports-out-dir (-ro): Overrides the default location for reports.
+    - --output-features (-o): Overrides the default location for output features.
+    - --input-features (-i): Overrides the default location for input features.
+- Create Report: Pivotable and FeatureDB button to use FilePickerHandler `(#431) <https://github.com/AutoFlowResearch/SmartPeak/pull/431>`_
+
+Fix
+~~~
+- Fixed number of transitions does not appear after loading `(#430) <https://github.com/AutoFlowResearch/SmartPeak/pull/430>`_
+
+Changes
+~~~~~~~
+- Changed options to SmartPeakCLI `(#429) <https://github.com/AutoFlowResearch/SmartPeak/pull/429>`_
+    - --output (-o) is now replaced by either --output-features or --reports-out-dir
+    - --disable-progressbar short form has been replaced from -p to -pg
+    - --integrity short form has been replaced from -i to -t
+
 v1.14.0 (2020-09-30)
 --------------------
 
