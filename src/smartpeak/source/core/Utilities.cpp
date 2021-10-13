@@ -911,7 +911,7 @@ namespace SmartPeak
       }
       else
       {
-        LOGW << full_path.generic_string() << " not found in session directory, OpenMS will look for it in other directories.";
+        LOGW << file_path.generic_string() << " not found in session directory, OpenMS will look for it in other directories.";
       }
     }
   }
@@ -943,7 +943,7 @@ namespace SmartPeak
         }
         else
         {
-          LOGW << full_path.generic_string() << " not found in session directory, OpenMS will look for it in other directories.";
+          LOGW << file_path.generic_string() << " not found in session directory, OpenMS will look for it in other directories.";
         }
       }
       fixed_file_list.push_back(file_path);
