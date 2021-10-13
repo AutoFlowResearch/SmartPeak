@@ -887,5 +887,81 @@ namespace SmartPeak
     }
     return tmp_dir_path;
   }
+
+  void Utilities::prepareFileParameter(
+    ParameterSet& parameter_set,
+    const std::string& function_parameter,
+    const std::string& parameter_name,
+    const std::filesystem::path main_path)
+  {
+    auto parameter = parameter_set.at(function_parameter).findParameter(parameter_name);
+    if (!parameter)
+    {
+      LOGE << "Cannot find parameter " << function_parameter << ":" << parameter_name;
+      return;
+    }
+    const auto file_path_as_string = parameter->getValueAsString();
+    std::filesystem::path file_path(file_path_as_string);
+    if (file_path.is_relative())
+    {
+      std::filesystem::path full_path = main_path / file_path;
+      if (std::filesystem::exists(full_path))
+      {
+        parameter->setValueFromString(full_path.lexically_normal().generic_string());
+      }
+      else
+      {
+        LOGW << full_path.generic_string() << " not found in session directory, OpenMS will look for it in other directories.";
+      }
+    }
+  }
+
+  void Utilities::prepareFileParameterList(
+    ParameterSet& parameter_set,
+    const std::string& function_parameter,
+    const std::string& parameter_name,
+    const std::filesystem::path main_path)
+  {
+    auto parameter = parameter_set.at(function_parameter).findParameter(parameter_name);
+    if (!parameter)
+    {
+      LOGE << "Cannot find parameter " << function_parameter << ":" << parameter_name;
+      return;
+    }
+    CastValue file_list;
+    std::vector<std::filesystem::path> fixed_file_list;
+    Utilities::parseString(parameter->getValueAsString(), file_list);
+    for (const auto& file_path_as_string : file_list.sl_)
+    {
+      std::filesystem::path file_path(file_path_as_string);
+      if (file_path.is_relative())
+      {
+        std::filesystem::path full_path = main_path / file_path;
+        if (std::filesystem::exists(full_path))
+        {
+          file_path = full_path;
+        }
+        else
+        {
+          LOGW << full_path.generic_string() << " not found in session directory, OpenMS will look for it in other directories.";
+        }
+      }
+      fixed_file_list.push_back(file_path);
+    }
+    std::ostringstream os;
+    os << "[";
+    std::string list_separator;
+    for (const auto& file_path : fixed_file_list)
+    {
+      os << list_separator << "'" << file_path.lexically_normal().generic_string() << "'";
+      if (list_separator.empty())
+      {
+        list_separator = ",";
+      }
+    }
+    os << "]";
+    parameter->setValueFromString(os.str());
+  }
+
 }
 
