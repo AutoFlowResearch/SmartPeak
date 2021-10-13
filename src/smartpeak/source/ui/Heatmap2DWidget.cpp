@@ -72,13 +72,66 @@ namespace SmartPeak
       Eigen::Tensor<std::string, 1> selected_sample_names = session_handler_.getSelectSampleNamesPlot();
       Eigen::Tensor<std::string, 1> selected_transitions = session_handler_.getSelectTransitionsPlot();
       Eigen::Tensor<std::string, 1> selected_transition_groups = session_handler_.getSelectTransitionGroupsPlot();
+      
       if ((refresh_needed_) || // data changed
           (selected_feature_ != heatmap_data_.selected_feature_) ||
           !compareInput(selected_sample_names, heatmap_data_.selected_sample_names_) ||
           !compareInput(selected_transitions, heatmap_data_.selected_transitions_) ||
           !compareInput(selected_transition_groups, heatmap_data_.selected_transition_groups_))
       {
-        session_handler_.getHeatMap(sequence_handler_, heatmap_data_, selected_feature_);
+        //heatmap_server
+        if (heatmap_data_.feat_heatmap_col_labels.size() != server_heatmap_data_.feat_heatmap_col_labels.size() ||
+            heatmap_data_.feat_heatmap_row_labels.size() != server_heatmap_data_.feat_heatmap_row_labels.size() ||
+            (heatmap_data_.selected_feature_ != server_heatmap_data_.selected_feature_) ||
+            !compareInput(heatmap_data_.selected_sample_names_, server_heatmap_data_.selected_sample_names_) ||
+            !compareInput(heatmap_data_.selected_transitions_, server_heatmap_data_.selected_transitions_) ||
+            !compareInput(heatmap_data_.selected_transition_groups_, server_heatmap_data_.selected_transition_groups_) ||
+            !compareInput(server_heatmap_data_.selected_sample_names_ , selected_sample_names) ||
+            !compareInput(server_heatmap_data_.selected_transitions_ , selected_transitions) ||
+            !compareInput(server_heatmap_data_.selected_transition_groups_ , selected_transition_groups)
+            ) {
+          
+          //heatmap_data_.selected_feature_ = server_heatmap_data_.selected_feature_;
+          server_heatmap_data_.selected_sample_names_ = selected_sample_names;
+          server_heatmap_data_.selected_transitions_ = selected_transitions;
+          server_heatmap_data_.selected_transition_groups_ = selected_transition_groups;
+          
+          heatmap_data_.feat_heatmap_col_labels.resize(server_heatmap_data_.feat_heatmap_col_labels.size());
+          heatmap_data_.feat_heatmap_row_labels.resize(server_heatmap_data_.feat_heatmap_row_labels.size());
+          heatmap_data_.feat_heatmap_data.resize(server_heatmap_data_.feat_heatmap_row_labels.size(),
+                                                 server_heatmap_data_.feat_heatmap_col_labels.size());
+          
+          heatmap_data_.selected_feature_ = server_heatmap_data_.selected_feature_;
+          heatmap_data_.selected_sample_names_ = server_heatmap_data_.selected_sample_names_;
+          heatmap_data_.selected_transitions_ = server_heatmap_data_.selected_transitions_;
+          heatmap_data_.selected_transition_groups_ = server_heatmap_data_.selected_transition_groups_;
+          
+          heatmap_data_.feat_heatmap_x_axis_title = server_heatmap_data_.feat_heatmap_x_axis_title;
+          heatmap_data_.feat_heatmap_y_axis_title = server_heatmap_data_.feat_heatmap_y_axis_title;
+          
+          heatmap_data_.feat_value_min_ = server_heatmap_data_.feat_value_min_;
+          heatmap_data_.feat_value_max_ = server_heatmap_data_.feat_value_max_;
+          
+          for (size_t i = 0; i < server_heatmap_data_.feat_heatmap_row_labels.size(); ++i) {
+            heatmap_data_.feat_heatmap_row_labels(i) = server_heatmap_data_.feat_heatmap_row_labels(i);
+          }
+          for (size_t i = 0; i < server_heatmap_data_.feat_heatmap_col_labels.size(); ++i) {
+            heatmap_data_.feat_heatmap_col_labels(i) = server_heatmap_data_.feat_heatmap_col_labels(i);
+          }
+
+          for (size_t j = 0; j < server_heatmap_data_.feat_heatmap_row_labels.size(); ++j) {
+            for (size_t i = 0; i < server_heatmap_data_.feat_heatmap_col_labels.size(); ++i) {
+              if (server_heatmap_data_.feat_heatmap_data(i,j) < high_value_threeshold_)
+                heatmap_data_.feat_heatmap_data(i,j) = server_heatmap_data_.feat_heatmap_data(i,j);
+              else
+                heatmap_data_.feat_heatmap_data(i,j) = 0;
+            }
+          }
+        }
+        // heatmap_server
+        
+        if (!run_on_server)
+          session_handler_.getHeatMap(sequence_handler_, heatmap_data_, selected_feature_);
         // We need to handle "invalid" data - infinite values, or very high - which will crash ImPlot.
         invalid_data_ = false;
         for (int i = 0; i < heatmap_data_.feat_heatmap_row_labels.size(); ++i)

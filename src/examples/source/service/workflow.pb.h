@@ -47,7 +47,7 @@ struct TableStruct_workflow_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::AuxiliaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[6]
+  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[7]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::FieldMetadata field_metadata[];
   static const ::PROTOBUF_NAMESPACE_ID::internal::SerializationTable serialization_table[];
@@ -59,6 +59,9 @@ namespace SmartPeakServer {
 class GraphData;
 struct GraphDataDefaultTypeInternal;
 extern GraphDataDefaultTypeInternal _GraphData_default_instance_;
+class HeatmapData;
+struct HeatmapDataDefaultTypeInternal;
+extern HeatmapDataDefaultTypeInternal _HeatmapData_default_instance_;
 class InquireLogs;
 struct InquireLogsDefaultTypeInternal;
 extern InquireLogsDefaultTypeInternal _InquireLogs_default_instance_;
@@ -77,6 +80,7 @@ extern WorkflowResultDefaultTypeInternal _WorkflowResult_default_instance_;
 }  // namespace SmartPeakServer
 PROTOBUF_NAMESPACE_OPEN
 template<> ::SmartPeakServer::GraphData* Arena::CreateMaybeMessage<::SmartPeakServer::GraphData>(Arena*);
+template<> ::SmartPeakServer::HeatmapData* Arena::CreateMaybeMessage<::SmartPeakServer::HeatmapData>(Arena*);
 template<> ::SmartPeakServer::InquireLogs* Arena::CreateMaybeMessage<::SmartPeakServer::InquireLogs>(Arena*);
 template<> ::SmartPeakServer::LogStream* Arena::CreateMaybeMessage<::SmartPeakServer::LogStream>(Arena*);
 template<> ::SmartPeakServer::SingleAxisData* Arena::CreateMaybeMessage<::SmartPeakServer::SingleAxisData>(Arena*);
@@ -903,6 +907,358 @@ class GraphData PROTOBUF_FINAL :
 };
 // -------------------------------------------------------------------
 
+class HeatmapData PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:SmartPeakServer.HeatmapData) */ {
+ public:
+  inline HeatmapData() : HeatmapData(nullptr) {}
+  virtual ~HeatmapData();
+  explicit constexpr HeatmapData(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  HeatmapData(const HeatmapData& from);
+  HeatmapData(HeatmapData&& from) noexcept
+    : HeatmapData() {
+    *this = ::std::move(from);
+  }
+
+  inline HeatmapData& operator=(const HeatmapData& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline HeatmapData& operator=(HeatmapData&& from) noexcept {
+    if (GetArena() == from.GetArena()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
+  static const HeatmapData& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const HeatmapData* internal_default_instance() {
+    return reinterpret_cast<const HeatmapData*>(
+               &_HeatmapData_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    3;
+
+  friend void swap(HeatmapData& a, HeatmapData& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(HeatmapData* other) {
+    if (other == this) return;
+    if (GetArena() == other->GetArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(HeatmapData* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline HeatmapData* New() const final {
+    return CreateMaybeMessage<HeatmapData>(nullptr);
+  }
+
+  HeatmapData* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<HeatmapData>(arena);
+  }
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void CopyFrom(const HeatmapData& from);
+  void MergeFrom(const HeatmapData& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  inline void SharedCtor();
+  inline void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(HeatmapData* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "SmartPeakServer.HeatmapData";
+  }
+  protected:
+  explicit HeatmapData(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    return ::descriptor_table_workflow_2eproto_metadata_getter(kIndexInFileMessages);
+  }
+
+  public:
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kSelectedSampleNamesFieldNumber = 1,
+    kSelectedTransitionsFieldNumber = 2,
+    kSelectedTransitionGroupsFieldNumber = 3,
+    kHeaderRowFieldNumber = 4,
+    kHeaderColumnFieldNumber = 5,
+    kColumnDataFieldNumber = 6,
+    kXAxisTitleFieldNumber = 7,
+    kYAxisTitleFieldNumber = 8,
+    kSelectedFeatureFieldNumber = 9,
+    kFeatValueMinFieldNumber = 10,
+    kFeatValueMaxFieldNumber = 11,
+  };
+  // repeated string selected_sample_names = 1;
+  int selected_sample_names_size() const;
+  private:
+  int _internal_selected_sample_names_size() const;
+  public:
+  void clear_selected_sample_names();
+  const std::string& selected_sample_names(int index) const;
+  std::string* mutable_selected_sample_names(int index);
+  void set_selected_sample_names(int index, const std::string& value);
+  void set_selected_sample_names(int index, std::string&& value);
+  void set_selected_sample_names(int index, const char* value);
+  void set_selected_sample_names(int index, const char* value, size_t size);
+  std::string* add_selected_sample_names();
+  void add_selected_sample_names(const std::string& value);
+  void add_selected_sample_names(std::string&& value);
+  void add_selected_sample_names(const char* value);
+  void add_selected_sample_names(const char* value, size_t size);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>& selected_sample_names() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>* mutable_selected_sample_names();
+  private:
+  const std::string& _internal_selected_sample_names(int index) const;
+  std::string* _internal_add_selected_sample_names();
+  public:
+
+  // repeated string selected_transitions = 2;
+  int selected_transitions_size() const;
+  private:
+  int _internal_selected_transitions_size() const;
+  public:
+  void clear_selected_transitions();
+  const std::string& selected_transitions(int index) const;
+  std::string* mutable_selected_transitions(int index);
+  void set_selected_transitions(int index, const std::string& value);
+  void set_selected_transitions(int index, std::string&& value);
+  void set_selected_transitions(int index, const char* value);
+  void set_selected_transitions(int index, const char* value, size_t size);
+  std::string* add_selected_transitions();
+  void add_selected_transitions(const std::string& value);
+  void add_selected_transitions(std::string&& value);
+  void add_selected_transitions(const char* value);
+  void add_selected_transitions(const char* value, size_t size);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>& selected_transitions() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>* mutable_selected_transitions();
+  private:
+  const std::string& _internal_selected_transitions(int index) const;
+  std::string* _internal_add_selected_transitions();
+  public:
+
+  // repeated string selected_transition_groups = 3;
+  int selected_transition_groups_size() const;
+  private:
+  int _internal_selected_transition_groups_size() const;
+  public:
+  void clear_selected_transition_groups();
+  const std::string& selected_transition_groups(int index) const;
+  std::string* mutable_selected_transition_groups(int index);
+  void set_selected_transition_groups(int index, const std::string& value);
+  void set_selected_transition_groups(int index, std::string&& value);
+  void set_selected_transition_groups(int index, const char* value);
+  void set_selected_transition_groups(int index, const char* value, size_t size);
+  std::string* add_selected_transition_groups();
+  void add_selected_transition_groups(const std::string& value);
+  void add_selected_transition_groups(std::string&& value);
+  void add_selected_transition_groups(const char* value);
+  void add_selected_transition_groups(const char* value, size_t size);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>& selected_transition_groups() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>* mutable_selected_transition_groups();
+  private:
+  const std::string& _internal_selected_transition_groups(int index) const;
+  std::string* _internal_add_selected_transition_groups();
+  public:
+
+  // repeated string header_row = 4;
+  int header_row_size() const;
+  private:
+  int _internal_header_row_size() const;
+  public:
+  void clear_header_row();
+  const std::string& header_row(int index) const;
+  std::string* mutable_header_row(int index);
+  void set_header_row(int index, const std::string& value);
+  void set_header_row(int index, std::string&& value);
+  void set_header_row(int index, const char* value);
+  void set_header_row(int index, const char* value, size_t size);
+  std::string* add_header_row();
+  void add_header_row(const std::string& value);
+  void add_header_row(std::string&& value);
+  void add_header_row(const char* value);
+  void add_header_row(const char* value, size_t size);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>& header_row() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>* mutable_header_row();
+  private:
+  const std::string& _internal_header_row(int index) const;
+  std::string* _internal_add_header_row();
+  public:
+
+  // repeated string header_column = 5;
+  int header_column_size() const;
+  private:
+  int _internal_header_column_size() const;
+  public:
+  void clear_header_column();
+  const std::string& header_column(int index) const;
+  std::string* mutable_header_column(int index);
+  void set_header_column(int index, const std::string& value);
+  void set_header_column(int index, std::string&& value);
+  void set_header_column(int index, const char* value);
+  void set_header_column(int index, const char* value, size_t size);
+  std::string* add_header_column();
+  void add_header_column(const std::string& value);
+  void add_header_column(std::string&& value);
+  void add_header_column(const char* value);
+  void add_header_column(const char* value, size_t size);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>& header_column() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>* mutable_header_column();
+  private:
+  const std::string& _internal_header_column(int index) const;
+  std::string* _internal_add_header_column();
+  public:
+
+  // repeated .SmartPeakServer.SingleAxisData column_data = 6;
+  int column_data_size() const;
+  private:
+  int _internal_column_data_size() const;
+  public:
+  void clear_column_data();
+  ::SmartPeakServer::SingleAxisData* mutable_column_data(int index);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::SmartPeakServer::SingleAxisData >*
+      mutable_column_data();
+  private:
+  const ::SmartPeakServer::SingleAxisData& _internal_column_data(int index) const;
+  ::SmartPeakServer::SingleAxisData* _internal_add_column_data();
+  public:
+  const ::SmartPeakServer::SingleAxisData& column_data(int index) const;
+  ::SmartPeakServer::SingleAxisData* add_column_data();
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::SmartPeakServer::SingleAxisData >&
+      column_data() const;
+
+  // string x_axis_title = 7;
+  void clear_x_axis_title();
+  const std::string& x_axis_title() const;
+  void set_x_axis_title(const std::string& value);
+  void set_x_axis_title(std::string&& value);
+  void set_x_axis_title(const char* value);
+  void set_x_axis_title(const char* value, size_t size);
+  std::string* mutable_x_axis_title();
+  std::string* release_x_axis_title();
+  void set_allocated_x_axis_title(std::string* x_axis_title);
+  private:
+  const std::string& _internal_x_axis_title() const;
+  void _internal_set_x_axis_title(const std::string& value);
+  std::string* _internal_mutable_x_axis_title();
+  public:
+
+  // string y_axis_title = 8;
+  void clear_y_axis_title();
+  const std::string& y_axis_title() const;
+  void set_y_axis_title(const std::string& value);
+  void set_y_axis_title(std::string&& value);
+  void set_y_axis_title(const char* value);
+  void set_y_axis_title(const char* value, size_t size);
+  std::string* mutable_y_axis_title();
+  std::string* release_y_axis_title();
+  void set_allocated_y_axis_title(std::string* y_axis_title);
+  private:
+  const std::string& _internal_y_axis_title() const;
+  void _internal_set_y_axis_title(const std::string& value);
+  std::string* _internal_mutable_y_axis_title();
+  public:
+
+  // string selected_feature = 9;
+  void clear_selected_feature();
+  const std::string& selected_feature() const;
+  void set_selected_feature(const std::string& value);
+  void set_selected_feature(std::string&& value);
+  void set_selected_feature(const char* value);
+  void set_selected_feature(const char* value, size_t size);
+  std::string* mutable_selected_feature();
+  std::string* release_selected_feature();
+  void set_allocated_selected_feature(std::string* selected_feature);
+  private:
+  const std::string& _internal_selected_feature() const;
+  void _internal_set_selected_feature(const std::string& value);
+  std::string* _internal_mutable_selected_feature();
+  public:
+
+  // float feat_value_min = 10;
+  void clear_feat_value_min();
+  float feat_value_min() const;
+  void set_feat_value_min(float value);
+  private:
+  float _internal_feat_value_min() const;
+  void _internal_set_feat_value_min(float value);
+  public:
+
+  // float feat_value_max = 11;
+  void clear_feat_value_max();
+  float feat_value_max() const;
+  void set_feat_value_max(float value);
+  private:
+  float _internal_feat_value_max() const;
+  void _internal_set_feat_value_max(float value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:SmartPeakServer.HeatmapData)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string> selected_sample_names_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string> selected_transitions_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string> selected_transition_groups_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string> header_row_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string> header_column_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::SmartPeakServer::SingleAxisData > column_data_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr x_axis_title_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr y_axis_title_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr selected_feature_;
+  float feat_value_min_;
+  float feat_value_max_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_workflow_2eproto;
+};
+// -------------------------------------------------------------------
+
 class WorkflowResult PROTOBUF_FINAL :
     public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:SmartPeakServer.WorkflowResult) */ {
  public:
@@ -946,7 +1302,7 @@ class WorkflowResult PROTOBUF_FINAL :
                &_WorkflowResult_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    3;
+    4;
 
   friend void swap(WorkflowResult& a, WorkflowResult& b) {
     a.Swap(&b);
@@ -1016,13 +1372,13 @@ class WorkflowResult PROTOBUF_FINAL :
   // accessors -------------------------------------------------------
 
   enum : int {
-    kStatusCodeFieldNumber = 2,
-    kSessionIdFieldNumber = 3,
-    kPathToResultsFieldNumber = 4,
-    kGraphDataFieldNumber = 5,
-    kProgressInPercentFieldNumber = 1,
+    kStatusCodeFieldNumber = 1,
+    kSessionIdFieldNumber = 2,
+    kPathToResultsFieldNumber = 3,
+    kGraphDataFieldNumber = 4,
+    kHeatmapDataFieldNumber = 5,
   };
-  // string status_code = 2;
+  // string status_code = 1;
   void clear_status_code();
   const std::string& status_code() const;
   void set_status_code(const std::string& value);
@@ -1038,7 +1394,7 @@ class WorkflowResult PROTOBUF_FINAL :
   std::string* _internal_mutable_status_code();
   public:
 
-  // string session_id = 3;
+  // string session_id = 2;
   void clear_session_id();
   const std::string& session_id() const;
   void set_session_id(const std::string& value);
@@ -1054,7 +1410,7 @@ class WorkflowResult PROTOBUF_FINAL :
   std::string* _internal_mutable_session_id();
   public:
 
-  // string path_to_results = 4;
+  // string path_to_results = 3;
   void clear_path_to_results();
   const std::string& path_to_results() const;
   void set_path_to_results(const std::string& value);
@@ -1070,7 +1426,7 @@ class WorkflowResult PROTOBUF_FINAL :
   std::string* _internal_mutable_path_to_results();
   public:
 
-  // .SmartPeakServer.GraphData graph_data = 5;
+  // .SmartPeakServer.GraphData graph_data = 4;
   bool has_graph_data() const;
   private:
   bool _internal_has_graph_data() const;
@@ -1088,14 +1444,23 @@ class WorkflowResult PROTOBUF_FINAL :
       ::SmartPeakServer::GraphData* graph_data);
   ::SmartPeakServer::GraphData* unsafe_arena_release_graph_data();
 
-  // int32 progress_in_percent = 1;
-  void clear_progress_in_percent();
-  ::PROTOBUF_NAMESPACE_ID::int32 progress_in_percent() const;
-  void set_progress_in_percent(::PROTOBUF_NAMESPACE_ID::int32 value);
+  // .SmartPeakServer.HeatmapData heatmap_data = 5;
+  bool has_heatmap_data() const;
   private:
-  ::PROTOBUF_NAMESPACE_ID::int32 _internal_progress_in_percent() const;
-  void _internal_set_progress_in_percent(::PROTOBUF_NAMESPACE_ID::int32 value);
+  bool _internal_has_heatmap_data() const;
   public:
+  void clear_heatmap_data();
+  const ::SmartPeakServer::HeatmapData& heatmap_data() const;
+  ::SmartPeakServer::HeatmapData* release_heatmap_data();
+  ::SmartPeakServer::HeatmapData* mutable_heatmap_data();
+  void set_allocated_heatmap_data(::SmartPeakServer::HeatmapData* heatmap_data);
+  private:
+  const ::SmartPeakServer::HeatmapData& _internal_heatmap_data() const;
+  ::SmartPeakServer::HeatmapData* _internal_mutable_heatmap_data();
+  public:
+  void unsafe_arena_set_allocated_heatmap_data(
+      ::SmartPeakServer::HeatmapData* heatmap_data);
+  ::SmartPeakServer::HeatmapData* unsafe_arena_release_heatmap_data();
 
   // @@protoc_insertion_point(class_scope:SmartPeakServer.WorkflowResult)
  private:
@@ -1108,7 +1473,7 @@ class WorkflowResult PROTOBUF_FINAL :
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr session_id_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr path_to_results_;
   ::SmartPeakServer::GraphData* graph_data_;
-  ::PROTOBUF_NAMESPACE_ID::int32 progress_in_percent_;
+  ::SmartPeakServer::HeatmapData* heatmap_data_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_workflow_2eproto;
 };
@@ -1157,7 +1522,7 @@ class InquireLogs PROTOBUF_FINAL :
                &_InquireLogs_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    4;
+    5;
 
   friend void swap(InquireLogs& a, InquireLogs& b) {
     a.Swap(&b);
@@ -1294,7 +1659,7 @@ class LogStream PROTOBUF_FINAL :
                &_LogStream_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    5;
+    6;
 
   friend void swap(LogStream& a, LogStream& b) {
     a.Swap(&b);
@@ -2371,29 +2736,645 @@ inline void GraphData::set_max_nb_points(::PROTOBUF_NAMESPACE_ID::int32 value) {
 
 // -------------------------------------------------------------------
 
+// HeatmapData
+
+// repeated string selected_sample_names = 1;
+inline int HeatmapData::_internal_selected_sample_names_size() const {
+  return selected_sample_names_.size();
+}
+inline int HeatmapData::selected_sample_names_size() const {
+  return _internal_selected_sample_names_size();
+}
+inline void HeatmapData::clear_selected_sample_names() {
+  selected_sample_names_.Clear();
+}
+inline std::string* HeatmapData::add_selected_sample_names() {
+  // @@protoc_insertion_point(field_add_mutable:SmartPeakServer.HeatmapData.selected_sample_names)
+  return _internal_add_selected_sample_names();
+}
+inline const std::string& HeatmapData::_internal_selected_sample_names(int index) const {
+  return selected_sample_names_.Get(index);
+}
+inline const std::string& HeatmapData::selected_sample_names(int index) const {
+  // @@protoc_insertion_point(field_get:SmartPeakServer.HeatmapData.selected_sample_names)
+  return _internal_selected_sample_names(index);
+}
+inline std::string* HeatmapData::mutable_selected_sample_names(int index) {
+  // @@protoc_insertion_point(field_mutable:SmartPeakServer.HeatmapData.selected_sample_names)
+  return selected_sample_names_.Mutable(index);
+}
+inline void HeatmapData::set_selected_sample_names(int index, const std::string& value) {
+  // @@protoc_insertion_point(field_set:SmartPeakServer.HeatmapData.selected_sample_names)
+  selected_sample_names_.Mutable(index)->assign(value);
+}
+inline void HeatmapData::set_selected_sample_names(int index, std::string&& value) {
+  // @@protoc_insertion_point(field_set:SmartPeakServer.HeatmapData.selected_sample_names)
+  selected_sample_names_.Mutable(index)->assign(std::move(value));
+}
+inline void HeatmapData::set_selected_sample_names(int index, const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  selected_sample_names_.Mutable(index)->assign(value);
+  // @@protoc_insertion_point(field_set_char:SmartPeakServer.HeatmapData.selected_sample_names)
+}
+inline void HeatmapData::set_selected_sample_names(int index, const char* value, size_t size) {
+  selected_sample_names_.Mutable(index)->assign(
+    reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:SmartPeakServer.HeatmapData.selected_sample_names)
+}
+inline std::string* HeatmapData::_internal_add_selected_sample_names() {
+  return selected_sample_names_.Add();
+}
+inline void HeatmapData::add_selected_sample_names(const std::string& value) {
+  selected_sample_names_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add:SmartPeakServer.HeatmapData.selected_sample_names)
+}
+inline void HeatmapData::add_selected_sample_names(std::string&& value) {
+  selected_sample_names_.Add(std::move(value));
+  // @@protoc_insertion_point(field_add:SmartPeakServer.HeatmapData.selected_sample_names)
+}
+inline void HeatmapData::add_selected_sample_names(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  selected_sample_names_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add_char:SmartPeakServer.HeatmapData.selected_sample_names)
+}
+inline void HeatmapData::add_selected_sample_names(const char* value, size_t size) {
+  selected_sample_names_.Add()->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_add_pointer:SmartPeakServer.HeatmapData.selected_sample_names)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>&
+HeatmapData::selected_sample_names() const {
+  // @@protoc_insertion_point(field_list:SmartPeakServer.HeatmapData.selected_sample_names)
+  return selected_sample_names_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>*
+HeatmapData::mutable_selected_sample_names() {
+  // @@protoc_insertion_point(field_mutable_list:SmartPeakServer.HeatmapData.selected_sample_names)
+  return &selected_sample_names_;
+}
+
+// repeated string selected_transitions = 2;
+inline int HeatmapData::_internal_selected_transitions_size() const {
+  return selected_transitions_.size();
+}
+inline int HeatmapData::selected_transitions_size() const {
+  return _internal_selected_transitions_size();
+}
+inline void HeatmapData::clear_selected_transitions() {
+  selected_transitions_.Clear();
+}
+inline std::string* HeatmapData::add_selected_transitions() {
+  // @@protoc_insertion_point(field_add_mutable:SmartPeakServer.HeatmapData.selected_transitions)
+  return _internal_add_selected_transitions();
+}
+inline const std::string& HeatmapData::_internal_selected_transitions(int index) const {
+  return selected_transitions_.Get(index);
+}
+inline const std::string& HeatmapData::selected_transitions(int index) const {
+  // @@protoc_insertion_point(field_get:SmartPeakServer.HeatmapData.selected_transitions)
+  return _internal_selected_transitions(index);
+}
+inline std::string* HeatmapData::mutable_selected_transitions(int index) {
+  // @@protoc_insertion_point(field_mutable:SmartPeakServer.HeatmapData.selected_transitions)
+  return selected_transitions_.Mutable(index);
+}
+inline void HeatmapData::set_selected_transitions(int index, const std::string& value) {
+  // @@protoc_insertion_point(field_set:SmartPeakServer.HeatmapData.selected_transitions)
+  selected_transitions_.Mutable(index)->assign(value);
+}
+inline void HeatmapData::set_selected_transitions(int index, std::string&& value) {
+  // @@protoc_insertion_point(field_set:SmartPeakServer.HeatmapData.selected_transitions)
+  selected_transitions_.Mutable(index)->assign(std::move(value));
+}
+inline void HeatmapData::set_selected_transitions(int index, const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  selected_transitions_.Mutable(index)->assign(value);
+  // @@protoc_insertion_point(field_set_char:SmartPeakServer.HeatmapData.selected_transitions)
+}
+inline void HeatmapData::set_selected_transitions(int index, const char* value, size_t size) {
+  selected_transitions_.Mutable(index)->assign(
+    reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:SmartPeakServer.HeatmapData.selected_transitions)
+}
+inline std::string* HeatmapData::_internal_add_selected_transitions() {
+  return selected_transitions_.Add();
+}
+inline void HeatmapData::add_selected_transitions(const std::string& value) {
+  selected_transitions_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add:SmartPeakServer.HeatmapData.selected_transitions)
+}
+inline void HeatmapData::add_selected_transitions(std::string&& value) {
+  selected_transitions_.Add(std::move(value));
+  // @@protoc_insertion_point(field_add:SmartPeakServer.HeatmapData.selected_transitions)
+}
+inline void HeatmapData::add_selected_transitions(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  selected_transitions_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add_char:SmartPeakServer.HeatmapData.selected_transitions)
+}
+inline void HeatmapData::add_selected_transitions(const char* value, size_t size) {
+  selected_transitions_.Add()->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_add_pointer:SmartPeakServer.HeatmapData.selected_transitions)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>&
+HeatmapData::selected_transitions() const {
+  // @@protoc_insertion_point(field_list:SmartPeakServer.HeatmapData.selected_transitions)
+  return selected_transitions_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>*
+HeatmapData::mutable_selected_transitions() {
+  // @@protoc_insertion_point(field_mutable_list:SmartPeakServer.HeatmapData.selected_transitions)
+  return &selected_transitions_;
+}
+
+// repeated string selected_transition_groups = 3;
+inline int HeatmapData::_internal_selected_transition_groups_size() const {
+  return selected_transition_groups_.size();
+}
+inline int HeatmapData::selected_transition_groups_size() const {
+  return _internal_selected_transition_groups_size();
+}
+inline void HeatmapData::clear_selected_transition_groups() {
+  selected_transition_groups_.Clear();
+}
+inline std::string* HeatmapData::add_selected_transition_groups() {
+  // @@protoc_insertion_point(field_add_mutable:SmartPeakServer.HeatmapData.selected_transition_groups)
+  return _internal_add_selected_transition_groups();
+}
+inline const std::string& HeatmapData::_internal_selected_transition_groups(int index) const {
+  return selected_transition_groups_.Get(index);
+}
+inline const std::string& HeatmapData::selected_transition_groups(int index) const {
+  // @@protoc_insertion_point(field_get:SmartPeakServer.HeatmapData.selected_transition_groups)
+  return _internal_selected_transition_groups(index);
+}
+inline std::string* HeatmapData::mutable_selected_transition_groups(int index) {
+  // @@protoc_insertion_point(field_mutable:SmartPeakServer.HeatmapData.selected_transition_groups)
+  return selected_transition_groups_.Mutable(index);
+}
+inline void HeatmapData::set_selected_transition_groups(int index, const std::string& value) {
+  // @@protoc_insertion_point(field_set:SmartPeakServer.HeatmapData.selected_transition_groups)
+  selected_transition_groups_.Mutable(index)->assign(value);
+}
+inline void HeatmapData::set_selected_transition_groups(int index, std::string&& value) {
+  // @@protoc_insertion_point(field_set:SmartPeakServer.HeatmapData.selected_transition_groups)
+  selected_transition_groups_.Mutable(index)->assign(std::move(value));
+}
+inline void HeatmapData::set_selected_transition_groups(int index, const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  selected_transition_groups_.Mutable(index)->assign(value);
+  // @@protoc_insertion_point(field_set_char:SmartPeakServer.HeatmapData.selected_transition_groups)
+}
+inline void HeatmapData::set_selected_transition_groups(int index, const char* value, size_t size) {
+  selected_transition_groups_.Mutable(index)->assign(
+    reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:SmartPeakServer.HeatmapData.selected_transition_groups)
+}
+inline std::string* HeatmapData::_internal_add_selected_transition_groups() {
+  return selected_transition_groups_.Add();
+}
+inline void HeatmapData::add_selected_transition_groups(const std::string& value) {
+  selected_transition_groups_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add:SmartPeakServer.HeatmapData.selected_transition_groups)
+}
+inline void HeatmapData::add_selected_transition_groups(std::string&& value) {
+  selected_transition_groups_.Add(std::move(value));
+  // @@protoc_insertion_point(field_add:SmartPeakServer.HeatmapData.selected_transition_groups)
+}
+inline void HeatmapData::add_selected_transition_groups(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  selected_transition_groups_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add_char:SmartPeakServer.HeatmapData.selected_transition_groups)
+}
+inline void HeatmapData::add_selected_transition_groups(const char* value, size_t size) {
+  selected_transition_groups_.Add()->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_add_pointer:SmartPeakServer.HeatmapData.selected_transition_groups)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>&
+HeatmapData::selected_transition_groups() const {
+  // @@protoc_insertion_point(field_list:SmartPeakServer.HeatmapData.selected_transition_groups)
+  return selected_transition_groups_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>*
+HeatmapData::mutable_selected_transition_groups() {
+  // @@protoc_insertion_point(field_mutable_list:SmartPeakServer.HeatmapData.selected_transition_groups)
+  return &selected_transition_groups_;
+}
+
+// repeated string header_row = 4;
+inline int HeatmapData::_internal_header_row_size() const {
+  return header_row_.size();
+}
+inline int HeatmapData::header_row_size() const {
+  return _internal_header_row_size();
+}
+inline void HeatmapData::clear_header_row() {
+  header_row_.Clear();
+}
+inline std::string* HeatmapData::add_header_row() {
+  // @@protoc_insertion_point(field_add_mutable:SmartPeakServer.HeatmapData.header_row)
+  return _internal_add_header_row();
+}
+inline const std::string& HeatmapData::_internal_header_row(int index) const {
+  return header_row_.Get(index);
+}
+inline const std::string& HeatmapData::header_row(int index) const {
+  // @@protoc_insertion_point(field_get:SmartPeakServer.HeatmapData.header_row)
+  return _internal_header_row(index);
+}
+inline std::string* HeatmapData::mutable_header_row(int index) {
+  // @@protoc_insertion_point(field_mutable:SmartPeakServer.HeatmapData.header_row)
+  return header_row_.Mutable(index);
+}
+inline void HeatmapData::set_header_row(int index, const std::string& value) {
+  // @@protoc_insertion_point(field_set:SmartPeakServer.HeatmapData.header_row)
+  header_row_.Mutable(index)->assign(value);
+}
+inline void HeatmapData::set_header_row(int index, std::string&& value) {
+  // @@protoc_insertion_point(field_set:SmartPeakServer.HeatmapData.header_row)
+  header_row_.Mutable(index)->assign(std::move(value));
+}
+inline void HeatmapData::set_header_row(int index, const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  header_row_.Mutable(index)->assign(value);
+  // @@protoc_insertion_point(field_set_char:SmartPeakServer.HeatmapData.header_row)
+}
+inline void HeatmapData::set_header_row(int index, const char* value, size_t size) {
+  header_row_.Mutable(index)->assign(
+    reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:SmartPeakServer.HeatmapData.header_row)
+}
+inline std::string* HeatmapData::_internal_add_header_row() {
+  return header_row_.Add();
+}
+inline void HeatmapData::add_header_row(const std::string& value) {
+  header_row_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add:SmartPeakServer.HeatmapData.header_row)
+}
+inline void HeatmapData::add_header_row(std::string&& value) {
+  header_row_.Add(std::move(value));
+  // @@protoc_insertion_point(field_add:SmartPeakServer.HeatmapData.header_row)
+}
+inline void HeatmapData::add_header_row(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  header_row_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add_char:SmartPeakServer.HeatmapData.header_row)
+}
+inline void HeatmapData::add_header_row(const char* value, size_t size) {
+  header_row_.Add()->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_add_pointer:SmartPeakServer.HeatmapData.header_row)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>&
+HeatmapData::header_row() const {
+  // @@protoc_insertion_point(field_list:SmartPeakServer.HeatmapData.header_row)
+  return header_row_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>*
+HeatmapData::mutable_header_row() {
+  // @@protoc_insertion_point(field_mutable_list:SmartPeakServer.HeatmapData.header_row)
+  return &header_row_;
+}
+
+// repeated string header_column = 5;
+inline int HeatmapData::_internal_header_column_size() const {
+  return header_column_.size();
+}
+inline int HeatmapData::header_column_size() const {
+  return _internal_header_column_size();
+}
+inline void HeatmapData::clear_header_column() {
+  header_column_.Clear();
+}
+inline std::string* HeatmapData::add_header_column() {
+  // @@protoc_insertion_point(field_add_mutable:SmartPeakServer.HeatmapData.header_column)
+  return _internal_add_header_column();
+}
+inline const std::string& HeatmapData::_internal_header_column(int index) const {
+  return header_column_.Get(index);
+}
+inline const std::string& HeatmapData::header_column(int index) const {
+  // @@protoc_insertion_point(field_get:SmartPeakServer.HeatmapData.header_column)
+  return _internal_header_column(index);
+}
+inline std::string* HeatmapData::mutable_header_column(int index) {
+  // @@protoc_insertion_point(field_mutable:SmartPeakServer.HeatmapData.header_column)
+  return header_column_.Mutable(index);
+}
+inline void HeatmapData::set_header_column(int index, const std::string& value) {
+  // @@protoc_insertion_point(field_set:SmartPeakServer.HeatmapData.header_column)
+  header_column_.Mutable(index)->assign(value);
+}
+inline void HeatmapData::set_header_column(int index, std::string&& value) {
+  // @@protoc_insertion_point(field_set:SmartPeakServer.HeatmapData.header_column)
+  header_column_.Mutable(index)->assign(std::move(value));
+}
+inline void HeatmapData::set_header_column(int index, const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  header_column_.Mutable(index)->assign(value);
+  // @@protoc_insertion_point(field_set_char:SmartPeakServer.HeatmapData.header_column)
+}
+inline void HeatmapData::set_header_column(int index, const char* value, size_t size) {
+  header_column_.Mutable(index)->assign(
+    reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:SmartPeakServer.HeatmapData.header_column)
+}
+inline std::string* HeatmapData::_internal_add_header_column() {
+  return header_column_.Add();
+}
+inline void HeatmapData::add_header_column(const std::string& value) {
+  header_column_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add:SmartPeakServer.HeatmapData.header_column)
+}
+inline void HeatmapData::add_header_column(std::string&& value) {
+  header_column_.Add(std::move(value));
+  // @@protoc_insertion_point(field_add:SmartPeakServer.HeatmapData.header_column)
+}
+inline void HeatmapData::add_header_column(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  header_column_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add_char:SmartPeakServer.HeatmapData.header_column)
+}
+inline void HeatmapData::add_header_column(const char* value, size_t size) {
+  header_column_.Add()->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_add_pointer:SmartPeakServer.HeatmapData.header_column)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>&
+HeatmapData::header_column() const {
+  // @@protoc_insertion_point(field_list:SmartPeakServer.HeatmapData.header_column)
+  return header_column_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>*
+HeatmapData::mutable_header_column() {
+  // @@protoc_insertion_point(field_mutable_list:SmartPeakServer.HeatmapData.header_column)
+  return &header_column_;
+}
+
+// repeated .SmartPeakServer.SingleAxisData column_data = 6;
+inline int HeatmapData::_internal_column_data_size() const {
+  return column_data_.size();
+}
+inline int HeatmapData::column_data_size() const {
+  return _internal_column_data_size();
+}
+inline void HeatmapData::clear_column_data() {
+  column_data_.Clear();
+}
+inline ::SmartPeakServer::SingleAxisData* HeatmapData::mutable_column_data(int index) {
+  // @@protoc_insertion_point(field_mutable:SmartPeakServer.HeatmapData.column_data)
+  return column_data_.Mutable(index);
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::SmartPeakServer::SingleAxisData >*
+HeatmapData::mutable_column_data() {
+  // @@protoc_insertion_point(field_mutable_list:SmartPeakServer.HeatmapData.column_data)
+  return &column_data_;
+}
+inline const ::SmartPeakServer::SingleAxisData& HeatmapData::_internal_column_data(int index) const {
+  return column_data_.Get(index);
+}
+inline const ::SmartPeakServer::SingleAxisData& HeatmapData::column_data(int index) const {
+  // @@protoc_insertion_point(field_get:SmartPeakServer.HeatmapData.column_data)
+  return _internal_column_data(index);
+}
+inline ::SmartPeakServer::SingleAxisData* HeatmapData::_internal_add_column_data() {
+  return column_data_.Add();
+}
+inline ::SmartPeakServer::SingleAxisData* HeatmapData::add_column_data() {
+  // @@protoc_insertion_point(field_add:SmartPeakServer.HeatmapData.column_data)
+  return _internal_add_column_data();
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::SmartPeakServer::SingleAxisData >&
+HeatmapData::column_data() const {
+  // @@protoc_insertion_point(field_list:SmartPeakServer.HeatmapData.column_data)
+  return column_data_;
+}
+
+// string x_axis_title = 7;
+inline void HeatmapData::clear_x_axis_title() {
+  x_axis_title_.ClearToEmpty();
+}
+inline const std::string& HeatmapData::x_axis_title() const {
+  // @@protoc_insertion_point(field_get:SmartPeakServer.HeatmapData.x_axis_title)
+  return _internal_x_axis_title();
+}
+inline void HeatmapData::set_x_axis_title(const std::string& value) {
+  _internal_set_x_axis_title(value);
+  // @@protoc_insertion_point(field_set:SmartPeakServer.HeatmapData.x_axis_title)
+}
+inline std::string* HeatmapData::mutable_x_axis_title() {
+  // @@protoc_insertion_point(field_mutable:SmartPeakServer.HeatmapData.x_axis_title)
+  return _internal_mutable_x_axis_title();
+}
+inline const std::string& HeatmapData::_internal_x_axis_title() const {
+  return x_axis_title_.Get();
+}
+inline void HeatmapData::_internal_set_x_axis_title(const std::string& value) {
+  
+  x_axis_title_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArena());
+}
+inline void HeatmapData::set_x_axis_title(std::string&& value) {
+  
+  x_axis_title_.Set(
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, ::std::move(value), GetArena());
+  // @@protoc_insertion_point(field_set_rvalue:SmartPeakServer.HeatmapData.x_axis_title)
+}
+inline void HeatmapData::set_x_axis_title(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  x_axis_title_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, ::std::string(value), GetArena());
+  // @@protoc_insertion_point(field_set_char:SmartPeakServer.HeatmapData.x_axis_title)
+}
+inline void HeatmapData::set_x_axis_title(const char* value,
+    size_t size) {
+  
+  x_axis_title_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, ::std::string(
+      reinterpret_cast<const char*>(value), size), GetArena());
+  // @@protoc_insertion_point(field_set_pointer:SmartPeakServer.HeatmapData.x_axis_title)
+}
+inline std::string* HeatmapData::_internal_mutable_x_axis_title() {
+  
+  return x_axis_title_.Mutable(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArena());
+}
+inline std::string* HeatmapData::release_x_axis_title() {
+  // @@protoc_insertion_point(field_release:SmartPeakServer.HeatmapData.x_axis_title)
+  return x_axis_title_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline void HeatmapData::set_allocated_x_axis_title(std::string* x_axis_title) {
+  if (x_axis_title != nullptr) {
+    
+  } else {
+    
+  }
+  x_axis_title_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), x_axis_title,
+      GetArena());
+  // @@protoc_insertion_point(field_set_allocated:SmartPeakServer.HeatmapData.x_axis_title)
+}
+
+// string y_axis_title = 8;
+inline void HeatmapData::clear_y_axis_title() {
+  y_axis_title_.ClearToEmpty();
+}
+inline const std::string& HeatmapData::y_axis_title() const {
+  // @@protoc_insertion_point(field_get:SmartPeakServer.HeatmapData.y_axis_title)
+  return _internal_y_axis_title();
+}
+inline void HeatmapData::set_y_axis_title(const std::string& value) {
+  _internal_set_y_axis_title(value);
+  // @@protoc_insertion_point(field_set:SmartPeakServer.HeatmapData.y_axis_title)
+}
+inline std::string* HeatmapData::mutable_y_axis_title() {
+  // @@protoc_insertion_point(field_mutable:SmartPeakServer.HeatmapData.y_axis_title)
+  return _internal_mutable_y_axis_title();
+}
+inline const std::string& HeatmapData::_internal_y_axis_title() const {
+  return y_axis_title_.Get();
+}
+inline void HeatmapData::_internal_set_y_axis_title(const std::string& value) {
+  
+  y_axis_title_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArena());
+}
+inline void HeatmapData::set_y_axis_title(std::string&& value) {
+  
+  y_axis_title_.Set(
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, ::std::move(value), GetArena());
+  // @@protoc_insertion_point(field_set_rvalue:SmartPeakServer.HeatmapData.y_axis_title)
+}
+inline void HeatmapData::set_y_axis_title(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  y_axis_title_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, ::std::string(value), GetArena());
+  // @@protoc_insertion_point(field_set_char:SmartPeakServer.HeatmapData.y_axis_title)
+}
+inline void HeatmapData::set_y_axis_title(const char* value,
+    size_t size) {
+  
+  y_axis_title_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, ::std::string(
+      reinterpret_cast<const char*>(value), size), GetArena());
+  // @@protoc_insertion_point(field_set_pointer:SmartPeakServer.HeatmapData.y_axis_title)
+}
+inline std::string* HeatmapData::_internal_mutable_y_axis_title() {
+  
+  return y_axis_title_.Mutable(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArena());
+}
+inline std::string* HeatmapData::release_y_axis_title() {
+  // @@protoc_insertion_point(field_release:SmartPeakServer.HeatmapData.y_axis_title)
+  return y_axis_title_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline void HeatmapData::set_allocated_y_axis_title(std::string* y_axis_title) {
+  if (y_axis_title != nullptr) {
+    
+  } else {
+    
+  }
+  y_axis_title_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), y_axis_title,
+      GetArena());
+  // @@protoc_insertion_point(field_set_allocated:SmartPeakServer.HeatmapData.y_axis_title)
+}
+
+// string selected_feature = 9;
+inline void HeatmapData::clear_selected_feature() {
+  selected_feature_.ClearToEmpty();
+}
+inline const std::string& HeatmapData::selected_feature() const {
+  // @@protoc_insertion_point(field_get:SmartPeakServer.HeatmapData.selected_feature)
+  return _internal_selected_feature();
+}
+inline void HeatmapData::set_selected_feature(const std::string& value) {
+  _internal_set_selected_feature(value);
+  // @@protoc_insertion_point(field_set:SmartPeakServer.HeatmapData.selected_feature)
+}
+inline std::string* HeatmapData::mutable_selected_feature() {
+  // @@protoc_insertion_point(field_mutable:SmartPeakServer.HeatmapData.selected_feature)
+  return _internal_mutable_selected_feature();
+}
+inline const std::string& HeatmapData::_internal_selected_feature() const {
+  return selected_feature_.Get();
+}
+inline void HeatmapData::_internal_set_selected_feature(const std::string& value) {
+  
+  selected_feature_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArena());
+}
+inline void HeatmapData::set_selected_feature(std::string&& value) {
+  
+  selected_feature_.Set(
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, ::std::move(value), GetArena());
+  // @@protoc_insertion_point(field_set_rvalue:SmartPeakServer.HeatmapData.selected_feature)
+}
+inline void HeatmapData::set_selected_feature(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  selected_feature_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, ::std::string(value), GetArena());
+  // @@protoc_insertion_point(field_set_char:SmartPeakServer.HeatmapData.selected_feature)
+}
+inline void HeatmapData::set_selected_feature(const char* value,
+    size_t size) {
+  
+  selected_feature_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, ::std::string(
+      reinterpret_cast<const char*>(value), size), GetArena());
+  // @@protoc_insertion_point(field_set_pointer:SmartPeakServer.HeatmapData.selected_feature)
+}
+inline std::string* HeatmapData::_internal_mutable_selected_feature() {
+  
+  return selected_feature_.Mutable(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArena());
+}
+inline std::string* HeatmapData::release_selected_feature() {
+  // @@protoc_insertion_point(field_release:SmartPeakServer.HeatmapData.selected_feature)
+  return selected_feature_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline void HeatmapData::set_allocated_selected_feature(std::string* selected_feature) {
+  if (selected_feature != nullptr) {
+    
+  } else {
+    
+  }
+  selected_feature_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), selected_feature,
+      GetArena());
+  // @@protoc_insertion_point(field_set_allocated:SmartPeakServer.HeatmapData.selected_feature)
+}
+
+// float feat_value_min = 10;
+inline void HeatmapData::clear_feat_value_min() {
+  feat_value_min_ = 0;
+}
+inline float HeatmapData::_internal_feat_value_min() const {
+  return feat_value_min_;
+}
+inline float HeatmapData::feat_value_min() const {
+  // @@protoc_insertion_point(field_get:SmartPeakServer.HeatmapData.feat_value_min)
+  return _internal_feat_value_min();
+}
+inline void HeatmapData::_internal_set_feat_value_min(float value) {
+  
+  feat_value_min_ = value;
+}
+inline void HeatmapData::set_feat_value_min(float value) {
+  _internal_set_feat_value_min(value);
+  // @@protoc_insertion_point(field_set:SmartPeakServer.HeatmapData.feat_value_min)
+}
+
+// float feat_value_max = 11;
+inline void HeatmapData::clear_feat_value_max() {
+  feat_value_max_ = 0;
+}
+inline float HeatmapData::_internal_feat_value_max() const {
+  return feat_value_max_;
+}
+inline float HeatmapData::feat_value_max() const {
+  // @@protoc_insertion_point(field_get:SmartPeakServer.HeatmapData.feat_value_max)
+  return _internal_feat_value_max();
+}
+inline void HeatmapData::_internal_set_feat_value_max(float value) {
+  
+  feat_value_max_ = value;
+}
+inline void HeatmapData::set_feat_value_max(float value) {
+  _internal_set_feat_value_max(value);
+  // @@protoc_insertion_point(field_set:SmartPeakServer.HeatmapData.feat_value_max)
+}
+
+// -------------------------------------------------------------------
+
 // WorkflowResult
 
-// int32 progress_in_percent = 1;
-inline void WorkflowResult::clear_progress_in_percent() {
-  progress_in_percent_ = 0;
-}
-inline ::PROTOBUF_NAMESPACE_ID::int32 WorkflowResult::_internal_progress_in_percent() const {
-  return progress_in_percent_;
-}
-inline ::PROTOBUF_NAMESPACE_ID::int32 WorkflowResult::progress_in_percent() const {
-  // @@protoc_insertion_point(field_get:SmartPeakServer.WorkflowResult.progress_in_percent)
-  return _internal_progress_in_percent();
-}
-inline void WorkflowResult::_internal_set_progress_in_percent(::PROTOBUF_NAMESPACE_ID::int32 value) {
-  
-  progress_in_percent_ = value;
-}
-inline void WorkflowResult::set_progress_in_percent(::PROTOBUF_NAMESPACE_ID::int32 value) {
-  _internal_set_progress_in_percent(value);
-  // @@protoc_insertion_point(field_set:SmartPeakServer.WorkflowResult.progress_in_percent)
-}
-
-// string status_code = 2;
+// string status_code = 1;
 inline void WorkflowResult::clear_status_code() {
   status_code_.ClearToEmpty();
 }
@@ -2454,7 +3435,7 @@ inline void WorkflowResult::set_allocated_status_code(std::string* status_code) 
   // @@protoc_insertion_point(field_set_allocated:SmartPeakServer.WorkflowResult.status_code)
 }
 
-// string session_id = 3;
+// string session_id = 2;
 inline void WorkflowResult::clear_session_id() {
   session_id_.ClearToEmpty();
 }
@@ -2515,7 +3496,7 @@ inline void WorkflowResult::set_allocated_session_id(std::string* session_id) {
   // @@protoc_insertion_point(field_set_allocated:SmartPeakServer.WorkflowResult.session_id)
 }
 
-// string path_to_results = 4;
+// string path_to_results = 3;
 inline void WorkflowResult::clear_path_to_results() {
   path_to_results_.ClearToEmpty();
 }
@@ -2576,7 +3557,7 @@ inline void WorkflowResult::set_allocated_path_to_results(std::string* path_to_r
   // @@protoc_insertion_point(field_set_allocated:SmartPeakServer.WorkflowResult.path_to_results)
 }
 
-// .SmartPeakServer.GraphData graph_data = 5;
+// .SmartPeakServer.GraphData graph_data = 4;
 inline bool WorkflowResult::_internal_has_graph_data() const {
   return this != internal_default_instance() && graph_data_ != nullptr;
 }
@@ -2657,6 +3638,89 @@ inline void WorkflowResult::set_allocated_graph_data(::SmartPeakServer::GraphDat
   }
   graph_data_ = graph_data;
   // @@protoc_insertion_point(field_set_allocated:SmartPeakServer.WorkflowResult.graph_data)
+}
+
+// .SmartPeakServer.HeatmapData heatmap_data = 5;
+inline bool WorkflowResult::_internal_has_heatmap_data() const {
+  return this != internal_default_instance() && heatmap_data_ != nullptr;
+}
+inline bool WorkflowResult::has_heatmap_data() const {
+  return _internal_has_heatmap_data();
+}
+inline void WorkflowResult::clear_heatmap_data() {
+  if (GetArena() == nullptr && heatmap_data_ != nullptr) {
+    delete heatmap_data_;
+  }
+  heatmap_data_ = nullptr;
+}
+inline const ::SmartPeakServer::HeatmapData& WorkflowResult::_internal_heatmap_data() const {
+  const ::SmartPeakServer::HeatmapData* p = heatmap_data_;
+  return p != nullptr ? *p : reinterpret_cast<const ::SmartPeakServer::HeatmapData&>(
+      ::SmartPeakServer::_HeatmapData_default_instance_);
+}
+inline const ::SmartPeakServer::HeatmapData& WorkflowResult::heatmap_data() const {
+  // @@protoc_insertion_point(field_get:SmartPeakServer.WorkflowResult.heatmap_data)
+  return _internal_heatmap_data();
+}
+inline void WorkflowResult::unsafe_arena_set_allocated_heatmap_data(
+    ::SmartPeakServer::HeatmapData* heatmap_data) {
+  if (GetArena() == nullptr) {
+    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(heatmap_data_);
+  }
+  heatmap_data_ = heatmap_data;
+  if (heatmap_data) {
+    
+  } else {
+    
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:SmartPeakServer.WorkflowResult.heatmap_data)
+}
+inline ::SmartPeakServer::HeatmapData* WorkflowResult::release_heatmap_data() {
+  
+  ::SmartPeakServer::HeatmapData* temp = heatmap_data_;
+  heatmap_data_ = nullptr;
+  if (GetArena() != nullptr) {
+    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  }
+  return temp;
+}
+inline ::SmartPeakServer::HeatmapData* WorkflowResult::unsafe_arena_release_heatmap_data() {
+  // @@protoc_insertion_point(field_release:SmartPeakServer.WorkflowResult.heatmap_data)
+  
+  ::SmartPeakServer::HeatmapData* temp = heatmap_data_;
+  heatmap_data_ = nullptr;
+  return temp;
+}
+inline ::SmartPeakServer::HeatmapData* WorkflowResult::_internal_mutable_heatmap_data() {
+  
+  if (heatmap_data_ == nullptr) {
+    auto* p = CreateMaybeMessage<::SmartPeakServer::HeatmapData>(GetArena());
+    heatmap_data_ = p;
+  }
+  return heatmap_data_;
+}
+inline ::SmartPeakServer::HeatmapData* WorkflowResult::mutable_heatmap_data() {
+  // @@protoc_insertion_point(field_mutable:SmartPeakServer.WorkflowResult.heatmap_data)
+  return _internal_mutable_heatmap_data();
+}
+inline void WorkflowResult::set_allocated_heatmap_data(::SmartPeakServer::HeatmapData* heatmap_data) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
+  if (message_arena == nullptr) {
+    delete heatmap_data_;
+  }
+  if (heatmap_data) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+      ::PROTOBUF_NAMESPACE_ID::Arena::GetArena(heatmap_data);
+    if (message_arena != submessage_arena) {
+      heatmap_data = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, heatmap_data, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  heatmap_data_ = heatmap_data;
+  // @@protoc_insertion_point(field_set_allocated:SmartPeakServer.WorkflowResult.heatmap_data)
 }
 
 // -------------------------------------------------------------------
@@ -2751,6 +3815,8 @@ inline void LogStream::set_allocated_log_line(std::string* log_line) {
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

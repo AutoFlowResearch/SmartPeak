@@ -690,7 +690,7 @@ TEST(SessionHandler, getSpectrumScatterPlot1)
   const std::pair<float, float> range = std::make_pair(0, 1800);
   const std::set<std::string> sample_names;
   const std::set<std::string> component_names;
-  session_handler.getChromatogramScatterPlot(testData.sequenceHandler, result, range, sample_names, component_names);
+  session_handler.getChromatogramScatterPlot(testData.sequenceHandler, result, range, sample_names, component_names, 6000);
   EXPECT_FALSE(result.points_overflow_);
 }
 TEST(SessionHandler, setSpectrumScatterPlot1)

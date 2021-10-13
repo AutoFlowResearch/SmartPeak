@@ -31,6 +31,8 @@ namespace SmartPeak
       sequence_observable.addSequenceObserver(this);
     };
     void draw() override;
+    
+    void setHeatmapData(SessionHandler::HeatMapData& heatmap_data) { server_heatmap_data_ = heatmap_data; }
 
   public:
     /**
@@ -44,6 +46,7 @@ namespace SmartPeak
     SessionHandler& session_handler_;
     SequenceHandler& sequence_handler_;
     SessionHandler::HeatMapData heatmap_data_;
+    SessionHandler::HeatMapData server_heatmap_data_;
     std::string plot_title_; // used as the ID of the plot as well so this should be unique across the different Widgets
     std::string selected_feature_;
     bool invalid_data_;

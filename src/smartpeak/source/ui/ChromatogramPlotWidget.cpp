@@ -37,7 +37,8 @@ namespace SmartPeak
       
       // we may recompute the RT window, get the whole graph area
       if (!SmartPeak::run_on_server) {
-        session_handler_.getChromatogramScatterPlot(sequence_handler_, graph_viz_data_, std::make_pair(0, 1800), sample_names, component_names);
+        session_handler_.getChromatogramScatterPlot(sequence_handler_, graph_viz_data_,
+                                                    std::make_pair(0, 1800), sample_names, component_names, 6000);
       }
       updateRanges();
       input_sample_names_ = sample_names;
@@ -47,7 +48,8 @@ namespace SmartPeak
     else if (input_range_ != current_range_) // user zoom in/out
     {
       if (!SmartPeak::run_on_server) {
-        session_handler_.getChromatogramScatterPlot(sequence_handler_, graph_viz_data_, current_range_, sample_names, component_names);
+        session_handler_.getChromatogramScatterPlot(sequence_handler_, graph_viz_data_,
+                                                    current_range_, sample_names, component_names, 6000);
       }
       input_range_ = current_range_;
     }

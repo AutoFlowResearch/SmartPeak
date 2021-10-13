@@ -241,7 +241,8 @@ namespace SmartPeak
                                     GraphVizData& result,
                                     const std::pair<float, float>& range,
                                     const std::set<std::string>& sample_names,
-                                    const std::set<std::string>& component_names) const;
+                                    const std::set<std::string>& component_names,
+                                    const size_t max_points) const;
 
     /*
     @brief Gets the TIC chromatogram data
@@ -336,6 +337,10 @@ namespace SmartPeak
     @brief fill the HeatMapData structure, given a feature name
     */
     void getHeatMap(const SequenceHandler& sequence_handler, HeatMapData& result, const std::string& feature_name);
+    
+    void getHeatMap(const SequenceHandler& sequence_handler, HeatMapData& result, const std::string& feature_name,
+                    const std::set<std::string>& sample_names, const std::set<std::string>& component_names,
+                    const std::set<std::string>& component_group_names);
     
     /*
     @brief Sets the data used for rendering the calibrators

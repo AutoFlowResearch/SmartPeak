@@ -720,9 +720,11 @@ int main(int argc, char** argv)
           LogStreamClientS logstream_client(grpc::CreateChannel(server_dialogue_->server_ip_address_, grpc::InsecureChannelCredentials()));
 
           SmartPeak::SessionHandler::GraphVizData graph_data;
-          std::string workflow_status = workflow_client.runWorkflow(server_dialogue_->sequence_file_path_, graph_data);
+          SmartPeak::SessionHandler::HeatMapData heatmap_data;
+          std::string workflow_status = workflow_client.runWorkflow(server_dialogue_->sequence_file_path_, graph_data, heatmap_data);
           chromatogram_tic_plot_widget_->setGraphVizData(graph_data);
           chromatogram_plot_widget_->setGraphVizData(graph_data);
+          heatmap_plot_widget_->setHeatmapData(heatmap_data);
           
           logstream_client.getLogstream();
           std::cout << ">>> GUI workflow_status : " << workflow_status << std::endl;

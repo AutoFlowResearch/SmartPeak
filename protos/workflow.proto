@@ -43,12 +43,26 @@ message GraphData {
   int32 max_nb_points = 16;
 }
 
+message HeatmapData {
+  repeated string selected_sample_names = 1;
+  repeated string selected_transitions = 2;
+  repeated string selected_transition_groups = 3;
+  repeated string header_row = 4;
+  repeated string header_column = 5;
+  repeated SingleAxisData column_data = 6;
+  string x_axis_title = 7;
+  string y_axis_title = 8;
+  string selected_feature = 9;
+  float feat_value_min = 10;
+  float feat_value_max = 11;
+}
+
 message WorkflowResult {
-  int32 progress_in_percent = 1;
-  string status_code = 2;
-  string session_id = 3;
-  string path_to_results = 4;
-  GraphData graph_data = 5;
+  string status_code = 1;
+  string session_id = 2;
+  string path_to_results = 3;
+  GraphData graph_data = 4;
+  HeatmapData heatmap_data = 5;
 }
 
 message InquireLogs {

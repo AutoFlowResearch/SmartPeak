@@ -1645,7 +1645,8 @@ namespace SmartPeak
                                                   GraphVizData& result, 
                                                   const std::pair<float, float>& chrom_time_range,
                                                   const std::set<std::string>& sample_names,
-                                                  const std::set<std::string>& component_names) const
+                                                  const std::set<std::string>& component_names,
+                                                  const size_t max_points) const
   {
     if (sequence_handler.getSequence().size() > 0 &&
       (sequence_handler.getSequence().at(0).getRawData().getFeatureMapHistory().size() > 0 ||
@@ -1653,8 +1654,7 @@ namespace SmartPeak
     {
       LOGD << "Making the chromatogram data for plotting";
       // Set the axes titles and min/max defaults
-      if (run_on_server) result.reset("Time (sec)", "Intensity (au)", {}, 6000000);
-      else result.reset("Time (sec)", "Intensity (au)", {}, 6000);
+      result.reset("Time (sec)", "Intensity (au)", {}, max_points);
       auto sequence = sequence_handler.getSequence();
       for (const auto& injection : sequence) {
         if (sample_names.count(injection.getMetaData().getSampleName()) == 0) continue;
@@ -1992,6 +1992,82 @@ namespace SmartPeak
     result.selected_sample_names_ = selected_sample_names;
     result.selected_transitions_ = selected_transitions;
     result.selected_transition_groups_ = selected_transition_groups;
+  }
+  void SessionHandler::getHeatMap(const SequenceHandler& sequence_handler, HeatMapData& result, const std::string& feature_name,
+                                  const std::set<std::string>& sample_names, const std::set<std::string>& component_names,
+                                  const std::set<std::string>& component_group_names)
+  {
+    LOGD << "Getting Heatmap data";
+    std::vector<std::string> feature_names;
+    feature_names.push_back(feature_name);
+    // get the selected sample types
+    std::set<SampleType> sample_types; // TODO: options for the user to select what sample_types
+    for (const std::pair<SampleType, std::string>& p : sampleTypeToString) sample_types.insert(p.first);
+    // get the selected sample names
+//    Eigen::Tensor<std::string, 1> selected_sample_names = getSelectSampleNamesPlot();
+//    std::set<std::string> sample_names;
+//    for (int i = 0; i < selected_sample_names.size(); ++i) {
+//      if (!selected_sample_names(i).empty())
+//        sample_names.insert(selected_sample_names(i));
+//    }
+    // get the selected transitions
+//    Eigen::Tensor<std::string, 1> selected_transitions = getSelectTransitionsPlot();
+//    std::set<std::string> component_names;
+//    for (int i = 0; i < selected_transitions.size(); ++i) {
+//      if (!selected_transitions(i).empty())
+//        component_names.insert(selected_transitions(i));
+//    }
+    // get the selected transition groups
+//    Eigen::Tensor<std::string, 1> selected_transition_groups = getSelectTransitionGroupsPlot();
+//    std::set<std::string> component_group_names;
+//    for (int i = 0; i < selected_transition_groups.size(); ++i) {
+//      if (!selected_transition_groups(i).empty())
+//        component_group_names.insert(selected_transition_groups(i));
+//    }
+    // Update the unique transitions
+    feature_matrix_unique_transitions_ = getNSelectedTransitionsPlot() * getNSelectedFeatureMetaValuesPlot();
+    // get the matrix of data
+    if (sequence_handler.getSequence().size() > 0 &&
+      sequence_handler.getSequence().at(0).getRawData().getFeatureMapHistory().size() > 0)
+    {
+      Eigen::Tensor<std::string, 2> rows_out;
+      Eigen::Tensor<float, 2> heatmap_value_data;
+      SequenceParser::makeDataMatrixFromMetaValue(sequence_handler,
+                                                  heatmap_value_data,
+                                                  result.feat_heatmap_col_labels,
+                                                  rows_out,
+                                                  feature_names,
+                                                  sample_types,
+                                                  sample_names,
+                                                  component_group_names,
+                                                  component_names);
+      const int n_rows = heatmap_value_data.dimension(0);
+      // allocate space for the pivot table body and heatmap row labels
+      result.feat_heatmap_row_labels.resize(n_rows);
+      for (int row = 0; row < n_rows; ++row) {
+        result.feat_heatmap_row_labels(row) = rows_out(row, 0);
+      }
+      // assign the heatmap data
+      result.feat_heatmap_data.resize(heatmap_value_data.dimensions());
+      result.feat_heatmap_data = heatmap_value_data.swap_layout().shuffle(Eigen::array<Eigen::Index, 2>({ 1,0 }));
+      const Eigen::Tensor<float, 0> feat_value_data_maximum = heatmap_value_data.maximum();
+      result.feat_value_max_ = feat_value_data_maximum(0);
+      const Eigen::Tensor<float, 0> feat_value_data_minimum = heatmap_value_data.minimum();
+      result.feat_value_min_ = feat_value_data_minimum(0);
+    }
+    else
+    {
+      result.feat_heatmap_data.setZero();
+      result.feat_value_max_ = std::numeric_limits<float>::min();
+      result.feat_value_min_ = std::numeric_limits<float>::max();
+    }
+    // Set the axes titles
+    result.feat_heatmap_x_axis_title = "Injections";
+    result.feat_heatmap_y_axis_title = "Transitions";
+    result.selected_feature_ = feature_name;
+//    result.selected_sample_names_ = selected_sample_names;
+//    result.selected_transitions_ = selected_transitions;
+//    result.selected_transition_groups_ = selected_transition_groups;
   }
   bool SessionHandler::setCalibratorsScatterLinePlot(const SequenceHandler & sequence_handler)
   {
