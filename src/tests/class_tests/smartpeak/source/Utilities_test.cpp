@@ -643,3 +643,82 @@ TEST(utilities, removeTrailing)
   Utilities::removeTrailing(str3, ".00");
   EXPECT_STREQ(str3.c_str(), "234");
 }
+
+TEST(utilities, prepareFileParameter)
+{
+  map<std::string, vector<map<string, string>>> param_struct1({
+  {"test",
+    {
+      {
+        {"name", "existing_relative_path"},
+        {"type", "string"},
+        {"value", "SequenceParser_sequence_1.csv"}
+      },
+      {
+        {"name", "non_existing_relative_path"},
+        {"type", "string"},
+        {"value", "non_existing_file.csv"}
+      },
+      {
+        {"name", "absolute_path"},
+        {"type", "string"},
+        {"value", SMARTPEAK_GET_TEST_DATA_PATH("SequenceParser_sequence_1.csv")}
+      }
+    }
+  }});
+  ParameterSet parameter_set(param_struct1);
+  std::filesystem::path main_path = std::filesystem::path(SMARTPEAK_GET_TEST_DATA_PATH(""));
+
+  Utilities::prepareFileParameter(parameter_set, "test", "existing_relative_path", main_path);
+  EXPECT_EQ(parameter_set.findParameter("test", "existing_relative_path")->getValueAsString(),
+            (main_path / std::filesystem::path("SequenceParser_sequence_1.csv")).lexically_normal().generic_string());
+
+  Utilities::prepareFileParameter(parameter_set, "test", "non_existing_relative_path", main_path);
+  EXPECT_EQ(parameter_set.findParameter("test", "non_existing_relative_path")->getValueAsString(),
+           "non_existing_file.csv");
+
+  Utilities::prepareFileParameter(parameter_set, "test", "absolute_path", main_path);
+  EXPECT_EQ(parameter_set.findParameter("test", "absolute_path")->getValueAsString(),
+            SMARTPEAK_GET_TEST_DATA_PATH("SequenceParser_sequence_1.csv"));
+}
+
+TEST(utilities, prepareFileParameterList)
+{
+  map<std::string, vector<map<string, string>>> param_struct1({
+  {"test",
+    {
+      {
+        {"name", "existing_relative_path"},
+        {"type", "list"},
+        {"value", "['SequenceParser_sequence_1.csv','SequenceParser_sequence_1_semicolon.csv']"}
+      },
+      {
+        {"name", "non_existing_relative_path"},
+        {"type", "list"},
+        {"value", "['non_existing_file.csv','non_existing_file2.csv']"}
+      },
+      {
+        {"name", "absolute_path"},
+        {"type", "list"},
+        {"value", std::string("['") + SMARTPEAK_GET_TEST_DATA_PATH("SequenceParser_sequence_1.csv") + std::string("',")
+                  + std::string("'") + SMARTPEAK_GET_TEST_DATA_PATH("SequenceParser_sequence_1_semicolon.csv") + std::string("']")}
+      }
+    }
+  } });
+  ParameterSet parameter_set(param_struct1);
+  std::filesystem::path main_path = std::filesystem::path(SMARTPEAK_GET_TEST_DATA_PATH(""));
+
+  Utilities::prepareFileParameterList(parameter_set, "test", "existing_relative_path", main_path);
+  EXPECT_EQ(parameter_set.findParameter("test", "existing_relative_path")->getValueAsString(),
+           std::string("['") + (main_path / std::filesystem::path("SequenceParser_sequence_1.csv")).lexically_normal().generic_string() + std::string("'")
+          +std::string(",'") +(main_path / std::filesystem::path("SequenceParser_sequence_1_semicolon.csv")).lexically_normal().generic_string() + std::string("']"));
+
+  Utilities::prepareFileParameter(parameter_set, "test", "non_existing_relative_path", main_path);
+  EXPECT_EQ(parameter_set.findParameter("test", "non_existing_relative_path")->getValueAsString(),
+    "['non_existing_file.csv','non_existing_file2.csv']");
+
+  Utilities::prepareFileParameter(parameter_set, "test", "absolute_path", main_path);
+  EXPECT_EQ(parameter_set.findParameter("test", "absolute_path")->getValueAsString(),
+    std::string("['") + SMARTPEAK_GET_TEST_DATA_PATH("SequenceParser_sequence_1.csv") + std::string("',")
+    + std::string("'") + SMARTPEAK_GET_TEST_DATA_PATH("SequenceParser_sequence_1_semicolon.csv") + std::string("']"));
+}
