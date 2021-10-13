@@ -400,5 +400,24 @@ public:
      @brief return an empty, temporary directory.
     */
     static std::filesystem::path createEmptyTempDirectory();
+
+    /**
+      @brief for parameter that is supposed to be file path, make it full path if it exists.
+    */
+    static void prepareFileParameter(
+      ParameterSet& parameter_set,
+      const std::string& function_parameter,
+      const std::string& parameter_name,
+      const std::filesystem::path main_path);
+
+    /**
+     @brief for parameter that is supposed to be file path, make it full path if it exists (list version).
+     */
+    static void prepareFileParameterList(
+      ParameterSet& parameter_set,
+      const std::string& function_parameter,
+      const std::string& parameter_name,
+      const std::filesystem::path main_path);
+
   };
 }

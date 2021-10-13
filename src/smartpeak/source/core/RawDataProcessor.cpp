@@ -2483,8 +2483,17 @@ namespace SmartPeak
     getFilenames(filenames_I);
     LOGI << "SearchAccurateMass input size: " << rawDataHandler_IO.getFeatureMap().size();
 
+    // Complete user parameters with schema
+    ParameterSet params(params_I);
+    params.merge(getParameterSchema());
+    std::filesystem::path main_path(filenames_I.getTag(Filenames::Tag::MAIN_DIR));
+    Utilities::prepareFileParameterList(params, "AccurateMassSearchEngine", "db:mapping", main_path);
+    Utilities::prepareFileParameterList(params, "AccurateMassSearchEngine", "db:struct", main_path);
+    Utilities::prepareFileParameter(params, "AccurateMassSearchEngine", "positive_adducts", main_path);
+    Utilities::prepareFileParameter(params, "AccurateMassSearchEngine", "negative_adducts", main_path);
+
     OpenMS::AccurateMassSearchEngine ams;
-    Utilities::setUserParameters(ams, params_I);
+    Utilities::setUserParameters(ams, params);
 
     try {
       // Run the accurate mass search engine
@@ -2657,10 +2666,14 @@ namespace SmartPeak
     // Complete user parameters with schema
     ParameterSet params(params_I);
     params.merge(getParameterSchema());
+    std::filesystem::path main_path(filenames_I.getTag(Filenames::Tag::MAIN_DIR));
+    Utilities::prepareFileParameterList(params, "TargetedSpectraExtractor", "AccurateMassSearchEngine:db:mapping", main_path);
+    Utilities::prepareFileParameterList(params, "TargetedSpectraExtractor", "AccurateMassSearchEngine:db:struct", main_path);
+    Utilities::prepareFileParameter(params, "TargetedSpectraExtractor", "AccurateMassSearchEngine:positive_adducts", main_path);
+    Utilities::prepareFileParameter(params, "TargetedSpectraExtractor", "AccurateMassSearchEngine:negative_adducts", main_path);
 
     OpenMS::TargetedSpectraExtractor targeted_spectra_extractor;
-    OpenMS::Param parameters = targeted_spectra_extractor.getParameters();
-    targeted_spectra_extractor.setParameters(parameters);
+    Utilities::setUserParameters(targeted_spectra_extractor, params);
 
     try {
       OpenMS::FeatureMap feat_map_output;
@@ -2701,10 +2714,14 @@ namespace SmartPeak
     // Complete user parameters with schema
     ParameterSet params(params_I);
     params.merge(getParameterSchema());
+    std::filesystem::path main_path(filenames_I.getTag(Filenames::Tag::MAIN_DIR));
+    Utilities::prepareFileParameterList(params, "TargetedSpectraExtractor", "AccurateMassSearchEngine:db:mapping", main_path);
+    Utilities::prepareFileParameterList(params, "TargetedSpectraExtractor", "AccurateMassSearchEngine:db:struct", main_path);
+    Utilities::prepareFileParameter(params, "TargetedSpectraExtractor", "AccurateMassSearchEngine:positive_adducts", main_path);
+    Utilities::prepareFileParameter(params, "TargetedSpectraExtractor", "AccurateMassSearchEngine:negative_adducts", main_path);
 
     OpenMS::TargetedSpectraExtractor targeted_spectra_extractor;
-    OpenMS::Param parameters = targeted_spectra_extractor.getParameters();
-    targeted_spectra_extractor.setParameters(parameters);
+    Utilities::setUserParameters(targeted_spectra_extractor, params);
 
     try {
       // merge features (will be on MS1 spectra)
