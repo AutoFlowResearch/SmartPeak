@@ -2654,13 +2654,8 @@ namespace SmartPeak
     LOGD << "START SearchSpectrum";
     getFilenames(filenames_I);
 
-    // Complete user parameters with schema
-    ParameterSet params(params_I);
-    params.merge(getParameterSchema());
-
     OpenMS::TargetedSpectraExtractor targeted_spectra_extractor;
-    OpenMS::Param parameters = targeted_spectra_extractor.getParameters();
-    targeted_spectra_extractor.setParameters(parameters);
+    Utilities::setUserParameters(targeted_spectra_extractor, params_I);
 
     try {
       OpenMS::FeatureMap feat_map_output;
@@ -2698,13 +2693,8 @@ namespace SmartPeak
     LOGD << "START DDA";
     getFilenames(filenames_I);
 
-    // Complete user parameters with schema
-    ParameterSet params(params_I);
-    params.merge(getParameterSchema());
-
     OpenMS::TargetedSpectraExtractor targeted_spectra_extractor;
-    OpenMS::Param parameters = targeted_spectra_extractor.getParameters();
-    targeted_spectra_extractor.setParameters(parameters);
+    Utilities::setUserParameters(targeted_spectra_extractor, params_I);
 
     try {
       // merge features (will be on MS1 spectra)
