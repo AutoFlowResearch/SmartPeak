@@ -18,6 +18,7 @@ include(executables.cmake)
 #------------------------------------------------------------------------------
 # Include directories for examples
 set(SMARTPEAK_EXAMPLES_INTERNAL_INCLUDE_DIRECTORIES "${PROJECT_BINARY_DIR}/include/")
+set(SMARTPEAK_EXAMPLES_INTERNAL_INCLUDE_DIRECTORIES "${PROJECT_BINARY_DIR}/source/service/")
 # add SmartPeak directories
 set(SMARTPEAK_EXAMPLES_EXTERNAL_INCLUDE_DIRECTORIES "${SmartPeak_INCLUDE_DIRECTORIES}")
 include_directories(${SMARTPEAK_EXAMPLES_INTERNAL_INCLUDE_DIRECTORIES})
@@ -134,15 +135,15 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(gRPC)
 
 set(grpc_required_libs 
-libprotobuf grpc++ 
-            grpc++_reflection 
-            grpc++_unsecure grpc_unsecure
-            grpc++_error_details
-            grpc gpr
-            absl_flags
-            crypto
-            address_sorting
-            grpc_plugin_support grpcpp_channelz)
+    libprotobuf grpc++ 
+    grpc++_reflection 
+    grpc++_unsecure grpc_unsecure
+    grpc++_error_details
+    grpc gpr
+    absl_flags
+    crypto
+    address_sorting
+    grpc_plugin_support grpcpp_channelz)
 #------------------------------------------------------------------------------
 # pipeline examples
 add_custom_target(PIPELINE_EXAMPLES)

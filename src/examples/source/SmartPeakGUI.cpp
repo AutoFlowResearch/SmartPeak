@@ -41,7 +41,6 @@
 #include <SmartPeak/ui/ChromatogramXICPlotWidget.h>
 #include <SmartPeak/ui/SpectraPlotWidget.h>
 #include <SmartPeak/ui/SpectraMSMSPlotWidget.h>
-#include <SmartPeak/ui/ServerDialogueWidget.h>
 #include <SmartPeak/ui/ParametersTableWidget.h>
 #include <SmartPeak/ui/Report.h>
 #include <SmartPeak/ui/WorkflowWidget.h>
@@ -64,7 +63,6 @@
 #include <backends/imgui_impl_sdl.h>
 #include <backends/imgui_impl_opengl2.h>
 #include <misc/cpp/imgui_stdlib.h>
-
 #include "service/services.hpp"
 
 using namespace SmartPeak;
@@ -86,10 +84,6 @@ void checkTitles(const std::vector<std::shared_ptr<Widget>> windows);
 int main(int argc, char** argv)
 // `int argc, char **argv` are required on Win to link against the proper SDL2/OpenGL implementation
 {
-
-  std::thread run_workflow_;
-  
-  
   // to disable buttons, display info, and update the session cache
   bool workflow_is_done_ = true;
   bool remote_execution_done_ = false;
@@ -121,7 +115,6 @@ int main(int argc, char** argv)
                                                             event_dispatcher,
                                                             event_dispatcher);
   auto report_ = std::make_shared<Report>(application_handler_);
-  auto server_dialogue_ = std::make_shared<ServerDialogueWidget>(application_handler_);
   auto workflow_ = std::make_shared<WorkflowWidget>("Workflow", application_handler_, workflow_manager_);
   auto statistics_ = std::make_shared<StatisticsWidget>("Statistics", application_handler_, event_dispatcher);
   auto run_workflow_widget_ = std::make_shared<RunWorkflowWidget>(application_handler_, 
@@ -424,12 +417,6 @@ int main(int argc, char** argv)
       ImGui::OpenPopup("Report dialog");
       report_->draw();
     }
-    
-    if (server_dialogue_->visible_)
-    {
-      ImGui::OpenPopup("Connect to server");
-      server_dialogue_->draw();
-    }
 
     // ======================================
     // Menu
@@ -680,10 +667,6 @@ int main(int argc, char** argv)
         }
         showQuickHelpToolTip("report");
         
-        if (ImGui::MenuItem("Connect to server"))
-        {
-          server_dialogue_->visible_ = true;
-        }
         ImGui::EndMenu();
       }
       showQuickHelpToolTip("actions");
@@ -714,23 +697,14 @@ int main(int argc, char** argv)
     // ======================================
     // Server-Side Execution
     // ======================================
-      if (server_dialogue_->fields_set_) {
-        for (int i=0; i<2; ++i) {
-          WorkflowClientS workflow_client(grpc::CreateChannel(server_dialogue_->server_ip_address_, grpc::InsecureChannelCredentials()));
-          LogStreamClientS logstream_client(grpc::CreateChannel(server_dialogue_->server_ip_address_, grpc::InsecureChannelCredentials()));
-
-          SmartPeak::SessionHandler::GraphVizData graph_data;
-          SmartPeak::SessionHandler::HeatMapData heatmap_data;
-          std::string workflow_status = workflow_client.runWorkflow(server_dialogue_->sequence_file_path_, graph_data, heatmap_data);
-          chromatogram_tic_plot_widget_->setGraphVizData(graph_data);
-          chromatogram_plot_widget_->setGraphVizData(graph_data);
-          heatmap_plot_widget_->setHeatmapData(heatmap_data);
-          
-          logstream_client.getLogstream();
-          std::cout << ">>> GUI workflow_status : " << workflow_status << std::endl;
-          std::this_thread::sleep_for(std::chrono::seconds(2));
-        }
-        server_dialogue_->fields_set_ = false;
+      if (run_workflow_widget_->server_fields_set)
+      {
+        WorkflowClient workflow_client(grpc::CreateChannel(run_workflow_widget_->server_url, grpc::InsecureChannelCredentials()));
+        std::string workflow_status = workflow_client.runWorkflow(application_handler_.sequence_pathname_);
+        workflow_client.getLogstream();
+        LOGI << "GUI workflow status : " << workflow_status << std::endl;
+        ::serv::loadRawDataAndFeatures(application_handler_, session_handler_, workflow_manager_, event_dispatcher);
+        run_workflow_widget_->server_fields_set = false;
       }
 
     // ======================================

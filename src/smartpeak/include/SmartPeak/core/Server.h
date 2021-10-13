@@ -21,14 +21,6 @@
 // $Authors: Ahmed Khalil $
 // --------------------------------------------------------------------------
 #pragma once
-#include <iostream>
-#include <algorithm>
-#include <vector>
-#include <memory>
-#include <filesystem>
-#include <chrono>
-#include <cassert>
-
 #include <SmartPeak/io/SequenceParser.h>
 #include <SmartPeak/io/InputDataValidation.h>
 
@@ -51,15 +43,17 @@
 #include <SmartPeak/ui/GuiAppender.h>
 #include <plog/Log.h>
 
+#include <iostream>
+#include <algorithm>
+#include <vector>
+#include <memory>
+#include <filesystem>
+#include <chrono>
+#include <cassert>
+
 
 namespace SmartPeak {
   namespace serv {
-  
-    static bool contains_option(
-      const std::vector<std::string>& list,
-      const std::string& option,
-      std::string log_msg="");
-
     class ServerManager {
     public:
       /**
@@ -123,9 +117,17 @@ namespace SmartPeak {
       const std::vector<std::string>& application_settings,
       std::vector<SmartPeak::FeatureMetadata>& report_metadata);
   
+    static bool contains_option(
+      const std::vector<std::string>& list,
+      const std::string& option, std::string log_msg="");
+  
     std::tuple<bool, std::vector<SmartPeak::GuiAppender::GuiAppenderRecord>>
       handleWorkflowRequest(ServerManager* application_manager, bool is_logger_init);
   
     bool handleLogger(SmartPeak::ConsoleHandler* logger);
+  
+    void loadRawDataAndFeatures(
+      ApplicationHandler& application_handler, SessionHandler& session_handler,
+      WorkflowManager& workflow_manager, EventDispatcher& event_dispatcher);
   }
 }

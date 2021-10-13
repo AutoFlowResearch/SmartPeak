@@ -26,18 +26,16 @@
 
 namespace SmartPeak {
   namespace serv {
-
+  
     bool contains_option(
-        const std::vector<std::string>& list,
-        const std::string& option,
-        std::string log_msg)
+      const std::vector<std::string>& list,
+      const std::string& option,
+      std::string log_msg)
     {
       auto flag = false;
-      if (1 <= list.size())
-      {
+      if (1 <= list.size()) {
         auto it = std::find(list.cbegin(), list.cend(), option);
-        if (it != std::end(list))
-        {
+        if (it != std::end(list)) {
           flag = true;
           LOG_DEBUG << log_msg << option;
         }
@@ -45,14 +43,12 @@ namespace SmartPeak {
       return flag;
     }
 
-    void _extract_report_sampletypes(
-        const std::vector<std::string>& selected_report_sample_types,
-        std::set<SmartPeak::SampleType>& report_sample_types)
+    void extract_report_sampletypes(const std::vector<std::string>& selected_report_sample_types,
+                                    std::set<SmartPeak::SampleType>& report_sample_types)
     {
       auto& available_types = SmartPeak::sampleTypeToString;
       auto& types = selected_report_sample_types;
-      if (contains_option(
-              types, "ALL", "Detected report-sample-types option: "))
+      if (contains_option(types, "ALL", "Detected report-sample-types option: "))
       {
         std::transform(available_types.cbegin(), available_types.cend(),
             std::inserter(report_sample_types, report_sample_types.begin()),
@@ -74,14 +70,13 @@ namespace SmartPeak {
       }
     }
 
-    void _extract_report_metadata(
-        const std::vector<std::string>& selected_report_metadata,
-        std::vector<SmartPeak::FeatureMetadata>& report_metadata)
+    void extract_report_metadata(
+      const std::vector<std::string>& selected_report_metadata,
+      std::vector<SmartPeak::FeatureMetadata>& report_metadata)
     {
       auto& available_metadata = SmartPeak::metadataToString;
       auto& meta = selected_report_metadata;
-      if (contains_option(
-              meta, "ALL", "Detected report-metadata option: "))
+      if (contains_option(meta, "ALL", "Detected report-metadata option: "))
       {
         std::transform(available_metadata.cbegin(), available_metadata.cend(),
             std::back_inserter(report_metadata), [](const auto& m){ return m.first; });
@@ -106,8 +101,7 @@ namespace SmartPeak {
       handleWorkflowRequest(ServerManager* application_manager, bool is_logger_init)
     {
       bool job_done = false;
-      std::cout << ">>> SERVER received : " << application_manager->sequence_file << std::endl;
-        LOGI << ">>> SERVER received : " << application_manager->sequence_file;
+      LOGI << ">>> SERVER is processing : " << application_manager->sequence_file;
         
       try
       {
@@ -115,7 +109,6 @@ namespace SmartPeak {
         auto create_sequence = SmartPeak::CreateSequence{application_handler.sequenceHandler_};
         create_sequence.onFilePicked(application_manager->sequence_file, &application_handler);
         
-        // init-dirs
         auto main_dir = application_handler.main_dir_;
         if (!application_manager->out_dir.empty() && application_manager->out_dir != ".")
         {
@@ -143,13 +136,13 @@ namespace SmartPeak {
         catch (std::filesystem::filesystem_error& fe)
         {
           if (fe.code() == std::errc::permission_denied)
-            LOG_ERROR << static_cast<std::ostringstream&&>(
-              std::ostringstream()
-                << "Unable to create output directory, permission denied: '" << current_path << "'").str();
+            LOG_ERROR
+              << static_cast<std::ostringstream&&>(std::ostringstream()
+              << "Unable to create output directory, permission denied: '" << current_path << "'").str();
           else
-            LOG_ERROR << static_cast<std::ostringstream&&>(
-              std::ostringstream()
-                << "Unable to create output directory: '" << current_path << "'").str();
+            LOG_ERROR
+              << static_cast<std::ostringstream&&>(std::ostringstream()
+              << "Unable to create output directory: '" << current_path << "'").str();
         }
 
         SmartPeak::BuildCommandsFromNames buildCommandsFromNames{application_handler};
@@ -179,17 +172,9 @@ namespace SmartPeak {
           }
         }
         
-        // RunInC-impl.
         auto& session_handler = application_manager->get_session_handler();
         auto& workflow_manager = application_manager->get_workflow_manager();
         auto& event_dispatcher = application_manager->get_event_dispatcher();
-        auto& progress_info = application_manager->get_progress_info();
-        {
-          //event_dispatcher.addApplicationProcessorObserver(this);
-          //event_dispatcher.addSequenceProcessorObserver(this);
-          //event_dispatcher.addSequenceSegmentProcessorObserver(this);
-          //event_dispatcher.addSampleGroupProcessorObserver(this);
-        }
         try
         {
           const auto injection_names = session_handler.getSelectInjectionNamesWorkflow(application_handler.sequenceHandler_);
@@ -200,18 +185,6 @@ namespace SmartPeak {
             application_handler, injection_names, sequence_segment_names,
             sample_group_names, application_manager->get_workflow_commands(),
             &event_dispatcher, &event_dispatcher, &event_dispatcher, &event_dispatcher, true);
-
-          if (false)
-          {
-            auto freq = static_cast<double>(20.); // Hz
-            auto rate = std::chrono::milliseconds(static_cast<uint64_t>(1000. / freq));
-            while (!workflow_manager.isWorkflowDone())
-            {
-              event_dispatcher.dispatchEvents();
-              //std::this_thread::sleep_for(rate);
-              //show_progress(progress_info, 40);
-            }
-          }
         }
         catch(const std::exception& e)
         {
@@ -220,14 +193,13 @@ namespace SmartPeak {
 
         try
         {
-          bool all_reports = true; //todo
+          bool all_reports = true;
           auto feature_db = all_reports;
           auto pivot_table = all_reports;
-
           auto report_sample_types = std::set<SmartPeak::SampleType>{};
           auto report_metadata = std::vector<SmartPeak::FeatureMetadata>{};
-          _extract_report_sampletypes(application_manager->report_sample_types, report_sample_types);
-          _extract_report_metadata(application_manager->report_metadata, report_metadata);
+          extract_report_sampletypes(application_manager->report_sample_types, report_sample_types);
+          extract_report_metadata(application_manager->report_metadata, report_metadata);
 
           auto main_dir = application_handler.main_dir_;
           if (!application_manager->out_dir.empty() && application_manager->out_dir != ".")
@@ -243,6 +215,7 @@ namespace SmartPeak {
               sequance_handler, filepath,
               report_metadata, report_sample_types);
           }
+          
           if (pivot_table)
           {
             auto& sequance_handler = application_handler.sequenceHandler_;
@@ -252,11 +225,12 @@ namespace SmartPeak {
               report_metadata, report_sample_types);
           }
           
-          job_done = true; //chainer-req
+          job_done = true;
         }
         catch(const std::exception& e)
         {
           LOG_ERROR << e.what();
+          job_done = false;
         }
       }
       catch(const std::exception& e)
@@ -264,8 +238,8 @@ namespace SmartPeak {
         LOG_ERROR << e.what();
       }
       
-      std::cout << ">>> Server : job_done : " << (job_done ? "YES" : "NO") << std::endl;
-      std::cout << ">>> Server : Server waiting .. " << std::endl;
+      LOGI << " Server : Workflow finished : " << (job_done ? "YES" : "NO") << std::endl;
+      LOGI << " Server : Waiting for jobs .. " << std::endl;
       
       std::vector<SmartPeak::GuiAppender::GuiAppenderRecord> logs;
       return std::tie(job_done, logs);
@@ -294,8 +268,33 @@ namespace SmartPeak {
       logger->set_log_directory(logdirpath);
       logger->use_colors(false);
       logger->set_severity(plog::debug);
-      logger->initialize("Start SmartPeak version " + SmartPeak::Utilities::getSmartPeakVersion());
+      logger->initialize("Starting SmartPeak version " + SmartPeak::Utilities::getSmartPeakVersion());
       return true;
+    }
+  
+    void loadRawDataAndFeatures(ApplicationHandler& application_handler, SessionHandler& session_handler,
+                                WorkflowManager& workflow_manager, EventDispatcher& event_dispatcher)
+    {
+      BuildCommandsFromNames buildCommandsFromNames(application_handler);
+      buildCommandsFromNames.names_ = {"LOAD_RAW_DATA","LOAD_FEATURES","MAP_CHROMATOGRAMS"};
+      if (!buildCommandsFromNames.process()) {
+        LOGE << "Failed to create Commands, aborting.";
+      } else {
+        for (auto& cmd : buildCommandsFromNames.commands_) {
+          for (auto& p : cmd.dynamic_filenames) {
+            p.second.setTag(Filenames::Tag::MZML_INPUT_PATH, application_handler.mzML_dir_.generic_string());
+            p.second.setTag(Filenames::Tag::FEATURES_INPUT_PATH, application_handler.features_in_dir_.generic_string());
+            p.second.setTag(Filenames::Tag::FEATURES_OUTPUT_PATH, application_handler.features_out_dir_.generic_string());
+          }
+        }
+        const std::set<std::string> injection_names = session_handler.getSelectInjectionNamesWorkflow(application_handler.sequenceHandler_);
+        const std::set<std::string> sequence_segment_names = session_handler.getSelectSequenceSegmentNamesWorkflow(application_handler.sequenceHandler_);
+        const std::set<std::string> sample_group_names = session_handler.getSelectSampleGroupNamesWorkflow(application_handler.sequenceHandler_);
+        
+        workflow_manager.addWorkflow(application_handler, injection_names, sequence_segment_names,
+                                     sample_group_names, buildCommandsFromNames.commands_, &event_dispatcher,
+                                     &event_dispatcher, &event_dispatcher, &event_dispatcher);
+      }
     }
   }
 }

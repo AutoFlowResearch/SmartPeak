@@ -26,11 +26,7 @@
 
 int main(int argc, char** argv)
 {
-  runSyncServer("localhost:50051");
-  
-//  AsyncServer a_serv("localhost:50051");
-//  a_serv.init("localhost:50051", "localhost");
-//  a_serv.run();
+  runSmartPeakServer("localhost:50051");
   
   return 0;
 }
