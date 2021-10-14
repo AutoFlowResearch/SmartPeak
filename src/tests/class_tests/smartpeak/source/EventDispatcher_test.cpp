@@ -95,6 +95,10 @@ struct EventDispatcherFixture : public ::testing::Test
     {
       events_.push_back(std::make_tuple("onSequenceProcessorSampleStart", 0, sample_name, std::vector<std::string>()));
     }
+    virtual void onSequenceProcessorError(const std::string& sample_name, const std::string& processor_name, const std::string& error) override
+    {
+      // TODO
+    }
     virtual void onSequenceProcessorSampleEnd(const std::string& sample_name) override
     {
       events_.push_back(std::make_tuple("onSequenceProcessorSampleEnd", 0, sample_name, std::vector<std::string>()));
@@ -119,6 +123,10 @@ struct EventDispatcherFixture : public ::testing::Test
     {
       events_.push_back(std::make_tuple("onSequenceSegmentProcessorEnd", 0, "", std::vector<std::string>()));
     }
+    virtual void onSequenceSegmentProcessorError(const std::string& segment_name, const std::string& processor_name, const std::string& error) override
+    {
+      // TODO
+    }
 
     /**
       ISampleGroupProcessorObserver
@@ -138,6 +146,10 @@ struct EventDispatcherFixture : public ::testing::Test
     virtual void onSampleGroupProcessorEnd() override
     {
       events_.push_back(std::make_tuple("onSampleGroupProcessorEnd", 0, "", std::vector<std::string>()));
+    }
+    virtual void onSampleGroupProcessorError(const std::string& group_name, const std::string& processor_name, const std::string& error)
+    {
+      // TODO
     }
 
     /**

@@ -42,6 +42,33 @@
 namespace SmartPeak
 {
 
+  class WorkflowException : public std::exception
+  {
+  public:
+
+    explicit WorkflowException(const std::string& item, const std::string& processor, const std::string& message)
+      : item_(item), processor_(processor), msg_(message)  {}
+
+    virtual ~WorkflowException() noexcept {}
+
+    virtual const char* what() const noexcept override {
+      return msg_.c_str();
+    }
+
+    virtual const std::string item() const noexcept {
+      return item_;
+    }
+
+    virtual const std::string processor() const noexcept {
+      return processor_;
+    }
+
+  protected:
+    std::string item_;
+    std::string processor_;
+    std::string msg_;
+  };
+
   ParameterSet ProcessSequence::getParameterSchemaStatic()
   {
     std::map<std::string, std::vector<std::map<std::string, std::string>>> param_struct({
@@ -156,16 +183,25 @@ namespace SmartPeak
     LOGI << ">>Processing SequenceSegment [" << sequence_segment.getSequenceSegmentName() << "]\n";
     for (size_t i = 0; i < nr_methods; ++i) {
       LOGI << "[" << (i + 1) << "/" << nr_methods << "] steps in processing sequence segments";
-      methods[i]->process(
-        sequence_segment,
-        sequenceHandler_IO,
-        (sequenceHandler_IO)
-          .getSequence()
-          .at(sequence_segment.getSampleIndices().front())
-          .getRawData()
-          .getParameters(),
-        filenames
-      );
+      try
+      {
+        methods[i]->process(
+          sequence_segment,
+          sequenceHandler_IO,
+          (sequenceHandler_IO)
+            .getSequence()
+            .at(sequence_segment.getSampleIndices().front())
+            .getRawData()
+            .getParameters(),
+          filenames
+        );
+      }
+      catch (const std::exception& e)
+      {
+        LOGE << e.what();
+        WorkflowException we(sequence_segment.getSequenceSegmentName(), methods[i]->getName(), e.what());
+        throw we;
+      }
     }
   }
 
@@ -196,8 +232,19 @@ namespace SmartPeak
         try {
           f.get();
         }
-        catch (const std::exception& e) {
-          LOGE << "SequenceSegment [" << "i" << "]: " << typeid(e).name() << " : " << e.what();
+        catch (const WorkflowException& e)
+        {
+          if (observable_)
+          {
+            observable_->notifySequenceSegmentProcessorError(
+              e.item(),
+              e.processor(),
+              e.what());
+          }
+          else
+          {
+            LOGE << "SequenceSegment [" << "i" << "]: " << typeid(e).name() << " : " << e.what();
+          }
         }
           
         if (observable_) observable_->notifySequenceSegmentProcessorSampleEnd(sequence_seg.getSequenceSegmentName());
@@ -228,21 +275,32 @@ namespace SmartPeak
         std::ref(filenames_.at( sequence_seg.getSampleGroupName())),
         std::cref(sample_group_processing_methods_));
           
-        LOGI << ">>SequenceSegment [" << sequence_seg.getSampleGroupName() << "]: waiting...";
+        LOGI << ">>SampleGroup [" << sequence_seg.getSampleGroupName() << "]: waiting...";
         f.wait();
-        LOGI << ">>SequenceSegment [" << sequence_seg.getSampleGroupName() << "]: done";
+        LOGI << ">>SampleGroup [" << sequence_seg.getSampleGroupName() << "]: done";
           
         try {
           f.get();
         }
-        catch (const std::exception& e) {
-          LOGE << "SequenceSegment [" << "i" << "]: " << typeid(e).name() << " : " << e.what();
+        catch (const WorkflowException& e)
+        {
+          if (observable_)
+          {
+            observable_->notifySampleGroupProcessorError(
+              e.item(),
+              e.processor(),
+              e.what());
+          }
+          else
+          {
+            LOGE << "SampleGroup [" << "i" << "]: " << typeid(e).name() << " : " << e.what();
+          }
         }
           
         if (observable_) observable_->notifySampleGroupProcessorSampleEnd(sequence_seg.getSampleGroupName());
       }
       catch (const std::exception& e) {
-        LOGE << "SequenceSegment [" << "i" << "]: " << typeid(e).name() << " : " << e.what();
+        LOGE << "SampleGroup [" << "i" << "]: " << typeid(e).name() << " : " << e.what();
       }
     }
   }
@@ -301,16 +359,25 @@ namespace SmartPeak
     const size_t n = methods.size();
     for (size_t i = 0; i < n; ++i) {
       LOGI << "[" << (i + 1) << "/" << n << "] steps in processing sample groups";
-      methods[i]->process(
-        sample_group,
-        sequenceHandler_IO,
-        (sequenceHandler_IO)
-        .getSequence()
-        .at(sample_group.getSampleIndices().front())
-        .getRawData()
-        .getParameters(),
-        filenames
-      );
+      try
+      {
+        methods[i]->process(
+          sample_group,
+          sequenceHandler_IO,
+          (sequenceHandler_IO)
+          .getSequence()
+          .at(sample_group.getSampleIndices().front())
+          .getRawData()
+          .getParameters(),
+          filenames
+        );
+      }
+      catch (const std::exception& e)
+      {
+        LOGE << e.what();
+        WorkflowException we(sample_group.getSampleGroupName(), methods[i]->getName(), e.what());
+        throw we;
+      }
     }
   }
 
@@ -411,8 +478,19 @@ namespace SmartPeak
         try {
           f.get(); // check for exceptions
         }
-        catch (const std::exception& e) {
-          LOGE << "Injection [" << i << "]: " << typeid(e).name() << " : " << e.what();
+        catch (const WorkflowException& e)
+        {
+          if (observable_)
+          {
+            observable_->notifySequenceError(
+              e.item(),
+              e.processor(),
+              e.what());
+          }
+          else
+          {
+            LOGE << "Injection [" << i << "]: " << typeid(e).name() << " : " << e.what();
+          }
         }
         if (observable_) observable_->notifySequenceProcessorSampleEnd(injection.getMetaData().getSampleName());
       }
@@ -454,12 +532,21 @@ namespace SmartPeak
     const size_t n_steps { methods.size() };
     const std::string inj_name { injection.getMetaData().getInjectionName() };
     for (const std::shared_ptr<RawDataProcessor>& p : methods) {
-      LOGI << "[" << (i_step++) << "/" << n_steps << "] method on injection: " << inj_name;
-      p->process( //TODO: (SIGABRT)
-        injection.getRawData(),
-        injection.getRawData().getParameters(),
-        filenames_I
-      );
+      try
+      {
+        LOGI << "[" << (i_step++) << "/" << n_steps << "] method on injection: " << inj_name;
+        p->process( //TODO: (SIGABRT)
+          injection.getRawData(),
+          injection.getRawData().getParameters(),
+          filenames_I
+        );
+      }
+      catch (const std::exception& e)
+      {
+        LOGE << e.what();
+        WorkflowException we(inj_name, p->getName(), e.what());
+        throw we;
+      }
     }
   }
 

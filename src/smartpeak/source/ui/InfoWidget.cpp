@@ -38,6 +38,7 @@ namespace SmartPeak
     showQuickHelpToolTip("Info");
     
     drawWorkflowStatus();
+    drawListOfErrors();
 
     ImGui::Separator();
 
@@ -235,8 +236,32 @@ namespace SmartPeak
         }
         ImGui::TreePop();
       }
-
       spinner_counter_++;
+    }
+  }
+
+  void InfoWidget::drawListOfErrors()
+  {
+    static const int max_number_of_errors = 10;
+    if (!progress_info_.errors().empty())
+    {
+      ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+      if (ImGui::TreeNode("Errors (see logs for details)"))
+      {
+        int cpt = 0;
+        for (const auto& error : progress_info_.errors())
+        {
+          ImGui::Text("%s", error.c_str());
+          ++cpt;
+          if (cpt == max_number_of_errors)
+          {
+            ImGui::Text("... and %d more errors.", progress_info_.errors().size() - cpt);
+            break;
+          }
+        }
+        ImGui::TreePop();
+      }
+      ImGui::PopStyleColor();
     }
   }
 

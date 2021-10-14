@@ -86,6 +86,7 @@ namespace SmartPeak
     void drawTransition();
     void drawLastRunTime();
     void drawWorkflowProgress();
+    void drawListOfErrors();
     std::string formattedTime(const std::chrono::steady_clock::duration& duration) const;
 
   protected:

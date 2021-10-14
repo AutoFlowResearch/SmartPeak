@@ -135,6 +135,10 @@ public:
     }
     virtual void onSequenceProcessorSampleEnd(const std::string& sample) override {}
     virtual void onSequenceProcessorEnd() override {}
+    virtual void onSequenceProcessorError(
+      const std::string& sample_name,
+      const std::string& processor_name,
+      const std::string& error) override {};
 
     /**
       ISequenceSegmentProcessorObserver
@@ -147,18 +151,20 @@ public:
     }
     virtual void onSequenceSegmentProcessorSampleEnd(const std::string& segment_name) override {}
     virtual void onSequenceSegmentProcessorEnd() override {}
+    virtual void onSequenceSegmentProcessorError(const std::string& segment_name, const std::string& processor_name, const std::string& error) override {};
 
     /**
       ISampleGroupProcessorObserver
     */
-    virtual void onSampleGroupProcessorStart(const size_t nb_segments) override {}
-    virtual void onSampleGroupProcessorSampleStart(const std::string& segment_name) override
+    virtual void onSampleGroupProcessorStart(const size_t nb_groups) override {}
+    virtual void onSampleGroupProcessorSampleStart(const std::string& group_name) override
     { 
         m_event_type = 2; 
-        m_event_name = segment_name;
+        m_event_name = group_name;
     }
-    virtual void onSampleGroupProcessorSampleEnd(const std::string& segment_name) override {}
+    virtual void onSampleGroupProcessorSampleEnd(const std::string& group_name) override {}
     virtual void onSampleGroupProcessorEnd() override {}
+    virtual void onSampleGroupProcessorError(const std::string& group_name, const std::string& processor_name, const std::string& error) override {};
 
 private:
     std::string formatted_time(const std::chrono::steady_clock::duration& duration) const;

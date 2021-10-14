@@ -266,9 +266,9 @@ namespace SmartPeak
       }
     }
     catch (const std::exception& e) {
-      LOGE << e.what();
       sequenceSegmentHandler_IO.getStandardsConcentrations().clear();
       LOGI << "Standards concentrations clear";
+      throw e;
     }
 
     LOGD << "END loadStandardsConcentrations";
@@ -312,52 +312,45 @@ namespace SmartPeak
   {
     LOGD << "START StoreStandardsConcentrations";
 
-    try
+    if (!InputDataValidation::prepareToStore(filenames_I, "standardsConcentrations"))
     {
-      if (!InputDataValidation::prepareToStore(filenames_I, "standardsConcentrations"))
+      LOGD << "END " << getName();
+      return;
+    }
+    if (filenames_I.isEmbedded("standardsConcentrations"))
+    {
+      auto db_context = filenames_I.getSessionDB().beginWrite(
+        "standardsConcentrations",
+        "sample_name", "TEXT",
+        "component_name", "TEXT",
+        "IS_component_name", "TEXT",
+        "actual_concentration", "REAL",
+        "IS_actual_concentration", "REAL",
+        "concentration_units", "TEXT",
+        "dilution_factor", "REAL"
+        );
+      if (!db_context)
       {
-        LOGD << "END " << getName();
         return;
       }
-      if (filenames_I.isEmbedded("standardsConcentrations"))
+      for (const auto& concentration : sequenceSegmentHandler_IO.getStandardsConcentrations())
       {
-        auto db_context = filenames_I.getSessionDB().beginWrite(
-          "standardsConcentrations",
-          "sample_name", "TEXT",
-          "component_name", "TEXT",
-          "IS_component_name", "TEXT",
-          "actual_concentration", "REAL",
-          "IS_actual_concentration", "REAL",
-          "concentration_units", "TEXT",
-          "dilution_factor", "REAL"
+        filenames_I.getSessionDB().write(
+          *db_context,
+          concentration.sample_name,
+          concentration.component_name,
+          concentration.IS_component_name,
+          concentration.actual_concentration,
+          concentration.IS_actual_concentration,
+          concentration.concentration_units,
+          concentration.dilution_factor
           );
-        if (!db_context)
-        {
-          return;
-        }
-        for (const auto& concentration : sequenceSegmentHandler_IO.getStandardsConcentrations())
-        {
-          filenames_I.getSessionDB().write(
-            *db_context,
-            concentration.sample_name,
-            concentration.component_name,
-            concentration.IS_component_name,
-            concentration.actual_concentration,
-            concentration.IS_actual_concentration,
-            concentration.concentration_units,
-            concentration.dilution_factor
-            );
-        }
-        filenames_I.getSessionDB().endWrite(*db_context);
       }
-      else
-      {
-        LOGE << "Not implemented";
-      }
+      filenames_I.getSessionDB().endWrite(*db_context);
     }
-    catch (const std::exception& e)
+    else
     {
-      LOGE << e.what();
+      LOGE << "Not implemented";
     }
   }
 

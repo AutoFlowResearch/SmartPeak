@@ -77,7 +77,7 @@ namespace SmartPeak
     catch (const std::exception& e)
     {
       LOGE << "Failed to read select dilutions file [" << filenames_I.getFullPath("selectDilutions").generic_string() << "] : " << e.what();
-      return;
+      throw e;
     }
 
     std::map<std::string, std::set<int>> existing_dilutions_map;
@@ -730,6 +730,7 @@ namespace SmartPeak
       LOGE << e.what();
       sampleGroupHandler_IO.getFeatureMap().clear();
       LOGE << "feature map clear";
+      throw e;
     }
 
     LOGD << "END LoadFeaturesSampleGroup";
@@ -760,14 +761,9 @@ namespace SmartPeak
       return;
     }
 
-    try {
-      // Store outfile as featureXML
-      OpenMS::FeatureXMLFile featurexml;
-      featurexml.store(filenames_I.getFullPath("featureXMLSampleGroup_o").generic_string(), sampleGroupHandler_IO.getFeatureMap());
-    }
-    catch (const std::exception& e) {
-      LOGE << e.what();
-    }
+    // Store outfile as featureXML
+    OpenMS::FeatureXMLFile featurexml;
+    featurexml.store(filenames_I.getFullPath("featureXMLSampleGroup_o").generic_string(), sampleGroupHandler_IO.getFeatureMap());
 
     LOGD << "END storeFeaturesSampleGroup";
   }
