@@ -86,11 +86,11 @@ struct EventDispatcherFixture : public ::testing::Test
     }
     virtual void onApplicationProcessorError(const std::string& error) override
     {
-      // TODO
+      events_.push_back(std::make_tuple("onApplicationProcessorError", 0, "", std::vector<std::string>({ error })));
     }
 
     /**
-      ISequenceSegmentProcessorObserver
+      ISequenceProcessorObserver
     */
     virtual void onSequenceProcessorStart(const size_t nb_injections) override
     {
@@ -100,10 +100,6 @@ struct EventDispatcherFixture : public ::testing::Test
     {
       events_.push_back(std::make_tuple("onSequenceProcessorSampleStart", 0, sample_name, std::vector<std::string>()));
     }
-    virtual void onSequenceProcessorError(const std::string& sample_name, const std::string& processor_name, const std::string& error) override
-    {
-      // TODO
-    }
     virtual void onSequenceProcessorSampleEnd(const std::string& sample_name) override
     {
       events_.push_back(std::make_tuple("onSequenceProcessorSampleEnd", 0, sample_name, std::vector<std::string>()));
@@ -112,6 +108,14 @@ struct EventDispatcherFixture : public ::testing::Test
     {
       events_.push_back(std::make_tuple("onSequenceProcessorEnd", 0, "", std::vector<std::string>()));
     }
+    virtual void onSequenceProcessorError(const std::string& sample_name, const std::string& processor_name, const std::string& error) override
+    {
+      events_.push_back(std::make_tuple("onSequenceProcessorError", 0, sample_name, std::vector<std::string>({ processor_name , error })));
+    }
+
+    /**
+      ISequenceSegmentProcessorObserver
+    */
     virtual void onSequenceSegmentProcessorStart(const size_t nb_segments) override
     {
       events_.push_back(std::make_tuple("onSequenceSegmentProcessorStart", nb_segments, "", std::vector<std::string>()));
@@ -130,7 +134,7 @@ struct EventDispatcherFixture : public ::testing::Test
     }
     virtual void onSequenceSegmentProcessorError(const std::string& segment_name, const std::string& processor_name, const std::string& error) override
     {
-      // TODO
+      events_.push_back(std::make_tuple("onSequenceSegmentProcessorError", 0, segment_name, std::vector<std::string>({ processor_name , error })));
     }
 
     /**
@@ -154,7 +158,7 @@ struct EventDispatcherFixture : public ::testing::Test
     }
     virtual void onSampleGroupProcessorError(const std::string& group_name, const std::string& processor_name, const std::string& error)
     {
-      // TODO
+      events_.push_back(std::make_tuple("onSampleGroupProcessorError", 0, group_name, std::vector<std::string>({ processor_name , error})));
     }
 
     /**
@@ -219,6 +223,7 @@ TEST_F(EventDispatcherFixture, dispatchEvents)
   event_dispatcher_observable.notifyApplicationProcessorCommandStart(2, "command2");
   event_dispatcher_observable.notifySequenceProcessorStart(2);
   event_dispatcher_observable.notifySequenceProcessorSampleStart("injection1");
+  event_dispatcher_observable.notifySequenceProcessorError("injection1", "processor1", "error1");
   event_dispatcher_observable.notifySequenceProcessorSampleEnd("injection1");
   event_dispatcher_observable.notifySequenceProcessorSampleStart("injection2");
   event_dispatcher_observable.notifySequenceProcessorSampleEnd("injection2");
@@ -231,6 +236,7 @@ TEST_F(EventDispatcherFixture, dispatchEvents)
   event_dispatcher_observable.notifySequenceProcessorSampleStart("sample1");
   event_dispatcher_observable.notifySequenceProcessorSampleEnd("sample1");
   event_dispatcher_observable.notifySequenceProcessorSampleStart("sample2");
+  event_dispatcher_observable.notifySequenceProcessorError("sample2", "processor2", "error2");
   event_dispatcher_observable.notifySequenceProcessorSampleEnd("sample2");
   event_dispatcher_observable.notifySampleGroupProcessorEnd();
   event_dispatcher_observable.notifyApplicationProcessorCommandEnd(3, "command3");
@@ -248,6 +254,7 @@ TEST_F(EventDispatcherFixture, dispatchEvents)
     {"onApplicationProcessorCommandStart",2,"command2", std::vector<std::string>()},
     {"onSequenceProcessorStart",2,"", std::vector<std::string>()},
     {"onSequenceProcessorSampleStart",0,"injection1", std::vector<std::string>()},
+    {"onSequenceProcessorError",0,"injection1", std::vector<std::string>({"processor1","error1"})},
     {"onSequenceProcessorSampleEnd",0,"injection1", std::vector<std::string>()},
     {"onSequenceProcessorSampleStart",0,"injection2", std::vector<std::string>()},
     {"onSequenceProcessorSampleEnd",0,"injection2", std::vector<std::string>()},
@@ -260,6 +267,7 @@ TEST_F(EventDispatcherFixture, dispatchEvents)
     {"onSequenceProcessorSampleStart",0,"sample1", std::vector<std::string>()},
     {"onSequenceProcessorSampleEnd",0,"sample1", std::vector<std::string>()},
     {"onSequenceProcessorSampleStart",0,"sample2", std::vector<std::string>()},
+    {"onSequenceProcessorError",0,"sample2", std::vector<std::string>({"processor2","error2"})},
     {"onSequenceProcessorSampleEnd",0,"sample2", std::vector<std::string>()},
     {"onSampleGroupProcessorEnd",0,"", std::vector<std::string>()},
     {"onApplicationProcessorCommandEnd",3,"command3", std::vector<std::string>()},

@@ -108,7 +108,7 @@ namespace SmartPeak
     void EventDispatcher::onSequenceProcessorError(const std::string& sample_name, const std::string& processor_name, const std::string& error)
     {
       queueEvent(std::make_shared<std::future<void>>(std::async(std::launch::deferred,
-        [this, sample_name, processor_name, error] { this->notifySequenceError(sample_name, processor_name, error); }
+        [this, sample_name, processor_name, error] { this->notifySequenceProcessorError(sample_name, processor_name, error); }
       )));
     }
     void EventDispatcher::onSequenceSegmentProcessorStart(const size_t nb_segments)

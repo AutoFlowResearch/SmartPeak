@@ -482,7 +482,7 @@ namespace SmartPeak
         {
           if (observable_)
           {
-            observable_->notifySequenceError(
+            observable_->notifySequenceProcessorError(
               e.item(),
               e.processor(),
               e.what());
