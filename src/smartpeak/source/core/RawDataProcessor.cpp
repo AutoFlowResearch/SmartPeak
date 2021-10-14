@@ -334,8 +334,7 @@ namespace SmartPeak
 
     if (!InputDataValidation::prepareToStore(filenames_I, "mzML_i"))
     {
-      LOGD << "END " << getName();
-      return;
+      throw std::invalid_argument("Failed to store output file");
     }
 
     OpenMS::MzMLFile mzmlfile;
@@ -366,8 +365,7 @@ namespace SmartPeak
 
     if (!InputDataValidation::prepareToLoad(filenames_I, "featureXML_i"))
     {
-      LOGD << "END " << getName();
-      return;
+      throw std::invalid_argument("Failed to load input file");
     }
 
     try {
@@ -410,8 +408,7 @@ namespace SmartPeak
 
     if (!InputDataValidation::prepareToStore(filenames_I, "featureXML_o"))
     {
-      LOGD << "END " << getName();
-      return;
+      throw std::invalid_argument("Failed to store output file");
     }
 
     // Store outfile as featureXML
@@ -437,8 +434,7 @@ namespace SmartPeak
 
     if (!InputDataValidation::prepareToLoad(filenames_I, "mzTab_i"))
     {
-      LOGD << "END " << getName();
-      return;
+      throw std::invalid_argument("Failed to load input file");
     }
 
     try {
@@ -477,8 +473,7 @@ namespace SmartPeak
 
     if (!InputDataValidation::prepareToStore(filenames_I, "mzTab_o"))
     {
-      LOGD << "END " << getName();
-      return;
+      throw std::invalid_argument("Failed to store output file");
     }
 
     // Store outfile as mzTab
@@ -630,9 +625,7 @@ namespace SmartPeak
       params_I.at("MRMFeatureSelector.schedule_MRMFeatures_score").empty();
 
     if (qmip_params_passed_but_empty || score_params_passed_but_empty) {
-      LOGE << "Parameters missing for selectFeatures. Not selecting";
-      LOGD << "END selectFeatures";
-      return;
+      throw std::invalid_argument("Missing parameters");
     }
 
     OpenMS::FeatureMap output;
@@ -827,16 +820,14 @@ namespace SmartPeak
 
     if (!InputDataValidation::prepareToLoad(filenames_I, "traML"))
     {
-      LOGD << "END " << getName();
-      return;
+      throw std::invalid_argument("Failed to load input file");
     }
 
     const auto format_param = params.findParameter("LoadTransitions", "format");
     if (!format_param)
     {
       // should actually not happen since we merge with the default params
-      LOGE << "LoadTransitions/format parameter not found";
-      return;
+      throw std::invalid_argument("LoadTransitions/format parameter not found");
     }
 
     const std::string format = format_param->getValueAsString();
@@ -1067,8 +1058,7 @@ namespace SmartPeak
     getFilenames(filenames_I);
     if (!InputDataValidation::prepareToLoad(filenames_I, "referenceData"))
     {
-      LOGD << "END " << getName();
-      return;
+      throw std::invalid_argument("Failed to load input file");
     }
 
     try
@@ -1134,7 +1124,7 @@ namespace SmartPeak
         );
         if (!db_context)
         {
-          return;
+          throw std::runtime_error("Failed to load from session database");
         }
         while (filenames_I.getSessionDB().read(
           *db_context,
@@ -1302,8 +1292,7 @@ namespace SmartPeak
 
     if (!InputDataValidation::prepareToStore(filenames_I, "referenceData"))
     {
-      LOGD << "END " << getName();
-      return;
+      throw std::invalid_argument("Failed to load input file");
     }
     if (filenames_I.isEmbedded("referenceData"))
     {
@@ -1329,7 +1318,7 @@ namespace SmartPeak
       );
       if (!db_context)
       {
-        return;
+        throw std::runtime_error("Failed to save in session database");
       }
       std::vector<std::map<std::string, CastValue>>& reference_data = rawDataHandler_IO.getReferenceData();
       for (const auto& ref : reference_data)
@@ -1397,8 +1386,7 @@ namespace SmartPeak
     getFilenames(filenames_I);
     if (!InputDataValidation::prepareToLoad(filenames_I, "parameters"))
     {
-      LOGD << "END " << getName();
-      return;
+      throw std::invalid_argument("Failed to load input file");
     }
     if (filenames_I.isEmbedded("parameters"))
     {
@@ -1411,7 +1399,7 @@ namespace SmartPeak
       );
       if (!db_context)
       {
-        return;
+        throw std::runtime_error("Failed to load from session database");
       }
       ParameterSet parameters;
       std::string function;
@@ -1529,8 +1517,7 @@ namespace SmartPeak
     LOGD << "START StoreParameters";
     if (!InputDataValidation::prepareToStore(filenames_I, "parameters"))
     {
-      LOGD << "END " << getName();
-      return;
+      throw std::invalid_argument("Failed to store output file");
     }
     if (filenames_I.isEmbedded("parameters"))
     {
@@ -1543,7 +1530,7 @@ namespace SmartPeak
       );
       if (!db_context)
       {
-        return;
+        throw std::runtime_error("Failed to save in session database");
       }
       const auto& parameters = rawDataHandler_IO.getParameters();
       for (const auto& parameter_function : parameters)
@@ -1566,9 +1553,7 @@ namespace SmartPeak
       getFilenames(filenames_I);
       LOGI << "Storing " << filename_;
       if (filenames_I.getFullPath("parameters").empty()) {
-        LOGE << "Filename is empty";
-        LOGD << "END readRawDataProcessingParameters";
-        return;
+        throw std::invalid_argument("Failed to store output file");
       }
       ParametersParser::write(filenames_I.getFullPath("parameters").generic_string(), rawDataHandler_IO.getParameters());
     }
@@ -1742,9 +1727,7 @@ namespace SmartPeak
     }
 
     if (stop == 0) {
-      LOGE << "No parameters passed to ExtractSpectraWindows.  Spectra will not be extracted.";
-      LOGD << "END ExtractSpectraWindows";
-      return;
+      throw std::invalid_argument("No parameters passed to ExtractSpectraWindows.  Spectra will not be extracted.");
     }
 
     std::vector<OpenMS::MSSpectrum> output;
@@ -2104,9 +2087,7 @@ namespace SmartPeak
     }
 
     if (resolution == 0 || max_mz == 0 || bin_step == 0) {
-      LOGE << "Missing parameters for MergeSpectra.  Spectra will not be merged.";
-      LOGD << "END MergeSpectra";
-      return;
+      throw std::invalid_argument("Missing parameters");
     }
 
     // calculate the bin sizes and mass buckets
@@ -2294,9 +2275,7 @@ namespace SmartPeak
       }
     }
     if (sn_window == 0) {
-      LOGE << "Missing sne:window parameter for PickMS1Features. Not picking";
-      LOGD << "END PickMS1Features";
-      return;
+      throw std::invalid_argument("Missing sne : window parameter for PickMS1Features. Not picking.");
     }
     
     OpenMS::SavitzkyGolayFilter sgfilter;
@@ -3106,9 +3085,8 @@ namespace SmartPeak
     }
     if (ms_peakmap.empty())
     {
-      LOGW << "The given file does not contain any conventional peak data, but might"
-        " contain chromatograms. This tool currently cannot handle them, sorry.";
-      return;
+      throw std::invalid_argument("The given file does not contain any conventional peak data, but might"
+                                  " contain chromatograms. This tool currently cannot handle them, sorry.");
     }
 
     // determine type of spectral data (profile or centroided)
@@ -3119,8 +3097,7 @@ namespace SmartPeak
       Parameter* force_processing = pick_ms2_feature_params.findParameter("force_processing");
       if (!force_processing || force_processing->getValueAsString() == "false")
       {
-        LOGE << "Error: Profile data provided but centroided spectra expected. To enforce processing of the data set the force_processing parameter.";
-        return;
+        throw std::invalid_argument("Error: Profile data provided but centroided spectra expected. To enforce processing of the data set the force_processing parameter.");
       }
     }
 
@@ -3196,8 +3173,7 @@ namespace SmartPeak
     {
       if (!feat.metaValueExists("num_of_masstraces"))
       {
-        LOGE << "MetaValue 'num_of_masstraces' missing from FFMetabo output!";
-        return;
+        throw std::invalid_argument("MetaValue 'num_of_masstraces' missing from FFMetabo output!");
       }
       trace_count += (size_t)feat.getMetaValue("num_of_masstraces");
     }
@@ -3205,8 +3181,7 @@ namespace SmartPeak
     {
       if (!ffmet_parameters.getValue("remove_single_traces").toBool())
       {
-        LOGE << "FF-Metabo: Internal error. Not all mass traces have been assembled to features! Aborting.";
-        return;
+        throw std::invalid_argument("FF-Metabo: Internal error. Not all mass traces have been assembled to features! Aborting.");
       }
       else
       {

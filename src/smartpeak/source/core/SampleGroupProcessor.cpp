@@ -213,9 +213,7 @@ namespace SmartPeak
 
     // Check the parameters
     if (params_I.at("MergeInjections").empty() && params_I.at("MergeInjections").empty()) {
-      LOGE << "Parameters not found for MergeInjections. Returning";
-      LOGD << "END MergeInjections";
-      return;
+      throw std::invalid_argument("Parameters not found");
     }
 
     // Extract out the parameters
@@ -276,9 +274,7 @@ namespace SmartPeak
     }
     if (scan_polarity_merge_rule.empty() || mass_range_merge_rule.empty() || dilution_series_merge_rule.empty() || 
       scan_polarity_merge_feature_name.empty() || mass_range_merge_feature_name.empty() || dilution_series_merge_feature_name.empty()) {
-      LOGE << "Missing parameters for MergeInjections. Not merging.";
-      LOGD << "END MergeInjections";
-      return;
+      throw std::invalid_argument("Parameters not found");
     }
 
     // Get the injection names for all the different scan polarities, mass ranges and dilutions
@@ -718,8 +714,7 @@ namespace SmartPeak
 
     if (!InputDataValidation::prepareToLoad(filenames_I, "featureXMLSampleGroup_i"))
     {
-      LOGD << "END " << getName();
-      return;
+      throw std::invalid_argument("Failed to load input file");
     }
 
     try {
@@ -757,8 +752,7 @@ namespace SmartPeak
 
     if (!InputDataValidation::prepareToStore(filenames_I, "featureXMLSampleGroup_o"))
     {
-      LOGD << "END " << getName();
-      return;
+      throw std::invalid_argument("Failed to store output file");
     }
 
     // Store outfile as featureXML
