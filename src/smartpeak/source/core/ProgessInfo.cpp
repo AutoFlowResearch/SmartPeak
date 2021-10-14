@@ -57,6 +57,11 @@ namespace SmartPeak
     running_ = false;
   }
 
+  void ProgressInfo::onApplicationProcessorError(const std::string& error)
+  {
+    errors_.push_back(error);
+  }
+
   void ProgressInfo::onSequenceProcessorStart(const size_t nb_injections)
   {
     running_batch_ = std::make_shared<RunningBatch>(nb_injections);

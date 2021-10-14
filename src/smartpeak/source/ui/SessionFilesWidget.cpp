@@ -47,10 +47,14 @@ namespace SmartPeak
     ENotUsed
   };
 
-  SessionFilesWidget::SessionFilesWidget(ApplicationHandler& application_handler, SessionFilesWidget::Mode mode) :
+  SessionFilesWidget::SessionFilesWidget(
+    ApplicationHandler& application_handler,
+    SessionFilesWidget::Mode mode,
+    IApplicationProcessorObserver* application_observer) :
     Widget("Session Files"),
     application_handler_(application_handler),
-    mode_(mode)
+    mode_(mode),
+    application_observer_(application_observer)
   {
     setHints(application_handler_.loading_processors_);
   };
@@ -331,6 +335,7 @@ namespace SmartPeak
     application_handler_.filenames_ = filenames;
     application_handler_.main_dir_ = filenames_.getTag(Filenames::Tag::MAIN_DIR);
     LoadSession load_session(application_handler_);
+    load_session.addApplicationProcessorObserver(application_observer_);
     load_session.filenames_ = filenames;
     // When modifiying one file, we load it using all files are marked as external, to eventually import them.
     for (const auto& fef : file_editor_fields_)
@@ -340,30 +345,39 @@ namespace SmartPeak
         load_session.filenames_->setEmbedded(fef.first, false);
       }
     }
-    load_session.process();
-    // Update saved state
-    for (const auto& fef : file_editor_fields_)
+    load_session.notifyApplicationProcessorStart({}); // we need a proper loading in thread to profit from the progressbar
+    if (load_session.process())
     {
-      if (fef.second.embedded_)
+      // Update saved state
+      for (const auto& fef : file_editor_fields_)
       {
-        if (mode_ == Mode::ECreation)
+        if (fef.second.embedded_)
         {
-          // if the file is embedded and we create a new session, 
-          // we need to set it as not saved, 
-          // so that the file will be embedded in the session db
-          application_handler_.setFileSavedState(fef.first, false);
+          if (mode_ == Mode::ECreation)
+          {
+            // if the file is embedded and we create a new session, 
+            // we need to set it as not saved, 
+            // so that the file will be embedded in the session db
+            application_handler_.setFileSavedState(fef.first, false);
+          }
+          else
+          {
+            application_handler_.setFileSavedState(fef.first, !(isModified(fef.first)));
+          }
         }
         else
         {
-          application_handler_.setFileSavedState(fef.first, !(isModified(fef.first)));
+          // The file is not embedded, we don't want to export it - set it to saved.
+          application_handler_.setFileSavedState(fef.first, true);
         }
       }
-      else
-      {
-        // The file is not embedded, we don't want to export it - set it to saved.
-        application_handler_.setFileSavedState(fef.first, true);
-      }
     }
+    else
+    {
+      // load failed
+      application_handler_.closeSession();
+    }
+    load_session.notifyApplicationProcessorEnd();
   }
 
   void SessionFilesWidget::updateFieldEditorsStatus()

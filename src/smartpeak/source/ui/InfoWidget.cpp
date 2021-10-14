@@ -39,10 +39,6 @@ namespace SmartPeak
     
     drawWorkflowStatus();
     drawListOfErrors();
-
-    ImGui::Separator();
-
-    drawFileloadingStatus();
     drawLastRunTime();
     drawErrorMessages();
 
@@ -65,22 +61,6 @@ namespace SmartPeak
     else
     {
       ImGui::Text("Workflow status: done");
-    }
-  }
-
-  void InfoWidget::drawFileloadingStatus()
-  {
-    if (file_load_error_)
-    {
-      std::ostringstream os;
-      os << "File loading failed.  Check the `Information` log.";
-      ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
-      ImGui::Text("%s", os.str().c_str());
-      ImGui::PopStyleColor();
-    }
-    else
-    {
-      ImGui::Text(file_loading_is_done_ ? "File loading status: done" : "File loading status: running...");
     }
   }
 

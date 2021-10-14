@@ -61,6 +61,12 @@ namespace SmartPeak
         [this] { this->notifyApplicationProcessorEnd(); }
       )));
     }
+    void EventDispatcher::onApplicationProcessorError(const std::string& error)
+    {
+      queueEvent(std::make_shared<std::future<void>>(std::async(std::launch::deferred,
+        [this, error] { this->notifyApplicationProcessorError(error); }
+      )));
+    }
 
     /**
       IFeaturesObserver

@@ -70,6 +70,7 @@ namespace SmartPeak
     virtual void onApplicationProcessorCommandStart(size_t command_index, const std::string& command_name) override;
     virtual void onApplicationProcessorCommandEnd(size_t command_index, const std::string& command_name) override;
     virtual void onApplicationProcessorEnd() override;
+    virtual void onApplicationProcessorError(const std::string& error) override;
 
     /**
       ISequenceProcessorObserver

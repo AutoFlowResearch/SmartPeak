@@ -84,6 +84,11 @@ struct EventDispatcherFixture : public ::testing::Test
     {
       events_.push_back(std::make_tuple("onApplicationProcessorEnd", 0, "", std::vector<std::string>()));
     }
+    virtual void onApplicationProcessorError(const std::string& error) override
+    {
+      // TODO
+    }
+
     /**
       ISequenceSegmentProcessorObserver
     */
