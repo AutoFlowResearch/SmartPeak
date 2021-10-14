@@ -2548,7 +2548,7 @@ namespace SmartPeak
       f.setSubordinates(f_map.second);
       fmap.push_back(f);
     }
-
+    rawDataHandler_IO.setFeatureMap(fmap);
     rawDataHandler_IO.updateFeatureMapHistory();
 
     LOGI << "MergeFeatures output size: " << rawDataHandler_IO.getFeatureMap().size();
