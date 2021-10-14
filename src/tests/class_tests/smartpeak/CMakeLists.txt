@@ -55,28 +55,6 @@ endif()
 #------------------------------------------------------------------------------
 # get the test executables
 include(executables.cmake)
-
-#------------------------------------------------------------------------------
-# googletest
-include(FetchContent)
-FetchContent_Declare(
-  googletest
-  GIT_REPOSITORY https://github.com/google/googletest.git
-  GIT_TAG release-1.10.0
-)
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-FetchContent_MakeAvailable(googletest)
-
-include(FetchContent)
-if(NOT googletest_POPULATED)
-  FetchContent_Populate(googletest)
-  add_subdirectory(
-    ${googletest_SOURCE_DIR}
-    ${googletest_BINARY_DIR}
-  )
-endif()
-include(GoogleTest)
-
 #------------------------------------------------------------------------------
 # Include directories for tests
 set(SMARTPEAK_CLASS_TESTS_INTERNAL_INCLUDE_DIRECTORIES "${PROJECT_BINARY_DIR}/include/")

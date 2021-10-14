@@ -30,6 +30,8 @@
 
 namespace SmartPeak
 {
+  extern bool run_on_server;
+
   class SessionHandler : 
     public ISequenceObserver,
     public ITransitionsObserver,

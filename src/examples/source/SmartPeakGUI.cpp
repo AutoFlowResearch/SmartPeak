@@ -66,10 +66,12 @@
 #include <backends/imgui_impl_sdl.h>
 #include <backends/imgui_impl_opengl2.h>
 #include <misc/cpp/imgui_stdlib.h>
+#include "service/services.hpp"
 
 using namespace SmartPeak;
 
 bool SmartPeak::enable_quick_help = true;
+bool SmartPeak::run_on_server = false;
 
 void initializeDataDirs(ApplicationHandler& state);
 
@@ -87,7 +89,6 @@ std::string getMainWindowTitle(const ApplicationHandler& application_handler);
 int main(int argc, char** argv)
 // `int argc, char **argv` are required on Win to link against the proper SDL2/OpenGL implementation
 {
-
   // to disable buttons, display info, and update the session cache
   bool workflow_is_done_ = true;
   bool file_loading_is_done_ = true;
@@ -665,6 +666,19 @@ int main(int argc, char** argv)
     bool show_left_window_ = std::find_if(left_windows.begin(), left_windows.end(), [](const auto& w) { return w->visible_; }) != left_windows.end();
     bool show_right_window_ = false;
     win_size_and_pos.setWindowSizesAndPositions(show_top_window_, show_bottom_window_, show_left_window_, show_right_window_);
+      
+    // ======================================
+    // Server-Side Execution
+    // ======================================
+      if (run_workflow_widget_->server_fields_set)
+      {
+        WorkflowClient workflow_client(grpc::CreateChannel(run_workflow_widget_->server_url, grpc::InsecureChannelCredentials()));
+        std::string workflow_status = workflow_client.runWorkflow(application_handler_.filenames_.getTag(Filenames::Tag::MAIN_DIR));
+        workflow_client.getLogstream();
+        LOGI << "GUI workflow status : " << workflow_status << std::endl;
+        ::serv::loadRawDataAndFeatures(application_handler_, session_handler_, workflow_manager_, event_dispatcher);
+        run_workflow_widget_->server_fields_set = false;
+      }
 
     // ======================================
     // Data updates

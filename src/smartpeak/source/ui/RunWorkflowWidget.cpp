@@ -35,6 +35,7 @@ namespace SmartPeak
 
   void RunWorkflowWidget::draw()
   {
+		ImGui::SetNextWindowSizeConstraints(ImVec2(320, 100), ImVec2(FLT_MAX, FLT_MAX));
     if (ImGui::BeginPopupModal(title_.c_str(), NULL, ImGuiWindowFlags_None))
     {
       if (   mzML_dir_old_ != application_handler_.mzML_dir_.generic_string()
@@ -92,9 +93,18 @@ namespace SmartPeak
       }
 
       file_picker_.draw();
-
+      
       ImGui::Separator();
-      if (ImGui::Button("Run workflow"))
+      ImGui::Checkbox("Run on Server", &run_on_server);
+      ImGui::Text("Server URL");
+      ImGui::SameLine();
+      ImGui::PushID(4);
+      ImGui::InputTextWithHint("", "localhost:50051", &server_url);
+      ImGui::PopID();
+      
+      ImGui::Separator();
+      bool run_workflow_clicked = false;
+      if ((run_workflow_clicked = ImGui::Button("Run workflow")) && !run_on_server)
       {
         application_handler_.mzML_dir_ = mzML_dir_edit_;
         application_handler_.features_in_dir_ = features_in_dir_edit_;
@@ -121,17 +131,28 @@ namespace SmartPeak
           const std::set<std::string> injection_names = session_handler_.getSelectInjectionNamesWorkflow(application_handler_.sequenceHandler_);
           const std::set<std::string> sequence_segment_names = session_handler_.getSelectSequenceSegmentNamesWorkflow(application_handler_.sequenceHandler_);
           const std::set<std::string> sample_group_names = session_handler_.getSelectSampleGroupNamesWorkflow(application_handler_.sequenceHandler_);
-          workflow_manager_.addWorkflow(application_handler_, 
+            workflow_manager_.addWorkflow(application_handler_,
             injection_names, 
-            sequence_segment_names, 
-            sample_group_names, 
-            buildCommandsFromNames.commands_, 
+            sequence_segment_names,
+            sample_group_names,
+            buildCommandsFromNames.commands_,
             &application_processor_observer_,
             &sequence_processor_observer_,
             &sequence_segment_processor_observer_,
             &sample_group_processor_observer_
           );
         }
+        visible_ = false;
+        ImGui::CloseCurrentPopup();
+      }
+      if (run_workflow_clicked && !server_url.empty() && run_on_server)
+      {
+        application_handler_.mzML_dir_ = mzML_dir_edit_;
+        application_handler_.features_in_dir_ = features_in_dir_edit_;
+        application_handler_.features_out_dir_ = features_out_dir_edit_;
+
+        
+        server_fields_set = true;
         visible_ = false;
         ImGui::CloseCurrentPopup();
       }

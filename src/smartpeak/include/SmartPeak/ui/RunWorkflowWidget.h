@@ -71,5 +71,8 @@ namespace SmartPeak
     std::string mzML_dir_old_;
     std::string features_in_dir_old_;
     std::string features_out_dir_old_;
+  public:
+    std::string server_url;
+    bool server_fields_set;
   };
 }
