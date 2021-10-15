@@ -109,8 +109,7 @@ namespace SmartPeak {
     
     enum class PlotType {
       CURVE,
-      HEATMAP,
-      HISTOGRAM
+      HEATMAP
     };
   
     PlotExporter(std::string output_path, SessionHandler::GraphVizData& graphvis_data, int format, PlotType plot_type);
