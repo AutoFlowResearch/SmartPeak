@@ -210,6 +210,8 @@ namespace SmartPeak
           {
             LOGD << "Stopped adding points to the graph";
             points_overflow_ = true;
+            x_min_ = 0.0f;
+            x_max_ = 0.0f;
           }
         }
         return (!points_overflow_);
@@ -221,6 +223,11 @@ namespace SmartPeak
         {
           current_min = std::min(*std::min_element(v.begin(), v.end()), current_min);
           current_max = std::max(*std::max_element(v.begin(), v.end()), current_max);
+        }
+        else
+        {
+          current_min = 0.0f;
+          current_max = 0.0f;
         }
       }
 
