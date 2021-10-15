@@ -65,6 +65,10 @@ namespace SmartPeak
         {
           samples_chart_.label_char_ptr_.push_back(name.c_str());
         }
+        if (samples_chart_.values_.empty())
+        {
+          samples_chart_.error_message_ = "No chart to display, please select samples from the Injections explorer tab.";
+        }
       }
     }
     else
@@ -125,6 +129,10 @@ namespace SmartPeak
         {
           transitions_chart_.label_char_ptr_.push_back(name.c_str());
         }
+        if (transitions_chart_.values_.empty())
+        {
+          transitions_chart_.error_message_ = "No chart to display, please select transitions from the Transitions explorer tab.";
+        }
       }
     }
     else
@@ -158,6 +166,10 @@ namespace SmartPeak
         ImGuiCond_Always);
       ImPlot::SetNextPlotTicksX(&chart_data.positions_.front(), chart_data.values_.size());
     }
+    else
+    {
+      ImPlot::SetNextPlotLimits(-0.5, +0.5, 0, 1, ImGuiCond_Always);
+    }
     if (ImPlot::BeginPlot(title, x_label, y_label, ImVec2((width_/2.0f) - 10, height_ - 40), ImPlotFlags_Default & ~ImPlotFlags_Legend & ~ImPlotFlags_MousePos, ImPlotAxisFlags_GridLines | ImPlotAxisFlags_TickMarks)) {
       if (chart_data.values_.size() > 0)
       {
@@ -171,7 +183,7 @@ namespace SmartPeak
       }
       if (!chart_data.error_message_.empty())
       {
-        ImPlot::PlotText(chart_data.error_message_.c_str(), 0.0f, 0.0f, false, { 5, -20 });
+        ImPlot::PlotText(chart_data.error_message_.c_str(), -0.5f, 0.0f, false, { 5, -20 });
       }
       ImPlot::EndPlot();
     }
