@@ -843,6 +843,7 @@ namespace SmartPeak
 
   Filenames Utilities::buildFilenamesFromDirectory(ApplicationHandler& application_handler, const std::filesystem::path& path)
   {
+    std::cout << "buildFilenamesFromDirectory ==============================" << std::endl;
     Filenames filenames;
     filenames.setTag(Filenames::Tag::MAIN_DIR, path.generic_string());
     for (const auto& filename_handler : application_handler.loading_processors_)
@@ -853,12 +854,18 @@ namespace SmartPeak
     {
       filenames.setEmbedded(file_id, false);
       const auto& full_path = filenames.getFullPath(file_id);
+      std::cout << "testing " << full_path.generic_string() << std::endl;
       if (!(std::filesystem::is_regular_file(full_path) && std::filesystem::exists(full_path)))
       {
-        LOGI << "Non existing file, will not be used: " << full_path.generic_string();
+        std::cout << "Non existing file, will not be used: " << full_path.generic_string() << std::endl;
         filenames.setFullPath(file_id, "");
       }
+      else
+      {
+        std::cout << "File exists: " << full_path.generic_string() << std::endl;
+      }
     }
+    std::cout << "buildFilenamesFromDirectory ==============================" << std::endl;
     return filenames;
   }
 
