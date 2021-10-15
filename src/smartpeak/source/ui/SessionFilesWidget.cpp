@@ -336,7 +336,7 @@ namespace SmartPeak
       filenames.addFileName(fef.first, path);
       filenames.setEmbedded(fef.first, fef.second.embedded_);
     }
-    std::cout << "load_session.filenames_:---------------" << std::endl;
+    std::cout << "filenames:-----------------------------" << std::endl;
     filenames.log();
     std::cout << "---------------------------------------" << std::endl;
     application_handler_.closeSession();
