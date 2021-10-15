@@ -317,6 +317,7 @@ namespace SmartPeak
 
   void SessionFilesWidget::doUpdateSession()
   {
+    std::cout << "SessionFilesWidget::doUpdateSession start" << std::endl;
     // reconstruct filenames to be used to construct the session
     Filenames filenames;
     filenames.getSessionDB() = filenames_.getSessionDB();
@@ -348,6 +349,7 @@ namespace SmartPeak
     load_session.notifyApplicationProcessorStart({}); // we need a proper loading in thread to profit from the progressbar
     if (load_session.process())
     {
+      std::cout << "SessionFilesWidget::doUpdateSession load_session sucessfull" << std::endl;
       // Update saved state
       for (const auto& fef : file_editor_fields_)
       {
@@ -375,6 +377,7 @@ namespace SmartPeak
     else
     {
       // load failed
+      std::cout << "SessionFilesWidget::doUpdateSession load_session failed" << std::endl;
       application_handler_.closeSession();
     }
     load_session.notifyApplicationProcessorEnd();

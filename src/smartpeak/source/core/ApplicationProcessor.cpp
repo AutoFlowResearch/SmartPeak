@@ -291,6 +291,7 @@ namespace SmartPeak
   bool LoadSession::process()
   {
     LOGD << "START LoadSession";
+    std::cout << "LoadSession::process - start" << std::endl;
 
     if (!filenames_) // if filenames are not provided, we will take it from the DB.
     {
@@ -298,6 +299,7 @@ namespace SmartPeak
       if (!load_filenames.process())
       {
         notifyApplicationProcessorError("Failed to load session");
+        std::cout << "LoadSession::process - failed to load filenames" << std::endl;
         return false;
       }
       filenames_ = application_handler_.filenames_;
@@ -305,6 +307,7 @@ namespace SmartPeak
 
     if (!overrideFilenames())
     {
+      std::cout << "LoadSession::process - overrideFilenames failed" << std::endl;
       return false;
     }
 
@@ -335,6 +338,7 @@ namespace SmartPeak
           {
             LOGE << e.what();
             notifyApplicationProcessorError(e.what());
+            std::cout << "LoadSession::process - " << sequence_processor->getName() << " failed. " << e.what() << std::endl;
             return false;
           }
         }
@@ -352,6 +356,7 @@ namespace SmartPeak
             {
               LOGE << e.what();
               notifyApplicationProcessorError(e.what());
+              std::cout << "LoadSession::process - " << raw_data_processor->getName() << " failed. " << e.what() << std::endl;
               return false;
             }
           }
@@ -359,6 +364,7 @@ namespace SmartPeak
           {
             LOGE << "No Sequence available, Loading process aborted.";
             notifyApplicationProcessorError("Failed to load session");
+            std::cout << "LoadSession::process - No Sequence available, Loading process aborted." << std::endl;
             return false;
           }
         }
@@ -377,6 +383,7 @@ namespace SmartPeak
             {
               LOGE << e.what();
               notifyApplicationProcessorError(e.what());
+              std::cout << "LoadSession::process - " << sequence_segment_processor->getName() << " failed. " << e.what() << std::endl;
               return false;
             }
           }
@@ -384,6 +391,7 @@ namespace SmartPeak
           {
             LOGE << "No Sequence Segment available, Loading process aborted.";
             notifyApplicationProcessorError("Failed to load session");
+            std::cout << "LoadSession::process - No Sequence Segment available, Loading process aborted." << std::endl;
             return false;
           }
         }
@@ -392,6 +400,7 @@ namespace SmartPeak
 
     if (!overrideParameters())
     {
+      std::cout << "LoadSession::process - overrideParameters failed" << std::endl;
       return false;
     }
 
@@ -412,6 +421,7 @@ namespace SmartPeak
 
     application_handler_.sequenceHandler_.notifySequenceUpdated();
     LOGD << "END LoadSession";
+    std::cout << "LoadSession::process - end sucessfull" << std::endl;
     return true;
   }
 
