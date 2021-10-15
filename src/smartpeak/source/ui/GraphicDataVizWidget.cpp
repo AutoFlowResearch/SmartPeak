@@ -41,11 +41,11 @@ namespace SmartPeak
   {
     ImGui::DragFloatRange2("Time-Range",
                            &current_range_.first, &current_range_.second, 0.25f,
-                           //slider_min_max_.first, slider_min_max_.second,
-                           graph_viz_data_.x_min_, graph_viz_data_.x_max_,
+                           slider_min_max_.first, slider_min_max_.second,
                            std::string("min: %.4f "+graph_viz_data_.x_axis_title_).c_str(),
                            std::string("max: %.4f "+graph_viz_data_.x_axis_title_).c_str(),
                            ImGuiSliderFlags_AlwaysClamp);
+    if (current_range_.first < 0.0f) current_range_.first = 0.0f;
     
     float controls_pos_start_y = ImGui::GetCursorPosY();
     ImGui::Checkbox("Compact View", &compact_view_);
