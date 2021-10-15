@@ -18,10 +18,11 @@ include(executables.cmake)
 #------------------------------------------------------------------------------
 # Include directories for examples
 set(SMARTPEAK_EXAMPLES_INTERNAL_INCLUDE_DIRECTORIES "${PROJECT_BINARY_DIR}/include/")
-set(SMARTPEAK_EXAMPLES_INTERNAL_INCLUDE_DIRECTORIES "${PROJECT_BINARY_DIR}/source/service/")
+set(SMARTPEAK_SERVICES_INTERNAL_INCLUDE_DIRECTORIES "${PROJECT_BINARY_DIR}/source/service/")
 # add SmartPeak directories
 set(SMARTPEAK_EXAMPLES_EXTERNAL_INCLUDE_DIRECTORIES "${SmartPeak_INCLUDE_DIRECTORIES}")
 include_directories(${SMARTPEAK_EXAMPLES_INTERNAL_INCLUDE_DIRECTORIES})
+include_directories(${SMARTPEAK_SERVICES_INTERNAL_INCLUDE_DIRECTORIES})
 include_directories(SYSTEM ${SMARTPEAK_EXAMPLES_EXTERNAL_INCLUDE_DIRECTORIES})
 
 #------------------------------------------------------------------------------
