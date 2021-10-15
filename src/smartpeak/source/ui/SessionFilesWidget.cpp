@@ -328,6 +328,7 @@ namespace SmartPeak
     for (const auto& fef : file_editor_fields_)
     {
       std::string path = fef.second.text_editor_;
+      std::cout << fef.first << ": " << "[" << path << "] empty: " << path.empty() << " relative: " << (std::filesystem::path(path).is_relative()) << std::endl;
       if ((!path.empty()) && (std::filesystem::path(path).is_relative()))
       {
         path = "${MAIN_DIR}/" + path;
@@ -335,6 +336,9 @@ namespace SmartPeak
       filenames.addFileName(fef.first, path);
       filenames.setEmbedded(fef.first, fef.second.embedded_);
     }
+    std::cout << "load_session.filenames_:---------------" << std::endl;
+    filenames.log();
+    std::cout << "---------------------------------------" << std::endl;
     application_handler_.closeSession();
     application_handler_.filenames_ = filenames;
     application_handler_.main_dir_ = filenames_.getTag(Filenames::Tag::MAIN_DIR);
