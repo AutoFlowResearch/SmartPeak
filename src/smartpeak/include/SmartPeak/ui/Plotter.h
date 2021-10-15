@@ -203,6 +203,8 @@ namespace SmartPeak {
     std::string y_title_;
     std::string plot_title_;
     std::string gnuplot_path_;
+    uint        file_width_;
+    uint        file_height_;
     PlotType    plot_type_;
     
     std::vector<PlotLineProperties> plotlines_properties_;

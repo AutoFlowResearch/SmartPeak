@@ -186,6 +186,8 @@ namespace SmartPeak {
       heatmap_data_(heatmap_data),
       output_path_(output_path),
       plot_type_(plot_type),
+      file_width_(1400),
+      file_height_(800),
       gnuplot_path_("gnuplot")
   {
     //PNG=0, PDF=1, HTML=2, SVG=3
@@ -338,7 +340,8 @@ namespace SmartPeak {
     if (fout.is_open()) {
       appendFileHeader_(fout);
       if (isTermAvailable_("cairo")) {
-        fout << "set terminal pngcairo size 1400,800 dashed enhanced" << std::endl;
+        fout << "set terminal pngcairo size ";
+        fout << std::to_string(file_width_)+","+std::to_string(file_height_)+" dashed enhanced" << std::endl;
         fout << "set output '" << exported_plot << "'" << std::endl;
         if (with_grid_) {
           setGrid_(fout);
