@@ -602,11 +602,11 @@ namespace SmartPeak
   {
     if (filenames.isEmbedded(file_id))
     {
-      LOGI << "Loading from Session DB: " << file_id;
+      std::cout << "Loading from Session DB: " << file_id << std::endl;
     }
     else
     {
-      LOGI << "Loading: " << filenames.getFullPath(file_id).generic_string();
+      std::cout << "Loading: " << filenames.getFullPath(file_id).generic_string() << std::endl;
 
       const auto& full_path = filenames.getFullPath(file_id);
       const bool is_embedded = filenames.isEmbedded(file_id);
@@ -614,12 +614,12 @@ namespace SmartPeak
       if (!is_embedded)
       {
         if (full_path.empty()) {
-          LOGE << "Filename is empty";
+          std::cout << "Filename is empty" << std::endl;
           return false;
         }
 
         if (!InputDataValidation::fileExists(full_path)) {
-          LOGE << "File not found " << full_path.generic_string();
+          std::cout << "File not found " << full_path.generic_string() << std::endl;
           return false;
         }
       }

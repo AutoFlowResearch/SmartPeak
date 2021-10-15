@@ -1058,6 +1058,7 @@ namespace SmartPeak
     getFilenames(filenames_I);
     if (!InputDataValidation::prepareToLoad(filenames_I, "referenceData"))
     {
+      std::cout << "Failed to load input file" << std::endl;
       throw std::invalid_argument("Failed to load input file");
     }
 
@@ -1124,6 +1125,7 @@ namespace SmartPeak
         );
         if (!db_context)
         {
+          std::cout << "Failed to load from session database" << std::endl;
           throw std::runtime_error("Failed to load from session database");
         }
         while (filenames_I.getSessionDB().read(
@@ -1250,7 +1252,8 @@ namespace SmartPeak
       rawDataHandler_IO.setReferenceData(reference_data);
     }
     catch (const std::exception& e) {
-      LOGE << e.what();
+      std::cout << "Failure:" << std::endl;
+      std::cout << e.what() << std::endl;
       rawDataHandler_IO.getReferenceData().clear();
       LOGI << "RefereceData clear";
       throw e;
