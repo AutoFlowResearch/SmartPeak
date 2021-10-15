@@ -319,6 +319,9 @@ namespace SmartPeak
   {
     std::cout << "SessionFilesWidget::doUpdateSession start" << std::endl;
     // reconstruct filenames to be used to construct the session
+    std::cout << "filenames_:  --------------------------" << std::endl;
+    filenames_.log();
+    std::cout << "---------------------------------------" << std::endl;
     Filenames filenames;
     filenames.getSessionDB() = filenames_.getSessionDB();
     filenames.setTag(Filenames::Tag::MAIN_DIR, filenames_.getTag(Filenames::Tag::MAIN_DIR));
@@ -346,6 +349,10 @@ namespace SmartPeak
         load_session.filenames_->setEmbedded(fef.first, false);
       }
     }
+    std::cout << "load_session.filenames_:---------------" << std::endl;
+    load_session.filenames_->log();
+    std::cout << "---------------------------------------" << std::endl;
+
     load_session.notifyApplicationProcessorStart({}); // we need a proper loading in thread to profit from the progressbar
     if (load_session.process())
     {

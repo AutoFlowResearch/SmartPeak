@@ -203,17 +203,17 @@ namespace SmartPeak
 
   void Filenames::log() const
   {
-    LOGI << "Input Files Setup:";
+    std::cout << "Input Files Setup:" << std::endl;
     for (const auto& file_id : getFileIds())
     {
       const auto full_path = getFullPath(file_id);
       if (full_path.empty())
       {
-        LOGI << file_id << ": Not used";
+        std::cout << file_id << ": Not used" << std::endl;
       }
       else
       {
-        LOGI << file_id << ": " << "\"" << full_path.generic_string() << "\"";
+        std::cout << file_id << ": " << "\"" << full_path.generic_string() << "\"" << std::endl;
       }
     }
   }
