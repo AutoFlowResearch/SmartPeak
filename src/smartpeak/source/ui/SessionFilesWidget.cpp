@@ -191,7 +191,18 @@ namespace SmartPeak
     std::filesystem::path main_dir_path(filenames_.getTag(Filenames::Tag::MAIN_DIR));
     std::string relative_path = std::filesystem::relative(full_path_name, main_dir_path).generic_string();
     bool is_embedded = filenames_.isEmbedded(file_id);
-    bool file_exists = std::filesystem::exists(full_path_name);
+    bool file_exists = std::filesystem::is_regular_file(full_path_name);
+    //====================================
+    if (file_id == "workflow")
+    {
+      std::cout << "createEditorFields workflow *******>" << std::endl;
+      std::cout << "main: " << main_dir_path.generic_string() << std::endl;
+      std::cout << "full: " << full_path_name.generic_string() << std::endl;
+      std::cout << "relative: " << relative_path << std::endl;
+      std::cout << "exists: " << file_exists << std::endl;
+      std::cout << "createEditorFields workflow <*******" << std::endl;
+    }
+    //====================================
     if (mode_ == Mode::EModification)
     {
       // we are reviewing an existing session
