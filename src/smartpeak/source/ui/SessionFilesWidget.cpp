@@ -189,7 +189,15 @@ namespace SmartPeak
     const auto full_path_name = filenames_.getFullPath(file_id);
     std::string displayed_path;
     std::filesystem::path main_dir_path(filenames_.getTag(Filenames::Tag::MAIN_DIR));
-    std::string relative_path = std::filesystem::relative(full_path_name, main_dir_path).generic_string();
+    std::string relative_path;
+    if (full_path_name.empty())
+    {
+      relative_path = "";
+    }
+    else
+    {
+      relative_path = std::filesystem::relative(full_path_name, main_dir_path).generic_string();
+    }
     bool is_embedded = filenames_.isEmbedded(file_id);
     bool file_exists = std::filesystem::is_regular_file(full_path_name);
     //====================================
