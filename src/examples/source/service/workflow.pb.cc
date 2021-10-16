@@ -36,8 +36,7 @@ struct WorkflowParametersDefaultTypeInternal {
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT WorkflowParametersDefaultTypeInternal _WorkflowParameters_default_instance_;
 constexpr SingleAxisData::SingleAxisData(
   ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized)
-  : axis_data_()
-  , _axis_data_cached_byte_size_(){}
+  : axis_data_(){}
 struct SingleAxisDataDefaultTypeInternal {
   constexpr SingleAxisDataDefaultTypeInternal()
     : _instance(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized{}) {}
@@ -287,10 +286,8 @@ const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_workfl
   schemas, file_default_instances, TableStruct_workflow_2eproto::offsets,
   file_level_metadata_workflow_2eproto, file_level_enum_descriptors_workflow_2eproto, file_level_service_descriptors_workflow_2eproto,
 };
-PROTOBUF_ATTRIBUTE_WEAK ::PROTOBUF_NAMESPACE_ID::Metadata
-descriptor_table_workflow_2eproto_metadata_getter(int index) {
-  ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&descriptor_table_workflow_2eproto);
-  return descriptor_table_workflow_2eproto.file_level_metadata[index];
+PROTOBUF_ATTRIBUTE_WEAK const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable* descriptor_table_workflow_2eproto_getter() {
+  return &descriptor_table_workflow_2eproto;
 }
 
 // Force running AddDescriptors() at dynamic initialization time.
@@ -326,10 +323,13 @@ class WorkflowParameters::_Internal {
  public:
 };
 
-WorkflowParameters::WorkflowParameters(::PROTOBUF_NAMESPACE_ID::Arena* arena)
-  : ::PROTOBUF_NAMESPACE_ID::Message(arena) {
+WorkflowParameters::WorkflowParameters(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                         bool is_message_owned)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
   SharedCtor();
-  RegisterArenaDtor(arena);
+  if (!is_message_owned) {
+    RegisterArenaDtor(arena);
+  }
   // @@protoc_insertion_point(arena_constructor:SmartPeakServer.WorkflowParameters)
 }
 WorkflowParameters::WorkflowParameters(const WorkflowParameters& from)
@@ -338,28 +338,28 @@ WorkflowParameters::WorkflowParameters(const WorkflowParameters& from)
   dataset_path_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   if (!from._internal_dataset_path().empty()) {
     dataset_path_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_dataset_path(), 
-      GetArena());
+      GetArenaForAllocation());
   }
   report_metadata_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   if (!from._internal_report_metadata().empty()) {
     report_metadata_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_report_metadata(), 
-      GetArena());
+      GetArenaForAllocation());
   }
   report_sample_types_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   if (!from._internal_report_sample_types().empty()) {
     report_sample_types_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_report_sample_types(), 
-      GetArena());
+      GetArenaForAllocation());
   }
   integrity_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   if (!from._internal_integrity().empty()) {
     integrity_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_integrity(), 
-      GetArena());
+      GetArenaForAllocation());
   }
   export__ = from.export__;
   // @@protoc_insertion_point(copy_constructor:SmartPeakServer.WorkflowParameters)
 }
 
-void WorkflowParameters::SharedCtor() {
+inline void WorkflowParameters::SharedCtor() {
 dataset_path_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 report_metadata_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 report_sample_types_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
@@ -369,12 +369,13 @@ export__ = 0;
 
 WorkflowParameters::~WorkflowParameters() {
   // @@protoc_insertion_point(destructor:SmartPeakServer.WorkflowParameters)
+  if (GetArenaForAllocation() != nullptr) return;
   SharedDtor();
   _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
-void WorkflowParameters::SharedDtor() {
-  GOOGLE_DCHECK(GetArena() == nullptr);
+inline void WorkflowParameters::SharedDtor() {
+  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
   dataset_path_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   report_metadata_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   report_sample_types_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
@@ -410,7 +411,6 @@ const char* WorkflowParameters::_InternalParse(const char* ptr, ::PROTOBUF_NAMES
   while (!ctx->Done(&ptr)) {
     ::PROTOBUF_NAMESPACE_ID::uint32 tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
-    CHK_(ptr);
     switch (tag >> 3) {
       // string dataset_path = 1;
       case 1:
@@ -458,7 +458,8 @@ const char* WorkflowParameters::_InternalParse(const char* ptr, ::PROTOBUF_NAMES
         continue;
       default: {
       handle_unusual:
-        if ((tag & 7) == 4 || tag == 0) {
+        if ((tag == 0) || ((tag & 7) == 4)) {
+          CHK_(ptr);
           ctx->SetLastTag(tag);
           goto success;
         }
@@ -485,7 +486,7 @@ failure:
   (void) cached_has_bits;
 
   // string dataset_path = 1;
-  if (this->dataset_path().size() > 0) {
+  if (!this->_internal_dataset_path().empty()) {
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
       this->_internal_dataset_path().data(), static_cast<int>(this->_internal_dataset_path().length()),
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
@@ -495,14 +496,14 @@ failure:
   }
 
   // .SmartPeakServer.WorkflowParameters.ExportReport export = 2;
-  if (this->export_() != 0) {
+  if (this->_internal_export_() != 0) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteEnumToArray(
       2, this->_internal_export_(), target);
   }
 
   // string report_metadata = 3;
-  if (this->report_metadata().size() > 0) {
+  if (!this->_internal_report_metadata().empty()) {
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
       this->_internal_report_metadata().data(), static_cast<int>(this->_internal_report_metadata().length()),
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
@@ -512,7 +513,7 @@ failure:
   }
 
   // string report_sample_types = 4;
-  if (this->report_sample_types().size() > 0) {
+  if (!this->_internal_report_sample_types().empty()) {
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
       this->_internal_report_sample_types().data(), static_cast<int>(this->_internal_report_sample_types().length()),
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
@@ -522,7 +523,7 @@ failure:
   }
 
   // string integrity = 5;
-  if (this->integrity().size() > 0) {
+  if (!this->_internal_integrity().empty()) {
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
       this->_internal_integrity().data(), static_cast<int>(this->_internal_integrity().length()),
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
@@ -548,35 +549,35 @@ size_t WorkflowParameters::ByteSizeLong() const {
   (void) cached_has_bits;
 
   // string dataset_path = 1;
-  if (this->dataset_path().size() > 0) {
+  if (!this->_internal_dataset_path().empty()) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
         this->_internal_dataset_path());
   }
 
   // string report_metadata = 3;
-  if (this->report_metadata().size() > 0) {
+  if (!this->_internal_report_metadata().empty()) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
         this->_internal_report_metadata());
   }
 
   // string report_sample_types = 4;
-  if (this->report_sample_types().size() > 0) {
+  if (!this->_internal_report_sample_types().empty()) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
         this->_internal_report_sample_types());
   }
 
   // string integrity = 5;
-  if (this->integrity().size() > 0) {
+  if (!this->_internal_integrity().empty()) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
         this->_internal_integrity());
   }
 
   // .SmartPeakServer.WorkflowParameters.ExportReport export = 2;
-  if (this->export_() != 0) {
+  if (this->_internal_export_() != 0) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::EnumSize(this->_internal_export_());
   }
@@ -590,50 +591,41 @@ size_t WorkflowParameters::ByteSizeLong() const {
   return total_size;
 }
 
-void WorkflowParameters::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:SmartPeakServer.WorkflowParameters)
-  GOOGLE_DCHECK_NE(&from, this);
-  const WorkflowParameters* source =
-      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<WorkflowParameters>(
-          &from);
-  if (source == nullptr) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:SmartPeakServer.WorkflowParameters)
-    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
-  } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:SmartPeakServer.WorkflowParameters)
-    MergeFrom(*source);
-  }
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData WorkflowParameters::_class_data_ = {
+    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSizeCheck,
+    WorkflowParameters::MergeImpl
+};
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*WorkflowParameters::GetClassData() const { return &_class_data_; }
+
+void WorkflowParameters::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message*to,
+                      const ::PROTOBUF_NAMESPACE_ID::Message&from) {
+  static_cast<WorkflowParameters *>(to)->MergeFrom(
+      static_cast<const WorkflowParameters &>(from));
 }
+
 
 void WorkflowParameters::MergeFrom(const WorkflowParameters& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:SmartPeakServer.WorkflowParameters)
   GOOGLE_DCHECK_NE(&from, this);
-  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  if (from.dataset_path().size() > 0) {
+  if (!from._internal_dataset_path().empty()) {
     _internal_set_dataset_path(from._internal_dataset_path());
   }
-  if (from.report_metadata().size() > 0) {
+  if (!from._internal_report_metadata().empty()) {
     _internal_set_report_metadata(from._internal_report_metadata());
   }
-  if (from.report_sample_types().size() > 0) {
+  if (!from._internal_report_sample_types().empty()) {
     _internal_set_report_sample_types(from._internal_report_sample_types());
   }
-  if (from.integrity().size() > 0) {
+  if (!from._internal_integrity().empty()) {
     _internal_set_integrity(from._internal_integrity());
   }
-  if (from.export_() != 0) {
+  if (from._internal_export_() != 0) {
     _internal_set_export_(from._internal_export_());
   }
-}
-
-void WorkflowParameters::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:SmartPeakServer.WorkflowParameters)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
 }
 
 void WorkflowParameters::CopyFrom(const WorkflowParameters& from) {
@@ -649,18 +641,35 @@ bool WorkflowParameters::IsInitialized() const {
 
 void WorkflowParameters::InternalSwap(WorkflowParameters* other) {
   using std::swap;
-  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
-  dataset_path_.Swap(&other->dataset_path_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
-  report_metadata_.Swap(&other->report_metadata_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
-  report_sample_types_.Swap(&other->report_sample_types_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
-  integrity_.Swap(&other->integrity_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      &dataset_path_, GetArenaForAllocation(),
+      &other->dataset_path_, other->GetArenaForAllocation()
+  );
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      &report_metadata_, GetArenaForAllocation(),
+      &other->report_metadata_, other->GetArenaForAllocation()
+  );
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      &report_sample_types_, GetArenaForAllocation(),
+      &other->report_sample_types_, other->GetArenaForAllocation()
+  );
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      &integrity_, GetArenaForAllocation(),
+      &other->integrity_, other->GetArenaForAllocation()
+  );
   swap(export__, other->export__);
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata WorkflowParameters::GetMetadata() const {
-  return GetMetadataStatic();
+  return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
+      &descriptor_table_workflow_2eproto_getter, &descriptor_table_workflow_2eproto_once,
+      file_level_metadata_workflow_2eproto[0]);
 }
-
 
 // ===================================================================
 
@@ -668,11 +677,14 @@ class SingleAxisData::_Internal {
  public:
 };
 
-SingleAxisData::SingleAxisData(::PROTOBUF_NAMESPACE_ID::Arena* arena)
-  : ::PROTOBUF_NAMESPACE_ID::Message(arena),
+SingleAxisData::SingleAxisData(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                         bool is_message_owned)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned),
   axis_data_(arena) {
   SharedCtor();
-  RegisterArenaDtor(arena);
+  if (!is_message_owned) {
+    RegisterArenaDtor(arena);
+  }
   // @@protoc_insertion_point(arena_constructor:SmartPeakServer.SingleAxisData)
 }
 SingleAxisData::SingleAxisData(const SingleAxisData& from)
@@ -682,17 +694,18 @@ SingleAxisData::SingleAxisData(const SingleAxisData& from)
   // @@protoc_insertion_point(copy_constructor:SmartPeakServer.SingleAxisData)
 }
 
-void SingleAxisData::SharedCtor() {
+inline void SingleAxisData::SharedCtor() {
 }
 
 SingleAxisData::~SingleAxisData() {
   // @@protoc_insertion_point(destructor:SmartPeakServer.SingleAxisData)
+  if (GetArenaForAllocation() != nullptr) return;
   SharedDtor();
   _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
-void SingleAxisData::SharedDtor() {
-  GOOGLE_DCHECK(GetArena() == nullptr);
+inline void SingleAxisData::SharedDtor() {
+  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
 }
 
 void SingleAxisData::ArenaDtor(void* object) {
@@ -720,7 +733,6 @@ const char* SingleAxisData::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE
   while (!ctx->Done(&ptr)) {
     ::PROTOBUF_NAMESPACE_ID::uint32 tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
-    CHK_(ptr);
     switch (tag >> 3) {
       // repeated float axis_data = 1;
       case 1:
@@ -734,7 +746,8 @@ const char* SingleAxisData::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE
         continue;
       default: {
       handle_unusual:
-        if ((tag & 7) == 4 || tag == 0) {
+        if ((tag == 0) || ((tag & 7) == 4)) {
+          CHK_(ptr);
           ctx->SetLastTag(tag);
           goto success;
         }
@@ -790,9 +803,6 @@ size_t SingleAxisData::ByteSizeLong() const {
         ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
             static_cast<::PROTOBUF_NAMESPACE_ID::int32>(data_size));
     }
-    int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(data_size);
-    _axis_data_cached_byte_size_.store(cached_size,
-                                    std::memory_order_relaxed);
     total_size += data_size;
   }
 
@@ -805,36 +815,27 @@ size_t SingleAxisData::ByteSizeLong() const {
   return total_size;
 }
 
-void SingleAxisData::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:SmartPeakServer.SingleAxisData)
-  GOOGLE_DCHECK_NE(&from, this);
-  const SingleAxisData* source =
-      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<SingleAxisData>(
-          &from);
-  if (source == nullptr) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:SmartPeakServer.SingleAxisData)
-    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
-  } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:SmartPeakServer.SingleAxisData)
-    MergeFrom(*source);
-  }
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData SingleAxisData::_class_data_ = {
+    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSizeCheck,
+    SingleAxisData::MergeImpl
+};
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*SingleAxisData::GetClassData() const { return &_class_data_; }
+
+void SingleAxisData::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message*to,
+                      const ::PROTOBUF_NAMESPACE_ID::Message&from) {
+  static_cast<SingleAxisData *>(to)->MergeFrom(
+      static_cast<const SingleAxisData &>(from));
 }
+
 
 void SingleAxisData::MergeFrom(const SingleAxisData& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:SmartPeakServer.SingleAxisData)
   GOOGLE_DCHECK_NE(&from, this);
-  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
   axis_data_.MergeFrom(from.axis_data_);
-}
-
-void SingleAxisData::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:SmartPeakServer.SingleAxisData)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
 }
 
 void SingleAxisData::CopyFrom(const SingleAxisData& from) {
@@ -850,14 +851,15 @@ bool SingleAxisData::IsInitialized() const {
 
 void SingleAxisData::InternalSwap(SingleAxisData* other) {
   using std::swap;
-  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
   axis_data_.InternalSwap(&other->axis_data_);
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata SingleAxisData::GetMetadata() const {
-  return GetMetadataStatic();
+  return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
+      &descriptor_table_workflow_2eproto_getter, &descriptor_table_workflow_2eproto_once,
+      file_level_metadata_workflow_2eproto[1]);
 }
-
 
 // ===================================================================
 
@@ -865,8 +867,9 @@ class GraphData::_Internal {
  public:
 };
 
-GraphData::GraphData(::PROTOBUF_NAMESPACE_ID::Arena* arena)
-  : ::PROTOBUF_NAMESPACE_ID::Message(arena),
+GraphData::GraphData(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                         bool is_message_owned)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned),
   series_names_area_(arena),
   x_data_(arena),
   y_data_(arena),
@@ -875,7 +878,9 @@ GraphData::GraphData(::PROTOBUF_NAMESPACE_ID::Arena* arena)
   x_data_scatter_(arena),
   y_data_scatter_(arena) {
   SharedCtor();
-  RegisterArenaDtor(arena);
+  if (!is_message_owned) {
+    RegisterArenaDtor(arena);
+  }
   // @@protoc_insertion_point(arena_constructor:SmartPeakServer.GraphData)
 }
 GraphData::GraphData(const GraphData& from)
@@ -891,17 +896,17 @@ GraphData::GraphData(const GraphData& from)
   x_axis_title_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   if (!from._internal_x_axis_title().empty()) {
     x_axis_title_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_x_axis_title(), 
-      GetArena());
+      GetArenaForAllocation());
   }
   y_axis_title_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   if (!from._internal_y_axis_title().empty()) {
     y_axis_title_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_y_axis_title(), 
-      GetArena());
+      GetArenaForAllocation());
   }
   z_axis_title_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   if (!from._internal_z_axis_title().empty()) {
     z_axis_title_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_z_axis_title(), 
-      GetArena());
+      GetArenaForAllocation());
   }
   ::memcpy(&x_min_, &from.x_min_,
     static_cast<size_t>(reinterpret_cast<char*>(&max_nb_points_) -
@@ -909,7 +914,7 @@ GraphData::GraphData(const GraphData& from)
   // @@protoc_insertion_point(copy_constructor:SmartPeakServer.GraphData)
 }
 
-void GraphData::SharedCtor() {
+inline void GraphData::SharedCtor() {
 x_axis_title_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 y_axis_title_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 z_axis_title_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
@@ -921,12 +926,13 @@ z_axis_title_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStrin
 
 GraphData::~GraphData() {
   // @@protoc_insertion_point(destructor:SmartPeakServer.GraphData)
+  if (GetArenaForAllocation() != nullptr) return;
   SharedDtor();
   _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
-void GraphData::SharedDtor() {
-  GOOGLE_DCHECK(GetArena() == nullptr);
+inline void GraphData::SharedDtor() {
+  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
   x_axis_title_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   y_axis_title_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   z_axis_title_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
@@ -969,7 +975,6 @@ const char* GraphData::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::
   while (!ctx->Done(&ptr)) {
     ::PROTOBUF_NAMESPACE_ID::uint32 tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
-    CHK_(ptr);
     switch (tag >> 3) {
       // repeated string series_names_area = 1;
       case 1:
@@ -1130,7 +1135,8 @@ const char* GraphData::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::
         continue;
       default: {
       handle_unusual:
-        if ((tag & 7) == 4 || tag == 0) {
+        if ((tag == 0) || ((tag & 7) == 4)) {
+          CHK_(ptr);
           ctx->SetLastTag(tag);
           goto success;
         }
@@ -1217,7 +1223,7 @@ failure:
   }
 
   // string x_axis_title = 8;
-  if (this->x_axis_title().size() > 0) {
+  if (!this->_internal_x_axis_title().empty()) {
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
       this->_internal_x_axis_title().data(), static_cast<int>(this->_internal_x_axis_title().length()),
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
@@ -1227,7 +1233,7 @@ failure:
   }
 
   // string y_axis_title = 9;
-  if (this->y_axis_title().size() > 0) {
+  if (!this->_internal_y_axis_title().empty()) {
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
       this->_internal_y_axis_title().data(), static_cast<int>(this->_internal_y_axis_title().length()),
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
@@ -1237,7 +1243,7 @@ failure:
   }
 
   // string z_axis_title = 10;
-  if (this->z_axis_title().size() > 0) {
+  if (!this->_internal_z_axis_title().empty()) {
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
       this->_internal_z_axis_title().data(), static_cast<int>(this->_internal_z_axis_title().length()),
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
@@ -1247,37 +1253,37 @@ failure:
   }
 
   // float x_min = 11;
-  if (!(this->x_min() <= 0 && this->x_min() >= 0)) {
+  if (!(this->_internal_x_min() <= 0 && this->_internal_x_min() >= 0)) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(11, this->_internal_x_min(), target);
   }
 
   // float x_max = 12;
-  if (!(this->x_max() <= 0 && this->x_max() >= 0)) {
+  if (!(this->_internal_x_max() <= 0 && this->_internal_x_max() >= 0)) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(12, this->_internal_x_max(), target);
   }
 
   // float y_min = 13;
-  if (!(this->y_min() <= 0 && this->y_min() >= 0)) {
+  if (!(this->_internal_y_min() <= 0 && this->_internal_y_min() >= 0)) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(13, this->_internal_y_min(), target);
   }
 
   // float y_max = 14;
-  if (!(this->y_max() <= 0 && this->y_max() >= 0)) {
+  if (!(this->_internal_y_max() <= 0 && this->_internal_y_max() >= 0)) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(14, this->_internal_y_max(), target);
   }
 
   // int32 nb_points = 15;
-  if (this->nb_points() != 0) {
+  if (this->_internal_nb_points() != 0) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(15, this->_internal_nb_points(), target);
   }
 
   // int32 max_nb_points = 16;
-  if (this->max_nb_points() != 0) {
+  if (this->_internal_max_nb_points() != 0) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(16, this->_internal_max_nb_points(), target);
   }
@@ -1350,55 +1356,55 @@ size_t GraphData::ByteSizeLong() const {
   }
 
   // string x_axis_title = 8;
-  if (this->x_axis_title().size() > 0) {
+  if (!this->_internal_x_axis_title().empty()) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
         this->_internal_x_axis_title());
   }
 
   // string y_axis_title = 9;
-  if (this->y_axis_title().size() > 0) {
+  if (!this->_internal_y_axis_title().empty()) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
         this->_internal_y_axis_title());
   }
 
   // string z_axis_title = 10;
-  if (this->z_axis_title().size() > 0) {
+  if (!this->_internal_z_axis_title().empty()) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
         this->_internal_z_axis_title());
   }
 
   // float x_min = 11;
-  if (!(this->x_min() <= 0 && this->x_min() >= 0)) {
+  if (!(this->_internal_x_min() <= 0 && this->_internal_x_min() >= 0)) {
     total_size += 1 + 4;
   }
 
   // float x_max = 12;
-  if (!(this->x_max() <= 0 && this->x_max() >= 0)) {
+  if (!(this->_internal_x_max() <= 0 && this->_internal_x_max() >= 0)) {
     total_size += 1 + 4;
   }
 
   // float y_min = 13;
-  if (!(this->y_min() <= 0 && this->y_min() >= 0)) {
+  if (!(this->_internal_y_min() <= 0 && this->_internal_y_min() >= 0)) {
     total_size += 1 + 4;
   }
 
   // float y_max = 14;
-  if (!(this->y_max() <= 0 && this->y_max() >= 0)) {
+  if (!(this->_internal_y_max() <= 0 && this->_internal_y_max() >= 0)) {
     total_size += 1 + 4;
   }
 
   // int32 nb_points = 15;
-  if (this->nb_points() != 0) {
+  if (this->_internal_nb_points() != 0) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
         this->_internal_nb_points());
   }
 
   // int32 max_nb_points = 16;
-  if (this->max_nb_points() != 0) {
+  if (this->_internal_max_nb_points() != 0) {
     total_size += 2 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
         this->_internal_max_nb_points());
@@ -1413,25 +1419,22 @@ size_t GraphData::ByteSizeLong() const {
   return total_size;
 }
 
-void GraphData::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:SmartPeakServer.GraphData)
-  GOOGLE_DCHECK_NE(&from, this);
-  const GraphData* source =
-      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<GraphData>(
-          &from);
-  if (source == nullptr) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:SmartPeakServer.GraphData)
-    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
-  } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:SmartPeakServer.GraphData)
-    MergeFrom(*source);
-  }
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData GraphData::_class_data_ = {
+    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSizeCheck,
+    GraphData::MergeImpl
+};
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GraphData::GetClassData() const { return &_class_data_; }
+
+void GraphData::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message*to,
+                      const ::PROTOBUF_NAMESPACE_ID::Message&from) {
+  static_cast<GraphData *>(to)->MergeFrom(
+      static_cast<const GraphData &>(from));
 }
+
 
 void GraphData::MergeFrom(const GraphData& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:SmartPeakServer.GraphData)
   GOOGLE_DCHECK_NE(&from, this);
-  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
@@ -1442,40 +1445,34 @@ void GraphData::MergeFrom(const GraphData& from) {
   series_names_scatter_.MergeFrom(from.series_names_scatter_);
   x_data_scatter_.MergeFrom(from.x_data_scatter_);
   y_data_scatter_.MergeFrom(from.y_data_scatter_);
-  if (from.x_axis_title().size() > 0) {
+  if (!from._internal_x_axis_title().empty()) {
     _internal_set_x_axis_title(from._internal_x_axis_title());
   }
-  if (from.y_axis_title().size() > 0) {
+  if (!from._internal_y_axis_title().empty()) {
     _internal_set_y_axis_title(from._internal_y_axis_title());
   }
-  if (from.z_axis_title().size() > 0) {
+  if (!from._internal_z_axis_title().empty()) {
     _internal_set_z_axis_title(from._internal_z_axis_title());
   }
-  if (!(from.x_min() <= 0 && from.x_min() >= 0)) {
+  if (!(from._internal_x_min() <= 0 && from._internal_x_min() >= 0)) {
     _internal_set_x_min(from._internal_x_min());
   }
-  if (!(from.x_max() <= 0 && from.x_max() >= 0)) {
+  if (!(from._internal_x_max() <= 0 && from._internal_x_max() >= 0)) {
     _internal_set_x_max(from._internal_x_max());
   }
-  if (!(from.y_min() <= 0 && from.y_min() >= 0)) {
+  if (!(from._internal_y_min() <= 0 && from._internal_y_min() >= 0)) {
     _internal_set_y_min(from._internal_y_min());
   }
-  if (!(from.y_max() <= 0 && from.y_max() >= 0)) {
+  if (!(from._internal_y_max() <= 0 && from._internal_y_max() >= 0)) {
     _internal_set_y_max(from._internal_y_max());
   }
-  if (from.nb_points() != 0) {
+  if (from._internal_nb_points() != 0) {
     _internal_set_nb_points(from._internal_nb_points());
   }
-  if (from.max_nb_points() != 0) {
+  if (from._internal_max_nb_points() != 0) {
     _internal_set_max_nb_points(from._internal_max_nb_points());
   }
-}
-
-void GraphData::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:SmartPeakServer.GraphData)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
 }
 
 void GraphData::CopyFrom(const GraphData& from) {
@@ -1491,7 +1488,7 @@ bool GraphData::IsInitialized() const {
 
 void GraphData::InternalSwap(GraphData* other) {
   using std::swap;
-  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
   series_names_area_.InternalSwap(&other->series_names_area_);
   x_data_.InternalSwap(&other->x_data_);
   y_data_.InternalSwap(&other->y_data_);
@@ -1499,9 +1496,21 @@ void GraphData::InternalSwap(GraphData* other) {
   series_names_scatter_.InternalSwap(&other->series_names_scatter_);
   x_data_scatter_.InternalSwap(&other->x_data_scatter_);
   y_data_scatter_.InternalSwap(&other->y_data_scatter_);
-  x_axis_title_.Swap(&other->x_axis_title_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
-  y_axis_title_.Swap(&other->y_axis_title_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
-  z_axis_title_.Swap(&other->z_axis_title_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      &x_axis_title_, GetArenaForAllocation(),
+      &other->x_axis_title_, other->GetArenaForAllocation()
+  );
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      &y_axis_title_, GetArenaForAllocation(),
+      &other->y_axis_title_, other->GetArenaForAllocation()
+  );
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      &z_axis_title_, GetArenaForAllocation(),
+      &other->z_axis_title_, other->GetArenaForAllocation()
+  );
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
       PROTOBUF_FIELD_OFFSET(GraphData, max_nb_points_)
       + sizeof(GraphData::max_nb_points_)
@@ -1511,9 +1520,10 @@ void GraphData::InternalSwap(GraphData* other) {
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata GraphData::GetMetadata() const {
-  return GetMetadataStatic();
+  return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
+      &descriptor_table_workflow_2eproto_getter, &descriptor_table_workflow_2eproto_once,
+      file_level_metadata_workflow_2eproto[2]);
 }
-
 
 // ===================================================================
 
@@ -1521,8 +1531,9 @@ class HeatmapData::_Internal {
  public:
 };
 
-HeatmapData::HeatmapData(::PROTOBUF_NAMESPACE_ID::Arena* arena)
-  : ::PROTOBUF_NAMESPACE_ID::Message(arena),
+HeatmapData::HeatmapData(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                         bool is_message_owned)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned),
   selected_sample_names_(arena),
   selected_transitions_(arena),
   selected_transition_groups_(arena),
@@ -1530,7 +1541,9 @@ HeatmapData::HeatmapData(::PROTOBUF_NAMESPACE_ID::Arena* arena)
   header_column_(arena),
   column_data_(arena) {
   SharedCtor();
-  RegisterArenaDtor(arena);
+  if (!is_message_owned) {
+    RegisterArenaDtor(arena);
+  }
   // @@protoc_insertion_point(arena_constructor:SmartPeakServer.HeatmapData)
 }
 HeatmapData::HeatmapData(const HeatmapData& from)
@@ -1545,17 +1558,17 @@ HeatmapData::HeatmapData(const HeatmapData& from)
   x_axis_title_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   if (!from._internal_x_axis_title().empty()) {
     x_axis_title_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_x_axis_title(), 
-      GetArena());
+      GetArenaForAllocation());
   }
   y_axis_title_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   if (!from._internal_y_axis_title().empty()) {
     y_axis_title_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_y_axis_title(), 
-      GetArena());
+      GetArenaForAllocation());
   }
   selected_feature_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   if (!from._internal_selected_feature().empty()) {
     selected_feature_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_selected_feature(), 
-      GetArena());
+      GetArenaForAllocation());
   }
   ::memcpy(&feat_value_min_, &from.feat_value_min_,
     static_cast<size_t>(reinterpret_cast<char*>(&feat_value_max_) -
@@ -1563,7 +1576,7 @@ HeatmapData::HeatmapData(const HeatmapData& from)
   // @@protoc_insertion_point(copy_constructor:SmartPeakServer.HeatmapData)
 }
 
-void HeatmapData::SharedCtor() {
+inline void HeatmapData::SharedCtor() {
 x_axis_title_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 y_axis_title_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 selected_feature_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
@@ -1575,12 +1588,13 @@ selected_feature_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyS
 
 HeatmapData::~HeatmapData() {
   // @@protoc_insertion_point(destructor:SmartPeakServer.HeatmapData)
+  if (GetArenaForAllocation() != nullptr) return;
   SharedDtor();
   _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
-void HeatmapData::SharedDtor() {
-  GOOGLE_DCHECK(GetArena() == nullptr);
+inline void HeatmapData::SharedDtor() {
+  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
   x_axis_title_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   y_axis_title_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   selected_feature_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
@@ -1622,7 +1636,6 @@ const char* HeatmapData::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID
   while (!ctx->Done(&ptr)) {
     ::PROTOBUF_NAMESPACE_ID::uint32 tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
-    CHK_(ptr);
     switch (tag >> 3) {
       // repeated string selected_sample_names = 1;
       case 1:
@@ -1749,7 +1762,8 @@ const char* HeatmapData::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID
         continue;
       default: {
       handle_unusual:
-        if ((tag & 7) == 4 || tag == 0) {
+        if ((tag == 0) || ((tag & 7) == 4)) {
+          CHK_(ptr);
           ctx->SetLastTag(tag);
           goto success;
         }
@@ -1834,7 +1848,7 @@ failure:
   }
 
   // string x_axis_title = 7;
-  if (this->x_axis_title().size() > 0) {
+  if (!this->_internal_x_axis_title().empty()) {
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
       this->_internal_x_axis_title().data(), static_cast<int>(this->_internal_x_axis_title().length()),
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
@@ -1844,7 +1858,7 @@ failure:
   }
 
   // string y_axis_title = 8;
-  if (this->y_axis_title().size() > 0) {
+  if (!this->_internal_y_axis_title().empty()) {
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
       this->_internal_y_axis_title().data(), static_cast<int>(this->_internal_y_axis_title().length()),
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
@@ -1854,7 +1868,7 @@ failure:
   }
 
   // string selected_feature = 9;
-  if (this->selected_feature().size() > 0) {
+  if (!this->_internal_selected_feature().empty()) {
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
       this->_internal_selected_feature().data(), static_cast<int>(this->_internal_selected_feature().length()),
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
@@ -1864,13 +1878,13 @@ failure:
   }
 
   // float feat_value_min = 10;
-  if (!(this->feat_value_min() <= 0 && this->feat_value_min() >= 0)) {
+  if (!(this->_internal_feat_value_min() <= 0 && this->_internal_feat_value_min() >= 0)) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(10, this->_internal_feat_value_min(), target);
   }
 
   // float feat_value_max = 11;
-  if (!(this->feat_value_max() <= 0 && this->feat_value_max() >= 0)) {
+  if (!(this->_internal_feat_value_max() <= 0 && this->_internal_feat_value_max() >= 0)) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(11, this->_internal_feat_value_max(), target);
   }
@@ -1939,33 +1953,33 @@ size_t HeatmapData::ByteSizeLong() const {
   }
 
   // string x_axis_title = 7;
-  if (this->x_axis_title().size() > 0) {
+  if (!this->_internal_x_axis_title().empty()) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
         this->_internal_x_axis_title());
   }
 
   // string y_axis_title = 8;
-  if (this->y_axis_title().size() > 0) {
+  if (!this->_internal_y_axis_title().empty()) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
         this->_internal_y_axis_title());
   }
 
   // string selected_feature = 9;
-  if (this->selected_feature().size() > 0) {
+  if (!this->_internal_selected_feature().empty()) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
         this->_internal_selected_feature());
   }
 
   // float feat_value_min = 10;
-  if (!(this->feat_value_min() <= 0 && this->feat_value_min() >= 0)) {
+  if (!(this->_internal_feat_value_min() <= 0 && this->_internal_feat_value_min() >= 0)) {
     total_size += 1 + 4;
   }
 
   // float feat_value_max = 11;
-  if (!(this->feat_value_max() <= 0 && this->feat_value_max() >= 0)) {
+  if (!(this->_internal_feat_value_max() <= 0 && this->_internal_feat_value_max() >= 0)) {
     total_size += 1 + 4;
   }
 
@@ -1978,25 +1992,22 @@ size_t HeatmapData::ByteSizeLong() const {
   return total_size;
 }
 
-void HeatmapData::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:SmartPeakServer.HeatmapData)
-  GOOGLE_DCHECK_NE(&from, this);
-  const HeatmapData* source =
-      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<HeatmapData>(
-          &from);
-  if (source == nullptr) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:SmartPeakServer.HeatmapData)
-    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
-  } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:SmartPeakServer.HeatmapData)
-    MergeFrom(*source);
-  }
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData HeatmapData::_class_data_ = {
+    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSizeCheck,
+    HeatmapData::MergeImpl
+};
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*HeatmapData::GetClassData() const { return &_class_data_; }
+
+void HeatmapData::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message*to,
+                      const ::PROTOBUF_NAMESPACE_ID::Message&from) {
+  static_cast<HeatmapData *>(to)->MergeFrom(
+      static_cast<const HeatmapData &>(from));
 }
+
 
 void HeatmapData::MergeFrom(const HeatmapData& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:SmartPeakServer.HeatmapData)
   GOOGLE_DCHECK_NE(&from, this);
-  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
@@ -2006,28 +2017,22 @@ void HeatmapData::MergeFrom(const HeatmapData& from) {
   header_row_.MergeFrom(from.header_row_);
   header_column_.MergeFrom(from.header_column_);
   column_data_.MergeFrom(from.column_data_);
-  if (from.x_axis_title().size() > 0) {
+  if (!from._internal_x_axis_title().empty()) {
     _internal_set_x_axis_title(from._internal_x_axis_title());
   }
-  if (from.y_axis_title().size() > 0) {
+  if (!from._internal_y_axis_title().empty()) {
     _internal_set_y_axis_title(from._internal_y_axis_title());
   }
-  if (from.selected_feature().size() > 0) {
+  if (!from._internal_selected_feature().empty()) {
     _internal_set_selected_feature(from._internal_selected_feature());
   }
-  if (!(from.feat_value_min() <= 0 && from.feat_value_min() >= 0)) {
+  if (!(from._internal_feat_value_min() <= 0 && from._internal_feat_value_min() >= 0)) {
     _internal_set_feat_value_min(from._internal_feat_value_min());
   }
-  if (!(from.feat_value_max() <= 0 && from.feat_value_max() >= 0)) {
+  if (!(from._internal_feat_value_max() <= 0 && from._internal_feat_value_max() >= 0)) {
     _internal_set_feat_value_max(from._internal_feat_value_max());
   }
-}
-
-void HeatmapData::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:SmartPeakServer.HeatmapData)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
 }
 
 void HeatmapData::CopyFrom(const HeatmapData& from) {
@@ -2043,16 +2048,28 @@ bool HeatmapData::IsInitialized() const {
 
 void HeatmapData::InternalSwap(HeatmapData* other) {
   using std::swap;
-  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
   selected_sample_names_.InternalSwap(&other->selected_sample_names_);
   selected_transitions_.InternalSwap(&other->selected_transitions_);
   selected_transition_groups_.InternalSwap(&other->selected_transition_groups_);
   header_row_.InternalSwap(&other->header_row_);
   header_column_.InternalSwap(&other->header_column_);
   column_data_.InternalSwap(&other->column_data_);
-  x_axis_title_.Swap(&other->x_axis_title_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
-  y_axis_title_.Swap(&other->y_axis_title_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
-  selected_feature_.Swap(&other->selected_feature_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      &x_axis_title_, GetArenaForAllocation(),
+      &other->x_axis_title_, other->GetArenaForAllocation()
+  );
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      &y_axis_title_, GetArenaForAllocation(),
+      &other->y_axis_title_, other->GetArenaForAllocation()
+  );
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      &selected_feature_, GetArenaForAllocation(),
+      &other->selected_feature_, other->GetArenaForAllocation()
+  );
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
       PROTOBUF_FIELD_OFFSET(HeatmapData, feat_value_max_)
       + sizeof(HeatmapData::feat_value_max_)
@@ -2062,9 +2079,10 @@ void HeatmapData::InternalSwap(HeatmapData* other) {
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata HeatmapData::GetMetadata() const {
-  return GetMetadataStatic();
+  return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
+      &descriptor_table_workflow_2eproto_getter, &descriptor_table_workflow_2eproto_once,
+      file_level_metadata_workflow_2eproto[3]);
 }
-
 
 // ===================================================================
 
@@ -2082,10 +2100,13 @@ const ::SmartPeakServer::HeatmapData&
 WorkflowResult::_Internal::heatmap_data(const WorkflowResult* msg) {
   return *msg->heatmap_data_;
 }
-WorkflowResult::WorkflowResult(::PROTOBUF_NAMESPACE_ID::Arena* arena)
-  : ::PROTOBUF_NAMESPACE_ID::Message(arena) {
+WorkflowResult::WorkflowResult(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                         bool is_message_owned)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
   SharedCtor();
-  RegisterArenaDtor(arena);
+  if (!is_message_owned) {
+    RegisterArenaDtor(arena);
+  }
   // @@protoc_insertion_point(arena_constructor:SmartPeakServer.WorkflowResult)
 }
 WorkflowResult::WorkflowResult(const WorkflowResult& from)
@@ -2094,17 +2115,17 @@ WorkflowResult::WorkflowResult(const WorkflowResult& from)
   status_code_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   if (!from._internal_status_code().empty()) {
     status_code_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_status_code(), 
-      GetArena());
+      GetArenaForAllocation());
   }
   session_id_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   if (!from._internal_session_id().empty()) {
     session_id_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_session_id(), 
-      GetArena());
+      GetArenaForAllocation());
   }
   path_to_results_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   if (!from._internal_path_to_results().empty()) {
     path_to_results_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_path_to_results(), 
-      GetArena());
+      GetArenaForAllocation());
   }
   if (from._internal_has_graph_data()) {
     graph_data_ = new ::SmartPeakServer::GraphData(*from.graph_data_);
@@ -2119,7 +2140,7 @@ WorkflowResult::WorkflowResult(const WorkflowResult& from)
   // @@protoc_insertion_point(copy_constructor:SmartPeakServer.WorkflowResult)
 }
 
-void WorkflowResult::SharedCtor() {
+inline void WorkflowResult::SharedCtor() {
 status_code_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 session_id_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 path_to_results_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
@@ -2131,12 +2152,13 @@ path_to_results_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptySt
 
 WorkflowResult::~WorkflowResult() {
   // @@protoc_insertion_point(destructor:SmartPeakServer.WorkflowResult)
+  if (GetArenaForAllocation() != nullptr) return;
   SharedDtor();
   _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
-void WorkflowResult::SharedDtor() {
-  GOOGLE_DCHECK(GetArena() == nullptr);
+inline void WorkflowResult::SharedDtor() {
+  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
   status_code_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   session_id_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   path_to_results_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
@@ -2163,11 +2185,11 @@ void WorkflowResult::Clear() {
   status_code_.ClearToEmpty();
   session_id_.ClearToEmpty();
   path_to_results_.ClearToEmpty();
-  if (GetArena() == nullptr && graph_data_ != nullptr) {
+  if (GetArenaForAllocation() == nullptr && graph_data_ != nullptr) {
     delete graph_data_;
   }
   graph_data_ = nullptr;
-  if (GetArena() == nullptr && heatmap_data_ != nullptr) {
+  if (GetArenaForAllocation() == nullptr && heatmap_data_ != nullptr) {
     delete heatmap_data_;
   }
   heatmap_data_ = nullptr;
@@ -2179,7 +2201,6 @@ const char* WorkflowResult::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE
   while (!ctx->Done(&ptr)) {
     ::PROTOBUF_NAMESPACE_ID::uint32 tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
-    CHK_(ptr);
     switch (tag >> 3) {
       // string status_code = 1;
       case 1:
@@ -2224,7 +2245,8 @@ const char* WorkflowResult::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE
         continue;
       default: {
       handle_unusual:
-        if ((tag & 7) == 4 || tag == 0) {
+        if ((tag == 0) || ((tag & 7) == 4)) {
+          CHK_(ptr);
           ctx->SetLastTag(tag);
           goto success;
         }
@@ -2251,7 +2273,7 @@ failure:
   (void) cached_has_bits;
 
   // string status_code = 1;
-  if (this->status_code().size() > 0) {
+  if (!this->_internal_status_code().empty()) {
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
       this->_internal_status_code().data(), static_cast<int>(this->_internal_status_code().length()),
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
@@ -2261,7 +2283,7 @@ failure:
   }
 
   // string session_id = 2;
-  if (this->session_id().size() > 0) {
+  if (!this->_internal_session_id().empty()) {
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
       this->_internal_session_id().data(), static_cast<int>(this->_internal_session_id().length()),
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
@@ -2271,7 +2293,7 @@ failure:
   }
 
   // string path_to_results = 3;
-  if (this->path_to_results().size() > 0) {
+  if (!this->_internal_path_to_results().empty()) {
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
       this->_internal_path_to_results().data(), static_cast<int>(this->_internal_path_to_results().length()),
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
@@ -2281,7 +2303,7 @@ failure:
   }
 
   // .SmartPeakServer.GraphData graph_data = 4;
-  if (this->has_graph_data()) {
+  if (this->_internal_has_graph_data()) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
       InternalWriteMessage(
@@ -2289,7 +2311,7 @@ failure:
   }
 
   // .SmartPeakServer.HeatmapData heatmap_data = 5;
-  if (this->has_heatmap_data()) {
+  if (this->_internal_has_heatmap_data()) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
       InternalWriteMessage(
@@ -2313,35 +2335,35 @@ size_t WorkflowResult::ByteSizeLong() const {
   (void) cached_has_bits;
 
   // string status_code = 1;
-  if (this->status_code().size() > 0) {
+  if (!this->_internal_status_code().empty()) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
         this->_internal_status_code());
   }
 
   // string session_id = 2;
-  if (this->session_id().size() > 0) {
+  if (!this->_internal_session_id().empty()) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
         this->_internal_session_id());
   }
 
   // string path_to_results = 3;
-  if (this->path_to_results().size() > 0) {
+  if (!this->_internal_path_to_results().empty()) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
         this->_internal_path_to_results());
   }
 
   // .SmartPeakServer.GraphData graph_data = 4;
-  if (this->has_graph_data()) {
+  if (this->_internal_has_graph_data()) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
         *graph_data_);
   }
 
   // .SmartPeakServer.HeatmapData heatmap_data = 5;
-  if (this->has_heatmap_data()) {
+  if (this->_internal_has_heatmap_data()) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
         *heatmap_data_);
@@ -2356,50 +2378,41 @@ size_t WorkflowResult::ByteSizeLong() const {
   return total_size;
 }
 
-void WorkflowResult::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:SmartPeakServer.WorkflowResult)
-  GOOGLE_DCHECK_NE(&from, this);
-  const WorkflowResult* source =
-      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<WorkflowResult>(
-          &from);
-  if (source == nullptr) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:SmartPeakServer.WorkflowResult)
-    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
-  } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:SmartPeakServer.WorkflowResult)
-    MergeFrom(*source);
-  }
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData WorkflowResult::_class_data_ = {
+    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSizeCheck,
+    WorkflowResult::MergeImpl
+};
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*WorkflowResult::GetClassData() const { return &_class_data_; }
+
+void WorkflowResult::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message*to,
+                      const ::PROTOBUF_NAMESPACE_ID::Message&from) {
+  static_cast<WorkflowResult *>(to)->MergeFrom(
+      static_cast<const WorkflowResult &>(from));
 }
+
 
 void WorkflowResult::MergeFrom(const WorkflowResult& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:SmartPeakServer.WorkflowResult)
   GOOGLE_DCHECK_NE(&from, this);
-  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  if (from.status_code().size() > 0) {
+  if (!from._internal_status_code().empty()) {
     _internal_set_status_code(from._internal_status_code());
   }
-  if (from.session_id().size() > 0) {
+  if (!from._internal_session_id().empty()) {
     _internal_set_session_id(from._internal_session_id());
   }
-  if (from.path_to_results().size() > 0) {
+  if (!from._internal_path_to_results().empty()) {
     _internal_set_path_to_results(from._internal_path_to_results());
   }
-  if (from.has_graph_data()) {
+  if (from._internal_has_graph_data()) {
     _internal_mutable_graph_data()->::SmartPeakServer::GraphData::MergeFrom(from._internal_graph_data());
   }
-  if (from.has_heatmap_data()) {
+  if (from._internal_has_heatmap_data()) {
     _internal_mutable_heatmap_data()->::SmartPeakServer::HeatmapData::MergeFrom(from._internal_heatmap_data());
   }
-}
-
-void WorkflowResult::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:SmartPeakServer.WorkflowResult)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
 }
 
 void WorkflowResult::CopyFrom(const WorkflowResult& from) {
@@ -2415,10 +2428,22 @@ bool WorkflowResult::IsInitialized() const {
 
 void WorkflowResult::InternalSwap(WorkflowResult* other) {
   using std::swap;
-  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
-  status_code_.Swap(&other->status_code_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
-  session_id_.Swap(&other->session_id_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
-  path_to_results_.Swap(&other->path_to_results_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      &status_code_, GetArenaForAllocation(),
+      &other->status_code_, other->GetArenaForAllocation()
+  );
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      &session_id_, GetArenaForAllocation(),
+      &other->session_id_, other->GetArenaForAllocation()
+  );
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      &path_to_results_, GetArenaForAllocation(),
+      &other->path_to_results_, other->GetArenaForAllocation()
+  );
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
       PROTOBUF_FIELD_OFFSET(WorkflowResult, heatmap_data_)
       + sizeof(WorkflowResult::heatmap_data_)
@@ -2428,9 +2453,10 @@ void WorkflowResult::InternalSwap(WorkflowResult* other) {
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata WorkflowResult::GetMetadata() const {
-  return GetMetadataStatic();
+  return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
+      &descriptor_table_workflow_2eproto_getter, &descriptor_table_workflow_2eproto_once,
+      file_level_metadata_workflow_2eproto[4]);
 }
-
 
 // ===================================================================
 
@@ -2438,10 +2464,13 @@ class InquireLogs::_Internal {
  public:
 };
 
-InquireLogs::InquireLogs(::PROTOBUF_NAMESPACE_ID::Arena* arena)
-  : ::PROTOBUF_NAMESPACE_ID::Message(arena) {
+InquireLogs::InquireLogs(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                         bool is_message_owned)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
   SharedCtor();
-  RegisterArenaDtor(arena);
+  if (!is_message_owned) {
+    RegisterArenaDtor(arena);
+  }
   // @@protoc_insertion_point(arena_constructor:SmartPeakServer.InquireLogs)
 }
 InquireLogs::InquireLogs(const InquireLogs& from)
@@ -2451,18 +2480,19 @@ InquireLogs::InquireLogs(const InquireLogs& from)
   // @@protoc_insertion_point(copy_constructor:SmartPeakServer.InquireLogs)
 }
 
-void InquireLogs::SharedCtor() {
+inline void InquireLogs::SharedCtor() {
 nr_lines_ = 0;
 }
 
 InquireLogs::~InquireLogs() {
   // @@protoc_insertion_point(destructor:SmartPeakServer.InquireLogs)
+  if (GetArenaForAllocation() != nullptr) return;
   SharedDtor();
   _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
-void InquireLogs::SharedDtor() {
-  GOOGLE_DCHECK(GetArena() == nullptr);
+inline void InquireLogs::SharedDtor() {
+  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
 }
 
 void InquireLogs::ArenaDtor(void* object) {
@@ -2490,7 +2520,6 @@ const char* InquireLogs::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID
   while (!ctx->Done(&ptr)) {
     ::PROTOBUF_NAMESPACE_ID::uint32 tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
-    CHK_(ptr);
     switch (tag >> 3) {
       // int32 nr_lines = 1;
       case 1:
@@ -2501,7 +2530,8 @@ const char* InquireLogs::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID
         continue;
       default: {
       handle_unusual:
-        if ((tag & 7) == 4 || tag == 0) {
+        if ((tag == 0) || ((tag & 7) == 4)) {
+          CHK_(ptr);
           ctx->SetLastTag(tag);
           goto success;
         }
@@ -2528,7 +2558,7 @@ failure:
   (void) cached_has_bits;
 
   // int32 nr_lines = 1;
-  if (this->nr_lines() != 0) {
+  if (this->_internal_nr_lines() != 0) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(1, this->_internal_nr_lines(), target);
   }
@@ -2550,7 +2580,7 @@ size_t InquireLogs::ByteSizeLong() const {
   (void) cached_has_bits;
 
   // int32 nr_lines = 1;
-  if (this->nr_lines() != 0) {
+  if (this->_internal_nr_lines() != 0) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
         this->_internal_nr_lines());
@@ -2565,38 +2595,29 @@ size_t InquireLogs::ByteSizeLong() const {
   return total_size;
 }
 
-void InquireLogs::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:SmartPeakServer.InquireLogs)
-  GOOGLE_DCHECK_NE(&from, this);
-  const InquireLogs* source =
-      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<InquireLogs>(
-          &from);
-  if (source == nullptr) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:SmartPeakServer.InquireLogs)
-    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
-  } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:SmartPeakServer.InquireLogs)
-    MergeFrom(*source);
-  }
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData InquireLogs::_class_data_ = {
+    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSizeCheck,
+    InquireLogs::MergeImpl
+};
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*InquireLogs::GetClassData() const { return &_class_data_; }
+
+void InquireLogs::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message*to,
+                      const ::PROTOBUF_NAMESPACE_ID::Message&from) {
+  static_cast<InquireLogs *>(to)->MergeFrom(
+      static_cast<const InquireLogs &>(from));
 }
+
 
 void InquireLogs::MergeFrom(const InquireLogs& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:SmartPeakServer.InquireLogs)
   GOOGLE_DCHECK_NE(&from, this);
-  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  if (from.nr_lines() != 0) {
+  if (from._internal_nr_lines() != 0) {
     _internal_set_nr_lines(from._internal_nr_lines());
   }
-}
-
-void InquireLogs::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:SmartPeakServer.InquireLogs)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
 }
 
 void InquireLogs::CopyFrom(const InquireLogs& from) {
@@ -2612,14 +2633,15 @@ bool InquireLogs::IsInitialized() const {
 
 void InquireLogs::InternalSwap(InquireLogs* other) {
   using std::swap;
-  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
   swap(nr_lines_, other->nr_lines_);
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata InquireLogs::GetMetadata() const {
-  return GetMetadataStatic();
+  return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
+      &descriptor_table_workflow_2eproto_getter, &descriptor_table_workflow_2eproto_once,
+      file_level_metadata_workflow_2eproto[5]);
 }
-
 
 // ===================================================================
 
@@ -2627,10 +2649,13 @@ class LogStream::_Internal {
  public:
 };
 
-LogStream::LogStream(::PROTOBUF_NAMESPACE_ID::Arena* arena)
-  : ::PROTOBUF_NAMESPACE_ID::Message(arena) {
+LogStream::LogStream(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                         bool is_message_owned)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
   SharedCtor();
-  RegisterArenaDtor(arena);
+  if (!is_message_owned) {
+    RegisterArenaDtor(arena);
+  }
   // @@protoc_insertion_point(arena_constructor:SmartPeakServer.LogStream)
 }
 LogStream::LogStream(const LogStream& from)
@@ -2639,23 +2664,24 @@ LogStream::LogStream(const LogStream& from)
   log_line_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   if (!from._internal_log_line().empty()) {
     log_line_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_log_line(), 
-      GetArena());
+      GetArenaForAllocation());
   }
   // @@protoc_insertion_point(copy_constructor:SmartPeakServer.LogStream)
 }
 
-void LogStream::SharedCtor() {
+inline void LogStream::SharedCtor() {
 log_line_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
 
 LogStream::~LogStream() {
   // @@protoc_insertion_point(destructor:SmartPeakServer.LogStream)
+  if (GetArenaForAllocation() != nullptr) return;
   SharedDtor();
   _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
-void LogStream::SharedDtor() {
-  GOOGLE_DCHECK(GetArena() == nullptr);
+inline void LogStream::SharedDtor() {
+  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
   log_line_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
 
@@ -2684,7 +2710,6 @@ const char* LogStream::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::
   while (!ctx->Done(&ptr)) {
     ::PROTOBUF_NAMESPACE_ID::uint32 tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
-    CHK_(ptr);
     switch (tag >> 3) {
       // string log_line = 1;
       case 1:
@@ -2697,7 +2722,8 @@ const char* LogStream::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::
         continue;
       default: {
       handle_unusual:
-        if ((tag & 7) == 4 || tag == 0) {
+        if ((tag == 0) || ((tag & 7) == 4)) {
+          CHK_(ptr);
           ctx->SetLastTag(tag);
           goto success;
         }
@@ -2724,7 +2750,7 @@ failure:
   (void) cached_has_bits;
 
   // string log_line = 1;
-  if (this->log_line().size() > 0) {
+  if (!this->_internal_log_line().empty()) {
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
       this->_internal_log_line().data(), static_cast<int>(this->_internal_log_line().length()),
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
@@ -2750,7 +2776,7 @@ size_t LogStream::ByteSizeLong() const {
   (void) cached_has_bits;
 
   // string log_line = 1;
-  if (this->log_line().size() > 0) {
+  if (!this->_internal_log_line().empty()) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
         this->_internal_log_line());
@@ -2765,38 +2791,29 @@ size_t LogStream::ByteSizeLong() const {
   return total_size;
 }
 
-void LogStream::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:SmartPeakServer.LogStream)
-  GOOGLE_DCHECK_NE(&from, this);
-  const LogStream* source =
-      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<LogStream>(
-          &from);
-  if (source == nullptr) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:SmartPeakServer.LogStream)
-    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
-  } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:SmartPeakServer.LogStream)
-    MergeFrom(*source);
-  }
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData LogStream::_class_data_ = {
+    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSizeCheck,
+    LogStream::MergeImpl
+};
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*LogStream::GetClassData() const { return &_class_data_; }
+
+void LogStream::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message*to,
+                      const ::PROTOBUF_NAMESPACE_ID::Message&from) {
+  static_cast<LogStream *>(to)->MergeFrom(
+      static_cast<const LogStream &>(from));
 }
+
 
 void LogStream::MergeFrom(const LogStream& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:SmartPeakServer.LogStream)
   GOOGLE_DCHECK_NE(&from, this);
-  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  if (from.log_line().size() > 0) {
+  if (!from._internal_log_line().empty()) {
     _internal_set_log_line(from._internal_log_line());
   }
-}
-
-void LogStream::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:SmartPeakServer.LogStream)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
 }
 
 void LogStream::CopyFrom(const LogStream& from) {
@@ -2812,14 +2829,19 @@ bool LogStream::IsInitialized() const {
 
 void LogStream::InternalSwap(LogStream* other) {
   using std::swap;
-  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
-  log_line_.Swap(&other->log_line_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      &log_line_, GetArenaForAllocation(),
+      &other->log_line_, other->GetArenaForAllocation()
+  );
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata LogStream::GetMetadata() const {
-  return GetMetadataStatic();
+  return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
+      &descriptor_table_workflow_2eproto_getter, &descriptor_table_workflow_2eproto_once,
+      file_level_metadata_workflow_2eproto[6]);
 }
-
 
 // @@protoc_insertion_point(namespace_scope)
 }  // namespace SmartPeakServer

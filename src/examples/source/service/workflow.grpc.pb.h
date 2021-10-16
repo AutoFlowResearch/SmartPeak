@@ -61,7 +61,7 @@ class Workflow final {
     typedef class async_interface experimental_async_interface;
     virtual class async_interface* async() { return nullptr; }
     class async_interface* experimental_async() { return async(); }
-  private:
+   private:
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::SmartPeakServer::WorkflowResult>* AsyncrunWorkflowRaw(::grpc::ClientContext* context, const ::SmartPeakServer::WorkflowParameters& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::SmartPeakServer::WorkflowResult>* PrepareAsyncrunWorkflowRaw(::grpc::ClientContext* context, const ::SmartPeakServer::WorkflowParameters& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientReaderInterface< ::SmartPeakServer::LogStream>* getLogStreamRaw(::grpc::ClientContext* context, const ::SmartPeakServer::InquireLogs& request) = 0;
