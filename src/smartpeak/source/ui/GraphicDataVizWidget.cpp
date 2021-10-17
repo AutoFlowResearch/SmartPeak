@@ -42,8 +42,10 @@ namespace SmartPeak
     ImGui::DragFloatRange2("Time-Range",
                            &current_range_.first, &current_range_.second, 0.25f,
                            slider_min_max_.first, slider_min_max_.second,
-                           "min: %.4f (sec)", "max: %.4f (sec)",
+                           std::string("min: %.4f "+graph_viz_data_.x_axis_title_).c_str(),
+                           std::string("max: %.4f "+graph_viz_data_.x_axis_title_).c_str(),
                            ImGuiSliderFlags_AlwaysClamp);
+    if (current_range_.first < 0.0f) current_range_.first = 0.0f;
     
     float controls_pos_start_y = ImGui::GetCursorPosY();
     ImGui::Checkbox("Compact View", &compact_view_);
@@ -125,7 +127,7 @@ namespace SmartPeak
       ImPlotFlags plotFlags = show_legend_ ? ImPlotFlags_Default | ImPlotFlags_Legend : ImPlotFlags_Default & ~ImPlotFlags_Legend;
       plotFlags |= ImPlotFlags_Crosshairs;
       float graphic_height = height_ - sliders_height_;
-      if (ImPlot::BeginPlot(plot_title_.c_str(), graph_viz_data_.x_axis_title_.c_str(), graph_viz_data_.y_axis_title_.c_str(), ImVec2(width_ - 25, graphic_height - 40), plotFlags)) {
+      if (ImPlot::BeginPlot(plot_title_.c_str(), graph_viz_data_.x_axis_title_.c_str(), graph_viz_data_.y_axis_title_.c_str(), ImVec2(width_ - 25, graphic_height - 85), plotFlags)) {
         int i = 0;
         for (const auto& serie_name_scatter : graph_viz_data_.series_names_area_)
         {
