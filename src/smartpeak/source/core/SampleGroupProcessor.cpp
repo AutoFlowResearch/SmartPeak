@@ -308,7 +308,7 @@ namespace SmartPeak
 
     // pass 2: mass ranges
     scan_mass_ranges_keys_tup = std::set<std::pair<float, float>>({std::make_pair(-1,-1)});
-    mergeComponentsToFeaturesToInjectionsToValues(scan_polarity_merge_feature_name,
+    mergeComponentsToFeaturesToInjectionsToValues(mass_range_merge_feature_name,
                                                   mass_range_merge_rule,
                                                   scan_polarities_keys_tup,
                                                   scan_mass_ranges_keys_tup,
@@ -557,6 +557,16 @@ namespace SmartPeak
             if (weights.size() <= 0) continue; // Note: we use the weights to check instead of the injections as the weights will be empty if no features exist for any of the injections
             component_to_feature_to_injection_to_value.second.at(feature_name).insert_or_assign(injections, merged_value);
 
+            // If we are merging two or more injections, remove the feature associated with each of them
+            if (injections.size() > 1)
+            {
+              for (const auto& injection : injections)
+              {
+                std::set<std::string> injection_set({ injection });
+                component_to_feature_to_injection_to_value.second.at(feature_name).erase(injection_set);
+              }
+            }
+
             // Repeat for all other features
             for (auto& feature_to_injection_to_value : component_to_feature_to_injection_to_value.second) {
               if (feature_name == feature_to_injection_to_value.first) continue;
@@ -582,6 +592,16 @@ namespace SmartPeak
 
               // Make the merged feature
               feature_to_injection_to_value.second.insert_or_assign(injections, merged_value);
+
+              // If we are merging two or more injections, remove the feature associated with each of them
+              if (injections.size() > 1)
+              {
+                for (const auto& injection : injections)
+                {
+                  std::set<std::string> injection_set({ injection });
+                  feature_to_injection_to_value.second.erase(injection_set);
+                }
+              }
             }
           }
         }

@@ -179,6 +179,73 @@ void makeSequence(SequenceHandler& sequenceHandler_IO, const bool& test_only_pol
   }
 }
 
+void makeSequenceSameScanMassAndDilution(SequenceHandler& sequenceHandler_IO) {
+  // ser-L.ser-L_1.Light
+  const vector<double> x1 = {
+    1, 2, 3
+  };
+  const vector<double> y1 = {
+    10, 20 ,30
+  };
+  const vector<double> z1 = {
+    100, 200 ,300
+  };
+
+  size_t max_iters = x1.size();
+  for (size_t i = 0; i < max_iters; ++i) {
+    const string sample_name = "level" + std::to_string(i);
+    OpenMS::FeatureMap feature_map;
+
+    // ser-L.ser-L_1.Light
+    OpenMS::Feature mrm_feature;
+    OpenMS::Feature component, IS_component;
+    component.setMetaValue("native_id", "ser-L.ser-L_1.Light");
+    component.setMetaValue("peak_apex_int", x1[i]);
+    component.setMetaValue("QC_transition_score", y1[i]);
+    component.setMetaValue("calculated_concentration", z1[i]);
+    component.setRT(z1[i]);
+    component.setMZ(100);
+    IS_component.setMetaValue("native_id", "ser-L.ser-L_1.Heavy");
+    IS_component.setMetaValue("peak_apex_int", x1[i]);
+    IS_component.setMetaValue("QC_transition_score", y1[i]);
+    IS_component.setMetaValue("calculated_concentration", z1[i]);
+    IS_component.setRT(z1[i]);
+    IS_component.setMZ(100);
+    mrm_feature.setMetaValue("PeptideRef", "ser-L");
+    mrm_feature.setMetaValue("peak_apex_int", x1[i]);
+    mrm_feature.setMetaValue("QC_transition_score", y1[i]);
+    mrm_feature.setMetaValue("calculated_concentration", z1[i]);
+    mrm_feature.setRT(z1[i]);
+    mrm_feature.setMZ(100);
+    mrm_feature.setSubordinates({ component, IS_component });
+    feature_map.push_back(mrm_feature);
+
+    feature_map.setPrimaryMSRunPath({ sample_name });
+
+    MetaDataHandler meta_data;
+    meta_data.setSampleName(sample_name);
+    meta_data.setSampleGroupName("group1");
+    meta_data.setSampleType(SampleType::Standard);
+    meta_data.setFilename("filename" + std::to_string(i));
+    meta_data.setSequenceSegmentName("segment1");
+    meta_data.acq_method_name = "6";
+    meta_data.inj_volume = 7.0;
+    meta_data.inj_volume_units = "8";
+    meta_data.batch_name = "9";
+
+    meta_data.scan_polarity = "negative";
+    meta_data.scan_mass_low = -1;
+    meta_data.scan_mass_high = -1;
+    meta_data.dilution_factor = 1;
+
+    sequenceHandler_IO.addSampleToSequence(meta_data, OpenMS::FeatureMap());
+
+    RawDataHandler rawDataHandler;
+    rawDataHandler.setFeatureMap(feature_map);
+    sequenceHandler_IO.getSequence().at(i).setRawData(rawDataHandler);
+  }
+}
+
 /**
   MergeInjections Tests
 */
@@ -362,6 +429,61 @@ TEST(SampleGroupHandler, processMergeInjections)
   EXPECT_NEAR(static_cast<float>(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getMetaValue("calculated_concentration")), 0.00333333365, 1e-4);
   EXPECT_NEAR(static_cast<float>(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getRT()), 0.00333333365, 1e-4);
   EXPECT_NEAR(static_cast<float>(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getMZ()), 200, 1e-4);
+}
+
+TEST(SampleGroupHandler, processMergeInjections2)
+{
+  // setup the parameters
+  ParameterSet mergeinjs_params({ {"MergeInjections", {
+    {
+      {"name", "scan_polarity_merge_rule"},
+      {"value", "WeightedMean"}
+    },
+    {
+      {"name", "mass_range_merge_rule"},
+      {"value", "Sum"}
+    },
+    {
+      {"name", "dilution_series_merge_rule"},
+      {"value", "Max"}
+    },
+    {
+      {"name", "scan_polarity_merge_feature_name"},
+      {"value", "peak_apex_int"}
+    },
+    {
+      {"name", "mass_range_merge_feature_name"},
+      {"value", "peak_apex_int"}
+    },
+    {
+      {"name", "dilution_series_merge_feature_name"},
+      {"value", "peak_apex_int"}
+    },
+    {
+      {"name", "merge_subordinates"},
+      {"value", "true"}
+    }
+  }} });
+
+  // setup the sequence
+  SequenceHandler sequenceHandler;
+  makeSequenceSameScanMassAndDilution(sequenceHandler);
+  SampleGroupHandler sampleGroupHandler = sequenceHandler.getSampleGroups().front();
+
+  // test merge injections on all with subordinates
+  MergeInjections sampleGroupProcessor;
+  Filenames filenames;
+  sampleGroupProcessor.process(sampleGroupHandler, sequenceHandler, mergeinjs_params, filenames);
+
+  EXPECT_EQ(sampleGroupHandler.getFeatureMap().size(), 1);
+  EXPECT_EQ(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().size(), 2);
+  EXPECT_STREQ(sampleGroupHandler.getFeatureMap().at(0).getMetaValue("PeptideRef").toString().c_str(), "ser-L");
+  EXPECT_STREQ(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getMetaValue("native_id").toString().c_str(), "ser-L.ser-L_1.Heavy");
+  EXPECT_NEAR(static_cast<float>(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getMetaValue("peak_apex_int")), 3, 1e-4);
+  EXPECT_NEAR(static_cast<float>(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getMetaValue("QC_transition_score")), 30, 1e-4);
+  EXPECT_NEAR(static_cast<float>(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getMetaValue("calculated_concentration")), 300, 1e-4);
+  EXPECT_NEAR(static_cast<float>(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getRT()), 300, 1e-4);
+  EXPECT_NEAR(static_cast<float>(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getMZ()), 100, 1e-4);
 }
 
 /**
