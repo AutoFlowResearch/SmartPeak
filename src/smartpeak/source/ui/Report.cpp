@@ -38,7 +38,7 @@ namespace SmartPeak
   bool Report::ReportFilePickerHandler::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
   {
     report_.run_and_join(
-      SequenceParser::writeDataTableFromMetaValue,
+      writer_method_,
       title_,
       application_handler->sequenceHandler_,
       filename,
@@ -56,8 +56,8 @@ namespace SmartPeak
     std::fill(md_checks_.begin(), md_checks_.end(), false);
     all_st_checks_ = false; all_st_deactivated_ = true;
     all_md_checks_ = false; all_md_deactivated_ = true;
-    feature_db_file_picker_handler_ = std::make_shared<ReportFilePickerHandler>(*this, "Feature DB report");
-    pivot_table_file_picker_handler_ = std::make_shared<ReportFilePickerHandler>(*this, "Pivot Table");
+    feature_db_file_picker_handler_ = std::make_shared<ReportFilePickerHandler>(*this, "Feature DB", SequenceParser::writeDataTableFromMetaValue);
+    pivot_table_file_picker_handler_ = std::make_shared<ReportFilePickerHandler>(*this, "Pivot Table", SequenceParser::writeDataMatrixFromMetaValue);
   }
 
   void Report::draw()
