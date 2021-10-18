@@ -25,6 +25,9 @@
 
 int main(int argc, char** argv)
 {
-  runSmartPeakServer("localhost:50051");
+  if (argc > 1)
+    runSmartPeakServer(std::string(argv[1]));
+  else
+    runSmartPeakServer("0.0.0.0:50051");
   return 0;
 }
