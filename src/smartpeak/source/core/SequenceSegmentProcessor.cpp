@@ -110,9 +110,7 @@ namespace SmartPeak
 
     // check if there are any standards to calculate the calibrators from
     if (standards_indices.empty()) {
-      LOGE << "standards_indices argument is empty. Returning";
-      LOGD << "END optimizeCalibrationCurves";
-      return;
+      throw std::invalid_argument("standards_indices argument is empty.");
     }
 
     std::vector<OpenMS::FeatureMap> standards_featureMaps;
@@ -221,8 +219,7 @@ namespace SmartPeak
 
     if (!InputDataValidation::prepareToLoad(filenames_I, "standardsConcentrations"))
     {
-      LOGD << "END " << getName();
-      return;
+      throw std::invalid_argument("Failed to load input file");
     }
 
     try
@@ -241,7 +238,7 @@ namespace SmartPeak
         );
         if (!db_context)
         {
-          return;
+          throw std::runtime_error("Failed to load from session database");
         }
         OpenMS::AbsoluteQuantitationStandards::runConcentration run_concentration;
         while (filenames_I.getSessionDB().read(
@@ -266,9 +263,9 @@ namespace SmartPeak
       }
     }
     catch (const std::exception& e) {
-      LOGE << e.what();
       sequenceSegmentHandler_IO.getStandardsConcentrations().clear();
       LOGI << "Standards concentrations clear";
+      throw e;
     }
 
     LOGD << "END loadStandardsConcentrations";
@@ -312,52 +309,44 @@ namespace SmartPeak
   {
     LOGD << "START StoreStandardsConcentrations";
 
-    try
+    if (!InputDataValidation::prepareToStore(filenames_I, "standardsConcentrations"))
     {
-      if (!InputDataValidation::prepareToStore(filenames_I, "standardsConcentrations"))
-      {
-        LOGD << "END " << getName();
-        return;
-      }
-      if (filenames_I.isEmbedded("standardsConcentrations"))
-      {
-        auto db_context = filenames_I.getSessionDB().beginWrite(
-          "standardsConcentrations",
-          "sample_name", "TEXT",
-          "component_name", "TEXT",
-          "IS_component_name", "TEXT",
-          "actual_concentration", "REAL",
-          "IS_actual_concentration", "REAL",
-          "concentration_units", "TEXT",
-          "dilution_factor", "REAL"
-          );
-        if (!db_context)
-        {
-          return;
-        }
-        for (const auto& concentration : sequenceSegmentHandler_IO.getStandardsConcentrations())
-        {
-          filenames_I.getSessionDB().write(
-            *db_context,
-            concentration.sample_name,
-            concentration.component_name,
-            concentration.IS_component_name,
-            concentration.actual_concentration,
-            concentration.IS_actual_concentration,
-            concentration.concentration_units,
-            concentration.dilution_factor
-            );
-        }
-        filenames_I.getSessionDB().endWrite(*db_context);
-      }
-      else
-      {
-        LOGE << "Not implemented";
-      }
+      throw std::invalid_argument("Failed to store output file");
     }
-    catch (const std::exception& e)
+    if (filenames_I.isEmbedded("standardsConcentrations"))
     {
-      LOGE << e.what();
+      auto db_context = filenames_I.getSessionDB().beginWrite(
+        "standardsConcentrations",
+        "sample_name", "TEXT",
+        "component_name", "TEXT",
+        "IS_component_name", "TEXT",
+        "actual_concentration", "REAL",
+        "IS_actual_concentration", "REAL",
+        "concentration_units", "TEXT",
+        "dilution_factor", "REAL"
+        );
+      if (!db_context)
+      {
+        throw std::runtime_error("Failed to save in session database");
+      }
+      for (const auto& concentration : sequenceSegmentHandler_IO.getStandardsConcentrations())
+      {
+        filenames_I.getSessionDB().write(
+          *db_context,
+          concentration.sample_name,
+          concentration.component_name,
+          concentration.IS_component_name,
+          concentration.actual_concentration,
+          concentration.IS_actual_concentration,
+          concentration.concentration_units,
+          concentration.dilution_factor
+          );
+      }
+      filenames_I.getSessionDB().endWrite(*db_context);
+    }
+    else
+    {
+      LOGE << "Not implemented";
     }
   }
 
@@ -403,8 +392,7 @@ namespace SmartPeak
 
     if (!InputDataValidation::prepareToLoad(filenames_I, "quantitationMethods"))
     {
-      LOGD << "END " << getName();
-      return;
+      throw std::invalid_argument("Failed to load input file");
     }
 
     try {
@@ -447,8 +435,7 @@ namespace SmartPeak
 
     if (!InputDataValidation::prepareToStore(filenames_I, "quantitationMethods"))
     {
-      LOGD << "END " << getName();
-      return;
+      throw std::invalid_argument("Failed to store output file");
     }
 
     try {
@@ -1273,9 +1260,7 @@ namespace SmartPeak
 
     // check if there are any standards or QCs to estimate the feature filter parameters from
     if (standards_indices.empty() && qcs_indices.empty()) {
-      LOGE << "standards_indices and/or qcs_indices argument is empty. Returning";
-      LOGD << "END estimateFeatureFilterValues";
-      return;
+      throw std::invalid_argument("standards_indices and/or qcs_indices argument is empty. Returning");
     }
 
     // OPTIMIZATION: it would be prefered to only use those standards that are part of the optimized calibration curve for each component
@@ -1338,9 +1323,7 @@ namespace SmartPeak
 
     // check if there are any standards or QCs to estimate the feature filter parameters from
     if (standards_indices.empty() && qcs_indices.empty()) {
-      LOGE << "standards_indices and/or qcs_indices argument is empty. Returning";
-      LOGD << "END estimateFeatureQCValues";
-      return;
+      throw std::invalid_argument("standards_indices and/or qcs_indices argument is empty.");
     }
 
     // OPTIMIZATION: it would be prefered to only use those standards that are part of the optimized calibration curve for each component
@@ -1385,9 +1368,7 @@ namespace SmartPeak
 
     // check if there are any quantitation methods
     if (sequenceSegmentHandler_IO.getQuantitationMethods().empty()) {
-      LOGE << "quantitation methods is empty. Returning";
-      LOGD << "END TransferLOQToFeatureFilters";
-      return;
+      throw std::invalid_argument("quantitation methods is empty.");
     }
 
     OpenMS::MRMFeatureFilter featureFilter;
@@ -1421,9 +1402,7 @@ namespace SmartPeak
 
     // check if there are any quantitation methods
     if (sequenceSegmentHandler_IO.getQuantitationMethods().empty()) {
-      LOGE << "quantitation methods is empty. Returning";
-      LOGD << "END TransferLOQToFeatureQCs";
-      return;
+      throw std::invalid_argument("quantitation methods is empty.");
     }
 
     OpenMS::MRMFeatureFilter featureFilter;
@@ -1466,9 +1445,7 @@ namespace SmartPeak
 
     // check if there are any standards or QCs to estimate the feature filter parameters from
     if (qcs_indices.empty()) {
-      LOGE << "qcs_indices argument is empty. Returning";
-      LOGD << "END EstimateFeatureRSDs";
-      return;
+      throw std::invalid_argument("qcs_indices argument is empty.");
     }
 
     std::vector<OpenMS::FeatureMap> qcs_featureMaps;
@@ -1519,9 +1496,7 @@ namespace SmartPeak
 
     // check if there are any Blanks to estimate the background interference from
     if (blanks_indices.empty()) {
-      LOGE << "blanks_indices argument is empty. Returning";
-      LOGD << "END EstimateFeatureBackgroundInterferences";
-      return;
+      throw std::invalid_argument("blanks_indices argument is empty.");
     }
 
     std::vector<OpenMS::FeatureMap> blanks_featureMaps;

@@ -33,6 +33,7 @@ namespace SmartPeak
     commands_step_ = 0;
     all_commands_ = commands;
     application_processor_start_time_ = std::chrono::steady_clock::now();
+    errors_.clear();
   }
 
   void ProgressInfo::onApplicationProcessorCommandStart(size_t command_index, const std::string& command_name)
@@ -56,6 +57,11 @@ namespace SmartPeak
     running_ = false;
   }
 
+  void ProgressInfo::onApplicationProcessorError(const std::string& error)
+  {
+    errors_.push_back(error);
+  }
+
   void ProgressInfo::onSequenceProcessorStart(const size_t nb_injections)
   {
     running_batch_ = std::make_shared<RunningBatch>(nb_injections);
@@ -73,6 +79,11 @@ namespace SmartPeak
 
   void ProgressInfo::onSequenceProcessorEnd()
   {
+  }
+
+  void ProgressInfo::onSequenceProcessorError(const std::string& sample_name, const std::string& processor_name, const std::string& error)
+  {
+    errors_.push_back(sample_name + ", " + processor_name + ": " + error);
   }
 
   void ProgressInfo::onSequenceSegmentProcessorStart(const size_t nb_segments)
@@ -94,6 +105,11 @@ namespace SmartPeak
   {
   }
 
+  void ProgressInfo::onSequenceSegmentProcessorError(const std::string& segment_name, const std::string& processor_name, const std::string& error)
+  {
+    errors_.push_back(segment_name + ", " + processor_name + ": " + error);
+  }
+
   void ProgressInfo::onSampleGroupProcessorStart(const size_t nb_groups)
   {
     running_batch_ = std::make_shared<RunningBatch>(nb_groups);
@@ -111,6 +127,11 @@ namespace SmartPeak
 
   void ProgressInfo::onSampleGroupProcessorEnd()
   {
+  }
+
+  void ProgressInfo::onSampleGroupProcessorError(const std::string& group_name, const std::string& processor_name, const std::string& error)
+  {
+    errors_.push_back(group_name + ", " + processor_name + ": " + error);
   }
 
   void ProgressInfo::onRunningBatchEndItem(const std::string& item_name)

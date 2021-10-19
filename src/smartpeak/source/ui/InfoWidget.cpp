@@ -38,10 +38,7 @@ namespace SmartPeak
     showQuickHelpToolTip("Info");
     
     drawWorkflowStatus();
-
-    ImGui::Separator();
-
-    drawFileloadingStatus();
+    drawListOfErrors();
     drawLastRunTime();
     drawErrorMessages();
 
@@ -64,22 +61,6 @@ namespace SmartPeak
     else
     {
       ImGui::Text("Workflow status: done");
-    }
-  }
-
-  void InfoWidget::drawFileloadingStatus()
-  {
-    if (file_load_error_)
-    {
-      std::ostringstream os;
-      os << "File loading failed.  Check the `Information` log.";
-      ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
-      ImGui::Text("%s", os.str().c_str());
-      ImGui::PopStyleColor();
-    }
-    else
-    {
-      ImGui::Text(file_loading_is_done_ ? "File loading status: done" : "File loading status: running...");
     }
   }
 
@@ -235,8 +216,32 @@ namespace SmartPeak
         }
         ImGui::TreePop();
       }
-
       spinner_counter_++;
+    }
+  }
+
+  void InfoWidget::drawListOfErrors()
+  {
+    static const int max_number_of_errors = 10;
+    if (!progress_info_.errors().empty())
+    {
+      ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+      if (ImGui::TreeNode("Errors (see logs for details)"))
+      {
+        int cpt = 0;
+        for (const auto& error : progress_info_.errors())
+        {
+          ImGui::Text("%s", error.c_str());
+          ++cpt;
+          if (cpt == max_number_of_errors)
+          {
+            ImGui::Text("... and %d more errors.", progress_info_.errors().size() - cpt);
+            break;
+          }
+        }
+        ImGui::TreePop();
+      }
+      ImGui::PopStyleColor();
     }
   }
 

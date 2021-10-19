@@ -297,6 +297,7 @@ namespace SmartPeak
       LoadFilenames load_filenames(application_handler_);
       if (!load_filenames.process())
       {
+        notifyApplicationProcessorError("Failed to load session");
         return false;
       }
       filenames_ = application_handler_.filenames_;
@@ -326,7 +327,16 @@ namespace SmartPeak
         auto sequence_processor = std::dynamic_pointer_cast<SequenceProcessor>(loading_processor);
         if (sequence_processor)
         {
-          sequence_processor->process(*filenames_);
+          try
+          {
+            sequence_processor->process(*filenames_);
+          }
+          catch (const std::exception& e)
+          {
+            LOGE << e.what();
+            notifyApplicationProcessorError(e.what());
+            return false;
+          }
         }
         auto raw_data_processor = std::dynamic_pointer_cast<RawDataProcessor>(loading_processor);
         if (raw_data_processor)
@@ -334,11 +344,21 @@ namespace SmartPeak
           if (!application_handler_.sequenceHandler_.getSequence().empty())
           {
             RawDataHandler& rawDataHandler = application_handler_.sequenceHandler_.getSequence()[0].getRawData();
-            raw_data_processor->process(rawDataHandler, {}, *filenames_);
+            try
+            {
+              raw_data_processor->process(rawDataHandler, {}, *filenames_);
+            }
+            catch (const std::exception& e)
+            {
+              LOGE << e.what();
+              notifyApplicationProcessorError(e.what());
+              return false;
+            }
           }
           else
           {
             LOGE << "No Sequence available, Loading process aborted.";
+            notifyApplicationProcessorError("Failed to load session");
             return false;
           }
         }
@@ -349,11 +369,21 @@ namespace SmartPeak
           {
             SequenceSegmentHandler& sequenceSegmentHandler = application_handler_.sequenceHandler_.getSequenceSegments().at(0);
             sequence_segment_processor->sequence_segment_observable_ = &application_handler_.sequenceHandler_;
-            sequence_segment_processor->process(sequenceSegmentHandler, SequenceHandler(), {}, *filenames_);
+            try
+            {
+              sequence_segment_processor->process(sequenceSegmentHandler, SequenceHandler(), {}, *filenames_);
+            }
+            catch (const std::exception& e)
+            {
+              LOGE << e.what();
+              notifyApplicationProcessorError(e.what());
+              return false;
+            }
           }
           else
           {
             LOGE << "No Sequence Segment available, Loading process aborted.";
+            notifyApplicationProcessorError("Failed to load session");
             return false;
           }
         }

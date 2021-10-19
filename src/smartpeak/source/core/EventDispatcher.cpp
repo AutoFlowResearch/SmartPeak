@@ -61,6 +61,12 @@ namespace SmartPeak
         [this] { this->notifyApplicationProcessorEnd(); }
       )));
     }
+    void EventDispatcher::onApplicationProcessorError(const std::string& error)
+    {
+      queueEvent(std::make_shared<std::future<void>>(std::async(std::launch::deferred,
+        [this, error] { this->notifyApplicationProcessorError(error); }
+      )));
+    }
 
     /**
       IFeaturesObserver
@@ -99,6 +105,12 @@ namespace SmartPeak
         [this] { this->notifySequenceProcessorEnd(); }
       )));
     }
+    void EventDispatcher::onSequenceProcessorError(const std::string& sample_name, const std::string& processor_name, const std::string& error)
+    {
+      queueEvent(std::make_shared<std::future<void>>(std::async(std::launch::deferred,
+        [this, sample_name, processor_name, error] { this->notifySequenceProcessorError(sample_name, processor_name, error); }
+      )));
+    }
     void EventDispatcher::onSequenceSegmentProcessorStart(const size_t nb_segments)
     {
       queueEvent(std::make_shared<std::future<void>>(std::async(std::launch::deferred,
@@ -121,6 +133,12 @@ namespace SmartPeak
     {
       queueEvent(std::make_shared<std::future<void>>(std::async(std::launch::deferred,
         [this] { this->notifySequenceSegmentProcessorEnd(); }
+      )));
+    }
+    void EventDispatcher::onSequenceSegmentProcessorError(const std::string& segment_name, const std::string& processor_name, const std::string& error)
+    {
+      queueEvent(std::make_shared<std::future<void>>(std::async(std::launch::deferred,
+        [this, segment_name, processor_name, error] { this->notifySequenceSegmentProcessorError(segment_name, processor_name, error); }
       )));
     }
 
@@ -149,6 +167,12 @@ namespace SmartPeak
     {
       queueEvent(std::make_shared<std::future<void>>(std::async(std::launch::deferred,
         [this] { this->notifySampleGroupProcessorEnd(); }
+      )));
+    }
+    void EventDispatcher::onSampleGroupProcessorError(const std::string& group_name, const std::string& processor_name, const std::string& error)
+    {
+      queueEvent(std::make_shared<std::future<void>>(std::async(std::launch::deferred,
+        [this, group_name, processor_name, error] { this->notifySampleGroupProcessorError(group_name, processor_name, error); }
       )));
     }
 
