@@ -34,8 +34,8 @@ TEST(SelectDilutions, read)
   std::map<std::string, int> dilution_map;
   SelectDilutionsParser::read(pathname, dilution_map);
   ASSERT_EQ(dilution_map.size(), 2);
-  ASSERT_EQ(dilution_map.count("test1_1"), 1);
-  EXPECT_EQ(dilution_map["test1_1"], 10);
+  ASSERT_EQ(dilution_map.count("ser-L.ser-L_1.Heavy"), 1);
+  EXPECT_EQ(dilution_map["ser-L.ser-L_1.Heavy"], 20);
   ASSERT_EQ(dilution_map.count("test1_2"), 1);
   EXPECT_EQ(dilution_map["test1_2"], 1);
 }
