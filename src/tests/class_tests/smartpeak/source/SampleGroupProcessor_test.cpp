@@ -249,7 +249,6 @@ void makeSequenceSameScanMassAndDilution(SequenceHandler& sequenceHandler_IO) {
 /**
   MergeInjections Tests
 */
-/*
 TEST(MergeInjections, constructorMergeInjections)
 {
   MergeInjections* ptrMergeInjections = nullptr;
@@ -486,7 +485,7 @@ TEST(SampleGroupHandler, processMergeInjections2)
   EXPECT_NEAR(static_cast<float>(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getRT()), 300, 1e-4);
   EXPECT_NEAR(static_cast<float>(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getMZ()), 100, 1e-4);
 }
-*/
+
 TEST(SampleGroupHandler, processMergeInjections_selectDilution)
 {
   // setup the parameters
