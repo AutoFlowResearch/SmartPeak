@@ -88,6 +88,8 @@ int main(int argc, char** argv)
 // `int argc, char **argv` are required on Win to link against the proper SDL2/OpenGL implementation
 {
 
+  std::vector<IMetadataHandler*> to_serialize;
+
   // to disable buttons, display info, and update the session cache
   bool workflow_is_done_ = true;
   bool file_loading_is_done_ = true;
@@ -124,7 +126,7 @@ int main(int argc, char** argv)
   auto about_widget_ = std::make_shared<AboutWidget>();
   auto report_ = std::make_shared<Report>(application_handler_);
 
-  auto load_session_wizard_ = std::make_shared<LoadSessionWizard>(session_files_widget_modify_, &event_dispatcher);
+  auto load_session_wizard_ = std::make_shared<LoadSessionWizard>(session_files_widget_modify_, &event_dispatcher, to_serialize);
 
   // widgets: windows
   auto quickInfoText_= std::make_shared<InfoWidget>("Info", application_handler_,
@@ -211,6 +213,8 @@ int main(int argc, char** argv)
                                    &SessionHandler::setComponentGroupBackgroundEstimationsTable, &SessionHandler::getGroupFiltersTable, &application_handler_.sequenceHandler_);
   auto features_table_main_window_ = std::make_shared<FeaturesTableWidget>("featuresTableMainWindow", "Features table", &event_dispatcher);
   auto feature_matrix_main_window_ = std::make_shared<GenericTableWidget>("featureMatrixMainWindow", "Features matrix");
+
+  to_serialize.push_back(statistics_.get());
 
   // visible on start
   workflow_->visible_ = true;
@@ -445,12 +449,15 @@ int main(int argc, char** argv)
           workflow_is_done_ && file_loading_is_done_
           && application_handler_.filenames_.getSessionDB().getDBFilePath() != "")) {
           SaveSession save_session(application_handler_);
+          save_session.to_serialize = to_serialize;
           save_session.process();
         }
         if (ImGui::MenuItem("Save Session As ...", NULL, false, 
                              workflow_is_done_ && file_loading_is_done_ && application_handler_.sessionIsOpened())) {
+          auto save_session = std::make_shared<SaveSession>(application_handler_);
+          save_session->to_serialize = to_serialize;
           file_picker_->open("Select session file",
-            std::make_shared<SaveSession>(application_handler_),
+            save_session,
             FilePicker::Mode::EFileCreate,
             application_handler_,
             "session.db");

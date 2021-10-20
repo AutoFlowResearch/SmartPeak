@@ -29,8 +29,10 @@ namespace SmartPeak
 {
   struct IMetadataHandler
   {
-    virtual std::vector<std::tuple<std::string, CastValue::Type>> getFields() const = 0;
-    virtual std::optional<CastValue> getValue(const std::string& field) const = 0;
-    virtual void setValue(const std::string& field, const CastValue& value) = 0;
+    virtual std::string getName() const = 0;
+    virtual std::map<std::string, CastValue::Type> getFields() const = 0;
+    virtual size_t getNbRows() const { return 1; };
+    virtual std::optional<CastValue> getValue(const std::string& field, const size_t row = 0) const = 0;
+    virtual void setValue(const std::string& field, const CastValue& value, const size_t row) = 0;
   };
 }

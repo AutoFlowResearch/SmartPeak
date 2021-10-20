@@ -61,9 +61,10 @@ namespace SmartPeak
     /**
       IMetadataHandler
     */
-    virtual std::vector<std::tuple<std::string, CastValue::Type>> getFields() const override;
-    virtual std::optional<CastValue> getValue(const std::string& field) const override;
-    virtual void setValue(const std::string& field, const CastValue& value) override;
+    virtual std::string getName() const override;
+    virtual std::map<std::string, CastValue::Type> getFields() const override;
+    virtual std::optional<CastValue> getValue(const std::string& field, const size_t row) const override;
+    virtual void setValue(const std::string& field, const CastValue& value, const size_t row) override;
 
     /**
       Interface to show the widget

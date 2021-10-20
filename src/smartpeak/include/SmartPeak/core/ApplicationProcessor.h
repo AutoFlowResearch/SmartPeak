@@ -31,6 +31,7 @@
 #include <SmartPeak/iface/ISampleGroupProcessorObserver.h>
 #include <SmartPeak/core/ApplicationProcessorObservable.h>
 #include <SmartPeak/core/Parameters.h>
+#include <SmartPeak/iface/IMetadataHandler.h>
 #include <string>
 #include <vector>
 
@@ -106,6 +107,7 @@ namespace SmartPeak
     virtual std::string getName() const override { return "LOAD_SESSION"; }
     virtual std::string getDescription() const override { return "Load an existing session"; }
 
+    std::vector<IMetadataHandler*> to_serialize;
   protected:
     bool overrideFilenames();
     bool overrideParameters();
@@ -125,6 +127,8 @@ namespace SmartPeak
     /* IProcessorDescription */
     virtual std::string getName() const override { return "SAVE_SESSION"; }
     virtual std::string getDescription() const override { return "Save the session"; }
+
+    std::vector<IMetadataHandler*> to_serialize;
   };
 
   struct LoadFilenames : ApplicationProcessor
@@ -155,4 +159,33 @@ namespace SmartPeak
     virtual std::string getDescription() const override { return "Store Filenames to the DB"; }
   };
 
+  struct LoadWidgets : ApplicationProcessor
+  {
+    LoadWidgets() = default;
+    explicit LoadWidgets(ApplicationHandler& application_handler) : ApplicationProcessor(application_handler) {}
+
+    /* ApplicationProcessor */
+    bool process() override;
+
+    /* IProcessorDescription */
+    virtual std::string getName() const override { return "LOAD_WIDGETS"; }
+    virtual std::string getDescription() const override { return "Load Widgets"; }
+
+    IMetadataHandler* to_serialize;
+  };
+
+  struct StoreWidgets : ApplicationProcessor
+  {
+    StoreWidgets() = default;
+    explicit StoreWidgets(ApplicationHandler& application_handler) : ApplicationProcessor(application_handler) {}
+
+    /* ApplicationProcessor */
+    bool process() override;
+
+    /* IProcessorDescription */
+    virtual std::string getName() const override { return "STORE_WIDGETS"; }
+    virtual std::string getDescription() const override { return "Store Widgets"; }
+
+    IMetadataHandler* to_serialize;
+  };
 }

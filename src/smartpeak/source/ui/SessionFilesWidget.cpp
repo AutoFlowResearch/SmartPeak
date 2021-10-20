@@ -339,6 +339,7 @@ namespace SmartPeak
     application_handler_.filenames_ = filenames;
     application_handler_.main_dir_ = filenames_.getTag(Filenames::Tag::MAIN_DIR);
     LoadSession load_session(application_handler_);
+//    load_session.to_serialize = to_serialize_;
     load_session.addApplicationProcessorObserver(application_observer_);
     load_session.filenames_ = filenames;
     // When modifiying one file, we load it using all files are marked as external, to eventually import them.

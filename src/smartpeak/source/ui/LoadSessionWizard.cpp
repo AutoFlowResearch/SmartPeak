@@ -55,6 +55,7 @@ namespace SmartPeak
         application_handler->filenames_ = *filenames;
         application_handler->main_dir_ = filenames->getTag(Filenames::Tag::MAIN_DIR);
         LoadSession load_session(*application_handler);
+        load_session.to_serialize = to_serialize_;
         load_session.addApplicationProcessorObserver(application_observer_);
         load_session.filenames_ = filenames;
         load_session.notifyApplicationProcessorStart({}); // we need a proper loading in thread to profit from the progressbar

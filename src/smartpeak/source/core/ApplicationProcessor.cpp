@@ -390,6 +390,13 @@ namespace SmartPeak
       }
     }
 
+    for (auto s : to_serialize)
+    {
+      LoadWidgets load_widget(application_handler_);
+      load_widget.to_serialize = s;
+      load_widget.process();
+    }
+
     if (!overrideParameters())
     {
       return false;
@@ -561,6 +568,13 @@ namespace SmartPeak
       }
     }
 
+    for (auto s : to_serialize)
+    {
+      StoreWidgets store_widget(application_handler_);
+      store_widget.to_serialize = s;
+      store_widget.process();
+    }
+
     LOGD << "END SaveSession";
     return true;
   }
@@ -643,6 +657,16 @@ namespace SmartPeak
     application_handler_.filenames_.getSessionDB().endWrite(*db_context);
     LOGD << "END StoreFilenames";
     return true;
+  }
+
+  bool StoreWidgets::process()
+  {
+    return application_handler_.filenames_.getSessionDB().writeMetadataHandler(*to_serialize);
+  }
+
+  bool LoadWidgets::process()
+  {
+    return application_handler_.filenames_.getSessionDB().readMetadataHandler(*to_serialize);
   }
 
 }
