@@ -36,6 +36,28 @@ namespace SmartPeak
   const ImGuiTableSortSpecs* ImEntry::s_current_sort_specs = NULL;
   const double GenericGraphicWidget::high_value_threeshold_ = 1e20;
 
+  std::vector<std::tuple<std::string, CastValue::Type>> Widget::getFields() const
+  {
+    return { {"visible", CastValue::Type::BOOL } };
+  }
+  
+  std::optional<CastValue> Widget::getValue(const std::string& field) const
+  {
+    if (field == "visible")
+    {
+      return visible_;
+    }
+    return std::nullopt;
+  }
+
+  void Widget::setValue(const std::string& field, const CastValue& value)
+  {
+    if ((field == "visible") && (value.getTag() == CastValue::Type::BOOL))
+    {
+      visible_ = value.b_;
+    }
+  }
+
   bool GenericTableWidget::searcher(const std::vector<ImEntry>& Im_table_entries, const int& selected_entry,
     const ImGuiTextFilter& filter, const size_t row) const
   {

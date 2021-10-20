@@ -31,6 +31,7 @@
 #include <unsupported/Eigen/CXX11/Tensor>
 #include <SmartPeak/iface/ISequenceSegmentObserver.h>
 #include <SmartPeak/iface/IFeaturesObserver.h>
+#include <SmartPeak/iface/IMetadataHandler.h>
 #include <SmartPeak/core/EventDispatcher.h>
 
 #include <string>
@@ -48,7 +49,7 @@ namespace SmartPeak
   /**
     @brief Abstract base class for all panes, windows, and widgets
   */
-  class Widget
+  class Widget: public IMetadataHandler
   {
   public:
     explicit Widget(std::string title = ""):
@@ -56,6 +57,13 @@ namespace SmartPeak
     {};
     virtual ~Widget() = default;
     Widget(const Widget &&) = delete;
+
+    /**
+      IMetadataHandler
+    */
+    virtual std::vector<std::tuple<std::string, CastValue::Type>> getFields() const override;
+    virtual std::optional<CastValue> getValue(const std::string& field) const override;
+    virtual void setValue(const std::string& field, const CastValue& value) override;
 
     /**
       Interface to show the widget
