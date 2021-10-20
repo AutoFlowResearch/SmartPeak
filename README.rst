@@ -4,9 +4,9 @@ SmartPeak
 
 .. begin_badges
 
-.. |docs| image:: https://readthedocs.com/projects/smartpeak/badge/?version=develop
+.. |docs| image:: https://readthedocs.com/projects/smartpeak/badge/?version=latest
    :alt: Documentation Status
-   :target: https://smartpeak.readthedocs.io/en/develop/?badge=develop
+   :target: https://smartpeak.readthedocs.io/en/develop/?badge=latest
 
 .. |circleci| image:: https://circleci.com/gh/AutoFlowResearch/SmartPeak.svg?branch=develop?style=svg
    :alt: CircleCI Build Status (Windows, Linux & macOS)
