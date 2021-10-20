@@ -29,12 +29,12 @@ RUN apt -y update
 RUN apt install -y tzdata
 RUN ln -fs /usr/share/zoneinfo/UTC /etc/localtime
 RUN dpkg-reconfigure --frontend noninteractive tzdata
-RUN apt install -y  git cmake qt5-default libeigen3-dev \
-               					libboost-all-dev libxerces-c-dev \
-               					coinor-libcbc-dev libsvm-dev \
-               					libwildmagic-dev libsqlite3-dev \
-               					libglpk-dev seqan-dev libsdl2-dev libhdf5-dev \
-												cppcheck python3-pip
+RUN apt install -y  git 	cmake qt5-default libeigen3-dev \
+			libboost-all-dev libxerces-c-dev \
+			coinor-libcbc-dev libsvm-dev \
+			libwildmagic-dev libsqlite3-dev \
+			libglpk-dev seqan-dev libsdl2-dev libhdf5-dev \
+			cppcheck python3-pip
 
 FROM dependencies-fetcher AS bin-builder
 # Building OpenMS
@@ -42,20 +42,21 @@ WORKDIR /tmp
 RUN git clone --branch develop --depth 1 https://github.com/OpenMS/OpenMS.git && \
 		cd OpenMS && git -C /tmp/OpenMS submodule update --init && \
 		mkdir build && cd build && \
-		cmake -DBOOST_USE_STATIC=OFF -DHAS_XSERVER=OFF -DWITH_GUI=OFF \
-					-DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF \
-					-DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Release -DPYOPENMS=OFF \
-					-DOPENMS_COVERAGE=OFF /tmp/OpenMS
+		cmake 	-DBOOST_USE_STATIC=OFF \ 	
+			-DHAS_XSERVER=OFF -DWITH_GUI=OFF \
+			-DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF \
+			-DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Release -DPYOPENMS=OFF \
+			-DOPENMS_COVERAGE=OFF /tmp/OpenMS
 RUN cd OpenMS/build && make -j2 OpenMS && make install
 
 # SmartPeak superbuild
 RUN cd /tmp && \ 
-		git clone --branch develop --depth 1 https://github.com/AutoFlowResearch/SmartPeak.git && \ 
-		cd SmartPeak && \
-		mkdir -p superbuild && \
-		cd superbuild && \
-		cmake -DUSE_SUPERBUILD=ON -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release /tmp/SmartPeak && \
-		make -j4
+	git clone --branch develop --depth 1 https://github.com/AutoFlowResearch/SmartPeak.git && \ 
+	cd SmartPeak && \
+	mkdir -p superbuild && \
+	cd superbuild && \
+	cmake -DUSE_SUPERBUILD=ON -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release /tmp/SmartPeak && \
+	make -j4
 
 # Building SmartPeak
 RUN cd /tmp/SmartPeak && \
