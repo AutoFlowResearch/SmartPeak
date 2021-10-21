@@ -192,7 +192,11 @@ namespace SmartPeak
     std::map<componentKeyType, std::map<std::string, std::map<std::set<std::string>, float>>> component_to_feature_to_injection_to_values;
     getComponentsToFeaturesToInjectionsToValues(sampleGroupHandler_IO, sequenceHandler_I, merge_subordinates, component_to_feature_to_injection_to_values);
 
-    // Select preferred dilution
+    // Select preferred dilution.
+    // If the select_preferred_dilutions parameter is set to true,
+    // we will remove from the features all components that are listed
+    // in the file set by the select_preferred_dilutions_file and to which the
+    // injection dilution does not correspond to the value set in the select_preferred_dilutions_file.
     if (!selectDilutions(params, filenames_I, sequenceHandler_I, component_to_feature_to_injection_to_values))
     {
       return;
