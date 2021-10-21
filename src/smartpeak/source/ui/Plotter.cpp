@@ -169,6 +169,8 @@ namespace SmartPeak {
       graphvis_data_(graphvis_data),
       output_path_(output_path),
       plot_type_(plot_type),
+      file_width_(1400),
+      file_height_(800),
       gnuplot_path_("gnuplot")
   {
     //PNG=0, PDF=1, HTML=2, SVG=3
@@ -520,6 +522,7 @@ namespace SmartPeak {
       fout << "unset log" << std::endl;
       fout << "unset label" << std::endl;
       fout << "unset grid" << std::endl;
+      fout << "unset style" << std::endl;
       fout << "set palette rgbformulae 33,13,10" << std::endl;
       fout << "set view map scale 1" << std::endl;
       fout << "set xtic auto" << std::endl;
