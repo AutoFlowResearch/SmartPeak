@@ -43,18 +43,19 @@ struct ConsoleHandlerFixture : public ::testing::Test
 
 TEST_F(ConsoleHandlerFixture, ConsoleHandler_initialize)
 {
-    namespace fs = std::filesystem;
-    auto& ch = SmartPeak::ConsoleHandler::get_instance();
-    // Test singleton uniqueness:
-    auto& ch1 = SmartPeak::ConsoleHandler::get_instance();
-    EXPECT_EQ(&ch, &ch1);
-    // Test custom log location:
-    {
-        ch.set_log_directory(m_datapath);
-        ch.initialize("Welcome");
-        // m_filepath = ch.get_log_filepath();
-        EXPECT_TRUE(fs::exists(ch.get_log_filepath()));
-    }
-    // Test inability to initialize instance for the second time:
-    EXPECT_THROW(ch.initialize("Welcome"), std::runtime_error);
+  namespace fs = std::filesystem;
+  auto& ch = SmartPeak::ConsoleHandler::get_instance();
+  // Test singleton uniqueness:
+  auto& ch1 = SmartPeak::ConsoleHandler::get_instance();
+  EXPECT_EQ(&ch, &ch1);
+  // Test custom log location:
+  {
+    ch.set_log_directory(m_datapath);
+    ch.initialize("Welcome");
+    // m_filepath = ch.get_log_filepath();
+    EXPECT_TRUE(fs::exists(ch.get_log_filepath()));
+  }
+  // Test inability to initialize instance for the second time:
+  ch.initialize("Welcome");
+  EXPECT_TRUE(ch.is_initialized());
 }
