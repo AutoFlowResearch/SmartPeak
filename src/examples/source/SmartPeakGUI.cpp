@@ -214,8 +214,6 @@ int main(int argc, char** argv)
   auto features_table_main_window_ = std::make_shared<FeaturesTableWidget>("featuresTableMainWindow", "Features table", &event_dispatcher);
   auto feature_matrix_main_window_ = std::make_shared<GenericTableWidget>("featureMatrixMainWindow", "Features matrix");
 
-  to_serialize.push_back(statistics_.get());
-
   // visible on start
   workflow_->visible_ = true;
   quickInfoText_->visible_ = true;
@@ -283,6 +281,20 @@ int main(int argc, char** argv)
       about_widget_,
       report_
   };
+
+  for (auto& window : top_windows)
+  {
+    to_serialize.push_back(window.get());
+  }
+  for (auto& window : bottom_windows)
+  {
+    to_serialize.push_back(window.get());
+  }
+  for (auto& window : left_windows)
+  {
+    to_serialize.push_back(window.get());
+  }
+
 
   // We need titles for all sub windows
   checkTitles(top_windows);

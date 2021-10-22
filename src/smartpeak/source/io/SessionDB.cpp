@@ -273,7 +273,7 @@ bool SessionDB::writeMetadataHandler(const IMetadataHandler& metadata_handler)
   // first, we delete table (to remove)
   os.str("");
   os << "DROP TABLE ";
-  os << table_name;
+  os << "\"" << table_name << "\"";
   os << ";";
   std::string sql = os.str();
   rc = sqlite3_exec(*db, sql.c_str(), NULL, 0, &zErrMsg);
@@ -283,7 +283,7 @@ bool SessionDB::writeMetadataHandler(const IMetadataHandler& metadata_handler)
   auto fields = metadata_handler.getFields();
   os.str("");
   os << "CREATE TABLE ";
-  os << table_name;
+  os << "\"" << table_name << "\"";
   os << " (";
   os << "ID INTEGER PRIMARY KEY, ";
   std::string separator;
@@ -313,7 +313,7 @@ bool SessionDB::writeMetadataHandler(const IMetadataHandler& metadata_handler)
   for (size_t i = 0; i < nb_rows; ++i)
   {
     os << "INSERT INTO ";
-    os << table_name;
+    os << "\"" << table_name << "\"";
     separator = "";
     os << " (";
     for (const auto& [column_name, column_type] : fields)
@@ -374,13 +374,12 @@ bool SessionDB::readMetadataHandler(IMetadataHandler& metadata_handler)
   displaySessionInfo();
 
   auto table_name = metadata_handler.getName();
-
   db_context.table = table_name;
   db_context.db = *db;
 
   os.str("");
   os << "SELECT * FROM ";
-  os << table_name;
+  os << "\"" << table_name << "\"";
   os << "; ";
   std::string sql = os.str();
   rc = sqlite3_prepare(*db, sql.c_str(), sql.size(), &db_context.stmt, NULL);
