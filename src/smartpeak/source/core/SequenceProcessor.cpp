@@ -326,26 +326,35 @@ namespace SmartPeak
 
     notifySampleGroupProcessorStart(sample_groups.size());
 
-    // process by sample group
-    for (SampleGroupHandler& sample_group : sample_groups) {
-
-      notifySampleGroupProcessorSampleStart(sample_group.getSampleGroupName());
-      // handle user-desired sample_group_processing_methods
-      if (!sample_group_processing_methods_.size()) {
-        throw "no sample group processing methods given.\n";
+    // Determine the number of threads to launch
+    std::vector<InjectionHandler> injections = sequenceHandler_IO->getSequence();
+    int n_threads = 6;
+    if (injections.size())
+    {
+      const auto& params = injections.front().getRawData().getParameters();
+      if (params.count("SequenceProcessor") && !params.at("SequenceProcessor").empty()) {
+        for (const auto& p : params.at("SequenceProcessor")) {
+          if (p.getName() == "n_thread") {
+            try {
+              n_threads = std::stoi(p.getValueAsString());
+              LOGI << "SequenceProcessor::n_threads set to " << n_threads;
+            }
+            catch (const std::exception& e) {
+              LOGE << e.what();
+            }
+          }
+        }
       }
-      
-      SampleGroupProcessorMultithread manager(
-        sample_groups,
-        (*sequenceHandler_IO),
-        sample_group_processing_methods_,
-        filenames_,
-        this);
-      manager.run_processing();
-      //manager.spawn_workers(8);
-      notifySampleGroupProcessorSampleEnd(sample_group.getSampleGroupName());
     }
 
+    SampleGroupProcessorMultithread manager(
+      sample_groups,
+      (*sequenceHandler_IO),
+      sample_group_processing_methods_,
+      filenames_,
+      this);
+    manager.run_processing();
+    //manager.spawn_workers(n_threads);
     sequenceHandler_IO->setSampleGroups(sample_groups);
     notifySampleGroupProcessorEnd();
   }
