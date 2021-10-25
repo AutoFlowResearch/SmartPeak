@@ -65,28 +65,6 @@ namespace SmartPeak
     SampleGroupProcessor() = default;
   };
 
-  struct SelectDilutions : SampleGroupProcessor
-  {
-    /* IProcessorDescription */
-    virtual std::string getName() const override { return "SELECT_DILUTIONS"; }
-    virtual std::string getDescription() const override { return "Select features from dilution preferences"; }
-    virtual ParameterSet getParameterSchema() const override;
-    virtual std::vector<std::string> getRequirements() const override;
-
-    /**
-      Merge multiple injections of the same sample.
-    */
-    void process(
-      SampleGroupHandler& sampleGroupHandler_IO,
-      const SequenceHandler& sequenceHandler_I,
-      const ParameterSet& params_I,
-      Filenames& filenames_I
-    ) const override;
-
-    /* IFilenamesHandler */
-    virtual void getFilenames(Filenames& filenames) const override;
-  };
-
   struct MergeInjections : SampleGroupProcessor
   {
     /* IProcessorDescription */
@@ -109,6 +87,12 @@ namespace SmartPeak
 
     typedef std::tuple<std::string, std::pair<float, float>, float> mergeKeyType;
     typedef std::pair<std::string, std::string> componentKeyType;
+
+    static bool selectDilutions(
+      const ParameterSet& params,
+      const Filenames& filenames_I,
+      const SequenceHandler& sequenceHandler_I,
+      std::map<componentKeyType, std::map<std::string, std::map<std::set<std::string>, float>>>& component_to_feature_to_injection_to_values);
 
     static void getMergeKeysToInjections(const SampleGroupHandler& sampleGroupHandler_IO,
       const SequenceHandler& sequenceHandler_I, 

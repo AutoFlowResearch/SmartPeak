@@ -594,7 +594,7 @@ namespace SmartPeak
     }
   }
 
-  Parameter* FunctionParameters::findParameter(const std::string& parameter_name)
+  const Parameter* FunctionParameters::findParameter(const std::string& parameter_name) const
   {
     auto find_it = std::find_if(
       parameters_.begin(), parameters_.end(),
@@ -604,6 +604,11 @@ namespace SmartPeak
       return &(*find_it);
     else
       return nullptr;
+  }
+
+  Parameter* FunctionParameters::findParameter(const std::string& parameter_name)
+  {
+    return const_cast<Parameter*>(const_cast<const FunctionParameters*>(this)->findParameter(parameter_name));
   }
 
   bool FunctionParameters::operator==(const FunctionParameters& other) const

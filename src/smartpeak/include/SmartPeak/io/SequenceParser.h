@@ -124,6 +124,24 @@ public:
       const std::set<SampleType>& sample_types
     );
 
+    static void makeGroupDataTableFromMetaValue(
+      const SequenceHandler& sequenceHandler,
+      std::vector<std::vector<std::string>>& rows_out,
+      std::vector<std::string>& headers_out,
+      const std::vector<std::string>& meta_data,
+      const std::set<SampleType>& sample_types,
+      const std::set<std::string>& sample_names,
+      const std::set<std::string>& component_group_names,
+      const std::set<std::string>& component_names
+    );
+
+    static bool writeGroupDataTableFromMetaValue(
+      const SequenceHandler& sequenceHandler,
+      const std::filesystem::path& filename,
+      const std::vector<FeatureMetadata>& meta_data,
+      const std::set<SampleType>& sample_types
+    );
+
     static void makeDataMatrixFromMetaValue(
       const SequenceHandler& sequenceHandler,
       Eigen::Tensor<float,2>& data_out,
@@ -138,6 +156,25 @@ public:
 
     // NOTE: Internally, to_string() rounds at 1e-6. Therefore, some precision might be lost.
     static bool writeDataMatrixFromMetaValue(
+      const SequenceHandler& sequenceHandler,
+      const std::filesystem::path& filename,
+      const std::vector<FeatureMetadata>& meta_data,
+      const std::set<SampleType>& sample_types
+    );
+
+    static void makeGroupDataMatrixFromMetaValue(
+      const SequenceHandler& sequenceHandler,
+      Eigen::Tensor<float, 2>& data_out,
+      Eigen::Tensor<std::string, 1>& columns_out,
+      Eigen::Tensor<std::string, 2>& rows_out,
+      const std::vector<std::string>& meta_data,
+      const std::set<SampleType>& sample_types,
+      const std::set<std::string>& sample_names,
+      const std::set<std::string>& component_group_names,
+      const std::set<std::string>& component_names
+    );
+
+    static bool writeGroupDataMatrixFromMetaValue(
       const SequenceHandler& sequenceHandler,
       const std::filesystem::path& filename,
       const std::vector<FeatureMetadata>& meta_data,

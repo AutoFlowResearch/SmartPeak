@@ -58,11 +58,13 @@ namespace SmartPeak
     all_md_checks_ = false; all_md_deactivated_ = true;
     feature_db_file_picker_handler_ = std::make_shared<ReportFilePickerHandler>(*this, "Feature DB", SequenceParser::writeDataTableFromMetaValue);
     pivot_table_file_picker_handler_ = std::make_shared<ReportFilePickerHandler>(*this, "Pivot Table", SequenceParser::writeDataMatrixFromMetaValue);
+    group_feature_db_file_picker_handler_ = std::make_shared<ReportFilePickerHandler>(*this, "Group Feature DB", SequenceParser::writeGroupDataTableFromMetaValue);
+    group_pivot_table_file_picker_handler_ = std::make_shared<ReportFilePickerHandler>(*this, "Group Pivot Table", SequenceParser::writeGroupDataMatrixFromMetaValue);
   }
 
   void Report::draw()
   {
-    if (!ImGui::BeginPopupModal(title_.c_str(), NULL, ImGuiWindowFlags_NoResize)) {
+    if (!ImGui::BeginPopupModal(title_.c_str(), NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
       return;
     }
 
@@ -128,45 +130,17 @@ namespace SmartPeak
 
     ImGui::Separator();
 
-    if (ImGui::Button("Create Feature DB"))
-    {
-      const bool checkboxes_check = initializeMetadataAndSampleTypes();
-      if (checkboxes_check)
-      {
-        report_file_picker_.open(
-          "Create Feature DB",
-          feature_db_file_picker_handler_,
-          FilePicker::Mode::EFileCreate,
-          application_handler_,
-          "FeatureDB.csv");
-      }
-      else
-      {
-        LOGE << "Select at least one Sample Type and at least one Metadata";
-      }
-    }
-
+    ImGui::Text("Create Report:");
+    reportButton("Feature DB", feature_db_file_picker_handler_, "FeatureDB.csv");
     ImGui::SameLine();
-
-    if (ImGui::Button("Create Pivot Table"))
-    {
-      const bool checkboxes_check = initializeMetadataAndSampleTypes();
-      if (checkboxes_check)
-      {
-        report_file_picker_.open(
-          "Create Pivot Table",
-          pivot_table_file_picker_handler_,
-          FilePicker::Mode::EFileCreate,
-          application_handler_,
-          "PivotTable.csv");
-      }
-      else
-      {
-        LOGE << "Select at least one Sample Type and at least one Metadata";
-      }
-    }
-
+    reportButton("Pivot Table", pivot_table_file_picker_handler_, "PivotTable.csv");
     ImGui::SameLine();
+    reportButton("Group Feature DB", group_feature_db_file_picker_handler_, "GroupFeatureDB.csv");
+    ImGui::SameLine();
+    reportButton("Group Pivot Table", group_pivot_table_file_picker_handler_, "GroupPivotTable.csv");
+
+    ImGui::Separator();
+
     if (ImGui::Button("Close"))
     {
       LOGI << "Report window is closed.";
@@ -232,4 +206,28 @@ namespace SmartPeak
       LOGE << "Error during write. " << data_writer_label << " content is invalid.";
     }
   }
+
+  void Report::reportButton(const std::string& title,
+    std::shared_ptr<ReportFilePickerHandler> report_file_picker_handler,
+    const std::string& default_file_name)
+  {
+    if (ImGui::Button(title.c_str()))
+    {
+      const bool checkboxes_check = initializeMetadataAndSampleTypes();
+      if (checkboxes_check)
+      {
+        report_file_picker_.open(
+          title.c_str(),
+          report_file_picker_handler,
+          FilePicker::Mode::EFileCreate,
+          application_handler_,
+          default_file_name);
+      }
+      else
+      {
+        LOGE << "Select at least one Sample Type and at least one Metadata";
+      }
+    }
+  }
+
 }
