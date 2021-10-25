@@ -248,6 +248,12 @@ std::string castValueToSqlString(const CastValue& cast_value)
     escaped_string = std::regex_replace(escaped_string, std::regex("\'"), "\'\'");
     return std::string("'") + escaped_string + std::string("'");
   }
+  case CastValue::Type::BOOL_LIST:
+  case CastValue::Type::FLOAT_LIST:
+  case CastValue::Type::INT_LIST:
+  case CastValue::Type::STRING_LIST:
+    return std::string("'") + std::string(cast_value) + std::string("'");
+    break;
   default:
     return std::string(cast_value);
   }
@@ -433,6 +439,16 @@ bool SessionDB::readMetadataHandler(IMetadataHandler& metadata_handler)
           {
             const std::string value(reinterpret_cast<const char*>(sqlite3_column_text(db_context.stmt, i)));
             metadata_handler.setValue(column_name, CastValue(value), i);
+            break;
+          }
+          case CastValue::Type::BOOL_LIST:
+          case CastValue::Type::FLOAT_LIST:
+          case CastValue::Type::INT_LIST:
+          case CastValue::Type::STRING_LIST:
+          {
+            CastValue v;
+            Utilities::parseString(reinterpret_cast<const char*>(sqlite3_column_text(db_context.stmt, i)), v);
+            metadata_handler.setValue(column_name, v , i);
             break;
           }
           default:

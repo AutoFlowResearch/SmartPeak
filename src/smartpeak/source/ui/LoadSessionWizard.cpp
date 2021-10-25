@@ -58,7 +58,7 @@ namespace SmartPeak
         load_session.to_serialize = to_serialize_;
         load_session.addApplicationProcessorObserver(application_observer_);
         load_session.filenames_ = filenames;
-        load_session.notifyApplicationProcessorStart({}); // we need a proper loading in thread to profit from the progressbar
+        load_session.notifyApplicationProcessorStart({ load_session.getName() }); // we need a proper loading in thread to profit from the progressbar
         if (!load_session.process())
         {
           // load failed

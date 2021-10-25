@@ -350,7 +350,7 @@ namespace SmartPeak
         load_session.filenames_->setEmbedded(fef.first, false);
       }
     }
-    load_session.notifyApplicationProcessorStart({}); // we need a proper loading in thread to profit from the progressbar
+    load_session.notifyApplicationProcessorStart({ load_session.getName() }); // we need a proper loading in thread to profit from the progressbar
     if (load_session.process())
     {
       // Update saved state

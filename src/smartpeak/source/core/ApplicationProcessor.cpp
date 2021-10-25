@@ -390,13 +390,6 @@ namespace SmartPeak
       }
     }
 
-    for (auto s : to_serialize)
-    {
-      LoadWidgets load_widget(application_handler_);
-      load_widget.to_serialize = s;
-      load_widget.process();
-    }
-
     if (!overrideParameters())
     {
       return false;
@@ -419,6 +412,19 @@ namespace SmartPeak
 
     application_handler_.sequenceHandler_.notifySequenceUpdated();
     LOGD << "END LoadSession";
+    return true;
+  }
+
+  bool LoadLayout::process()
+  {
+    LOGD << "START LoadLayout";
+    for (auto s : to_serialize)
+    {
+      LoadWidgets load_widget(application_handler_);
+      load_widget.to_serialize = s;
+      load_widget.process();
+    }
+    LOGD << "END LoadLayout";
     return true;
   }
 

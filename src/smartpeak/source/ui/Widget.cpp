@@ -561,19 +561,29 @@ namespace SmartPeak
 
   std::optional<CastValue> ExplorerWidget::getValue(const std::string& field, const size_t row) const
   {
+    //=================================================
+    if (title_ == "Injections")
+    {
+      int break_here = 42;
+    }
+    //=================================================
     if (field == "visible") // TODO inherits
     {
       return visible_;
     }
     else if (field == "checkboxes_plot")
     {
-      std::vector<bool> checkoxes_plot;
-      for (int i = 0; i < (*checkbox_columns_).size(); ++i)
+      if (checkbox_columns_)
       {
-        bool checked = (*checkbox_columns_)(i, checkbox_columns_plot_col_);
-        checkoxes_plot.push_back(checked);
+        std::vector<bool> checkoxes_plot;
+        auto nb_checkboxes_plot = (*checkbox_columns_).dimension(0);
+        for (int i = 0; i < nb_checkboxes_plot; ++i)
+        {
+          bool checked = (*checkbox_columns_)(i, checkbox_columns_plot_col_);
+          checkoxes_plot.push_back(checked);
+        }
+        return checkoxes_plot;
       }
-      return checkoxes_plot;
     }
     return std::nullopt;
   }
@@ -583,6 +593,24 @@ namespace SmartPeak
     if ((field == "visible") && (value.getTag() == CastValue::Type::BOOL))
     {
       visible_ = value.b_;
+    }
+    else if (field == "checkboxes_plot")
+    {
+      if (checkbox_columns_)
+      {
+        const auto& bl = value.bl_;
+        size_t i = 0;
+        auto nb_checkboxes_plot = (*checkbox_columns_).dimension(0);
+        if (nb_checkboxes_plot == bl.size())
+        {
+          for (const auto b : bl)
+          {
+            (*checkbox_columns_)(i, checkbox_columns_plot_col_) = b;
+            table_entries_[i].entry_contents[checkbox_columns_plot_col_] = b;
+          }
+          ++i;
+        }
+      }
     }
   }
 

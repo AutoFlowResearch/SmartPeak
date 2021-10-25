@@ -113,6 +113,21 @@ namespace SmartPeak
     bool overrideParameters();
   };
 
+  struct LoadLayout : ApplicationProcessor
+  {
+    LoadLayout() = default;
+    explicit LoadLayout(ApplicationHandler& application_handler) : ApplicationProcessor(application_handler) {}
+
+    /* ApplicationProcessor */
+    bool process() override;
+
+    /* IProcessorDescription */
+    virtual std::string getName() const override { return "LOAD_LAYOUT"; }
+    virtual std::string getDescription() const override { return "Load a layout from DB"; }
+
+    std::vector<IMetadataHandler*> to_serialize;
+  };
+
   struct SaveSession : ApplicationProcessor, IFilePickerHandler
   {
     SaveSession() = default;

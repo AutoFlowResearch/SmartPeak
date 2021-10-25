@@ -657,7 +657,8 @@ TEST(SessionFilesWidget, SessionFilesWidget_EmbedAllFiles)
 
   auto session_widget_test_modify = std::make_shared<SessionFilesWidget_Test>(application_handler, SessionFilesWidget::Mode::EModification);
   auto session_widget_modify = std::static_pointer_cast<SessionFilesWidget>(session_widget_test_modify);
-  auto load_session_wizard_ = std::make_shared<LoadSessionWizard>(session_widget_modify, nullptr);
+  std::vector<IMetadataHandler*> to_serialize;
+  auto load_session_wizard_ = std::make_shared<LoadSessionWizard>(session_widget_modify, nullptr, to_serialize);
   load_session_wizard_->onFilePicked(db_path, &application_handler);
 
   ParameterSet& parameter_set3 = application_handler.sequenceHandler_.getSequence().at(0).getRawData().getParameters();

@@ -84,6 +84,34 @@ void checkTitles(const std::vector<std::shared_ptr<Widget>> windows);
 
 std::string getMainWindowTitle(const ApplicationHandler& application_handler);
 
+struct LoaderObserver : IApplicationProcessorObserver
+{
+  /**
+  IApplicationProcessorObserver
+  */
+  virtual void onApplicationProcessorStart(const std::vector<std::string>& commands) override 
+  {
+    if ((commands.size() == 1) && (commands.at(0) == "LOAD_SESSION"))
+    {
+      loading = true;
+    }
+  }
+  virtual void onApplicationProcessorCommandStart(size_t command_index, const std::string& command_name) override {}
+  virtual void onApplicationProcessorCommandEnd(size_t command_index, const std::string& command_name) override {}
+  virtual void onApplicationProcessorEnd() override 
+  {
+    if (loading)
+    {
+      just_loaded = true;
+    }
+    loading = false;
+  }
+
+  virtual void onApplicationProcessorError(const std::string& error) override { loading = false; }
+  bool loading = false;
+  bool just_loaded = false;
+};
+
 int main(int argc, char** argv)
 // `int argc, char **argv` are required on Win to link against the proper SDL2/OpenGL implementation
 {
@@ -101,6 +129,7 @@ int main(int argc, char** argv)
   SessionHandler session_handler_;
   WorkflowManager workflow_manager_;
   GuiAppender appender_;
+  LoaderObserver loader_observer;
 
   // EventDispatcher will dispatch events triggered by the observers in the main GUI thread
   EventDispatcher event_dispatcher;
@@ -110,6 +139,7 @@ int main(int argc, char** argv)
   event_dispatcher.addTransitionsObserver(&session_handler_);
   event_dispatcher.addSequenceObserver(&session_handler_);
   event_dispatcher.addFeaturesObserver(&session_handler_);
+  event_dispatcher.addApplicationProcessorObserver(&loader_observer);
 
   // widgets: pop ups
   auto file_picker_ = std::make_shared<FilePicker>();
@@ -804,7 +834,6 @@ int main(int argc, char** argv)
         "CalibratorsMainWindow");
     }
 
-
     // ======================================
     // Windows display
     // ======================================
@@ -893,6 +922,18 @@ int main(int argc, char** argv)
       ImGui::End();
       ImGui::PopStyleVar();
     }
+
+    // ======================================
+    // Load Layout if needed
+    // ======================================
+    if (loader_observer.just_loaded)
+    {
+      LoadLayout load_layout(application_handler_);
+      load_layout.to_serialize = to_serialize;
+      load_layout.process();
+      loader_observer.just_loaded = false;
+    }
+
     }
 
     // Rendering
