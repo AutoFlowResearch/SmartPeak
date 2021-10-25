@@ -552,6 +552,40 @@ namespace SmartPeak
     }
   }
 
+  std::map<std::string, CastValue::Type> ExplorerWidget::getFields() const
+  {
+    auto fields = Widget::getFields();
+    fields.emplace("checkboxes_plot", CastValue::Type::BOOL_LIST);
+    return fields;
+  }
+
+  std::optional<CastValue> ExplorerWidget::getValue(const std::string& field, const size_t row) const
+  {
+    if (field == "visible") // TODO inherits
+    {
+      return visible_;
+    }
+    else if (field == "checkboxes_plot")
+    {
+      std::vector<bool> checkoxes_plot;
+      for (int i = 0; i < (*checkbox_columns_).size(); ++i)
+      {
+        bool checked = (*checkbox_columns_)(i, checkbox_columns_plot_col_);
+        checkoxes_plot.push_back(checked);
+      }
+      return checkoxes_plot;
+    }
+    return std::nullopt;
+  }
+
+  void ExplorerWidget::setValue(const std::string& field, const CastValue& value, const size_t row)
+  {
+    if ((field == "visible") && (value.getTag() == CastValue::Type::BOOL))
+    {
+      visible_ = value.b_;
+    }
+  }
+
   void ExplorerWidget::onSequenceUpdated()
   {
     table_scanned_ = false;

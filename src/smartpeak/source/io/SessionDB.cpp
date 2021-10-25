@@ -226,6 +226,10 @@ std::string valueTypeToString(const CastValue::Type value_type)
   case CastValue::Type::FLOAT:
     return "REAL";
   case CastValue::Type::STRING:
+  case CastValue::Type::BOOL_LIST:
+  case CastValue::Type::FLOAT_LIST:
+  case CastValue::Type::INT_LIST:
+  case CastValue::Type::STRING_LIST:
     return "TEXT";
   default:
     throw std::invalid_argument("Type not supported");
