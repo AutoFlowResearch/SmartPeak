@@ -103,7 +103,6 @@ jobs:
       - run:
           name: Installing required libraries
           command: |
-            git -C /usr/local/Homebrew/Library/Taps/homebrew/homebrew-cask fetch --unshallow
             brew update
             brew remove yarn node
             brew install cmake qt5 sdl2
@@ -289,7 +288,7 @@ jobs:
             msbuild src/smartpeak/SmartPeak.sln /verbosity:normal /maxcpucount /p:Configuration=Release
             msbuild src/examples/SmartPeak_class_examples_smartpeak.sln /maxcpucount /property:Configuration=Release
             refreshenv
-            & 'C:\Program Files\cmake\bin\ctest.exe' -VV -F -E "(example|example|absl|dfa|exhaustive|random|re2)"
+            & 'C:\Program Files\cmake\bin\ctest.exe' -VV -F -E "(example|example|absl|dfa|exhaustive|random|re2|charclass|compile|mimics|parse_possible|regexp|required_prefix|search|set|simplify|string_generator)"
             ThrowOnFailure "CTest failed!"
             & 'C:\Program Files\cmake\bin\cpack.exe' -G NSIS64
             ThrowOnFailure "CPack failed!"
