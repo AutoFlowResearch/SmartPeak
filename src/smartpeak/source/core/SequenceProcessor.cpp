@@ -41,7 +41,7 @@
 
 namespace SmartPeak
 {
-
+  
   class WorkflowException : public std::exception
   {
   public:
@@ -68,6 +68,29 @@ namespace SmartPeak
     std::string processor_;
     std::string msg_;
   };
+
+  int nbThreads(const std::vector<InjectionHandler> injections)
+  {
+    int n_threads = 6;
+    if (injections.size())
+    {
+      const auto& params = injections.front().getRawData().getParameters();
+      if (params.count("SequenceProcessor") && !params.at("SequenceProcessor").empty()) {
+        for (const auto& p : params.at("SequenceProcessor")) {
+          if (p.getName() == "n_thread") {
+            try {
+              n_threads = std::stoi(p.getValueAsString());
+              LOGI << "SequenceProcessor::n_threads set to " << n_threads;
+            }
+            catch (const std::exception& e) {
+              LOGE << e.what();
+            }
+          }
+        }
+      }
+    }
+    return n_threads;
+  }
 
   ParameterSet ProcessSequence::getParameterSchemaStatic()
   {
@@ -106,34 +129,14 @@ namespace SmartPeak
       throw std::invalid_argument("The number of provided filenames locations is not correct.");
     }
 
-    notifySequenceProcessorStart(injections.size());
-
-    // Determine the number of threads to launch
-    int n_threads = 6;
-    if (injections.size())
-    {
-      const auto& params = injections.front().getRawData().getParameters();
-      if (params.count("SequenceProcessor") && !params.at("SequenceProcessor").empty()) {
-        for (const auto& p : params.at("SequenceProcessor")) {
-          if (p.getName() == "n_thread") {
-            try {
-              n_threads = std::stoi(p.getValueAsString());
-              LOGI << "SequenceProcessor::n_threads set to " << n_threads;
-            }
-            catch (const std::exception& e) {
-              LOGE << e.what();
-            }
-          }
-        }
-      }
-    }
-
     // Launch
+    notifySequenceProcessorStart(injections.size());
     SequenceProcessorMultithread manager(
       injections,
       filenames_,
       raw_data_processing_methods_,
       this);
+    int n_threads = nbThreads(injections);
     manager.spawn_workers(n_threads);
     notifySequenceProcessorEnd();
   }
@@ -155,20 +158,21 @@ namespace SmartPeak
       throw std::invalid_argument("The number of provided filenames_ locations is not correct.");
     }
 
-    notifySequenceSegmentProcessorStart(sequence_segments.size());
-
     // handle user-desired sequence_segment_processing_methods
     if (!sequence_segment_processing_methods_.size()) {
       throw "no sequence segment processing methods given.\n";
     }
 
+    // Launch
+    notifySequenceSegmentProcessorStart(sequence_segments.size());
     SequenceSegmentProcessorMultithread manager(
       sequence_segments,
       (*sequenceHandler_IO),
       sequence_segment_processing_methods_,
       filenames_,
       this);
-    manager.run_processing();
+    int n_threads = nbThreads(sequenceHandler_IO->getSequence());
+    manager.spawn_workers(n_threads);
     sequenceHandler_IO->setSequenceSegments(sequence_segments);
     notifySequenceSegmentProcessorEnd();
   }
@@ -324,37 +328,16 @@ namespace SmartPeak
       throw std::invalid_argument("The number of provided filenames_ locations is not correct.");
     }
 
+    // Launch
     notifySampleGroupProcessorStart(sample_groups.size());
-
-    // Determine the number of threads to launch
-    std::vector<InjectionHandler> injections = sequenceHandler_IO->getSequence();
-    int n_threads = 6;
-    if (injections.size())
-    {
-      const auto& params = injections.front().getRawData().getParameters();
-      if (params.count("SequenceProcessor") && !params.at("SequenceProcessor").empty()) {
-        for (const auto& p : params.at("SequenceProcessor")) {
-          if (p.getName() == "n_thread") {
-            try {
-              n_threads = std::stoi(p.getValueAsString());
-              LOGI << "SequenceProcessor::n_threads set to " << n_threads;
-            }
-            catch (const std::exception& e) {
-              LOGE << e.what();
-            }
-          }
-        }
-      }
-    }
-
     SampleGroupProcessorMultithread manager(
       sample_groups,
       (*sequenceHandler_IO),
       sample_group_processing_methods_,
       filenames_,
       this);
-    manager.run_processing();
-    //manager.spawn_workers(n_threads);
+    int n_threads = nbThreads(sequenceHandler_IO->getSequence());
+    manager.spawn_workers(n_threads);
     sequenceHandler_IO->setSampleGroups(sample_groups);
     notifySampleGroupProcessorEnd();
   }
