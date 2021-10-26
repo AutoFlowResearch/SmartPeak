@@ -301,7 +301,7 @@ bool SessionDB::writeMetadataHandler(const IMetadataHandler& metadata_handler)
   {
     // beginWrite(os, db_context.columns, value, value_type, args...);
     os << separator;
-    os << column_name;
+    os << "\"" << column_name << "\"";
     os << " ";
     os << valueTypeToString(column_type);
     os << "  NOT NULL";
@@ -329,7 +329,7 @@ bool SessionDB::writeMetadataHandler(const IMetadataHandler& metadata_handler)
     for (const auto& [column_name, column_type] : fields)
     {
       os << separator;
-      os << column_name;
+      os << "\"" << column_name << "\"";
       separator = ", ";
     }
     os << ") ";

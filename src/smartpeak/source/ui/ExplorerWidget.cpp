@@ -167,14 +167,18 @@ namespace SmartPeak
     }
 
     // restore serialized checkboxes
+    auto nb_headers = checkbox_headers_.dimension(0);
     if (serialized_checkboxes_.size())
     {
-      size_t i = 0;
-      for (const auto& b : serialized_checkboxes_)
+      for (int h = 0; h < nb_headers; ++h)
       {
-        table_entries_[i].entry_contents[table_entries_plot_col_] = (b ? "true" : "false");
-        (*checkbox_columns_)(table_entries_[i].ID, checkbox_columns_plot_col_) = b;
-        ++i;
+        size_t i = 0;
+        for (const auto& b : serialized_checkboxes_.at(h))
+        {
+          table_entries_[i].entry_contents[h+2] = (b ? "true" : "false");
+          (*checkbox_columns_)(table_entries_[i].ID, h) = b;
+          ++i;
+        }
       }
       plot_unplot_all_deactivated_ = true;
       serialized_checkboxes_.clear();
@@ -254,7 +258,13 @@ namespace SmartPeak
   std::map<std::string, CastValue::Type> ExplorerWidget::getFields() const
   {
     auto fields = Widget::getFields();
-    fields.emplace("checkboxes_plot", CastValue::Type::BOOL_LIST);
+    // checkboxes
+    auto nb_headers = checkbox_headers_.dimension(0);
+    for (int h = 0; h < nb_headers; ++h)
+    {
+      const auto& header_name = checkbox_headers_(h);
+      fields.emplace(header_name, CastValue::Type::BOOL_LIST);
+    }
     return fields;
   }
 
@@ -270,18 +280,24 @@ namespace SmartPeak
     {
       return visible_;
     }
-    else if (field == "checkboxes_plot")
+    // checkboxes
+    auto nb_headers = checkbox_headers_.dimension(0);
+    for (int h = 0; h < nb_headers; ++h)
     {
-      if (checkbox_columns_)
+      const auto& header_name = checkbox_headers_(h);
+      if (field == header_name)
       {
-        std::vector<bool> checkoxes_plot;
-        auto nb_checkboxes_plot = (*checkbox_columns_).dimension(0);
-        for (int i = 0; i < nb_checkboxes_plot; ++i)
+        if (checkbox_columns_)
         {
-          bool checked = (*checkbox_columns_)(i, checkbox_columns_plot_col_);
-          checkoxes_plot.push_back(checked);
+          std::vector<bool> checkoxes_plot;
+          auto nb_checkboxes_plot = (*checkbox_columns_).dimension(0);
+          for (int i = 0; i < nb_checkboxes_plot; ++i)
+          {
+            bool checked = (*checkbox_columns_)(i, h);
+            checkoxes_plot.push_back(checked);
+          }
+          return checkoxes_plot;
         }
-        return checkoxes_plot;
       }
     }
     return std::nullopt;
@@ -293,9 +309,15 @@ namespace SmartPeak
     {
       visible_ = value.b_;
     }
-    else if (field == "checkboxes_plot")
+    // checkboxes
+    auto nb_headers = checkbox_headers_.dimension(0);
+    for (int h = 0; h < nb_headers; ++h)
     {
-      serialized_checkboxes_ = value.bl_;
+      const auto& header_name = checkbox_headers_(h);
+      if (field == header_name)
+      {
+        serialized_checkboxes_.insert_or_assign(h, value.bl_);
+      }
     }
   }
 
