@@ -270,15 +270,10 @@ namespace SmartPeak
 
   std::optional<CastValue> ExplorerWidget::getValue(const std::string& field, const size_t row) const
   {
-    //=================================================
-    if (title_ == "Injections")
+    auto widget_field = Widget::getValue(field, row);
+    if (widget_field)
     {
-      int break_here = 42;
-    }
-    //=================================================
-    if (field == "visible") // TODO inherits
-    {
-      return visible_;
+      return widget_field;
     }
     // checkboxes
     auto nb_headers = checkbox_headers_.dimension(0);
@@ -305,10 +300,7 @@ namespace SmartPeak
 
   void ExplorerWidget::setValue(const std::string& field, const CastValue& value, const size_t row)
   {
-    if ((field == "visible") && (value.getTag() == CastValue::Type::BOOL))
-    {
-      visible_ = value.b_;
-    }
+    Widget::setValue(field, value, row);
     // checkboxes
     auto nb_headers = checkbox_headers_.dimension(0);
     for (int h = 0; h < nb_headers; ++h)
