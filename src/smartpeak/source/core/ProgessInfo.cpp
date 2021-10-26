@@ -202,7 +202,14 @@ namespace SmartPeak
 
   const std::vector<std::string>& ProgressInfo::runningBatch() const
   {
-    return running_batch_->running_items_;
+    if (running_batch_)
+    {
+      return running_batch_->running_items_;
+    }
+    else
+    {
+      return {};
+    }
   }
 
 }
