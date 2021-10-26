@@ -461,7 +461,7 @@ namespace SmartPeak
     ImGui::PopButtonRepeat();
     ImGui::SameLine();
     ImGui::Text("Plot-Stepper");
-    
+
     ImGui::SameLine();
     if (ImGui::Checkbox("Plot/Unplot All", &plot_all_)) { plot_unplot_all_deactivated_ = false; };
     if (plot_all_) { plot_switch_ = "plotunplotall"; plot_idx_ = 0; }
@@ -479,6 +479,20 @@ namespace SmartPeak
                           (*checkbox_columns_)(entry.ID, checkbox_columns_plot_col_) = false;
          });
       }
+    }
+
+    // restore serialized checkboxes
+    if (serialized_checkboxes_.size())
+    {
+      size_t i = 0;
+      for (const auto& b : serialized_checkboxes_)
+      {
+        table_entries_[i].entry_contents[table_entries_plot_col_] = (b ? "true" : "false");
+        (*checkbox_columns_)(table_entries_[i].ID, checkbox_columns_plot_col_) = b;
+        ++i;
+      }
+      plot_unplot_all_deactivated_ = true;
+      serialized_checkboxes_.clear();
     }
 
     if (ImGui::BeginTable(table_id_.c_str(), table_data_.headers_.size() + checkbox_headers_.size(), table_flags)) {
@@ -596,21 +610,7 @@ namespace SmartPeak
     }
     else if (field == "checkboxes_plot")
     {
-      if (checkbox_columns_)
-      {
-        const auto& bl = value.bl_;
-        size_t i = 0;
-        auto nb_checkboxes_plot = (*checkbox_columns_).dimension(0);
-        if (nb_checkboxes_plot == bl.size())
-        {
-          for (const auto b : bl)
-          {
-            (*checkbox_columns_)(i, checkbox_columns_plot_col_) = b;
-            table_entries_[i].entry_contents[checkbox_columns_plot_col_] = b;
-          }
-          ++i;
-        }
-      }
+      serialized_checkboxes_ = value.bl_;
     }
   }
 

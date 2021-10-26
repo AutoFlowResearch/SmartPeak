@@ -371,6 +371,8 @@ namespace SmartPeak
 
     Eigen::Tensor<std::string, 1> checkbox_headers_;
     Eigen::Tensor<bool, 2> *checkbox_columns_ = nullptr;
+
+    std::vector<bool> serialized_checkboxes_;
   };
 
   /**
