@@ -48,6 +48,7 @@
 #include <SmartPeak/ui/WorkflowWidget.h>
 #include <SmartPeak/ui/StatisticsWidget.h>
 #include <SmartPeak/ui/Widget.h>
+#include <SmartPeak/ui/ExplorerWidget.h>
 #include <SmartPeak/ui/InfoWidget.h>
 #include <SmartPeak/ui/RunWorkflowWidget.h>
 #include <SmartPeak/ui/AboutWidget.h>

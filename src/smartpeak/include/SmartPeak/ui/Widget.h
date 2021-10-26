@@ -322,60 +322,6 @@ namespace SmartPeak
   };
 
   /**
-    @brief Base class for all tables
-
-    TODO: features
-    - row highlighting on focus
-    - searching
-    - color coding of rows by status
-  */
-  class ExplorerWidget :
-      public GenericTableWidget,
-      public ISequenceObserver,
-      public IFeaturesObserver
-    {
-    public:
-      ExplorerWidget(const std::string& table_id, const std::string title ="", SequenceObservable* sequence_observable = nullptr)
-        :GenericTableWidget(table_id, title)
-      {
-        if (sequence_observable)
-        {
-          sequence_observable->addSequenceObserver(this);
-        }
-      };
-    /*
-    @brief Show the explorer
-
-    @param[in] headers Column header names
-    @param[in,out] columns Table body or matrix
-    @param[in,out] checked_rows What rows are checked/filtered
-    */
-    void draw() override;
-
-    /**
-    ISequenceObserver
-    */
-    virtual void onSequenceUpdated() override;
-    
-    /**
-    IFeaturesObserver
-    */
-    virtual void onFeaturesUpdated() override;
-
-    /**
-    IMetadataHandler
-    */
-    virtual std::map<std::string, CastValue::Type> getFields() const override;
-    virtual std::optional<CastValue> getValue(const std::string& field, const size_t row) const override;
-    virtual void setValue(const std::string& field, const CastValue& value, const size_t row) override;
-
-    Eigen::Tensor<std::string, 1> checkbox_headers_;
-    Eigen::Tensor<bool, 2> *checkbox_columns_ = nullptr;
-
-    std::vector<bool> serialized_checkboxes_;
-  };
-
-  /**
     @brief Base class for graphics including plots and layouts
   */
   class GenericGraphicWidget : public Widget

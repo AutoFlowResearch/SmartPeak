@@ -23,6 +23,7 @@
 
 #include <gtest/gtest.h>
 #include <SmartPeak/ui/Widget.h>
+#include <SmartPeak/ui/ExplorerWidget.h>
 #include <SmartPeak/test_config.h>
 #include <SmartPeak/io/SequenceParser.h>
 #include <SmartPeak/core/MetaDataHandler.h>

@@ -9,6 +9,7 @@ set(sources_list
 	ChromatogramTICPlotWidget.cpp
 	ChromatogramXICPlotWidget.cpp
 	CreateSessionWidget.cpp
+	ExplorerWidget.cpp
 	FilePicker.cpp
 	GraphicDataVizWidget.cpp
 	GuiAppender.cpp

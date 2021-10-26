@@ -9,6 +9,7 @@ set(sources_list_h
 	ChromatogramTICPlotWidget.h
 	ChromatogramXICPlotWidget.h
 	CreateSessionWidget.h
+	ExplorerWidget.h
 	FilePicker.h
 	GraphicDataVizWidget.h
 	GuiAppender.h
