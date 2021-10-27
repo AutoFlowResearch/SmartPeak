@@ -75,9 +75,9 @@ bool SmartPeak::enable_quick_help = true;
 void initializeDataDirs(ApplicationHandler& state);
 
 void initializeDataDir(
-  ApplicationHandler& state,
+  ApplicationHandler& application_handler,
   const std::string& label,
-  std::filesystem::path& data_dir_member,
+  Filenames::Tag tag,
   const std::filesystem::path& default_dir
 );
 
@@ -961,23 +961,23 @@ int main(int argc, char** argv)
 
 void initializeDataDirs(ApplicationHandler& application_handler)
 {
-  initializeDataDir(application_handler, "mzML", application_handler.mzML_dir_, "mzML");
-  initializeDataDir(application_handler, "INPUT features", application_handler.features_in_dir_, "features");
-  initializeDataDir(application_handler, "OUTPUT features", application_handler.features_out_dir_, "features");
+  initializeDataDir(application_handler, "mzML", Filenames::Tag::MZML_INPUT_PATH, "mzML");
+  initializeDataDir(application_handler, "INPUT features", Filenames::Tag::FEATURES_INPUT_PATH, "features");
+  initializeDataDir(application_handler, "OUTPUT features", Filenames::Tag::FEATURES_OUTPUT_PATH, "features");
 }
 
 void initializeDataDir(
   ApplicationHandler& application_handler,
   const std::string& label,
-  std::filesystem::path& data_dir_member,
+  Filenames::Tag tag,
   const std::filesystem::path& default_dir
 )
 {
-  if (!data_dir_member.empty()) {
+  auto tag_value = application_handler.filenames_.getTag(tag);
+  if (!tag_value.empty()) {
     return;
   }
-  data_dir_member = application_handler.main_dir_ / default_dir;
-  LOGN << "\n\nGenerated path for '" << label << "':\t" << data_dir_member.generic_string();
+  application_handler.filenames_.setTag(tag, (application_handler.main_dir_ / default_dir).generic_string());
 }
 
 void checkTitles(const std::vector<std::shared_ptr<Widget>> windows)

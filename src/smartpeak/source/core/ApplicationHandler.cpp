@@ -101,9 +101,6 @@ namespace SmartPeak
     LOGI << "Pathnames for 'mzML', 'INPUT features' and 'OUTPUT features' reset.";
     sequence_pathname_.clear();
     std::filesystem::path main_dir_ = ".";
-    mzML_dir_.clear();
-    features_in_dir_.clear();
-    features_out_dir_.clear();
     sequenceHandler_.clear();
     filenames_ = Filenames();
   }
