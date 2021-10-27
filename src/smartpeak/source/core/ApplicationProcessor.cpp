@@ -661,6 +661,26 @@ namespace SmartPeak
       );
     }
     application_handler_.filenames_.getSessionDB().endWrite(*db_context);
+
+    db_context = application_handler_.filenames_.getSessionDB().beginWrite(
+      "filenames_tags",
+      "tag", "TEXT",
+      "value", "TEXT"
+    );
+    if (!db_context)
+    {
+      return false;
+    }
+    for (const auto& tag_name : application_handler_.filenames_.getTagNames())
+    {
+      application_handler_.filenames_.getSessionDB().write(
+        *db_context,
+        tag_name.first,
+        application_handler_.filenames_.getTag(tag_name.second)
+      );
+    }
+    application_handler_.filenames_.getSessionDB().endWrite(*db_context);
+
     LOGD << "END StoreFilenames";
     return true;
   }
