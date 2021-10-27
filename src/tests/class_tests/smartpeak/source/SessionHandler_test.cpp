@@ -38,7 +38,8 @@ struct TestData {
     // Load the sequence
     if (load_sequence) {
       application_handler.filenames_ = Utilities::buildFilenamesFromDirectory(application_handler, pathname);
-      LoadSession cs(application_handler);
+      WorkflowManager workflow_manager;
+      LoadSession cs(application_handler, workflow_manager);
       cs.filenames_ = application_handler.filenames_;
       cs.delimiter = ",";
       cs.checkConsistency = false;

@@ -144,8 +144,8 @@ int main(int argc, char** argv)
 
   // widgets: pop ups
   auto file_picker_ = std::make_shared<FilePicker>();
-  auto session_files_widget_create_ = std::make_shared<SessionFilesWidget>(application_handler_, SessionFilesWidget::Mode::ECreation, &event_dispatcher);
-  auto session_files_widget_modify_ = std::make_shared<SessionFilesWidget>(application_handler_, SessionFilesWidget::Mode::EModification, &event_dispatcher);
+  auto session_files_widget_create_ = std::make_shared<SessionFilesWidget>(application_handler_, SessionFilesWidget::Mode::ECreation, &event_dispatcher, workflow_manager_);
+  auto session_files_widget_modify_ = std::make_shared<SessionFilesWidget>(application_handler_, SessionFilesWidget::Mode::EModification, &event_dispatcher, workflow_manager_);
   auto create_session_widget_ = std::make_shared<CreateSessionWidget>(application_handler_, session_files_widget_create_);
   auto run_workflow_widget_ = std::make_shared<RunWorkflowWidget>(application_handler_,
     session_handler_,
@@ -157,7 +157,7 @@ int main(int argc, char** argv)
   auto about_widget_ = std::make_shared<AboutWidget>();
   auto report_ = std::make_shared<Report>(application_handler_);
 
-  auto load_session_wizard_ = std::make_shared<LoadSessionWizard>(session_files_widget_modify_, &event_dispatcher, to_serialize);
+  auto load_session_wizard_ = std::make_shared<LoadSessionWizard>(session_files_widget_modify_, &event_dispatcher, to_serialize, workflow_manager_);
 
   // widgets: windows
   auto quickInfoText_= std::make_shared<InfoWidget>("Info", application_handler_,

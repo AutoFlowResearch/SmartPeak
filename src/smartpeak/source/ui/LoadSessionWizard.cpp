@@ -54,7 +54,7 @@ namespace SmartPeak
         application_handler->closeSession();
         application_handler->filenames_ = *filenames;
         application_handler->main_dir_ = filenames->getTag(Filenames::Tag::MAIN_DIR);
-        LoadSession load_session(*application_handler);
+        LoadSession load_session(*application_handler, workflow_manager_);
         load_session.to_serialize = to_serialize_;
         load_session.addApplicationProcessorObserver(application_observer_);
         load_session.filenames_ = filenames;

@@ -41,7 +41,11 @@ namespace SmartPeak
       EModification
     };
 
-    SessionFilesWidget(ApplicationHandler& application_handler, SessionFilesWidget::Mode mode, IApplicationProcessorObserver* application_observer);
+    SessionFilesWidget(
+      ApplicationHandler& application_handler,
+      SessionFilesWidget::Mode mode,
+      IApplicationProcessorObserver* application_observer,
+      WorkflowManager& workflow_manager);
 
     void draw() override;
     void open(const Filenames& filenames, const std::set<std::string>& requirements = {});
@@ -68,6 +72,7 @@ namespace SmartPeak
     std::map<std::string, std::filesystem::path> hints_;
     Mode mode_;
     std::set<std::string> requirements_;
+    WorkflowManager& workflow_manager_;
 
   protected:
     virtual void doUpdateSession();

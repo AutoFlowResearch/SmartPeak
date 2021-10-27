@@ -50,11 +50,13 @@ namespace SmartPeak
   SessionFilesWidget::SessionFilesWidget(
     ApplicationHandler& application_handler,
     SessionFilesWidget::Mode mode,
-    IApplicationProcessorObserver* application_observer) :
+    IApplicationProcessorObserver* application_observer,
+    WorkflowManager& workflow_manager) :
     Widget("Session Files"),
     application_handler_(application_handler),
     mode_(mode),
-    application_observer_(application_observer)
+    application_observer_(application_observer),
+    workflow_manager_(workflow_manager)
   {
     setHints(application_handler_.loading_processors_);
   };
@@ -338,7 +340,7 @@ namespace SmartPeak
     application_handler_.closeSession();
     application_handler_.filenames_ = filenames;
     application_handler_.main_dir_ = filenames_.getTag(Filenames::Tag::MAIN_DIR);
-    LoadSession load_session(application_handler_);
+    LoadSession load_session(application_handler_, workflow_manager_);
 //    load_session.to_serialize = to_serialize_;
     load_session.addApplicationProcessorObserver(application_observer_);
     load_session.filenames_ = filenames;

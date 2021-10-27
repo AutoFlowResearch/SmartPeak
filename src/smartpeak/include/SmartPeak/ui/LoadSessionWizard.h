@@ -37,10 +37,12 @@ namespace SmartPeak
   {
     LoadSessionWizard(std::shared_ptr<SessionFilesWidget>& session_files_widget_manage,
                       IApplicationProcessorObserver* application_observer,
-                      const std::vector<IMetadataHandler*>& to_serialize) :
+                      const std::vector<IMetadataHandler*>& to_serialize,
+                      WorkflowManager& workflow_manager) :
       application_observer_(application_observer),
       session_files_widget_manage_(session_files_widget_manage),
-      to_serialize_(to_serialize)
+      to_serialize_(to_serialize),
+      workflow_manager_(workflow_manager)
     {};
 
     /**
@@ -51,5 +53,6 @@ namespace SmartPeak
     IApplicationProcessorObserver* application_observer_ = nullptr;
     std::shared_ptr<SessionFilesWidget> session_files_widget_manage_;
     const std::vector<IMetadataHandler*>& to_serialize_;
+    WorkflowManager& workflow_manager_;
   };
 }

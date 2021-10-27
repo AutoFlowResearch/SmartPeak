@@ -238,7 +238,8 @@ TEST(SequenceHandler, createSequence)
 TEST(SequenceHandler, gettersCreateSequence)
 {
   ApplicationHandler application_handler;
-  LoadSession cs(application_handler);
+  WorkflowManager workflow_manager;
+  LoadSession cs(application_handler, workflow_manager);
   auto& sequenceHandler = application_handler.sequenceHandler_;
   EXPECT_STREQ(cs.getName().c_str(), "LOAD_SESSION");
 }
@@ -246,7 +247,8 @@ TEST(SequenceHandler, gettersCreateSequence)
 TEST(SequenceHandler, processSequence)
 {
   ApplicationHandler application_handler;
-  LoadSession cs(application_handler);
+  WorkflowManager workflow_manager;
+  LoadSession cs(application_handler, workflow_manager);
   auto& sequenceHandler = application_handler.sequenceHandler_;
   cs.filenames_        = generateTestFilenames();
   cs.delimiter        = ",";
@@ -333,7 +335,8 @@ TEST(SequenceHandler, gettersProcessSequence)
 TEST(SequenceHandler, processSequenceSegments)
 {
   ApplicationHandler application_handler;
-  LoadSession cs(application_handler);
+  WorkflowManager workflow_manager;
+  LoadSession cs(application_handler, workflow_manager);
   auto& sequenceHandler = application_handler.sequenceHandler_;
   cs.filenames_        = generateTestFilenames();
   cs.delimiter        = ",";
@@ -416,7 +419,8 @@ TEST(SequenceHandler, processSampleGroups)
 {
   // Create the sequence
   ApplicationHandler application_handler;
-  LoadSession cs(application_handler);
+  WorkflowManager workflow_manager;
+  LoadSession cs(application_handler, workflow_manager);
   auto& sequenceHandler = application_handler.sequenceHandler_;
   cs.filenames_ = generateTestFilenames();
   cs.delimiter = ",";
@@ -488,7 +492,8 @@ TEST(SequenceHandler, processSampleGroups_no_injections)
 {
   // Try to launch ProcessSequence while no injections is set.
   ApplicationHandler application_handler;
-  LoadSession cs(application_handler);
+  WorkflowManager workflow_manager;
+  LoadSession cs(application_handler, workflow_manager);
   auto& sequenceHandler = application_handler.sequenceHandler_;
   ProcessSequence ps(sequenceHandler);
   const vector<std::shared_ptr<RawDataProcessor>> raw_data_processing_methods = { std::make_shared<LoadFeatures>() };

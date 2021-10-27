@@ -398,6 +398,47 @@ namespace SmartPeak
       }
     }
 
+    // Load Features
+    std::vector<std::string> commands = { "LOAD_RAW_DATA","LOAD_FEATURES","MAP_CHROMATOGRAMS" };
+    BuildCommandsFromNames buildCommandsFromNames(application_handler_);
+    buildCommandsFromNames.names_ = commands;
+    if (!buildCommandsFromNames.process()) {
+      LOGE << "Failed to create Commands, aborting.";
+    }
+    else
+    {
+      for (auto& cmd : buildCommandsFromNames.commands_)
+      {
+        for (auto& p : cmd.dynamic_filenames)
+        {
+          p.second.setTag(Filenames::Tag::MZML_INPUT_PATH, application_handler_.filenames_.getTag(Filenames::Tag::MZML_INPUT_PATH));
+          p.second.setTag(Filenames::Tag::FEATURES_INPUT_PATH, application_handler_.filenames_.getTag(Filenames::Tag::FEATURES_INPUT_PATH));
+          p.second.setTag(Filenames::Tag::FEATURES_OUTPUT_PATH, application_handler_.filenames_.getTag(Filenames::Tag::FEATURES_OUTPUT_PATH));
+        }
+      }
+      std::set<std::string> injection_names;
+      for (const auto& injection : application_handler_.sequenceHandler_.getSequence())
+      {
+        injection_names.insert(injection.getMetaData().getInjectionName());
+      }
+      const std::set<std::string> sequence_segment_names = {}; // session_handler_.getSelectSequenceSegmentNamesWorkflow(application_handler_.sequenceHandler_);
+      const std::set<std::string> sample_group_names = {}; // session_handler_.getSelectSampleGroupNamesWorkflow(application_handler_.sequenceHandler_);
+      workflow_manager_.addWorkflow(
+        application_handler_,
+        injection_names,
+        sequence_segment_names,
+        sample_group_names,
+        buildCommandsFromNames.commands_,
+        nullptr, nullptr, nullptr, nullptr
+        /*
+        &application_processor_observer_,
+        &sequence_processor_observer_,
+        &sequence_segment_processor_observer_,
+        &sample_group_processor_observer_
+        */
+      );
+    }
+
     application_handler_.sequenceHandler_.notifySequenceUpdated();
     LOGD << "END LoadSession";
     return true;
@@ -620,6 +661,27 @@ namespace SmartPeak
     {
       filenames.addFileName(file_id, name_pattern);
       filenames.setEmbedded(file_id, embedded != 0);
+    };
+    filenames.getSessionDB().endRead(*db_context);
+
+    db_context = filenames.getSessionDB().beginRead(
+      "filenames_tags",
+      "tag",
+      "value"
+    );
+    if (!db_context)
+    {
+      return std::nullopt;
+    }
+    std::string tag;
+    std::string value;
+    while (filenames.getSessionDB().read(
+      *db_context,
+      tag,
+      value
+    ))
+    {
+      filenames.setTag(filenames.getTagNames().at(tag), value);
     };
     filenames.getSessionDB().endRead(*db_context);
     return filenames;

@@ -30,6 +30,7 @@
 #include <SmartPeak/iface/ISequenceSegmentProcessorObserver.h>
 #include <SmartPeak/iface/ISampleGroupProcessorObserver.h>
 #include <SmartPeak/core/ApplicationProcessorObservable.h>
+#include <SmartPeak/core/WorkflowManager.h>
 #include <SmartPeak/core/Parameters.h>
 #include <SmartPeak/iface/IMetadataHandler.h>
 #include <string>
@@ -98,7 +99,10 @@ namespace SmartPeak
     bool             checkConsistency = true;         /// Check consistency of data contained in files
 
     LoadSession() = default;
-    explicit LoadSession(ApplicationHandler& application_handler) : ApplicationProcessor(application_handler) {}
+    explicit LoadSession(ApplicationHandler& application_handler, WorkflowManager& workflow_manager)
+      : ApplicationProcessor(application_handler),
+        workflow_manager_(workflow_manager)
+    {}
 
     /* ApplicationProcessor */
     bool process() override;
@@ -111,6 +115,7 @@ namespace SmartPeak
   protected:
     bool overrideFilenames();
     bool overrideParameters();
+    WorkflowManager& workflow_manager_;
   };
 
   struct LoadLayout : ApplicationProcessor

@@ -309,6 +309,10 @@ namespace SmartPeak
       if (field == header_name)
       {
         serialized_checkboxes_.insert_or_assign(h, value.bl_);
+        for (int i = 0; i < value.bl_.size(); ++i)
+        {
+          (*checkbox_columns_)(i, h) = value.bl_[i];
+        }
       }
     }
   }

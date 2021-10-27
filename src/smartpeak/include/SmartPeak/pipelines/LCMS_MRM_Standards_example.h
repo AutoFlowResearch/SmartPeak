@@ -38,7 +38,8 @@ void example_LCMS_MRM_Standards(
 )
 {
   ApplicationHandler application_handler;
-  LoadSession cs(application_handler);
+  WorkflowManager workflow_manager;
+  LoadSession cs(application_handler, workflow_manager);
   auto& sequenceHandler = application_handler.sequenceHandler_;
   cs.filenames_          = filenames_I;
   cs.delimiter          = delimiter_I;
