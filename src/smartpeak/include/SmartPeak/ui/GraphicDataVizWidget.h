@@ -55,6 +55,13 @@ namespace SmartPeak
       plot_title_(id) {};
 
     void draw() override;
+
+    /**
+      IMetadataHandler
+    */
+    virtual std::map<std::string, CastValue::Type> getFields() const override;
+    virtual std::optional<CastValue> getValue(const std::string& field, const size_t row) const override;
+    virtual void setValue(const std::string& field, const CastValue& value, const size_t row) override;
     
   protected:
     virtual void setMarkerPosition(const std::optional<float>& marker_position);

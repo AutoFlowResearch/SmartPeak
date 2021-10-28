@@ -317,4 +317,63 @@ namespace SmartPeak
       ImGui::EndPopup();
     }
   }
+
+  std::map<std::string, CastValue::Type> GraphicDataVizWidget::getFields() const
+  {
+    auto fields = Widget::getFields();
+    // sliders ranges
+    fields.emplace("current_range_.first", CastValue::Type::FLOAT);
+    fields.emplace("current_range_.second", CastValue::Type::FLOAT);
+    fields.emplace("compact_view_", CastValue::Type::BOOL);
+    fields.emplace("show_legend_", CastValue::Type::BOOL);
+    return fields;
+  }
+
+  std::optional<CastValue> GraphicDataVizWidget::getValue(const std::string& field, const size_t row) const
+  {
+    auto widget_field = Widget::getValue(field, row);
+    if (widget_field)
+    {
+      return widget_field;
+    }
+    if (field == "current_range_.first")
+    {
+      return current_range_.first;
+    }
+    if (field == "current_range_.second")
+    {
+      return current_range_.second;
+    }
+    if (field == "compact_view_")
+    {
+      return compact_view_;
+    }
+    if (field == "show_legend_")
+    {
+      return show_legend_;
+    }
+    return std::nullopt;
+  }
+
+  void GraphicDataVizWidget::setValue(const std::string& field, const CastValue& value, const size_t row)
+  {
+    Widget::setValue(field, value, row);
+    if (field == "current_range_.first")
+    {
+      current_range_.first = value.f_;
+    }
+    if (field == "current_range_.second")
+    {
+      current_range_.second = value.f_;
+    }
+    if (field == "compact_view_")
+    {
+      compact_view_ = value.b_;
+    }
+    if (field == "show_legend_")
+    {
+      show_legend_ = value.b_;
+    }
+    refresh_needed_ = true;
+  }
 }

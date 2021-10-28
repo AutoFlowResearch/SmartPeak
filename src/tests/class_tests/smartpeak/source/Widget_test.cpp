@@ -192,10 +192,6 @@ public:
 
   virtual void updateData() override
   {
-//    GraphicDataVizWidget(SessionHandler& session_handler,
-//      ApplicationHandler& application_handler,
-//      const std::string& id,
-//      const std::string& title) :
   };
 
 public:
