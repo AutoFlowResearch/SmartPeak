@@ -93,6 +93,7 @@ namespace SmartPeak
     std::pair<float, float> slider_min_max_ = { 0.0f, 0.0f };
     std::pair<float, float> current_range_ = { 0.0f, 0.0f };
     std::pair<float, float> input_range_ = { 0.0f, 0.0f };
+    std::optional<std::pair<float, float>> serialized_range_;
     int current_z_ = 0;
     float sliders_height_ = 0.0f;
     std::optional<float> marker_position_;

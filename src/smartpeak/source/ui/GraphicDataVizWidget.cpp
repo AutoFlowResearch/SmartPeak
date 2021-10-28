@@ -107,6 +107,11 @@ namespace SmartPeak
       current_range_ = slider_min_max_ = std::make_pair(graph_viz_data_.x_min_, graph_viz_data_.x_max_);
     }
     input_range_ = std::make_pair(graph_viz_data_.x_min_, graph_viz_data_.x_max_);
+    if (serialized_range_)
+    {
+      current_range_ = *serialized_range_;
+      serialized_range_ = std::nullopt;
+    }
   }
 
   void GraphicDataVizWidget::drawGraph()
@@ -358,14 +363,6 @@ namespace SmartPeak
   void GraphicDataVizWidget::setValue(const std::string& field, const CastValue& value, const size_t row)
   {
     Widget::setValue(field, value, row);
-    if (field == "current_range_.first")
-    {
-      current_range_.first = value.f_;
-    }
-    if (field == "current_range_.second")
-    {
-      current_range_.second = value.f_;
-    }
     if (field == "compact_view_")
     {
       compact_view_ = value.b_;
@@ -374,6 +371,29 @@ namespace SmartPeak
     {
       show_legend_ = value.b_;
     }
-    refresh_needed_ = true;
+    // we need to keep range in a temporary variable to set it when the
+    // plot will be displayed.
+    if (field == "current_range_.first")
+    {
+      if (!serialized_range_)
+      {
+        serialized_range_ = { value.f_ , 0 };
+      }
+      else
+      {
+        serialized_range_->first = value.f_;
+      }
+    }
+    if (field == "current_range_.second")
+    {
+      if (!serialized_range_)
+      {
+        serialized_range_ = { 0, value.f_ };
+      }
+      else
+      {
+        serialized_range_->second = value.f_;
+      }
+    }
   }
 }
