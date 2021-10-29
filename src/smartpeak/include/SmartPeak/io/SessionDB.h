@@ -59,8 +59,8 @@ namespace SmartPeak
       return session_file_name_;
     }
 
-    bool writeMetadataHandler(const IPropertiesHandler& metadata_handler);
-    bool readMetadataHandler(IPropertiesHandler& metadata_handler);
+    bool writePropertiesHandler(const IPropertiesHandler& properties_handler);
+    bool readPropertiesHandler(IPropertiesHandler& properties_handler);
 
     template<typename Value, typename ...Args>
     std::optional<DBContext> beginRead(const std::string& table_name, const Value& value, const Args& ...args);

@@ -737,12 +737,12 @@ namespace SmartPeak
 
   bool StoreWidgets::process()
   {
-    return application_handler_.filenames_.getSessionDB().writeMetadataHandler(*to_serialize);
+    return application_handler_.filenames_.getSessionDB().writePropertiesHandler(*to_serialize);
   }
 
   bool LoadWidgets::process()
   {
-    return application_handler_.filenames_.getSessionDB().readMetadataHandler(*to_serialize);
+    return application_handler_.filenames_.getSessionDB().readPropertiesHandler(*to_serialize);
   }
 
 }
