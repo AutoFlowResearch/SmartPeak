@@ -117,7 +117,7 @@ int main(int argc, char** argv)
 // `int argc, char **argv` are required on Win to link against the proper SDL2/OpenGL implementation
 {
 
-  std::vector<IMetadataHandler*> to_serialize;
+  std::vector<IPropertiesHandler*> to_serialize;
 
   // to disable buttons, display info, and update the session cache
   bool workflow_is_done_ = true;

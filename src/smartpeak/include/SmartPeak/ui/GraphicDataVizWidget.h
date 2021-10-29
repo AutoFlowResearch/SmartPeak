@@ -57,11 +57,11 @@ namespace SmartPeak
     void draw() override;
 
     /**
-      IMetadataHandler
+      IPropertiesHandler
     */
-    virtual std::map<std::string, CastValue::Type> getFields() const override;
-    virtual std::optional<CastValue> getValue(const std::string& field, const size_t row) const override;
-    virtual void setValue(const std::string& field, const CastValue& value, const size_t row) override;
+    virtual std::map<std::string, CastValue::Type> getPropertiesSchema() const override;
+    virtual std::optional<CastValue> getProperty(const std::string& field, const size_t row) const override;
+    virtual void setProperty(const std::string& field, const CastValue& value, const size_t row) override;
     
   protected:
     virtual void setMarkerPosition(const std::optional<float>& marker_position);

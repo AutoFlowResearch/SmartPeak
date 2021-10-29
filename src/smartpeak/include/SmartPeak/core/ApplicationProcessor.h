@@ -32,7 +32,7 @@
 #include <SmartPeak/core/ApplicationProcessorObservable.h>
 #include <SmartPeak/core/WorkflowManager.h>
 #include <SmartPeak/core/Parameters.h>
-#include <SmartPeak/iface/IMetadataHandler.h>
+#include <SmartPeak/iface/IPropertiesHandler.h>
 #include <string>
 #include <vector>
 
@@ -111,7 +111,7 @@ namespace SmartPeak
     virtual std::string getName() const override { return "LOAD_SESSION"; }
     virtual std::string getDescription() const override { return "Load an existing session"; }
 
-    std::vector<IMetadataHandler*> to_serialize;
+    std::vector<IPropertiesHandler*> to_serialize;
   protected:
     bool overrideFilenames();
     bool overrideParameters();
@@ -130,7 +130,7 @@ namespace SmartPeak
     virtual std::string getName() const override { return "LOAD_LAYOUT"; }
     virtual std::string getDescription() const override { return "Load a layout from DB"; }
 
-    std::vector<IMetadataHandler*> to_serialize;
+    std::vector<IPropertiesHandler*> to_serialize;
   };
 
   struct SaveSession : ApplicationProcessor, IFilePickerHandler
@@ -148,7 +148,7 @@ namespace SmartPeak
     virtual std::string getName() const override { return "SAVE_SESSION"; }
     virtual std::string getDescription() const override { return "Save the session"; }
 
-    std::vector<IMetadataHandler*> to_serialize;
+    std::vector<IPropertiesHandler*> to_serialize;
   };
 
   struct LoadFilenames : ApplicationProcessor
@@ -191,7 +191,7 @@ namespace SmartPeak
     virtual std::string getName() const override { return "LOAD_WIDGETS"; }
     virtual std::string getDescription() const override { return "Load Widgets"; }
 
-    IMetadataHandler* to_serialize;
+    IPropertiesHandler* to_serialize;
   };
 
   struct StoreWidgets : ApplicationProcessor
@@ -206,6 +206,6 @@ namespace SmartPeak
     virtual std::string getName() const override { return "STORE_WIDGETS"; }
     virtual std::string getDescription() const override { return "Store Widgets"; }
 
-    IMetadataHandler* to_serialize;
+    IPropertiesHandler* to_serialize;
   };
 }

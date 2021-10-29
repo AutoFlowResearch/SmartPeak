@@ -259,7 +259,7 @@ std::string castValueToSqlString(const CastValue& cast_value)
   }
 }
 
-bool SessionDB::writeMetadataHandler(const IMetadataHandler& metadata_handler)
+bool SessionDB::writeMetadataHandler(const IPropertiesHandler& metadata_handler)
 {
   std::ostringstream os;
   int rc;
@@ -275,7 +275,7 @@ bool SessionDB::writeMetadataHandler(const IMetadataHandler& metadata_handler)
 
   updateSessionInfo(*db);
 
-  auto table_name = metadata_handler.getName();
+  auto table_name = metadata_handler.getPropertiesHandlerName();
 
   db_context.table = table_name;
   db_context.db = *db;
@@ -290,7 +290,7 @@ bool SessionDB::writeMetadataHandler(const IMetadataHandler& metadata_handler)
   // -- ignore error
 
   // create table
-  auto fields = metadata_handler.getFields();
+  auto fields = metadata_handler.getPropertiesSchema();
   os.str("");
   os << "CREATE TABLE ";
   os << "\"" << table_name << "\"";
@@ -339,7 +339,7 @@ bool SessionDB::writeMetadataHandler(const IMetadataHandler& metadata_handler)
     for (const auto& [column_name, column_type] : fields)
     {
       os << separator;
-      auto value = metadata_handler.getValue(column_name);
+      auto value = metadata_handler.getProperty(column_name);
       if (value)
       {
         os << castValueToSqlString(*value);
@@ -367,7 +367,7 @@ bool SessionDB::writeMetadataHandler(const IMetadataHandler& metadata_handler)
   return true;
 }
 
-bool SessionDB::readMetadataHandler(IMetadataHandler& metadata_handler)
+bool SessionDB::readMetadataHandler(IPropertiesHandler& metadata_handler)
 {
   std::ostringstream os;
   int rc;
@@ -383,7 +383,7 @@ bool SessionDB::readMetadataHandler(IMetadataHandler& metadata_handler)
   updateSessionInfo(*db);
   displaySessionInfo();
 
-  auto table_name = metadata_handler.getName();
+  auto table_name = metadata_handler.getPropertiesHandlerName();
   db_context.table = table_name;
   db_context.db = *db;
 
@@ -400,7 +400,7 @@ bool SessionDB::readMetadataHandler(IMetadataHandler& metadata_handler)
   }
 
   // read rows
-  auto fields = metadata_handler.getFields();
+  auto fields = metadata_handler.getPropertiesSchema();
   bool has_more = true;
   while (has_more)
   {
@@ -420,25 +420,25 @@ bool SessionDB::readMetadataHandler(IMetadataHandler& metadata_handler)
           case CastValue::Type::BOOL:
           {
             bool value(!(sqlite3_column_int(db_context.stmt, i) == 0));
-            metadata_handler.setValue(column_name, CastValue(value), i);
+            metadata_handler.setProperty(column_name, CastValue(value), i);
             break;
           }
           case CastValue::Type::INT:
           {
             int value(sqlite3_column_int(db_context.stmt, i));
-            metadata_handler.setValue(column_name, CastValue(value), i);
+            metadata_handler.setProperty(column_name, CastValue(value), i);
             break;
           }
           case CastValue::Type::FLOAT:
           {
             double value(sqlite3_column_double(db_context.stmt, i));
-            metadata_handler.setValue(column_name, CastValue(static_cast<float>(value)), i);
+            metadata_handler.setProperty(column_name, CastValue(static_cast<float>(value)), i);
             break;
           }
           case CastValue::Type::STRING:
           {
             const std::string value(reinterpret_cast<const char*>(sqlite3_column_text(db_context.stmt, i)));
-            metadata_handler.setValue(column_name, CastValue(value), i);
+            metadata_handler.setProperty(column_name, CastValue(value), i);
             break;
           }
           case CastValue::Type::BOOL_LIST:
@@ -448,7 +448,7 @@ bool SessionDB::readMetadataHandler(IMetadataHandler& metadata_handler)
           {
             CastValue v;
             Utilities::parseString(reinterpret_cast<const char*>(sqlite3_column_text(db_context.stmt, i)), v);
-            metadata_handler.setValue(column_name, v , i);
+            metadata_handler.setProperty(column_name, v , i);
             break;
           }
           default:

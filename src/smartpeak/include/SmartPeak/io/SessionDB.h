@@ -30,7 +30,7 @@
 #include <vector>
 #include <optional>
 #include <plog/Log.h>
-#include <SmartPeak/iface/IMetadataHandler.h>
+#include <SmartPeak/iface/IPropertiesHandler.h>
 #include <OpenMS/DATASTRUCTURES/String.h>
 
 namespace SmartPeak
@@ -59,8 +59,8 @@ namespace SmartPeak
       return session_file_name_;
     }
 
-    bool writeMetadataHandler(const IMetadataHandler& metadata_handler);
-    bool readMetadataHandler(IMetadataHandler& metadata_handler);
+    bool writeMetadataHandler(const IPropertiesHandler& metadata_handler);
+    bool readMetadataHandler(IPropertiesHandler& metadata_handler);
 
     template<typename Value, typename ...Args>
     std::optional<DBContext> beginRead(const std::string& table_name, const Value& value, const Args& ...args);

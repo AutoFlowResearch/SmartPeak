@@ -36,17 +36,17 @@ namespace SmartPeak
   const ImGuiTableSortSpecs* ImEntry::s_current_sort_specs = NULL;
   const double GenericGraphicWidget::high_value_threeshold_ = 1e20;
 
-  std::string Widget::getName() const
+  std::string Widget::getPropertiesHandlerName() const
   {
     return title_;
   }
 
-  std::map<std::string, CastValue::Type> Widget::getFields() const
+  std::map<std::string, CastValue::Type> Widget::getPropertiesSchema() const
   {
     return { {"visible", CastValue::Type::BOOL } };
   }
   
-  std::optional<CastValue> Widget::getValue(const std::string& field, const size_t row) const
+  std::optional<CastValue> Widget::getProperty(const std::string& field, const size_t row) const
   {
     if (field == "visible")
     {
@@ -55,7 +55,7 @@ namespace SmartPeak
     return std::nullopt;
   }
 
-  void Widget::setValue(const std::string& field, const CastValue& value, const size_t row)
+  void Widget::setProperty(const std::string& field, const CastValue& value, const size_t row)
   {
     if ((field == "visible") && (value.getTag() == CastValue::Type::BOOL))
     {

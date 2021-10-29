@@ -255,9 +255,9 @@ namespace SmartPeak
     }
   }
 
-  std::map<std::string, CastValue::Type> ExplorerWidget::getFields() const
+  std::map<std::string, CastValue::Type> ExplorerWidget::getPropertiesSchema() const
   {
-    auto fields = Widget::getFields();
+    auto fields = Widget::getPropertiesSchema();
     // checkboxes
     auto nb_headers = checkbox_headers_.dimension(0);
     for (int h = 0; h < nb_headers; ++h)
@@ -268,9 +268,9 @@ namespace SmartPeak
     return fields;
   }
 
-  std::optional<CastValue> ExplorerWidget::getValue(const std::string& field, const size_t row) const
+  std::optional<CastValue> ExplorerWidget::getProperty(const std::string& field, const size_t row) const
   {
-    auto widget_field = Widget::getValue(field, row);
+    auto widget_field = Widget::getProperty(field, row);
     if (widget_field)
     {
       return widget_field;
@@ -298,9 +298,9 @@ namespace SmartPeak
     return std::nullopt;
   }
 
-  void ExplorerWidget::setValue(const std::string& field, const CastValue& value, const size_t row)
+  void ExplorerWidget::setProperty(const std::string& field, const CastValue& value, const size_t row)
   {
-    Widget::setValue(field, value, row);
+    Widget::setProperty(field, value, row);
     // checkboxes
     auto nb_headers = checkbox_headers_.dimension(0);
     for (int h = 0; h < nb_headers; ++h)

@@ -323,9 +323,9 @@ namespace SmartPeak
     }
   }
 
-  std::map<std::string, CastValue::Type> GraphicDataVizWidget::getFields() const
+  std::map<std::string, CastValue::Type> GraphicDataVizWidget::getPropertiesSchema() const
   {
-    auto fields = Widget::getFields();
+    auto fields = Widget::getPropertiesSchema();
     // sliders ranges
     fields.emplace("current_range_.first", CastValue::Type::FLOAT);
     fields.emplace("current_range_.second", CastValue::Type::FLOAT);
@@ -334,9 +334,9 @@ namespace SmartPeak
     return fields;
   }
 
-  std::optional<CastValue> GraphicDataVizWidget::getValue(const std::string& field, const size_t row) const
+  std::optional<CastValue> GraphicDataVizWidget::getProperty(const std::string& field, const size_t row) const
   {
-    auto widget_field = Widget::getValue(field, row);
+    auto widget_field = Widget::getProperty(field, row);
     if (widget_field)
     {
       return widget_field;
@@ -360,9 +360,9 @@ namespace SmartPeak
     return std::nullopt;
   }
 
-  void GraphicDataVizWidget::setValue(const std::string& field, const CastValue& value, const size_t row)
+  void GraphicDataVizWidget::setProperty(const std::string& field, const CastValue& value, const size_t row)
   {
-    Widget::setValue(field, value, row);
+    Widget::setProperty(field, value, row);
     if (field == "compact_view_")
     {
       compact_view_ = value.b_;

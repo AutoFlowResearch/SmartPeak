@@ -7,9 +7,9 @@ set(sources_list_h
   IFeaturesObserver.h
   IFilenamesHandler.h
   IFilePickerHandler.h
-  IMetadataHandler.h
   IParametersObserver.h
   IProcessorDescription.h
+  IPropertiesHandler.h
   ISampleGroupProcessorObserver.h
   ISequenceObserver.h
   ISequenceProcessorObserver.h

@@ -31,7 +31,7 @@
 #include <unsupported/Eigen/CXX11/Tensor>
 #include <SmartPeak/iface/ISequenceSegmentObserver.h>
 #include <SmartPeak/iface/IFeaturesObserver.h>
-#include <SmartPeak/iface/IMetadataHandler.h>
+#include <SmartPeak/iface/IPropertiesHandler.h>
 #include <SmartPeak/core/EventDispatcher.h>
 
 #include <string>
@@ -49,7 +49,7 @@ namespace SmartPeak
   /**
     @brief Abstract base class for all panes, windows, and widgets
   */
-  class Widget: public IMetadataHandler
+  class Widget: public IPropertiesHandler
   {
   public:
     explicit Widget(std::string title = ""):
@@ -59,12 +59,12 @@ namespace SmartPeak
     Widget(const Widget &&) = delete;
 
     /**
-      IMetadataHandler
+      IPropertiesHandler
     */
-    virtual std::string getName() const override;
-    virtual std::map<std::string, CastValue::Type> getFields() const override;
-    virtual std::optional<CastValue> getValue(const std::string& field, const size_t row) const override;
-    virtual void setValue(const std::string& field, const CastValue& value, const size_t row) override;
+    virtual std::string getPropertiesHandlerName() const override;
+    virtual std::map<std::string, CastValue::Type> getPropertiesSchema() const override;
+    virtual std::optional<CastValue> getProperty(const std::string& field, const size_t row) const override;
+    virtual void setProperty(const std::string& field, const CastValue& value, const size_t row) override;
 
     /**
       Interface to show the widget
