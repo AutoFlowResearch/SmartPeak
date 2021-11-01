@@ -56,6 +56,7 @@
 #include <SmartPeak/ui/SequenceTableWidget.h>
 #include <SmartPeak/ui/WindowSizesAndPositions.h>
 #include <SmartPeak/ui/LoadSessionWizard.h>
+#include <SmartPeak/ui/LayoutLoader.h>
 #include <SmartPeak/core/EventDispatcher.h>
 #include <plog/Log.h>
 #include <plog/Appenders/ConsoleAppender.h>
@@ -85,40 +86,9 @@ void checkTitles(const std::vector<std::shared_ptr<Widget>> windows);
 
 std::string getMainWindowTitle(const ApplicationHandler& application_handler);
 
-struct LoaderObserver : IApplicationProcessorObserver
-{
-  /**
-  IApplicationProcessorObserver
-  */
-  virtual void onApplicationProcessorStart(const std::vector<std::string>& commands) override 
-  {
-    if ((commands.size() == 1) && (commands.at(0) == "LOAD_SESSION"))
-    {
-      loading = true;
-    }
-  }
-  virtual void onApplicationProcessorCommandStart(size_t command_index, const std::string& command_name) override {}
-  virtual void onApplicationProcessorCommandEnd(size_t command_index, const std::string& command_name) override {}
-  virtual void onApplicationProcessorEnd() override 
-  {
-    if (loading)
-    {
-      just_loaded = true;
-    }
-    loading = false;
-  }
-
-  virtual void onApplicationProcessorError(const std::string& error) override { loading = false; }
-  bool loading = false;
-  bool just_loaded = false;
-};
-
 int main(int argc, char** argv)
 // `int argc, char **argv` are required on Win to link against the proper SDL2/OpenGL implementation
 {
-
-  std::vector<IPropertiesHandler*> properties_handlers;
-
   // to disable buttons, display info, and update the session cache
   bool workflow_is_done_ = true;
   bool file_loading_is_done_ = true;
@@ -130,7 +100,7 @@ int main(int argc, char** argv)
   SessionHandler session_handler_;
   WorkflowManager workflow_manager_;
   GuiAppender appender_;
-  LoaderObserver loader_observer;
+  LayoutLoader layout_loader(application_handler_);
 
   // EventDispatcher will dispatch events triggered by the observers in the main GUI thread
   EventDispatcher event_dispatcher;
@@ -140,7 +110,7 @@ int main(int argc, char** argv)
   event_dispatcher.addTransitionsObserver(&session_handler_);
   event_dispatcher.addSequenceObserver(&session_handler_);
   event_dispatcher.addFeaturesObserver(&session_handler_);
-  event_dispatcher.addApplicationProcessorObserver(&loader_observer);
+  event_dispatcher.addApplicationProcessorObserver(&layout_loader);
 
   // widgets: pop ups
   auto file_picker_ = std::make_shared<FilePicker>();
@@ -160,7 +130,7 @@ int main(int argc, char** argv)
   auto load_session_wizard_ = std::make_shared<LoadSessionWizard>(
     session_files_widget_modify_,
     &event_dispatcher,
-    properties_handlers,
+    layout_loader.properties_handlers_,
     workflow_manager_,
     &event_dispatcher,
     &event_dispatcher,
@@ -323,15 +293,15 @@ int main(int argc, char** argv)
 
   for (auto& window : top_windows)
   {
-    properties_handlers.push_back(window.get());
+    layout_loader.properties_handlers_.push_back(window.get());
   }
   for (auto& window : bottom_windows)
   {
-    properties_handlers.push_back(window.get());
+    layout_loader.properties_handlers_.push_back(window.get());
   }
   for (auto& window : left_windows)
   {
-    properties_handlers.push_back(window.get());
+    layout_loader.properties_handlers_.push_back(window.get());
   }
 
 
@@ -500,13 +470,13 @@ int main(int argc, char** argv)
           workflow_is_done_ && file_loading_is_done_
           && application_handler_.filenames_.getSessionDB().getDBFilePath() != "")) {
           SaveSession save_session(application_handler_);
-          save_session.properties_handlers = properties_handlers;
+          save_session.properties_handlers = layout_loader.properties_handlers_;
           save_session.process();
         }
         if (ImGui::MenuItem("Save Session As ...", NULL, false, 
                              workflow_is_done_ && file_loading_is_done_ && application_handler_.sessionIsOpened())) {
           auto save_session = std::make_shared<SaveSession>(application_handler_);
-          save_session->properties_handlers = properties_handlers;
+          save_session->properties_handlers = layout_loader.properties_handlers_;
           file_picker_->open("Select session file",
             save_session,
             FilePicker::Mode::EFileCreate,
@@ -932,16 +902,10 @@ int main(int argc, char** argv)
       ImGui::PopStyleVar();
     }
 
-    // ======================================
-    // Load Layout if needed
-    // ======================================
-    if (loader_observer.just_loaded)
-    {
-      LoadPropertiesHandlers load_layout(application_handler_);
-      load_layout.properties_handlers = properties_handlers;
-      load_layout.process();
-      loader_observer.just_loaded = false;
-    }
+    // ===============================================
+    // Load/Save Layout (must be call after ui is set)
+    // ===============================================
+    layout_loader.process();
 
     }
 

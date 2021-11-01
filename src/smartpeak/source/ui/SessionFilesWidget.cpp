@@ -388,6 +388,7 @@ namespace SmartPeak
     {
       // load failed
       application_handler_.closeSession();
+      load_session.notifyApplicationProcessorError("Failed to load session.");
     }
     load_session.notifyApplicationProcessorEnd();
   }

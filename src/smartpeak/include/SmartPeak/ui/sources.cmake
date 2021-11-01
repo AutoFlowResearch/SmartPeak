@@ -17,6 +17,7 @@ set(sources_list_h
 	Help.h
 	ImEntry.h
 	InfoWidget.h
+	LayoutLoader.h
 	LoadSessionWizard.h
 	LogWidget.h
 	ParameterEditorWidget.h
