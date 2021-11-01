@@ -63,8 +63,8 @@ namespace SmartPeak
     */
     virtual std::string getPropertiesHandlerName() const override;
     virtual std::map<std::string, CastValue::Type> getPropertiesSchema() const override;
-    virtual std::optional<CastValue> getProperty(const std::string& field, const size_t row) const override;
-    virtual void setProperty(const std::string& field, const CastValue& value, const size_t row) override;
+    virtual std::optional<CastValue> getProperty(const std::string& property, const size_t row) const override;
+    virtual void setProperty(const std::string& property, const CastValue& value, const size_t row) override;
 
     /**
       Interface to show the widget

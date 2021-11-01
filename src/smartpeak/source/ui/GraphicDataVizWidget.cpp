@@ -325,55 +325,55 @@ namespace SmartPeak
 
   std::map<std::string, CastValue::Type> GraphicDataVizWidget::getPropertiesSchema() const
   {
-    auto fields = Widget::getPropertiesSchema();
+    auto properties = Widget::getPropertiesSchema();
     // sliders ranges
-    fields.emplace("current_range_.first", CastValue::Type::FLOAT);
-    fields.emplace("current_range_.second", CastValue::Type::FLOAT);
-    fields.emplace("compact_view_", CastValue::Type::BOOL);
-    fields.emplace("show_legend_", CastValue::Type::BOOL);
-    return fields;
+    properties.emplace("current_range_.first", CastValue::Type::FLOAT);
+    properties.emplace("current_range_.second", CastValue::Type::FLOAT);
+    properties.emplace("compact_view_", CastValue::Type::BOOL);
+    properties.emplace("show_legend_", CastValue::Type::BOOL);
+    return properties;
   }
 
-  std::optional<CastValue> GraphicDataVizWidget::getProperty(const std::string& field, const size_t row) const
+  std::optional<CastValue> GraphicDataVizWidget::getProperty(const std::string& property, const size_t row) const
   {
-    auto widget_field = Widget::getProperty(field, row);
+    auto widget_field = Widget::getProperty(property, row);
     if (widget_field)
     {
       return widget_field;
     }
-    if (field == "current_range_.first")
+    if (property == "current_range_.first")
     {
       return current_range_.first;
     }
-    if (field == "current_range_.second")
+    if (property == "current_range_.second")
     {
       return current_range_.second;
     }
-    if (field == "compact_view_")
+    if (property == "compact_view_")
     {
       return compact_view_;
     }
-    if (field == "show_legend_")
+    if (property == "show_legend_")
     {
       return show_legend_;
     }
     return std::nullopt;
   }
 
-  void GraphicDataVizWidget::setProperty(const std::string& field, const CastValue& value, const size_t row)
+  void GraphicDataVizWidget::setProperty(const std::string& property, const CastValue& value, const size_t row)
   {
-    Widget::setProperty(field, value, row);
-    if (field == "compact_view_")
+    Widget::setProperty(property, value, row);
+    if (property == "compact_view_")
     {
       compact_view_ = value.b_;
     }
-    if (field == "show_legend_")
+    if (property == "show_legend_")
     {
       show_legend_ = value.b_;
     }
     // we need to keep range in a temporary variable to set it when the
     // plot will be displayed.
-    if (field == "current_range_.first")
+    if (property == "current_range_.first")
     {
       if (!serialized_range_)
       {
@@ -384,7 +384,7 @@ namespace SmartPeak
         serialized_range_->first = value.f_;
       }
     }
-    if (field == "current_range_.second")
+    if (property == "current_range_.second")
     {
       if (!serialized_range_)
       {

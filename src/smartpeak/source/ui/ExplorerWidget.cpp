@@ -47,8 +47,7 @@ namespace SmartPeak
     static ImGuiTableColumnFlags column_0_flags = { ImGuiTableColumnFlags_DefaultSort | ImGuiTableColumnFlags_NoHide };
     static ImGuiTableColumnFlags column_any_flags = { ImGuiTableColumnFlags_NoHide };
 
-    static ImGuiTextFilter filter;
-    filter.Draw("Find");
+    filter_.Draw("Find");
 
     if (table_data_.body_.dimensions().TotalSize() > 0) {
       updateTableContents(table_entries_, table_scanned_,
@@ -200,7 +199,7 @@ namespace SmartPeak
         for (size_t row = 0; row < table_data_.body_.dimension(0); ++row) {
           if (checked_rows_.size() <= 0 || (checked_rows_.size() > 0 && checked_rows_(row)))
           {
-            if (searcher(table_entries_, selected_col_, filter, row))
+            if (searcher(table_entries_, selected_col_, filter_, row))
               continue;
 
             ImGui::TableNextRow();
@@ -257,30 +256,30 @@ namespace SmartPeak
 
   std::map<std::string, CastValue::Type> ExplorerWidget::getPropertiesSchema() const
   {
-    auto fields = Widget::getPropertiesSchema();
+    auto properties = Widget::getPropertiesSchema();
     // checkboxes
     auto nb_headers = checkbox_headers_.dimension(0);
     for (int h = 0; h < nb_headers; ++h)
     {
       const auto& header_name = checkbox_headers_(h);
-      fields.emplace(header_name, CastValue::Type::BOOL_LIST);
+      properties.emplace(header_name, CastValue::Type::BOOL_LIST);
     }
-    return fields;
+    return properties;
   }
 
-  std::optional<CastValue> ExplorerWidget::getProperty(const std::string& field, const size_t row) const
+  std::optional<CastValue> ExplorerWidget::getProperty(const std::string& property, const size_t row) const
   {
-    auto widget_field = Widget::getProperty(field, row);
-    if (widget_field)
+    auto widget_property = Widget::getProperty(property, row);
+    if (widget_property)
     {
-      return widget_field;
+      return widget_property;
     }
     // checkboxes
     auto nb_headers = checkbox_headers_.dimension(0);
     for (int h = 0; h < nb_headers; ++h)
     {
       const auto& header_name = checkbox_headers_(h);
-      if (field == header_name)
+      if (property == header_name)
       {
         if (checkbox_columns_)
         {
@@ -298,15 +297,15 @@ namespace SmartPeak
     return std::nullopt;
   }
 
-  void ExplorerWidget::setProperty(const std::string& field, const CastValue& value, const size_t row)
+  void ExplorerWidget::setProperty(const std::string& property, const CastValue& value, const size_t row)
   {
-    Widget::setProperty(field, value, row);
+    Widget::setProperty(property, value, row);
     // checkboxes
     auto nb_headers = checkbox_headers_.dimension(0);
     for (int h = 0; h < nb_headers; ++h)
     {
       const auto& header_name = checkbox_headers_(h);
-      if (field == header_name)
+      if (property == header_name)
       {
         serialized_checkboxes_.insert_or_assign(h, value.bl_);
         for (int i = 0; i < value.bl_.size(); ++i)

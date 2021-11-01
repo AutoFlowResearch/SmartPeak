@@ -290,14 +290,14 @@ bool SessionDB::writePropertiesHandler(const IPropertiesHandler& properties_hand
   // -- ignore error
 
   // create table
-  auto fields = properties_handler.getPropertiesSchema();
+  auto properties = properties_handler.getPropertiesSchema();
   os.str("");
   os << "CREATE TABLE ";
   os << "\"" << table_name << "\"";
   os << " (";
   os << "ID INTEGER PRIMARY KEY, ";
   std::string separator;
-  for (const auto& [column_name, column_type] : fields)
+  for (const auto& [column_name, column_type] : properties)
   {
     // beginWrite(os, db_context.columns, value, value_type, args...);
     os << separator;
@@ -326,7 +326,7 @@ bool SessionDB::writePropertiesHandler(const IPropertiesHandler& properties_hand
     os << "\"" << table_name << "\"";
     separator = "";
     os << " (";
-    for (const auto& [column_name, column_type] : fields)
+    for (const auto& [column_name, column_type] : properties)
     {
       os << separator;
       os << "\"" << column_name << "\"";
@@ -336,7 +336,7 @@ bool SessionDB::writePropertiesHandler(const IPropertiesHandler& properties_hand
 
     os << "VALUES (";
     separator = "";
-    for (const auto& [column_name, column_type] : fields)
+    for (const auto& [column_name, column_type] : properties)
     {
       os << separator;
       auto value = properties_handler.getProperty(column_name);
@@ -400,7 +400,7 @@ bool SessionDB::readPropertiesHandler(IPropertiesHandler& properties_handler)
   }
 
   // read rows
-  auto fields = properties_handler.getPropertiesSchema();
+  auto properties = properties_handler.getPropertiesSchema();
   bool has_more = true;
   while (has_more)
   {
@@ -412,9 +412,9 @@ bool SessionDB::readPropertiesHandler(IPropertiesHandler& properties_handler)
       for (int i = 0; i < nb_columns; ++i)
       {
         std::string column_name(sqlite3_column_name(db_context.stmt, i));
-        if (fields.count(column_name))
+        if (properties.count(column_name))
         {
-          auto column_type = fields.at(column_name);
+          auto column_type = properties.at(column_name);
           switch (column_type)
           {
           case CastValue::Type::BOOL:

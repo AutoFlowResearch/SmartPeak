@@ -46,18 +46,18 @@ namespace SmartPeak
     return { {"visible", CastValue::Type::BOOL } };
   }
   
-  std::optional<CastValue> Widget::getProperty(const std::string& field, const size_t row) const
+  std::optional<CastValue> Widget::getProperty(const std::string& property, const size_t row) const
   {
-    if (field == "visible")
+    if (property == "visible")
     {
       return visible_;
     }
     return std::nullopt;
   }
 
-  void Widget::setProperty(const std::string& field, const CastValue& value, const size_t row)
+  void Widget::setProperty(const std::string& property, const CastValue& value, const size_t row)
   {
-    if ((field == "visible") && (value.getTag() == CastValue::Type::BOOL))
+    if ((property == "visible") && (value.getTag() == CastValue::Type::BOOL))
     {
       visible_ = value.b_;
     }

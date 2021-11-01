@@ -32,7 +32,7 @@ namespace SmartPeak
     virtual std::string getPropertiesHandlerName() const = 0;
     virtual std::map<std::string, CastValue::Type> getPropertiesSchema() const = 0;
     virtual size_t getNbRows() const { return 1; };
-    virtual std::optional<CastValue> getProperty(const std::string& field, const size_t row = 0) const = 0;
-    virtual void setProperty(const std::string& field, const CastValue& value, const size_t row) = 0;
+    virtual std::optional<CastValue> getProperty(const std::string& property, const size_t row = 0) const = 0;
+    virtual void setProperty(const std::string& property, const CastValue& value, const size_t row) = 0;
   };
 }

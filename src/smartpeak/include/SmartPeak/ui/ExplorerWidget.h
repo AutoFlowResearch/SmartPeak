@@ -93,13 +93,15 @@ namespace SmartPeak
     IPropertiesHandler
     */
     virtual std::map<std::string, CastValue::Type> getPropertiesSchema() const override;
-    virtual std::optional<CastValue> getProperty(const std::string& field, const size_t row) const override;
-    virtual void setProperty(const std::string& field, const CastValue& value, const size_t row) override;
+    virtual std::optional<CastValue> getProperty(const std::string& property, const size_t row) const override;
+    virtual void setProperty(const std::string& property, const CastValue& value, const size_t row) override;
 
     Eigen::Tensor<std::string, 1> checkbox_headers_;
     Eigen::Tensor<bool, 2> *checkbox_columns_ = nullptr;
 
     std::map<int, std::vector<bool>> serialized_checkboxes_;
+
+    ImGuiTextFilter filter_;
   };
 
 }
