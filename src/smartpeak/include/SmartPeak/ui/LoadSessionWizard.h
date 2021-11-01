@@ -35,7 +35,9 @@ namespace SmartPeak
 {
   struct LoadSessionWizard : IFilePickerHandler
   {
-    LoadSessionWizard(std::shared_ptr<SessionFilesWidget>& session_files_widget_manage) :
+    LoadSessionWizard(std::shared_ptr<SessionFilesWidget>& session_files_widget_manage,
+                      IApplicationProcessorObserver* application_observer) :
+      application_observer_(application_observer),
       session_files_widget_manage_(session_files_widget_manage)
     {};
 
@@ -44,6 +46,7 @@ namespace SmartPeak
     */
     bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
   protected:
+    IApplicationProcessorObserver* application_observer_ = nullptr;
     std::shared_ptr<SessionFilesWidget> session_files_widget_manage_;
   };
 }

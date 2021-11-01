@@ -106,7 +106,15 @@ namespace SmartPeak {
   class PlotExporter
   {
   public:
-    PlotExporter(std::string output_path, SessionHandler::GraphVizData& graphvis_data, int mode);
+    
+    enum class PlotType {
+      CURVE,
+      HEATMAP
+    };
+  
+    PlotExporter(std::string output_path, SessionHandler::GraphVizData& graphvis_data, int format, PlotType plot_type);
+    
+    PlotExporter(std::string output_path, SessionHandler::HeatMapData& graphvis_data, int format, PlotType plot_type);
     
     /*
     @brief starts plotting
@@ -194,9 +202,13 @@ namespace SmartPeak {
     std::string y_title_;
     std::string plot_title_;
     std::string gnuplot_path_;
+    uint        file_width_;
+    uint        file_height_;
+    PlotType    plot_type_;
     
     std::vector<PlotLineProperties> plotlines_properties_;
-    SessionHandler::GraphVizData& graphvis_data_;
+    SessionHandler::GraphVizData graphvis_data_;
+    SessionHandler::HeatMapData heatmap_data_;
     
     bool plot_PNG_  = false;
     bool plot_PDF_  = false;

@@ -111,8 +111,8 @@ int main(int argc, char** argv)
 
   // widgets: pop ups
   auto file_picker_ = std::make_shared<FilePicker>();
-  auto session_files_widget_create_ = std::make_shared<SessionFilesWidget>(application_handler_, SessionFilesWidget::Mode::ECreation);
-  auto session_files_widget_modify_ = std::make_shared<SessionFilesWidget>(application_handler_, SessionFilesWidget::Mode::EModification);
+  auto session_files_widget_create_ = std::make_shared<SessionFilesWidget>(application_handler_, SessionFilesWidget::Mode::ECreation, &event_dispatcher);
+  auto session_files_widget_modify_ = std::make_shared<SessionFilesWidget>(application_handler_, SessionFilesWidget::Mode::EModification, &event_dispatcher);
   auto create_session_widget_ = std::make_shared<CreateSessionWidget>(application_handler_, session_files_widget_create_);
   auto run_workflow_widget_ = std::make_shared<RunWorkflowWidget>(application_handler_,
     session_handler_,
@@ -124,7 +124,7 @@ int main(int argc, char** argv)
   auto about_widget_ = std::make_shared<AboutWidget>();
   auto report_ = std::make_shared<Report>(application_handler_);
 
-  auto load_session_wizard_ = std::make_shared<LoadSessionWizard>(session_files_widget_modify_);
+  auto load_session_wizard_ = std::make_shared<LoadSessionWizard>(session_files_widget_modify_, &event_dispatcher);
 
   // widgets: windows
   auto quickInfoText_= std::make_shared<InfoWidget>("Info", application_handler_,
@@ -404,7 +404,6 @@ int main(int argc, char** argv)
       file_loading_is_done_ = file_picker_->fileLoadingIsDone();
 
       // Make the quick info text
-      quickInfoText_->setFileLoadingDone(file_loading_is_done_, file_picker_->errorLoadingFile());
       quickInfoText_->clearErrorMessages();
       if (exceeding_plot_points_) quickInfoText_->addErrorMessage("Plot rendering limit reached.  Not plotting all selected data.");
       if (exceeding_table_size_) quickInfoText_->addErrorMessage("Table rendering limit reached.  Not showing all selected data.");

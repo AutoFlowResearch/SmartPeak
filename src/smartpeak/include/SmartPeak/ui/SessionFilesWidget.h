@@ -41,7 +41,7 @@ namespace SmartPeak
       EModification
     };
 
-    SessionFilesWidget(ApplicationHandler& application_handler, SessionFilesWidget::Mode mode);
+    SessionFilesWidget(ApplicationHandler& application_handler, SessionFilesWidget::Mode mode, IApplicationProcessorObserver* application_observer);
 
     void draw() override;
     void open(const Filenames& filenames, const std::set<std::string>& requirements = {});
@@ -101,6 +101,7 @@ namespace SmartPeak
     bool one_missing_requirement_ = false;
     bool one_invalid_ = false;
     int id_ = 1;
+    IApplicationProcessorObserver* application_observer_ = nullptr;
     static std::vector<std::string> file_modes_strings_;
   };
 }

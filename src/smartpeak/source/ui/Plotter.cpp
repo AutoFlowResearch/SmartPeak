@@ -161,13 +161,35 @@ namespace SmartPeak {
     {"h", 13}
   };
 
-  PlotExporter::PlotExporter(std::string output_path, SessionHandler::GraphVizData& graphvis_data, int format)
+  PlotExporter::PlotExporter(std::string output_path, SessionHandler::GraphVizData& graphvis_data, int format, PlotType plot_type)
     : x_title_(graphvis_data.x_axis_title_),
       y_title_(graphvis_data.y_axis_title_),
       nr_plots_(0),
       with_grid_(true),
       graphvis_data_(graphvis_data),
       output_path_(output_path),
+      plot_type_(plot_type),
+      file_width_(1400),
+      file_height_(800),
+      gnuplot_path_("gnuplot")
+  {
+    //PNG=0, PDF=1, HTML=2, SVG=3
+    if (format == 0) plot_PNG_ = true;
+    if (format == 1) plot_PDF_ = true;
+    if (format == 2) plot_HTML_ = true;
+    if (format == 3) plot_SVG_ = true;
+  }
+
+  PlotExporter::PlotExporter(std::string output_path, SessionHandler::HeatMapData& heatmap_data, int format, PlotType plot_type)
+    : x_title_(heatmap_data.feat_heatmap_x_axis_title),
+      y_title_(heatmap_data.feat_heatmap_y_axis_title),
+      nr_plots_(0),
+      with_grid_(true),
+      heatmap_data_(heatmap_data),
+      output_path_(output_path),
+      plot_type_(plot_type),
+      file_width_(1400),
+      file_height_(800),
       gnuplot_path_("gnuplot")
   {
     //PNG=0, PDF=1, HTML=2, SVG=3
@@ -186,14 +208,39 @@ namespace SmartPeak {
        throw std::length_error("Graph visualisation data are not equal in size!");
      }
      if (data_vals_file.is_open()) {
-       for (size_t i = 0; i < graphvis_data_.x_data_area_.size(); ++i) {
-         const std::vector<float> &x = graphvis_data_.x_data_area_.at(i);
-         const std::vector<float> &y = graphvis_data_.y_data_area_.at(i);
-         data_vals_file << "# PLOT " << (nr_plots_)++ << std::endl;
-         for (uint i = 0; i < x.size(); ++i) {
-           data_vals_file << x[i] << "," << y[i] << std::endl;
+       if (plot_type_ == PlotType::CURVE) {
+         for (size_t i = 0; i < graphvis_data_.x_data_area_.size(); ++i) {
+           const std::vector<float> &x = graphvis_data_.x_data_area_.at(i);
+           const std::vector<float> &y = graphvis_data_.y_data_area_.at(i);
+           data_vals_file << "# PLOT " << (nr_plots_)++ << std::endl;
+           for (uint i = 0; i < x.size(); ++i) {
+             data_vals_file << x[i] << "," << y[i] << std::endl;
+           }
+           data_vals_file << std::endl << std::endl;
          }
-         data_vals_file << std::endl << std::endl;
+       } else if (plot_type_ == PlotType::HEATMAP) {
+         auto col_size = (size_t)heatmap_data_.feat_heatmap_col_labels.size();
+         auto row_size = (size_t)heatmap_data_.feat_heatmap_row_labels.size();
+         auto total_size = (size_t)heatmap_data_.feat_heatmap_data.size();
+         
+         data_vals_file << "# MAT " << (nr_plots_)++ << std::endl;
+         for (int j = 0; j < col_size; j++) {
+           std::string col_label = heatmap_data_.feat_heatmap_col_labels(j);
+           std::replace_if(col_label.begin(), col_label.end(), [](auto x){return x == '_';}, '-');
+           data_vals_file << "," << col_label;
+         }
+         data_vals_file << std::endl;
+         
+         for (int i = row_size-1; i >= 0; i--) {
+           std::string row_label = heatmap_data_.feat_heatmap_row_labels(i);
+           std::replace_if(row_label.begin(), row_label.end(), [](auto x){return x == '_';}, '-');
+           data_vals_file << row_label;
+           for (int j = 0; j < col_size; j++) {
+             data_vals_file << "," << heatmap_data_.feat_heatmap_data(i,j) << " ";
+           }
+           data_vals_file << std::endl;
+         }
+         data_vals_file << std::endl;
        }
        data_vals_file.close();
      } else {
@@ -295,7 +342,8 @@ namespace SmartPeak {
     if (fout.is_open()) {
       appendFileHeader_(fout);
       if (isTermAvailable_("cairo")) {
-        fout << "set terminal pngcairo dashed enhanced" << std::endl;
+        fout << "set terminal pngcairo size ";
+        fout << std::to_string(file_width_)+","+std::to_string(file_height_)+" dashed enhanced" << std::endl;
         fout << "set output '" << exported_plot << "'" << std::endl;
         if (with_grid_) {
           setGrid_(fout);
@@ -435,6 +483,7 @@ namespace SmartPeak {
 
   void PlotExporter::generatePlot_(std::ofstream &fout, const std::string &filename)
   {
+    if (plot_type_ == PlotType::CURVE) {
     auto legends = getLegend_();
     fout << "set key font \"Helvetica, 8\"" << std::endl;
     fout << "set style increment userstyle" << std::endl;
@@ -465,5 +514,27 @@ namespace SmartPeak {
 
     std::system((gnuplot_path_ + " " + filename).c_str());
     removeTempFiles_();
+    }
+    
+    if (plot_type_ == PlotType::HEATMAP) {
+      fout << "set style increment userstyle" << std::endl;
+      fout << "set autoscale fix" << std::endl;
+      fout << "unset log" << std::endl;
+      fout << "unset label" << std::endl;
+      fout << "unset grid" << std::endl;
+      fout << "unset style" << std::endl;
+      fout << "set palette rgbformulae 33,13,10" << std::endl;
+      fout << "set view map scale 1" << std::endl;
+      fout << "set xtic auto" << std::endl;
+      fout << "set ytic auto" << std::endl;
+      fout << "set title \"" << plot_title_ << "\"" << std::endl;
+      fout << "set xlabel \"" << x_title_ << "\"" << std::endl;
+      fout << "set ylabel \"" << y_title_ << "\"" << std::endl;
+      fout << "splot ";
+      fout << "'" << output_path_ + this->filename+".dat" << "'";
+      fout << " matrix columnheaders rowheaders w image" << std::endl;
+      std::system((gnuplot_path_ + " " + filename).c_str());
+      removeTempFiles_();
+    }
   }
 }
