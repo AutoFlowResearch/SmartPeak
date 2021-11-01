@@ -264,14 +264,14 @@ namespace SmartPeak {
       {
         features_out_dir = (application_handler.main_dir_ / features_out_dir).lexically_normal();
       }
-      application_handler.filenames_.setTag(Filenames::Tag::FEATURES_INPUT_PATH, features_out_dir.generic_string());
+      application_handler.filenames_.setTag(Filenames::Tag::FEATURES_OUTPUT_PATH, features_out_dir.generic_string());
 
       std::filesystem::path features_in_dir = application_settings.features_in_dir;
       if (features_in_dir.is_relative())
       {
         features_in_dir = (application_handler.main_dir_ / features_in_dir).lexically_normal();
       }
-      application_handler.filenames_.setTag(Filenames::Tag::FEATURES_OUTPUT_PATH, features_in_dir.generic_string());
+      application_handler.filenames_.setTag(Filenames::Tag::FEATURES_INPUT_PATH, features_in_dir.generic_string());
 
       auto paths = {
           application_handler.filenames_.getTag(Filenames::Tag::MZML_INPUT_PATH),
