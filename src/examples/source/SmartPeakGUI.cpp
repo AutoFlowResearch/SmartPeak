@@ -130,7 +130,6 @@ int main(int argc, char** argv)
   auto load_session_wizard_ = std::make_shared<LoadSessionWizard>(
     session_files_widget_modify_,
     &event_dispatcher,
-    layout_loader.properties_handlers_,
     workflow_manager_,
     &event_dispatcher,
     &event_dispatcher,

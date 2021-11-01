@@ -61,7 +61,6 @@ namespace SmartPeak
           sequence_processor_observer_,
           sequence_segment_processor_observer_,
           sample_group_processor_observer_);
-        load_session.properties_handlers = properties_handlers_;
         load_session.addApplicationProcessorObserver(application_observer_);
         load_session.filenames_ = filenames;
         load_session.notifyApplicationProcessorStart({ load_session.getName() }); // we need a proper loading in thread to profit from the progressbar
