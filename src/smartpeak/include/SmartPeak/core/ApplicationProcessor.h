@@ -141,8 +141,23 @@ namespace SmartPeak
     bool process() override;
 
     /* IProcessorDescription */
-    virtual std::string getName() const override { return "LOAD_LAYOUT"; }
-    virtual std::string getDescription() const override { return "Load a layout from DB"; }
+    virtual std::string getName() const override { return "LOAD_PROPERTIES_HANDLERS"; }
+    virtual std::string getDescription() const override { return "Load a list of properties PropertiesHandlers."; }
+
+    std::vector<IPropertiesHandler*> properties_handlers;
+  };
+
+  struct SavePropertiesHandlers : ApplicationProcessor
+  {
+    SavePropertiesHandlers() = default;
+    explicit SavePropertiesHandlers(ApplicationHandler& application_handler) : ApplicationProcessor(application_handler) {}
+
+    /* ApplicationProcessor */
+    bool process() override;
+
+    /* IProcessorDescription */
+    virtual std::string getName() const override { return "SAVE_PROPERTIES_HANDLERS"; }
+    virtual std::string getDescription() const override { return "Save a list of properties PropertiesHandlers."; }
 
     std::vector<IPropertiesHandler*> properties_handlers;
   };
@@ -193,33 +208,4 @@ namespace SmartPeak
     virtual std::string getDescription() const override { return "Store Filenames to the DB"; }
   };
 
-  struct LoadWidgets : ApplicationProcessor
-  {
-    LoadWidgets() = default;
-    explicit LoadWidgets(ApplicationHandler& application_handler) : ApplicationProcessor(application_handler) {}
-
-    /* ApplicationProcessor */
-    bool process() override;
-
-    /* IProcessorDescription */
-    virtual std::string getName() const override { return "LOAD_WIDGETS"; }
-    virtual std::string getDescription() const override { return "Load Widgets"; }
-
-    IPropertiesHandler* properties_handlers = nullptr;
-  };
-
-  struct StoreWidgets : ApplicationProcessor
-  {
-    StoreWidgets() = default;
-    explicit StoreWidgets(ApplicationHandler& application_handler) : ApplicationProcessor(application_handler) {}
-
-    /* ApplicationProcessor */
-    bool process() override;
-
-    /* IProcessorDescription */
-    virtual std::string getName() const override { return "STORE_WIDGETS"; }
-    virtual std::string getDescription() const override { return "Store Widgets"; }
-
-    IPropertiesHandler* properties_handlers = nullptr;
-  };
 }

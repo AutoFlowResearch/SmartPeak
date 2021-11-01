@@ -444,14 +444,23 @@ namespace SmartPeak
 
   bool LoadPropertiesHandlers::process()
   {
-    LOGD << "START LoadLayout";
+    LOGD << "START LoadPropertiesHandlers";
     for (auto properties_handler : properties_handlers)
     {
-      LoadWidgets load_widget(application_handler_);
-      load_widget.properties_handlers = properties_handler;
-      load_widget.process();
+      application_handler_.filenames_.getSessionDB().readPropertiesHandler(*properties_handler);
     }
-    LOGD << "END LoadLayout";
+    LOGD << "END LoadPropertiesHandlers";
+    return true;
+  }
+
+  bool SavePropertiesHandlers::process()
+  {
+    LOGD << "START SavePropertiesHandlers";
+    for (auto properties_handler : properties_handlers)
+    {
+      application_handler_.filenames_.getSessionDB().writePropertiesHandler(*properties_handler);
+    }
+    LOGD << "END SavePropertiesHandlers";
     return true;
   }
 
@@ -601,12 +610,9 @@ namespace SmartPeak
       }
     }
 
-    for (auto properties_handler : properties_handlers)
-    {
-      StoreWidgets store_widget(application_handler_);
-      store_widget.properties_handlers = properties_handler;
-      store_widget.process();
-    }
+    SavePropertiesHandlers save_properties_handlers(application_handler_);
+    save_properties_handlers.properties_handlers = properties_handlers;
+    save_properties_handlers.process();
 
     LOGD << "END SaveSession";
     return true;
@@ -731,16 +737,6 @@ namespace SmartPeak
 
     LOGD << "END StoreFilenames";
     return true;
-  }
-
-  bool StoreWidgets::process()
-  {
-    return application_handler_.filenames_.getSessionDB().writePropertiesHandler(*properties_handlers);
-  }
-
-  bool LoadWidgets::process()
-  {
-    return application_handler_.filenames_.getSessionDB().readPropertiesHandler(*properties_handlers);
   }
 
 }
