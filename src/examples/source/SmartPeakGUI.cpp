@@ -157,7 +157,15 @@ int main(int argc, char** argv)
   auto about_widget_ = std::make_shared<AboutWidget>();
   auto report_ = std::make_shared<Report>(application_handler_);
 
-  auto load_session_wizard_ = std::make_shared<LoadSessionWizard>(session_files_widget_modify_, &event_dispatcher, to_serialize, workflow_manager_);
+  auto load_session_wizard_ = std::make_shared<LoadSessionWizard>(
+    session_files_widget_modify_,
+    &event_dispatcher,
+    to_serialize,
+    workflow_manager_,
+    &event_dispatcher,
+    &event_dispatcher,
+    &event_dispatcher
+    );
 
   // widgets: windows
   auto quickInfoText_= std::make_shared<InfoWidget>("Info", application_handler_,

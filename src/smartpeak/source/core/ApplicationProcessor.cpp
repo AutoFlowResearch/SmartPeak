@@ -429,13 +429,11 @@ namespace SmartPeak
         sequence_segment_names,
         sample_group_names,
         buildCommandsFromNames.commands_,
-        nullptr, nullptr, nullptr, nullptr
-        /*
-        &application_processor_observer_,
-        &sequence_processor_observer_,
-        &sequence_segment_processor_observer_,
-        &sample_group_processor_observer_
-        */
+        application_processor_observer_,
+        sequence_processor_observer_,
+        sequence_segment_processor_observer_,
+        sample_group_processor_observer_,
+        true // At the moment, we are blocking the process of the workflow. put this to true (and other works) to profit from the progress bar.
       );
     }
 

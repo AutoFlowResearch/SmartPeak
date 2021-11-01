@@ -38,11 +38,17 @@ namespace SmartPeak
     LoadSessionWizard(std::shared_ptr<SessionFilesWidget>& session_files_widget_manage,
                       IApplicationProcessorObserver* application_observer,
                       const std::vector<IPropertiesHandler*>& to_serialize,
-                      WorkflowManager& workflow_manager) :
+                      WorkflowManager& workflow_manager,
+                      ISequenceProcessorObserver* sequence_processor_observer = nullptr,
+                      ISequenceSegmentProcessorObserver* sequence_segment_processor_observer = nullptr,
+                      ISampleGroupProcessorObserver* sample_group_processor_observer = nullptr) :
       application_observer_(application_observer),
       session_files_widget_manage_(session_files_widget_manage),
       to_serialize_(to_serialize),
-      workflow_manager_(workflow_manager)
+      workflow_manager_(workflow_manager),
+      sequence_processor_observer_(sequence_processor_observer),
+      sequence_segment_processor_observer_(sequence_segment_processor_observer),
+      sample_group_processor_observer_(sample_group_processor_observer)
     {};
 
     /**
@@ -54,5 +60,8 @@ namespace SmartPeak
     std::shared_ptr<SessionFilesWidget> session_files_widget_manage_;
     const std::vector<IPropertiesHandler*>& to_serialize_;
     WorkflowManager& workflow_manager_;
+    ISequenceProcessorObserver* sequence_processor_observer_;
+    ISequenceSegmentProcessorObserver* sequence_segment_processor_observer_;
+    ISampleGroupProcessorObserver* sample_group_processor_observer_;
   };
 }

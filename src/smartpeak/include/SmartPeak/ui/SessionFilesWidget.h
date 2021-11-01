@@ -45,7 +45,10 @@ namespace SmartPeak
       ApplicationHandler& application_handler,
       SessionFilesWidget::Mode mode,
       IApplicationProcessorObserver* application_observer,
-      WorkflowManager& workflow_manager);
+      WorkflowManager& workflow_manager,
+      ISequenceProcessorObserver* sequence_processor_observer = nullptr,
+      ISequenceSegmentProcessorObserver* sequence_segment_processor_observer = nullptr,
+      ISampleGroupProcessorObserver* sample_group_processor_observer = nullptr);
 
     void draw() override;
     void open(const Filenames& filenames, const std::set<std::string>& requirements = {});
@@ -108,5 +111,8 @@ namespace SmartPeak
     int id_ = 1;
     IApplicationProcessorObserver* application_observer_ = nullptr;
     static std::vector<std::string> file_modes_strings_;
+    ISequenceProcessorObserver* sequence_processor_observer_;
+    ISequenceSegmentProcessorObserver* sequence_segment_processor_observer_;
+    ISampleGroupProcessorObserver* sample_group_processor_observer_;
   };
 }

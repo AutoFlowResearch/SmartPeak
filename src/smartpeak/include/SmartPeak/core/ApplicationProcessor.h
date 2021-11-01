@@ -99,9 +99,19 @@ namespace SmartPeak
     bool             checkConsistency = true;         /// Check consistency of data contained in files
 
     LoadSession() = default;
-    explicit LoadSession(ApplicationHandler& application_handler, WorkflowManager& workflow_manager)
+    explicit LoadSession(
+      ApplicationHandler& application_handler, 
+      WorkflowManager& workflow_manager,
+      IApplicationProcessorObserver* application_processor_observer = nullptr,
+      ISequenceProcessorObserver* sequence_processor_observer = nullptr,
+      ISequenceSegmentProcessorObserver* sequence_segment_processor_observer = nullptr,
+      ISampleGroupProcessorObserver* sample_group_processor_observer = nullptr)
       : ApplicationProcessor(application_handler),
-        workflow_manager_(workflow_manager)
+        workflow_manager_(workflow_manager),
+        application_processor_observer_(application_processor_observer),
+        sequence_processor_observer_(sequence_processor_observer),
+        sequence_segment_processor_observer_(sequence_segment_processor_observer),
+        sample_group_processor_observer_(sample_group_processor_observer)
     {}
 
     /* ApplicationProcessor */
@@ -116,6 +126,10 @@ namespace SmartPeak
     bool overrideFilenames();
     bool overrideParameters();
     WorkflowManager& workflow_manager_;
+    IApplicationProcessorObserver* application_processor_observer_;
+    ISequenceProcessorObserver* sequence_processor_observer_;
+    ISequenceSegmentProcessorObserver* sequence_segment_processor_observer_;
+    ISampleGroupProcessorObserver* sample_group_processor_observer_;
   };
 
   struct LoadLayout : ApplicationProcessor

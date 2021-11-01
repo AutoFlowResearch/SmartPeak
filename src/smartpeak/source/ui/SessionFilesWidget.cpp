@@ -51,12 +51,18 @@ namespace SmartPeak
     ApplicationHandler& application_handler,
     SessionFilesWidget::Mode mode,
     IApplicationProcessorObserver* application_observer,
-    WorkflowManager& workflow_manager) :
+    WorkflowManager& workflow_manager,
+    ISequenceProcessorObserver* sequence_processor_observer,
+    ISequenceSegmentProcessorObserver* sequence_segment_processor_observer,
+    ISampleGroupProcessorObserver* sample_group_processor_observer) :
     Widget("Session Files"),
     application_handler_(application_handler),
     mode_(mode),
     application_observer_(application_observer),
-    workflow_manager_(workflow_manager)
+    workflow_manager_(workflow_manager),
+    sequence_processor_observer_(sequence_processor_observer),
+    sequence_segment_processor_observer_(sequence_segment_processor_observer),
+    sample_group_processor_observer_(sample_group_processor_observer)
   {
     setHints(application_handler_.loading_processors_);
   };
