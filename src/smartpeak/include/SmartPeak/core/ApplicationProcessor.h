@@ -176,8 +176,6 @@ namespace SmartPeak
     /* IProcessorDescription */
     virtual std::string getName() const override { return "SAVE_SESSION"; }
     virtual std::string getDescription() const override { return "Save the session"; }
-
-    std::vector<IPropertiesHandler*> properties_handlers;
   };
 
   struct LoadFilenames : ApplicationProcessor

@@ -41,7 +41,7 @@ namespace SmartPeak
                       ISequenceProcessorObserver* sequence_processor_observer = nullptr,
                       ISequenceSegmentProcessorObserver* sequence_segment_processor_observer = nullptr,
                       ISampleGroupProcessorObserver* sample_group_processor_observer = nullptr) :
-      application_observer_(application_observer),
+      application_processor_observer_(application_observer),
       session_files_widget_manage_(session_files_widget_manage),
       workflow_manager_(workflow_manager),
       sequence_processor_observer_(sequence_processor_observer),
@@ -54,7 +54,7 @@ namespace SmartPeak
     */
     bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
   protected:
-    IApplicationProcessorObserver* application_observer_ = nullptr;
+    IApplicationProcessorObserver* application_processor_observer_ = nullptr;
     std::shared_ptr<SessionFilesWidget> session_files_widget_manage_;
     WorkflowManager& workflow_manager_;
     ISequenceProcessorObserver* sequence_processor_observer_;

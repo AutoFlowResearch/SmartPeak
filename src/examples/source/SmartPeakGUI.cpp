@@ -469,13 +469,13 @@ int main(int argc, char** argv)
           workflow_is_done_ && file_loading_is_done_
           && application_handler_.filenames_.getSessionDB().getDBFilePath() != "")) {
           SaveSession save_session(application_handler_);
-          save_session.properties_handlers = layout_loader.properties_handlers_;
+          save_session.addApplicationProcessorObserver(&event_dispatcher);
           save_session.process();
         }
         if (ImGui::MenuItem("Save Session As ...", NULL, false, 
                              workflow_is_done_ && file_loading_is_done_ && application_handler_.sessionIsOpened())) {
           auto save_session = std::make_shared<SaveSession>(application_handler_);
-          save_session->properties_handlers = layout_loader.properties_handlers_;
+          save_session->addApplicationProcessorObserver(&event_dispatcher);
           file_picker_->open("Select session file",
             save_session,
             FilePicker::Mode::EFileCreate,

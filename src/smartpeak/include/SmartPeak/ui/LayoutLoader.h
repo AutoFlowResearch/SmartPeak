@@ -23,10 +23,7 @@
 
 #pragma once
 
-#include <SmartPeak/core/SequenceHandler.h>
 #include <SmartPeak/core/ApplicationHandler.h>
-#include <SmartPeak/core/EventDispatcher.h>
-#include <unsupported/Eigen/CXX11/Tensor>
 
 namespace SmartPeak
 {
@@ -53,6 +50,11 @@ namespace SmartPeak
         loading_session_ = true;
         session_loaded_ = false;
       }
+      else if ((commands.size() == 1) && (commands.at(0) == "SAVE_SESSION"))
+      {
+        saving_session_ = true;
+        session_saved_ = false;
+      }
     };
     virtual void onApplicationProcessorCommandStart(size_t command_index, const std::string& command_name) override { };
     virtual void onApplicationProcessorCommandEnd(size_t command_index, const std::string& command_name) override { };
@@ -63,6 +65,11 @@ namespace SmartPeak
         loading_session_ = false;
         session_loaded_ = true;
       }
+      if (saving_session_)
+      {
+        saving_session_ = false;
+        session_saved_ = true;
+      }
     };
     virtual void onApplicationProcessorError(const std::string& error) override
     {
@@ -70,6 +77,11 @@ namespace SmartPeak
       {
         loading_session_ = false;
         session_loaded_ = false;
+      }
+      if (saving_session_)
+      {
+        saving_session_ = false;
+        session_saved_ = false;
       }
     };
 
@@ -85,6 +97,13 @@ namespace SmartPeak
         load_layout.process();
         session_loaded_ = false;
       }
+      if (session_saved_)
+      {
+        SavePropertiesHandlers save_properties_handlers(application_handler_);
+        save_properties_handlers.properties_handlers = properties_handlers_;
+        save_properties_handlers.process();
+        session_saved_ = false;
+      }
     }
 
     std::vector<IPropertiesHandler*> properties_handlers_;
@@ -92,6 +111,8 @@ namespace SmartPeak
   protected:
     bool session_loaded_ = false;
     bool loading_session_ = false;
+    bool session_saved_ = false;
+    bool saving_session_ = false;
     ApplicationHandler& application_handler_;
   };
 }

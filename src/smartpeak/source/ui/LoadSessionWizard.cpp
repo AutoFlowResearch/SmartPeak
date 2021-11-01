@@ -57,13 +57,13 @@ namespace SmartPeak
         LoadSession load_session(
           *application_handler,
           workflow_manager_,
-          application_observer_,
+          application_processor_observer_,
           sequence_processor_observer_,
           sequence_segment_processor_observer_,
           sample_group_processor_observer_);
-        load_session.addApplicationProcessorObserver(application_observer_);
+        load_session.addApplicationProcessorObserver(application_processor_observer_);
         load_session.filenames_ = filenames;
-        load_session.notifyApplicationProcessorStart({ load_session.getName() }); // we need a proper loading in thread to profit from the progressbar
+        load_session.notifyApplicationProcessorStart({ load_session.getName() }); // we need to use the workflow manager to profit from the progressbar
         if (!load_session.process())
         {
           // load failed

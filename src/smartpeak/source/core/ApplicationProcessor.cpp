@@ -556,6 +556,7 @@ namespace SmartPeak
   {
     LOGD << "START SaveSession";
 
+    notifyApplicationProcessorStart({ getName() }); // we need to use the workflow manager to profit from the progressbar
     StoreFilenames store_filenames(application_handler_);
     store_filenames.process();
 
@@ -609,11 +610,7 @@ namespace SmartPeak
         }
       }
     }
-
-    SavePropertiesHandlers save_properties_handlers(application_handler_);
-    save_properties_handlers.properties_handlers = properties_handlers;
-    save_properties_handlers.process();
-
+    notifyApplicationProcessorEnd();
     LOGD << "END SaveSession";
     return true;
   }
