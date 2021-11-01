@@ -121,7 +121,6 @@ namespace SmartPeak
     virtual std::string getName() const override { return "LOAD_SESSION"; }
     virtual std::string getDescription() const override { return "Load an existing session"; }
 
-//    std::vector<IPropertiesHandler*> properties_handlers;
   protected:
     bool overrideFilenames();
     bool overrideParameters();

@@ -50,16 +50,16 @@ namespace SmartPeak
   SessionFilesWidget::SessionFilesWidget(
     ApplicationHandler& application_handler,
     SessionFilesWidget::Mode mode,
-    IApplicationProcessorObserver* application_observer,
     WorkflowManager& workflow_manager,
+    IApplicationProcessorObserver* application_processor_observer,
     ISequenceProcessorObserver* sequence_processor_observer,
     ISequenceSegmentProcessorObserver* sequence_segment_processor_observer,
     ISampleGroupProcessorObserver* sample_group_processor_observer) :
     Widget("Session Files"),
     application_handler_(application_handler),
     mode_(mode),
-    application_observer_(application_observer),
     workflow_manager_(workflow_manager),
+    application_processor_observer_(application_processor_observer),
     sequence_processor_observer_(sequence_processor_observer),
     sequence_segment_processor_observer_(sequence_segment_processor_observer),
     sample_group_processor_observer_(sample_group_processor_observer)
@@ -196,7 +196,7 @@ namespace SmartPeak
   {
     const auto full_path_name = filenames_.getFullPath(file_id);
     std::string displayed_path;
-    std::filesystem::path main_dir_path(filenames_.getTag(Filenames::Tag::MAIN_DIR));
+    std::filesystem::path main_dir_path(filenames_.getTagValue(Filenames::Tag::MAIN_DIR));
     std::string relative_path;
     if (!full_path_name.empty())
     {
@@ -332,7 +332,7 @@ namespace SmartPeak
     // reconstruct filenames to be used to construct the session
     Filenames filenames;
     filenames.getSessionDB() = filenames_.getSessionDB();
-    filenames.setTag(Filenames::Tag::MAIN_DIR, filenames_.getTag(Filenames::Tag::MAIN_DIR));
+    filenames.setTagValue(Filenames::Tag::MAIN_DIR, filenames_.getTagValue(Filenames::Tag::MAIN_DIR));
     for (const auto& fef : file_editor_fields_)
     {
       std::string path = fef.second.text_editor_;
@@ -345,9 +345,9 @@ namespace SmartPeak
     }
     application_handler_.closeSession();
     application_handler_.filenames_ = filenames;
-    application_handler_.main_dir_ = filenames_.getTag(Filenames::Tag::MAIN_DIR);
+    application_handler_.main_dir_ = filenames_.getTagValue(Filenames::Tag::MAIN_DIR);
     LoadSession load_session(application_handler_, workflow_manager_);
-    load_session.addApplicationProcessorObserver(application_observer_);
+    load_session.addApplicationProcessorObserver(application_processor_observer_);
     load_session.filenames_ = filenames;
     // When modifiying one file, we load it using all files are marked as external, to eventually import them.
     for (const auto& fef : file_editor_fields_)
@@ -415,7 +415,7 @@ namespace SmartPeak
       if (fef.text_editor_last_update_ != fef.text_editor_)
       {
         // Check if it exists
-        std::filesystem::path main_dir_path(filenames_.getTag(Filenames::Tag::MAIN_DIR));
+        std::filesystem::path main_dir_path(filenames_.getTagValue(Filenames::Tag::MAIN_DIR));
         std::filesystem::path full_path_name;
         auto entered_path = std::filesystem::path(fef.text_editor_);
         if (!entered_path.empty())

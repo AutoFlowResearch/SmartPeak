@@ -131,7 +131,7 @@ namespace SmartPeak
     */
     bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override
     {
-      application_handler->filenames_.setTag(Filenames::Tag::MZML_INPUT_PATH, filename.generic_string());
+      application_handler->filenames_.setTagValue(Filenames::Tag::MZML_INPUT_PATH, filename.generic_string());
       return true;
     };
   };
@@ -142,7 +142,7 @@ namespace SmartPeak
     */
     bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override
     {
-      application_handler->filenames_.setTag(Filenames::Tag::FEATURES_INPUT_PATH, filename.generic_string());
+      application_handler->filenames_.setTagValue(Filenames::Tag::FEATURES_INPUT_PATH, filename.generic_string());
       return true;
     };
   };
@@ -154,7 +154,7 @@ namespace SmartPeak
     */
     bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override
     {
-      application_handler->filenames_.setTag(Filenames::Tag::FEATURES_OUTPUT_PATH, filename.generic_string());
+      application_handler->filenames_.setTagValue(Filenames::Tag::FEATURES_OUTPUT_PATH, filename.generic_string());
       return true;
     }
   };

@@ -22,14 +22,6 @@
 // --------------------------------------------------------------------------
 
 #include <SmartPeak/ui/ExplorerWidget.h>
-#include <algorithm>
-#include <map>
-#include <string>
-#include <utility>
-#include <vector>
-#include <imgui.h>
-#include <imgui_internal.h>
-#include <implot.h>
 
 namespace SmartPeak
 {

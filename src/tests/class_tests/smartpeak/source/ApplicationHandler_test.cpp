@@ -45,27 +45,27 @@ public:
 TEST_F(ApplicationHandlerFixture, SetRawDataPathname_ProcessSetsPath)
 {
   SetRawDataPathname cmd;
-  EXPECT_STREQ(ah_.filenames_.getTag(Filenames::Tag::MZML_INPUT_PATH).c_str(), "");
+  EXPECT_STREQ(ah_.filenames_.getTagValue(Filenames::Tag::MZML_INPUT_PATH).c_str(), "");
   EXPECT_TRUE(cmd.onFilePicked("test", &ah_));
-  EXPECT_STREQ(ah_.filenames_.getTag(Filenames::Tag::MZML_INPUT_PATH).c_str(), "test");
+  EXPECT_STREQ(ah_.filenames_.getTagValue(Filenames::Tag::MZML_INPUT_PATH).c_str(), "test");
 }
 
 /* SetInputFeaturesPathname */
 TEST_F(ApplicationHandlerFixture, SetInputFeaturesPathname_ProcessSetsPath)
 {
   SetInputFeaturesPathname cmd;
-  EXPECT_STREQ(ah_.filenames_.getTag(Filenames::Tag::FEATURES_INPUT_PATH).c_str(), "");
+  EXPECT_STREQ(ah_.filenames_.getTagValue(Filenames::Tag::FEATURES_INPUT_PATH).c_str(), "");
   EXPECT_TRUE(cmd.onFilePicked("test", &ah_));
-  EXPECT_STREQ(ah_.filenames_.getTag(Filenames::Tag::FEATURES_INPUT_PATH).c_str(), "test");
+  EXPECT_STREQ(ah_.filenames_.getTagValue(Filenames::Tag::FEATURES_INPUT_PATH).c_str(), "test");
 }
 
 /* SetOutputFeaturesPathname */
 TEST_F(ApplicationHandlerFixture, SetOutputFeaturesPathname_ProcessSetsPath)
 {
   SetOutputFeaturesPathname cmd;
-  EXPECT_STREQ(ah_.filenames_.getTag(Filenames::Tag::FEATURES_OUTPUT_PATH).c_str(), "");
+  EXPECT_STREQ(ah_.filenames_.getTagValue(Filenames::Tag::FEATURES_OUTPUT_PATH).c_str(), "");
   EXPECT_TRUE(cmd.onFilePicked("test", &ah_));
-  EXPECT_STREQ(ah_.filenames_.getTag(Filenames::Tag::FEATURES_OUTPUT_PATH).c_str(), "test");
+  EXPECT_STREQ(ah_.filenames_.getTagValue(Filenames::Tag::FEATURES_OUTPUT_PATH).c_str(), "test");
 }
 
 TEST_F(ApplicationHandlerFixture, sessionIsOpen)

@@ -114,8 +114,8 @@ int main(int argc, char** argv)
 
   // widgets: pop ups
   auto file_picker_ = std::make_shared<FilePicker>();
-  auto session_files_widget_create_ = std::make_shared<SessionFilesWidget>(application_handler_, SessionFilesWidget::Mode::ECreation, &event_dispatcher, workflow_manager_);
-  auto session_files_widget_modify_ = std::make_shared<SessionFilesWidget>(application_handler_, SessionFilesWidget::Mode::EModification, &event_dispatcher, workflow_manager_);
+  auto session_files_widget_create_ = std::make_shared<SessionFilesWidget>(application_handler_, SessionFilesWidget::Mode::ECreation, workflow_manager_, &event_dispatcher);
+  auto session_files_widget_modify_ = std::make_shared<SessionFilesWidget>(application_handler_, SessionFilesWidget::Mode::EModification, workflow_manager_, &event_dispatcher);
   auto create_session_widget_ = std::make_shared<CreateSessionWidget>(application_handler_, session_files_widget_create_);
   auto run_workflow_widget_ = std::make_shared<RunWorkflowWidget>(application_handler_,
     session_handler_,
@@ -129,8 +129,8 @@ int main(int argc, char** argv)
 
   auto load_session_wizard_ = std::make_shared<LoadSessionWizard>(
     session_files_widget_modify_,
-    &event_dispatcher,
     workflow_manager_,
+    &event_dispatcher,
     &event_dispatcher,
     &event_dispatcher,
     &event_dispatcher
@@ -944,11 +944,11 @@ void initializeDataDir(
   const std::filesystem::path& default_dir
 )
 {
-  auto tag_value = application_handler.filenames_.getTag(tag);
+  auto tag_value = application_handler.filenames_.getTagValue(tag);
   if (!tag_value.empty()) {
     return;
   }
-  application_handler.filenames_.setTag(tag, (application_handler.main_dir_ / default_dir).generic_string());
+  application_handler.filenames_.setTagValue(tag, (application_handler.main_dir_ / default_dir).generic_string());
 }
 
 void checkTitles(const std::vector<std::shared_ptr<Widget>> windows)

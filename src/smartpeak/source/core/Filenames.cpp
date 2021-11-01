@@ -161,13 +161,13 @@ namespace SmartPeak
     return file_ids;
   }
 
-  void Filenames::setTag(Tag tag, const std::string& value)
+  void Filenames::setTagValue(Tag tag, const std::string& value)
   {
     tags_[tag] = value;
     updateFullPaths();
   }
 
-  std::string Filenames::getTag(Tag tag) const
+  std::string Filenames::getTagValue(Tag tag) const
   {
     if (tags_.count(tag))
     {
@@ -182,26 +182,6 @@ namespace SmartPeak
   std::map<std::string, Filenames::Tag> Filenames::getTagNames() const
   {
     return string_to_tag_;
-    /*
-    std::vector<std::string> tags;
-    for (int i = static_cast<int>(Tag::TAG_FIRST); i < static_cast<int>(Tag::TAG_LAST); ++i)
-    {
-      const auto tag = static_cast<Tag>(i);
-      // get tag name froms tring_to_tag_
-      std::string tag_name;
-      for (const auto& [key, value] : string_to_tag_)
-      {
-        if (value == tag)
-        {
-          tag_name = key;
-        }
-      }
-      if (!tag_name.empty())
-      {
-        tags.push_back(tag_name);
-      }
-    }
-    */
   }
 
   std::string Filenames::getDescription(const std::string& file_id) const

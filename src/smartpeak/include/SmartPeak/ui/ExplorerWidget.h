@@ -33,7 +33,6 @@
 #include <SmartPeak/iface/ISequenceSegmentObserver.h>
 #include <SmartPeak/iface/IFeaturesObserver.h>
 #include <SmartPeak/iface/IPropertiesHandler.h>
-#include <SmartPeak/core/EventDispatcher.h>
 
 #include <string>
 #include <utility>

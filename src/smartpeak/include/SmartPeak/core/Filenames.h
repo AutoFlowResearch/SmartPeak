@@ -95,12 +95,12 @@ namespace SmartPeak
     /**
       @brief set tags and update paths.
     */
-    void setTag(Tag tag, const std::string& value);
+    void setTagValue(Tag tag, const std::string& value);
 
     /**
       @brief get tag value.
     */
-    std::string getTag(Tag tag) const;
+    std::string getTagValue(Tag tag) const;
 
     /**
       @return list of tag names and there corresponding enum

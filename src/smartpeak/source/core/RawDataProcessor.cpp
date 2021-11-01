@@ -2406,7 +2406,7 @@ namespace SmartPeak
     // Complete user parameters with schema
     ParameterSet params(params_I);
     params.merge(getParameterSchema());
-    std::filesystem::path main_path(filenames_I.getTag(Filenames::Tag::MAIN_DIR));
+    std::filesystem::path main_path(filenames_I.getTagValue(Filenames::Tag::MAIN_DIR));
     Utilities::prepareFileParameterList(params, "AccurateMassSearchEngine", "db:mapping", main_path);
     Utilities::prepareFileParameterList(params, "AccurateMassSearchEngine", "db:struct", main_path);
     Utilities::prepareFileParameter(params, "AccurateMassSearchEngine", "positive_adducts", main_path);
@@ -2576,7 +2576,7 @@ namespace SmartPeak
     // Complete user parameters with schema
     ParameterSet params(params_I);
     params.merge(getParameterSchema());
-    std::filesystem::path main_path(filenames_I.getTag(Filenames::Tag::MAIN_DIR));
+    std::filesystem::path main_path(filenames_I.getTagValue(Filenames::Tag::MAIN_DIR));
     Utilities::prepareFileParameterList(params, "TargetedSpectraExtractor", "AccurateMassSearchEngine:db:mapping", main_path);
     Utilities::prepareFileParameterList(params, "TargetedSpectraExtractor", "AccurateMassSearchEngine:db:struct", main_path);
     Utilities::prepareFileParameter(params, "TargetedSpectraExtractor", "AccurateMassSearchEngine:positive_adducts", main_path);
@@ -2619,7 +2619,7 @@ namespace SmartPeak
     // Complete user parameters with schema
     ParameterSet params(params_I);
     params.merge(getParameterSchema());
-    std::filesystem::path main_path(filenames_I.getTag(Filenames::Tag::MAIN_DIR));
+    std::filesystem::path main_path(filenames_I.getTagValue(Filenames::Tag::MAIN_DIR));
     Utilities::prepareFileParameterList(params, "TargetedSpectraExtractor", "AccurateMassSearchEngine:db:mapping", main_path);
     Utilities::prepareFileParameterList(params, "TargetedSpectraExtractor", "AccurateMassSearchEngine:db:struct", main_path);
     Utilities::prepareFileParameter(params, "TargetedSpectraExtractor", "AccurateMassSearchEngine:positive_adducts", main_path);

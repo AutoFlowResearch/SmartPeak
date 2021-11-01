@@ -262,18 +262,18 @@ TEST(SequenceHandler, processSequence)
   std::map<std::string, Filenames> dynamic_filenames;
   Filenames methods_filenames;
   const std::string path = SMARTPEAK_GET_TEST_DATA_PATH("");
-  methods_filenames.setTag(Filenames::Tag::MAIN_DIR, path);
-  methods_filenames.setTag(Filenames::Tag::MZML_INPUT_PATH, path + "/mzML");
-  methods_filenames.setTag(Filenames::Tag::FEATURES_INPUT_PATH, path + "/features");
-  methods_filenames.setTag(Filenames::Tag::FEATURES_OUTPUT_PATH, path + "/features");
+  methods_filenames.setTagValue(Filenames::Tag::MAIN_DIR, path);
+  methods_filenames.setTagValue(Filenames::Tag::MZML_INPUT_PATH, path + "/mzML");
+  methods_filenames.setTagValue(Filenames::Tag::FEATURES_INPUT_PATH, path + "/features");
+  methods_filenames.setTagValue(Filenames::Tag::FEATURES_OUTPUT_PATH, path + "/features");
   for (const InjectionHandler& injection : sequenceHandler.getSequence()) {
     const std::string key = injection.getMetaData().getInjectionName();
     dynamic_filenames[key] = methods_filenames;
-    dynamic_filenames[key].setTag(Filenames::Tag::INPUT_MZML_FILENAME, injection.getMetaData().getFilename());
-    dynamic_filenames[key].setTag(Filenames::Tag::INPUT_INJECTION_NAME, key);
-    dynamic_filenames[key].setTag(Filenames::Tag::OUTPUT_INJECTION_NAME, key);
-    dynamic_filenames[key].setTag(Filenames::Tag::INPUT_GROUP_NAME, injection.getMetaData().getSampleGroupName());
-    dynamic_filenames[key].setTag(Filenames::Tag::OUTPUT_GROUP_NAME, injection.getMetaData().getSampleGroupName());
+    dynamic_filenames[key].setTagValue(Filenames::Tag::INPUT_MZML_FILENAME, injection.getMetaData().getFilename());
+    dynamic_filenames[key].setTagValue(Filenames::Tag::INPUT_INJECTION_NAME, key);
+    dynamic_filenames[key].setTagValue(Filenames::Tag::OUTPUT_INJECTION_NAME, key);
+    dynamic_filenames[key].setTagValue(Filenames::Tag::INPUT_GROUP_NAME, injection.getMetaData().getSampleGroupName());
+    dynamic_filenames[key].setTagValue(Filenames::Tag::OUTPUT_GROUP_NAME, injection.getMetaData().getSampleGroupName());
   }
 
   EXPECT_EQ(sequenceHandler.getSequence().size(), dynamic_filenames.size());
@@ -348,19 +348,19 @@ TEST(SequenceHandler, processSequenceSegments)
 
   Filenames methods_filenames;
   const std::string path = SMARTPEAK_GET_TEST_DATA_PATH("");
-  methods_filenames.setTag(Filenames::Tag::MAIN_DIR, path);
-  methods_filenames.setTag(Filenames::Tag::MZML_INPUT_PATH, path + "mzML");
-  methods_filenames.setTag(Filenames::Tag::FEATURES_INPUT_PATH, path + "features");
-  methods_filenames.setTag(Filenames::Tag::FEATURES_OUTPUT_PATH, path + "features");
+  methods_filenames.setTagValue(Filenames::Tag::MAIN_DIR, path);
+  methods_filenames.setTagValue(Filenames::Tag::MZML_INPUT_PATH, path + "mzML");
+  methods_filenames.setTagValue(Filenames::Tag::FEATURES_INPUT_PATH, path + "features");
+  methods_filenames.setTagValue(Filenames::Tag::FEATURES_OUTPUT_PATH, path + "features");
   std::map<std::string, Filenames> dynamic_filenames;
   for (const SequenceSegmentHandler& sequence_segment : sequenceHandler.getSequenceSegments()) {
     const std::string key = sequence_segment.getSequenceSegmentName();
     dynamic_filenames[key] = methods_filenames;
-    dynamic_filenames[key].setTag(Filenames::Tag::INPUT_MZML_FILENAME, "");
-    dynamic_filenames[key].setTag(Filenames::Tag::INPUT_INJECTION_NAME, key);
-    dynamic_filenames[key].setTag(Filenames::Tag::OUTPUT_INJECTION_NAME, key);
-    dynamic_filenames[key].setTag(Filenames::Tag::INPUT_GROUP_NAME, key);
-    dynamic_filenames[key].setTag(Filenames::Tag::OUTPUT_GROUP_NAME, key);
+    dynamic_filenames[key].setTagValue(Filenames::Tag::INPUT_MZML_FILENAME, "");
+    dynamic_filenames[key].setTagValue(Filenames::Tag::INPUT_INJECTION_NAME, key);
+    dynamic_filenames[key].setTagValue(Filenames::Tag::OUTPUT_INJECTION_NAME, key);
+    dynamic_filenames[key].setTagValue(Filenames::Tag::INPUT_GROUP_NAME, key);
+    dynamic_filenames[key].setTagValue(Filenames::Tag::OUTPUT_GROUP_NAME, key);
   }
 
   // Default sequence segment names (i.e., all)
@@ -435,15 +435,15 @@ TEST(SequenceHandler, processSampleGroups)
   for (const InjectionHandler& injection : sequenceHandler.getSequence()) {
     const std::string key = injection.getMetaData().getInjectionName();
     dynamic_filenames[key] = methods_filenames;
-    dynamic_filenames[key].setTag(Filenames::Tag::MAIN_DIR, path);
-    dynamic_filenames[key].setTag(Filenames::Tag::MZML_INPUT_PATH, path);
-    dynamic_filenames[key].setTag(Filenames::Tag::FEATURES_INPUT_PATH, path);
-    dynamic_filenames[key].setTag(Filenames::Tag::FEATURES_OUTPUT_PATH, path);
-    dynamic_filenames[key].setTag(Filenames::Tag::INPUT_MZML_FILENAME, injection.getMetaData().getFilename());
-    dynamic_filenames[key].setTag(Filenames::Tag::INPUT_INJECTION_NAME, key);
-    dynamic_filenames[key].setTag(Filenames::Tag::OUTPUT_INJECTION_NAME, key);
-    dynamic_filenames[key].setTag(Filenames::Tag::INPUT_GROUP_NAME, injection.getMetaData().getSampleGroupName());
-    dynamic_filenames[key].setTag(Filenames::Tag::OUTPUT_GROUP_NAME, injection.getMetaData().getSampleGroupName());
+    dynamic_filenames[key].setTagValue(Filenames::Tag::MAIN_DIR, path);
+    dynamic_filenames[key].setTagValue(Filenames::Tag::MZML_INPUT_PATH, path);
+    dynamic_filenames[key].setTagValue(Filenames::Tag::FEATURES_INPUT_PATH, path);
+    dynamic_filenames[key].setTagValue(Filenames::Tag::FEATURES_OUTPUT_PATH, path);
+    dynamic_filenames[key].setTagValue(Filenames::Tag::INPUT_MZML_FILENAME, injection.getMetaData().getFilename());
+    dynamic_filenames[key].setTagValue(Filenames::Tag::INPUT_INJECTION_NAME, key);
+    dynamic_filenames[key].setTagValue(Filenames::Tag::OUTPUT_INJECTION_NAME, key);
+    dynamic_filenames[key].setTagValue(Filenames::Tag::INPUT_GROUP_NAME, injection.getMetaData().getSampleGroupName());
+    dynamic_filenames[key].setTagValue(Filenames::Tag::OUTPUT_GROUP_NAME, injection.getMetaData().getSampleGroupName());
   }
 
   ProcessSequence ps(sequenceHandler);
@@ -455,17 +455,17 @@ TEST(SequenceHandler, processSampleGroups)
   { std::make_shared<MergeInjections>() };
   dynamic_filenames.clear();
   Filenames methods_filenames2;
-  methods_filenames2.setTag(Filenames::Tag::MAIN_DIR, path);
-  methods_filenames2.setTag(Filenames::Tag::MZML_INPUT_PATH, path + "mzML");
-  methods_filenames2.setTag(Filenames::Tag::FEATURES_INPUT_PATH, path + "features");
-  methods_filenames2.setTag(Filenames::Tag::FEATURES_OUTPUT_PATH, path + "features");
+  methods_filenames2.setTagValue(Filenames::Tag::MAIN_DIR, path);
+  methods_filenames2.setTagValue(Filenames::Tag::MZML_INPUT_PATH, path + "mzML");
+  methods_filenames2.setTagValue(Filenames::Tag::FEATURES_INPUT_PATH, path + "features");
+  methods_filenames2.setTagValue(Filenames::Tag::FEATURES_OUTPUT_PATH, path + "features");
   for (const SampleGroupHandler& sampleGroupHandler : sequenceHandler.getSampleGroups()) {
     dynamic_filenames[sampleGroupHandler.getSampleGroupName()] = methods_filenames2;
-    dynamic_filenames[sampleGroupHandler.getSampleGroupName()].setTag(Filenames::Tag::INPUT_MZML_FILENAME, "");
-    dynamic_filenames[sampleGroupHandler.getSampleGroupName()].setTag(Filenames::Tag::INPUT_INJECTION_NAME, sampleGroupHandler.getSampleGroupName());
-    dynamic_filenames[sampleGroupHandler.getSampleGroupName()].setTag(Filenames::Tag::OUTPUT_INJECTION_NAME, sampleGroupHandler.getSampleGroupName());
-    dynamic_filenames[sampleGroupHandler.getSampleGroupName()].setTag(Filenames::Tag::INPUT_GROUP_NAME, sampleGroupHandler.getSampleGroupName());
-    dynamic_filenames[sampleGroupHandler.getSampleGroupName()].setTag(Filenames::Tag::OUTPUT_GROUP_NAME, sampleGroupHandler.getSampleGroupName());
+    dynamic_filenames[sampleGroupHandler.getSampleGroupName()].setTagValue(Filenames::Tag::INPUT_MZML_FILENAME, "");
+    dynamic_filenames[sampleGroupHandler.getSampleGroupName()].setTagValue(Filenames::Tag::INPUT_INJECTION_NAME, sampleGroupHandler.getSampleGroupName());
+    dynamic_filenames[sampleGroupHandler.getSampleGroupName()].setTagValue(Filenames::Tag::OUTPUT_INJECTION_NAME, sampleGroupHandler.getSampleGroupName());
+    dynamic_filenames[sampleGroupHandler.getSampleGroupName()].setTagValue(Filenames::Tag::INPUT_GROUP_NAME, sampleGroupHandler.getSampleGroupName());
+    dynamic_filenames[sampleGroupHandler.getSampleGroupName()].setTagValue(Filenames::Tag::OUTPUT_GROUP_NAME, sampleGroupHandler.getSampleGroupName());
   }
 
   // Default sample group names (i.e., all)

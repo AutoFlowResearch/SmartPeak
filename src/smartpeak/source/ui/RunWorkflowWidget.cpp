@@ -37,14 +37,14 @@ namespace SmartPeak
   {
     if (ImGui::BeginPopupModal(title_.c_str(), NULL, ImGuiWindowFlags_None))
     {
-      if (   mzML_dir_old_ != application_handler_.filenames_.getTag(Filenames::Tag::MZML_INPUT_PATH)
-          || features_in_dir_old_ != application_handler_.filenames_.getTag(Filenames::Tag::FEATURES_INPUT_PATH)
-          || features_out_dir_old_ != application_handler_.filenames_.getTag(Filenames::Tag::FEATURES_OUTPUT_PATH))
+      if (   mzML_dir_old_ != application_handler_.filenames_.getTagValue(Filenames::Tag::MZML_INPUT_PATH)
+          || features_in_dir_old_ != application_handler_.filenames_.getTagValue(Filenames::Tag::FEATURES_INPUT_PATH)
+          || features_out_dir_old_ != application_handler_.filenames_.getTagValue(Filenames::Tag::FEATURES_OUTPUT_PATH))
       {
         // InputTextWithHint does not support std::filesystem::path so we have to create temporary strings for the paths
-        mzML_dir_old_ = mzML_dir_edit_ = application_handler_.filenames_.getTag(Filenames::Tag::MZML_INPUT_PATH);
-        features_in_dir_old_ = features_in_dir_edit_ = application_handler_.filenames_.getTag(Filenames::Tag::FEATURES_INPUT_PATH);
-        features_out_dir_old_ = features_out_dir_edit_ = application_handler_.filenames_.getTag(Filenames::Tag::FEATURES_OUTPUT_PATH);
+        mzML_dir_old_ = mzML_dir_edit_ = application_handler_.filenames_.getTagValue(Filenames::Tag::MZML_INPUT_PATH);
+        features_in_dir_old_ = features_in_dir_edit_ = application_handler_.filenames_.getTagValue(Filenames::Tag::FEATURES_INPUT_PATH);
+        features_out_dir_old_ = features_out_dir_edit_ = application_handler_.filenames_.getTagValue(Filenames::Tag::FEATURES_OUTPUT_PATH);
       }
 
       ImGui::Text("mzML folder");
@@ -96,9 +96,9 @@ namespace SmartPeak
       ImGui::Separator();
       if (ImGui::Button("Run workflow"))
       {
-        application_handler_.filenames_.setTag(Filenames::Tag::MZML_INPUT_PATH, mzML_dir_edit_);
-        application_handler_.filenames_.setTag(Filenames::Tag::FEATURES_INPUT_PATH, features_in_dir_edit_);
-        application_handler_.filenames_.setTag(Filenames::Tag::FEATURES_OUTPUT_PATH, features_out_dir_edit_);
+        application_handler_.filenames_.setTagValue(Filenames::Tag::MZML_INPUT_PATH, mzML_dir_edit_);
+        application_handler_.filenames_.setTagValue(Filenames::Tag::FEATURES_INPUT_PATH, features_in_dir_edit_);
+        application_handler_.filenames_.setTagValue(Filenames::Tag::FEATURES_OUTPUT_PATH, features_out_dir_edit_);
         for (const auto& pathname : { mzML_dir_edit_, features_in_dir_edit_, features_out_dir_edit_ }) {
           fs::create_directories(fs::path(pathname));
         }
@@ -113,9 +113,9 @@ namespace SmartPeak
           {
             for (auto& p : cmd.dynamic_filenames)
             {
-              p.second.setTag(Filenames::Tag::MZML_INPUT_PATH, mzML_dir_edit_);
-              p.second.setTag(Filenames::Tag::FEATURES_INPUT_PATH, features_in_dir_edit_);
-              p.second.setTag(Filenames::Tag::FEATURES_OUTPUT_PATH, features_out_dir_edit_);
+              p.second.setTagValue(Filenames::Tag::MZML_INPUT_PATH, mzML_dir_edit_);
+              p.second.setTagValue(Filenames::Tag::FEATURES_INPUT_PATH, features_in_dir_edit_);
+              p.second.setTagValue(Filenames::Tag::FEATURES_OUTPUT_PATH, features_out_dir_edit_);
             }
           }
           const std::set<std::string> injection_names = session_handler_.getSelectInjectionNamesWorkflow(application_handler_.sequenceHandler_);

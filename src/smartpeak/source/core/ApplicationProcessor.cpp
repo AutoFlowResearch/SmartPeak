@@ -209,11 +209,11 @@ namespace SmartPeak
       for (const InjectionHandler& injection : application_handler_.sequenceHandler_.getSequence()) {
         const std::string& key = injection.getMetaData().getInjectionName();
         cmd_.dynamic_filenames[key] = method_filenames;
-        cmd_.dynamic_filenames[key].setTag(Filenames::Tag::INPUT_MZML_FILENAME, injection.getMetaData().getFilename());
-        cmd_.dynamic_filenames[key].setTag(Filenames::Tag::INPUT_INJECTION_NAME, key);
-        cmd_.dynamic_filenames[key].setTag(Filenames::Tag::OUTPUT_INJECTION_NAME, key);
-        cmd_.dynamic_filenames[key].setTag(Filenames::Tag::INPUT_GROUP_NAME, injection.getMetaData().getSampleGroupName());
-        cmd_.dynamic_filenames[key].setTag(Filenames::Tag::OUTPUT_GROUP_NAME, injection.getMetaData().getSampleGroupName());
+        cmd_.dynamic_filenames[key].setTagValue(Filenames::Tag::INPUT_MZML_FILENAME, injection.getMetaData().getFilename());
+        cmd_.dynamic_filenames[key].setTagValue(Filenames::Tag::INPUT_INJECTION_NAME, key);
+        cmd_.dynamic_filenames[key].setTagValue(Filenames::Tag::OUTPUT_INJECTION_NAME, key);
+        cmd_.dynamic_filenames[key].setTagValue(Filenames::Tag::INPUT_GROUP_NAME, injection.getMetaData().getSampleGroupName());
+        cmd_.dynamic_filenames[key].setTagValue(Filenames::Tag::OUTPUT_GROUP_NAME, injection.getMetaData().getSampleGroupName());
       }
     } else if (std::count(valid_commands_sequence_segment_processor.begin(), valid_commands_sequence_segment_processor.end(), name_)) {
       const auto& method = n_to_seq_seg_method_.at(name_);
@@ -222,11 +222,11 @@ namespace SmartPeak
       for (const SequenceSegmentHandler& sequence_segment : application_handler_.sequenceHandler_.getSequenceSegments()) {
         const std::string& key = sequence_segment.getSequenceSegmentName();
         cmd_.dynamic_filenames[key] = method_filenames;
-        cmd_.dynamic_filenames[key].setTag(Filenames::Tag::INPUT_MZML_FILENAME, "");
-        cmd_.dynamic_filenames[key].setTag(Filenames::Tag::INPUT_INJECTION_NAME, key);
-        cmd_.dynamic_filenames[key].setTag(Filenames::Tag::OUTPUT_INJECTION_NAME, key);
-        cmd_.dynamic_filenames[key].setTag(Filenames::Tag::INPUT_GROUP_NAME, key);
-        cmd_.dynamic_filenames[key].setTag(Filenames::Tag::OUTPUT_GROUP_NAME, key);
+        cmd_.dynamic_filenames[key].setTagValue(Filenames::Tag::INPUT_MZML_FILENAME, "");
+        cmd_.dynamic_filenames[key].setTagValue(Filenames::Tag::INPUT_INJECTION_NAME, key);
+        cmd_.dynamic_filenames[key].setTagValue(Filenames::Tag::OUTPUT_INJECTION_NAME, key);
+        cmd_.dynamic_filenames[key].setTagValue(Filenames::Tag::INPUT_GROUP_NAME, key);
+        cmd_.dynamic_filenames[key].setTagValue(Filenames::Tag::OUTPUT_GROUP_NAME, key);
       }
     } else if (std::count(valid_commands_sample_group_processor.begin(), valid_commands_sample_group_processor.end(), name_)) {
       const auto& method = n_to_sample_group_method_.at(name_);
@@ -235,11 +235,11 @@ namespace SmartPeak
       for (const SampleGroupHandler& sample_group : application_handler_.sequenceHandler_.getSampleGroups()) {
         const std::string& key = sample_group.getSampleGroupName();
         cmd_.dynamic_filenames[key] = method_filenames;
-        cmd_.dynamic_filenames[key].setTag(Filenames::Tag::INPUT_MZML_FILENAME, "");
-        cmd_.dynamic_filenames[key].setTag(Filenames::Tag::INPUT_INJECTION_NAME, key);
-        cmd_.dynamic_filenames[key].setTag(Filenames::Tag::OUTPUT_INJECTION_NAME, key);
-        cmd_.dynamic_filenames[key].setTag(Filenames::Tag::INPUT_GROUP_NAME, key);
-        cmd_.dynamic_filenames[key].setTag(Filenames::Tag::OUTPUT_GROUP_NAME, key);
+        cmd_.dynamic_filenames[key].setTagValue(Filenames::Tag::INPUT_MZML_FILENAME, "");
+        cmd_.dynamic_filenames[key].setTagValue(Filenames::Tag::INPUT_INJECTION_NAME, key);
+        cmd_.dynamic_filenames[key].setTagValue(Filenames::Tag::OUTPUT_INJECTION_NAME, key);
+        cmd_.dynamic_filenames[key].setTagValue(Filenames::Tag::INPUT_GROUP_NAME, key);
+        cmd_.dynamic_filenames[key].setTagValue(Filenames::Tag::OUTPUT_GROUP_NAME, key);
       }
     }
     else 
@@ -411,9 +411,9 @@ namespace SmartPeak
       {
         for (auto& p : cmd.dynamic_filenames)
         {
-          p.second.setTag(Filenames::Tag::MZML_INPUT_PATH, application_handler_.filenames_.getTag(Filenames::Tag::MZML_INPUT_PATH));
-          p.second.setTag(Filenames::Tag::FEATURES_INPUT_PATH, application_handler_.filenames_.getTag(Filenames::Tag::FEATURES_INPUT_PATH));
-          p.second.setTag(Filenames::Tag::FEATURES_OUTPUT_PATH, application_handler_.filenames_.getTag(Filenames::Tag::FEATURES_OUTPUT_PATH));
+          p.second.setTagValue(Filenames::Tag::MZML_INPUT_PATH, application_handler_.filenames_.getTagValue(Filenames::Tag::MZML_INPUT_PATH));
+          p.second.setTagValue(Filenames::Tag::FEATURES_INPUT_PATH, application_handler_.filenames_.getTagValue(Filenames::Tag::FEATURES_INPUT_PATH));
+          p.second.setTagValue(Filenames::Tag::FEATURES_OUTPUT_PATH, application_handler_.filenames_.getTagValue(Filenames::Tag::FEATURES_OUTPUT_PATH));
         }
       }
       std::set<std::string> injection_names;
@@ -468,7 +468,7 @@ namespace SmartPeak
   {
     if (filenames_override_)
     {
-      filenames_override_->setTag(Filenames::Tag::MAIN_DIR, filenames_->getTag(Filenames::Tag::MAIN_DIR));
+      filenames_override_->setTagValue(Filenames::Tag::MAIN_DIR, filenames_->getTagValue(Filenames::Tag::MAIN_DIR));
       const auto& src = filenames_->getFileIds();
       for (const auto& file_id : filenames_override_->getFileIds())
       {
@@ -624,7 +624,7 @@ namespace SmartPeak
       return false;
     }
     // reset main dir
-    (*filenames).setTag(Filenames::Tag::MAIN_DIR, application_handler_.main_dir_.generic_string());
+    (*filenames).setTagValue(Filenames::Tag::MAIN_DIR, application_handler_.main_dir_.generic_string());
     (*filenames).getSessionDB().setDBFilePath(application_handler_.filenames_.getSessionDB().getDBFilePath());
     application_handler_.filenames_ = *filenames;
     LOGD << "END LoadFilenames";
@@ -682,7 +682,7 @@ namespace SmartPeak
       value
     ))
     {
-      filenames.setTag(filenames.getTagNames().at(tag), value);
+      filenames.setTagValue(filenames.getTagNames().at(tag), value);
     };
     filenames.getSessionDB().endRead(*db_context);
     return filenames;
@@ -727,7 +727,7 @@ namespace SmartPeak
       application_handler_.filenames_.getSessionDB().write(
         *db_context,
         tag_name.first,
-        application_handler_.filenames_.getTag(tag_name.second)
+        application_handler_.filenames_.getTagValue(tag_name.second)
       );
     }
     application_handler_.filenames_.getSessionDB().endWrite(*db_context);
