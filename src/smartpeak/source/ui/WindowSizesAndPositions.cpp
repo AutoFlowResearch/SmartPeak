@@ -25,6 +25,54 @@
 
 namespace SmartPeak
 {
+
+  std::string WindowSizesAndPositions::getPropertiesHandlerName() const
+  {
+    return "WindowSizesAndPositions";
+  }
+
+  std::map<std::string, CastValue::Type> WindowSizesAndPositions::getPropertiesSchema() const
+  {
+    std::map<std::string, CastValue::Type> properties;
+    properties.emplace("bottom_window_y_perc_", CastValue::Type::FLOAT);
+    properties.emplace("left_window_x_perc_", CastValue::Type::FLOAT);
+    properties.emplace("right_window_x_perc_", CastValue::Type::FLOAT);
+    return properties;
+  }
+
+  std::optional<CastValue> WindowSizesAndPositions::getProperty(const std::string& property, const size_t row) const
+  {
+    if (property == "bottom_window_y_perc_")
+    {
+      return bottom_window_y_perc_;
+    }
+    if (property == "left_window_x_perc_")
+    {
+      return left_window_x_perc_;
+    }
+    if (property == "right_window_x_perc_")
+    {
+      return right_window_x_perc_;
+    }
+    return std::nullopt;
+  }
+
+  void WindowSizesAndPositions::setProperty(const std::string& property, const CastValue& value, const size_t row)
+  {
+    if (property == "bottom_window_y_perc_")
+    {
+      bottom_window_y_perc_ = value.f_;
+    }
+    if (property == "left_window_x_perc_")
+    {
+      left_window_x_perc_ = value.f_;
+    }
+    if (property == "right_window_x_perc_")
+    {
+      right_window_x_perc_ = value.f_;
+    }
+  }
+
   void WindowSizesAndPositions::setXAndYSizes(const float & x, const float & y) {
     x_size_ = x; 
     y_size_ = y - main_menu_bar_y_size_;

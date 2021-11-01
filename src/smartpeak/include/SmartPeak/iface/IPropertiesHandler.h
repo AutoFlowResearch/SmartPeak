@@ -25,6 +25,9 @@
 
 #include <SmartPeak/core/CastValue.h>
 
+#include <map>
+#include <optional>
+
 namespace SmartPeak
 {
   struct IPropertiesHandler

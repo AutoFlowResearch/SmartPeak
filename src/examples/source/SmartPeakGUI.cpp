@@ -100,6 +100,7 @@ int main(int argc, char** argv)
   SessionHandler session_handler_;
   WorkflowManager workflow_manager_;
   GuiAppender appender_;
+  WindowSizesAndPositions win_size_and_pos;
   LayoutLoader layout_loader(application_handler_);
 
   // EventDispatcher will dispatch events triggered by the observers in the main GUI thread
@@ -302,6 +303,7 @@ int main(int argc, char** argv)
   {
     layout_loader.properties_handlers_.push_back(window.get());
   }
+  layout_loader.properties_handlers_.push_back(&win_size_and_pos);
 
 
   // We need titles for all sub windows
@@ -393,7 +395,6 @@ int main(int argc, char** argv)
   ImGui_ImplOpenGL2_Init();
 
   ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-  WindowSizesAndPositions win_size_and_pos;
 
   // Main loop
   bool done = false;

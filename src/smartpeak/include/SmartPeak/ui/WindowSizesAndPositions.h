@@ -23,9 +23,20 @@
 
 #pragma once
 
+#include <SmartPeak/iface/IPropertiesHandler.h>
+
 namespace SmartPeak
 {
-  struct WindowSizesAndPositions {
+  struct WindowSizesAndPositions : public IPropertiesHandler {
+
+    /**
+      IPropertiesHandler
+    */
+    virtual std::string getPropertiesHandlerName() const override;
+    virtual std::map<std::string, CastValue::Type> getPropertiesSchema() const override;
+    virtual std::optional<CastValue> getProperty(const std::string& property, const size_t row) const override;
+    virtual void setProperty(const std::string& property, const CastValue& value, const size_t row) override;
+
     void setXAndYSizes(const float& x, const float& y);
     void setWindowPercentages(const float& bottom_window_y_perc, const float& left_window_x_perc, const float& right_window_x_perc);
     void setWindowSizesAndPositions_(const float& bottom_window_y_perc, const float& left_window_x_perc, const float& right_window_x_perc);
