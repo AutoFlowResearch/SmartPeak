@@ -372,6 +372,7 @@ TEST(SessionFilesWidget, SessionFilesWidget_isModified)
   WorkflowManager workflow_manager;
   Filenames filenames = Utilities::buildFilenamesFromDirectory(application_handler, SMARTPEAK_GET_TEST_DATA_PATH("workflow_csv_files"));
   SessionFilesWidget_Test session_widget_test(application_handler, SessionFilesWidget::Mode::ECreation, workflow_manager);
+  session_widget_test.open(filenames);
   EXPECT_EQ(session_widget_test.isModified("parameters"), false);
 }
 
