@@ -442,13 +442,13 @@ namespace SmartPeak
     return true;
   }
 
-  bool LoadLayout::process()
+  bool LoadPropertiesHandlers::process()
   {
     LOGD << "START LoadLayout";
-    for (auto s : to_serialize)
+    for (auto properties_handler : properties_handlers)
     {
       LoadWidgets load_widget(application_handler_);
-      load_widget.to_serialize = s;
+      load_widget.properties_handlers = properties_handler;
       load_widget.process();
     }
     LOGD << "END LoadLayout";
@@ -601,10 +601,10 @@ namespace SmartPeak
       }
     }
 
-    for (auto s : to_serialize)
+    for (auto properties_handler : properties_handlers)
     {
       StoreWidgets store_widget(application_handler_);
-      store_widget.to_serialize = s;
+      store_widget.properties_handlers = properties_handler;
       store_widget.process();
     }
 
@@ -735,12 +735,12 @@ namespace SmartPeak
 
   bool StoreWidgets::process()
   {
-    return application_handler_.filenames_.getSessionDB().writePropertiesHandler(*to_serialize);
+    return application_handler_.filenames_.getSessionDB().writePropertiesHandler(*properties_handlers);
   }
 
   bool LoadWidgets::process()
   {
-    return application_handler_.filenames_.getSessionDB().readPropertiesHandler(*to_serialize);
+    return application_handler_.filenames_.getSessionDB().readPropertiesHandler(*properties_handlers);
   }
 
 }

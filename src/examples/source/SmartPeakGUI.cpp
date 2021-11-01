@@ -117,7 +117,7 @@ int main(int argc, char** argv)
 // `int argc, char **argv` are required on Win to link against the proper SDL2/OpenGL implementation
 {
 
-  std::vector<IPropertiesHandler*> to_serialize;
+  std::vector<IPropertiesHandler*> properties_handlers;
 
   // to disable buttons, display info, and update the session cache
   bool workflow_is_done_ = true;
@@ -160,7 +160,7 @@ int main(int argc, char** argv)
   auto load_session_wizard_ = std::make_shared<LoadSessionWizard>(
     session_files_widget_modify_,
     &event_dispatcher,
-    to_serialize,
+    properties_handlers,
     workflow_manager_,
     &event_dispatcher,
     &event_dispatcher,
@@ -323,15 +323,15 @@ int main(int argc, char** argv)
 
   for (auto& window : top_windows)
   {
-    to_serialize.push_back(window.get());
+    properties_handlers.push_back(window.get());
   }
   for (auto& window : bottom_windows)
   {
-    to_serialize.push_back(window.get());
+    properties_handlers.push_back(window.get());
   }
   for (auto& window : left_windows)
   {
-    to_serialize.push_back(window.get());
+    properties_handlers.push_back(window.get());
   }
 
 
@@ -500,13 +500,13 @@ int main(int argc, char** argv)
           workflow_is_done_ && file_loading_is_done_
           && application_handler_.filenames_.getSessionDB().getDBFilePath() != "")) {
           SaveSession save_session(application_handler_);
-          save_session.to_serialize = to_serialize;
+          save_session.properties_handlers = properties_handlers;
           save_session.process();
         }
         if (ImGui::MenuItem("Save Session As ...", NULL, false, 
                              workflow_is_done_ && file_loading_is_done_ && application_handler_.sessionIsOpened())) {
           auto save_session = std::make_shared<SaveSession>(application_handler_);
-          save_session->to_serialize = to_serialize;
+          save_session->properties_handlers = properties_handlers;
           file_picker_->open("Select session file",
             save_session,
             FilePicker::Mode::EFileCreate,
@@ -937,8 +937,8 @@ int main(int argc, char** argv)
     // ======================================
     if (loader_observer.just_loaded)
     {
-      LoadLayout load_layout(application_handler_);
-      load_layout.to_serialize = to_serialize;
+      LoadPropertiesHandlers load_layout(application_handler_);
+      load_layout.properties_handlers = properties_handlers;
       load_layout.process();
       loader_observer.just_loaded = false;
     }

@@ -121,7 +121,7 @@ namespace SmartPeak
     virtual std::string getName() const override { return "LOAD_SESSION"; }
     virtual std::string getDescription() const override { return "Load an existing session"; }
 
-    std::vector<IPropertiesHandler*> to_serialize;
+    std::vector<IPropertiesHandler*> properties_handlers;
   protected:
     bool overrideFilenames();
     bool overrideParameters();
@@ -132,10 +132,10 @@ namespace SmartPeak
     ISampleGroupProcessorObserver* sample_group_processor_observer_;
   };
 
-  struct LoadLayout : ApplicationProcessor
+  struct LoadPropertiesHandlers : ApplicationProcessor
   {
-    LoadLayout() = default;
-    explicit LoadLayout(ApplicationHandler& application_handler) : ApplicationProcessor(application_handler) {}
+    LoadPropertiesHandlers() = default;
+    explicit LoadPropertiesHandlers(ApplicationHandler& application_handler) : ApplicationProcessor(application_handler) {}
 
     /* ApplicationProcessor */
     bool process() override;
@@ -144,7 +144,7 @@ namespace SmartPeak
     virtual std::string getName() const override { return "LOAD_LAYOUT"; }
     virtual std::string getDescription() const override { return "Load a layout from DB"; }
 
-    std::vector<IPropertiesHandler*> to_serialize;
+    std::vector<IPropertiesHandler*> properties_handlers;
   };
 
   struct SaveSession : ApplicationProcessor, IFilePickerHandler
@@ -162,7 +162,7 @@ namespace SmartPeak
     virtual std::string getName() const override { return "SAVE_SESSION"; }
     virtual std::string getDescription() const override { return "Save the session"; }
 
-    std::vector<IPropertiesHandler*> to_serialize;
+    std::vector<IPropertiesHandler*> properties_handlers;
   };
 
   struct LoadFilenames : ApplicationProcessor
@@ -205,7 +205,7 @@ namespace SmartPeak
     virtual std::string getName() const override { return "LOAD_WIDGETS"; }
     virtual std::string getDescription() const override { return "Load Widgets"; }
 
-    IPropertiesHandler* to_serialize;
+    IPropertiesHandler* properties_handlers = nullptr;
   };
 
   struct StoreWidgets : ApplicationProcessor
@@ -220,6 +220,6 @@ namespace SmartPeak
     virtual std::string getName() const override { return "STORE_WIDGETS"; }
     virtual std::string getDescription() const override { return "Store Widgets"; }
 
-    IPropertiesHandler* to_serialize;
+    IPropertiesHandler* properties_handlers = nullptr;
   };
 }
