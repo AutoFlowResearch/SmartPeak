@@ -343,11 +343,25 @@ namespace SmartPeak
     }
     if (property == "current_range_.first")
     {
-      return current_range_.first;
+      if (serialized_range_)
+      {
+        return serialized_range_->first;
+      }
+      else
+      {
+        return current_range_.first;
+      }
     }
     if (property == "current_range_.second")
     {
-      return current_range_.second;
+      if (serialized_range_)
+      {
+        return serialized_range_->second;
+      }
+      else
+      {
+        return current_range_.second;
+      }
     }
     if (property == "compact_view_")
     {

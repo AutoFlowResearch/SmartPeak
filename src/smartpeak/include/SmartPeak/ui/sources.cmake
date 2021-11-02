@@ -31,6 +31,7 @@ set(sources_list_h
 	SessionFilesWidget.h
 	SpectraMSMSPlotWidget.h
 	SpectraPlotWidget.h
+	SplitWindow.h
 	StatisticsWidget.h
 	Widget.h
 	WindowSizesAndPositions.h

@@ -29,6 +29,7 @@ set(sources_list
 	SessionFilesWidget.cpp
 	SpectraMSMSPlotWidget.cpp
 	SpectraPlotWidget.cpp
+	SplitWindow.cpp
 	StatisticsWidget.cpp
 	Widget.cpp
 	WindowSizesAndPositions.cpp

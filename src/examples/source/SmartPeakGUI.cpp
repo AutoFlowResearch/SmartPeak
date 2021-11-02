@@ -54,9 +54,9 @@
 #include <SmartPeak/ui/AboutWidget.h>
 #include <SmartPeak/ui/LogWidget.h>
 #include <SmartPeak/ui/SequenceTableWidget.h>
-#include <SmartPeak/ui/WindowSizesAndPositions.h>
 #include <SmartPeak/ui/LoadSessionWizard.h>
 #include <SmartPeak/ui/LayoutLoader.h>
+#include <SmartPeak/ui/SplitWindow.h>
 #include <SmartPeak/core/EventDispatcher.h>
 #include <plog/Log.h>
 #include <plog/Appenders/ConsoleAppender.h>
@@ -100,7 +100,7 @@ int main(int argc, char** argv)
   SessionHandler session_handler_;
   WorkflowManager workflow_manager_;
   GuiAppender appender_;
-  WindowSizesAndPositions win_size_and_pos;
+  SplitWindow split_window;
   LayoutLoader layout_loader(application_handler_);
 
   // EventDispatcher will dispatch events triggered by the observers in the main GUI thread
@@ -230,7 +230,7 @@ int main(int argc, char** argv)
   transitions_explorer_window_->visible_ = true;
 
   // windows organization
-  std::vector<std::shared_ptr<Widget>> top_windows = {
+  split_window.top_windows = {
     statistics_,
     sequence_main_window_,
     transitions_main_window_,
@@ -267,14 +267,14 @@ int main(int argc, char** argv)
     calibrators_line_plot_
   };
 
-  std::vector<std::shared_ptr<Widget>> bottom_windows = {
+  split_window.bottom_windows = {
     quickInfoText_,
     log_widget_,
     spectra_msms_plot_widget_,
     spectra_ms2_plot_widget_,
   };
 
-  std::vector<std::shared_ptr<Widget>> left_windows = {
+  split_window.left_windows = {
     injections_explorer_window_,
     transitions_explorer_window_,
     features_explorer_window_,
@@ -291,25 +291,12 @@ int main(int argc, char** argv)
       report_
   };
 
-  for (auto& window : top_windows)
-  {
-    layout_loader.properties_handlers_.push_back(window.get());
-  }
-  for (auto& window : bottom_windows)
-  {
-    layout_loader.properties_handlers_.push_back(window.get());
-  }
-  for (auto& window : left_windows)
-  {
-    layout_loader.properties_handlers_.push_back(window.get());
-  }
-  layout_loader.properties_handlers_.push_back(&win_size_and_pos);
-
+  split_window.setupLayoutLoader(layout_loader);
 
   // We need titles for all sub windows
-  checkTitles(top_windows);
-  checkTitles(bottom_windows);
-  checkTitles(left_windows);
+  checkTitles(split_window.top_windows);
+  checkTitles(split_window.bottom_windows);
+  checkTitles(split_window.left_windows);
 
   // Create log path
   const std::time_t t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
@@ -420,7 +407,7 @@ int main(int argc, char** argv)
 
       session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
 
-      win_size_and_pos.setXAndYSizes(io.DisplaySize.x, io.DisplaySize.y);
+      split_window.win_size_and_pos.setXAndYSizes(io.DisplaySize.x, io.DisplaySize.y);
       if ((!workflow_is_done_) && workflow_manager_.isWorkflowDone()) // workflow just finished
       {
         workflow_manager_.updateApplicationHandler(application_handler_);
@@ -685,15 +672,6 @@ int main(int argc, char** argv)
     }
 
     // ======================================
-    // Window size computation
-    // ======================================
-    bool show_top_window_ = std::find_if(top_windows.begin(), top_windows.end(), [](const auto& w) { return w->visible_; }) != top_windows.end();
-    bool show_bottom_window_ = std::find_if(bottom_windows.begin(), bottom_windows.end(), [](const auto& w) { return w->visible_; }) != bottom_windows.end();
-    bool show_left_window_ = std::find_if(left_windows.begin(), left_windows.end(), [](const auto& w) { return w->visible_; }) != left_windows.end();
-    bool show_right_window_ = false;
-    win_size_and_pos.setWindowSizesAndPositions(show_top_window_, show_bottom_window_, show_left_window_, show_right_window_);
-
-    // ======================================
     // Data updates
     //
     // (Widgets should update their data 
@@ -816,95 +794,11 @@ int main(int argc, char** argv)
     // ======================================
     // Windows display
     // ======================================
-    
-    // windfow flags common to top, left and bottom windows
-    const ImGuiWindowFlags window_flags =
-      ImGuiWindowFlags_NoTitleBar |
-      ImGuiWindowFlags_NoMove |
-      ImGuiWindowFlags_NoCollapse |
-      ImGuiWindowFlags_NoFocusOnAppearing;
+    split_window.draw();
 
-    // Left window
-    if (show_left_window_) {
-      ImGui::SetNextWindowPos(ImVec2(win_size_and_pos.left_window_x_pos_, win_size_and_pos.left_and_right_window_y_pos_));
-      ImGui::SetNextWindowSize(ImVec2(win_size_and_pos.left_window_x_size_, win_size_and_pos.left_and_right_window_y_size_));
-      ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0);
-      ImGui::Begin("Left window", NULL, window_flags);
-      if (ImGui::BeginTabBar("Left window tab bar", ImGuiTabBarFlags_Reorderable | ImGuiTabBarFlags_AutoSelectNewTabs))
-      {
-        for (auto& widget : left_windows)
-        {
-          if (ImGui::BeginTabItem(widget->title_.c_str(), &widget->visible_))
-          {
-            widget->setWindowSize(win_size_and_pos.left_window_x_size_, win_size_and_pos.left_and_right_window_y_size_);
-            showQuickHelpToolTip(widget->title_);
-            widget->draw();
-            ImGui::EndTabItem();
-          }
-        }
-        ImGui::EndTabBar();
-      }
-      win_size_and_pos.setLeftWindowXSize(ImGui::GetWindowWidth());
-      win_size_and_pos.setWindowSizesAndPositions(show_top_window_, show_bottom_window_, show_left_window_, show_right_window_);
-      ImGui::End();
-      ImGui::PopStyleVar();
-    }
-
-    // Top window
-    if (show_top_window_)
-    {
-      ImGui::SetNextWindowPos(ImVec2(win_size_and_pos.bottom_and_top_window_x_pos_, win_size_and_pos.top_window_y_pos_));
-      ImGui::SetNextWindowSize(ImVec2(win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.top_window_y_size_));
-      ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0);
-      ImGui::Begin("Top window", NULL, window_flags);
-      if (ImGui::BeginTabBar("Top window tab bar", ImGuiTabBarFlags_Reorderable | ImGuiTabBarFlags_AutoSelectNewTabs))
-      {
-        for (auto& widget : top_windows)
-        {
-          if (ImGui::BeginTabItem(widget->title_.c_str(), &widget->visible_))
-          {
-            widget->setWindowSize(win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.top_window_y_size_);
-            showQuickHelpToolTip(widget->title_);
-            widget->draw();
-            ImGui::EndTabItem();
-          }
-        }
-        ImGui::EndTabBar();
-      }
-      win_size_and_pos.setTopWindowYSize(ImGui::GetWindowHeight());
-      win_size_and_pos.setLeftWindowXSize(ImGui::GetWindowPos().x);
-      win_size_and_pos.setWindowSizesAndPositions(show_top_window_, show_bottom_window_, show_left_window_, show_right_window_);
-      ImGui::End();
-      ImGui::PopStyleVar();
-    }
-
-    // Bottom window
-    if (show_bottom_window_)
-    {
-      ImGui::SetNextWindowPos(ImVec2(win_size_and_pos.bottom_and_top_window_x_pos_, win_size_and_pos.bottom_window_y_pos_));
-      ImGui::SetNextWindowSize(ImVec2(win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.bottom_window_y_size_));
-      ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0);
-      ImGui::Begin("Bottom window", NULL, window_flags);
-      if (ImGui::BeginTabBar("Bottom window tab bar", ImGuiTabBarFlags_Reorderable | ImGuiTabBarFlags_AutoSelectNewTabs))
-      {
-        for (auto& widget : bottom_windows)
-        {
-          if (ImGui::BeginTabItem(widget->title_.c_str(), &widget->visible_))
-          {
-            widget->setWindowSize(win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.bottom_window_y_size_);
-            widget->draw();
-            ImGui::EndTabItem();
-          }
-        }
-        ImGui::EndTabBar();
-      }
-      ImGui::End();
-      ImGui::PopStyleVar();
-    }
-
-    // ===============================================
-    // Load/Save Layout (must be call after ui is set)
-    // ===============================================
+    // =====================================================
+    // Load/Save Layout (must be call after ui has been set)
+    // =====================================================
     layout_loader.process();
 
     }

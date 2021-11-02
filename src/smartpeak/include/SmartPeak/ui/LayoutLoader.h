@@ -24,6 +24,9 @@
 #pragma once
 
 #include <SmartPeak/core/ApplicationHandler.h>
+#include <SmartPeak/iface/IApplicationProcessorObserver.h>
+#include <SmartPeak/core/ApplicationProcessor.h>
+
 
 namespace SmartPeak
 {
