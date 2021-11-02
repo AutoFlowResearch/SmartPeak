@@ -399,7 +399,11 @@ namespace SmartPeak
     }
 
     // Load Features
-    std::vector<std::string> commands = { "LOAD_RAW_DATA","LOAD_FEATURES","MAP_CHROMATOGRAMS", "EXTRACT_CHROMATOGRAM_WINDOWS", "ZERO_CHROMATOGRAM_BASELINE"};
+    LoadPropertiesHandlers loading_workflow(application_handler_);
+    loading_workflow.properties_handlers = { &application_handler_.session_loader_filter };
+    loading_workflow.process();
+
+    std::vector<std::string> commands = application_handler_.session_loader_filter.getLoadingWorkflowCommands();
     BuildCommandsFromNames buildCommandsFromNames(application_handler_);
     buildCommandsFromNames.names_ = commands;
     if (!buildCommandsFromNames.process()) {

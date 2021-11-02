@@ -35,6 +35,7 @@ set(sources_list_h
 	SequenceSegmentProcessor.h
 	SequenceSegmentProcessorObservable.h
 	SessionHandler.h
+	SessionLoaderFilter.h
 	SharedProcessors.h
 	TransitionsObservable.h
 	Utilities.h

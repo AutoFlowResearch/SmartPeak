@@ -103,6 +103,7 @@ namespace SmartPeak
     std::filesystem::path main_dir_ = ".";
     sequenceHandler_.clear();
     filenames_ = Filenames();
+    session_loader_filter.clear();
   }
   
   bool ApplicationHandler::sessionIsOpened() const

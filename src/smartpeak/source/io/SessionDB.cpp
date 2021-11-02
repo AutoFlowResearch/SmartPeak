@@ -243,6 +243,7 @@ std::string castValueToSqlString(const CastValue& cast_value)
   case CastValue::Type::BOOL:
     return (cast_value.b_ ? "1" : "0");
   case CastValue::Type::STRING:
+  case CastValue::Type::STRING_LIST:
   {
     std::string escaped_string(cast_value);
     escaped_string = std::regex_replace(escaped_string, std::regex("\'"), "\'\'");
@@ -251,9 +252,7 @@ std::string castValueToSqlString(const CastValue& cast_value)
   case CastValue::Type::BOOL_LIST:
   case CastValue::Type::FLOAT_LIST:
   case CastValue::Type::INT_LIST:
-  case CastValue::Type::STRING_LIST:
     return std::string("'") + std::string(cast_value) + std::string("'");
-    break;
   default:
     return std::string(cast_value);
   }

@@ -112,6 +112,7 @@ int main(int argc, char** argv)
   event_dispatcher.addSequenceObserver(&session_handler_);
   event_dispatcher.addFeaturesObserver(&session_handler_);
   event_dispatcher.addApplicationProcessorObserver(&layout_loader);
+  event_dispatcher.addApplicationProcessorObserver(&application_handler_.session_loader_filter);
 
   // widgets: pop ups
   auto file_picker_ = std::make_shared<FilePicker>();
