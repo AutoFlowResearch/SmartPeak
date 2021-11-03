@@ -448,9 +448,11 @@ bool SessionDB::readPropertiesHandler(IPropertiesHandler& properties_handler)
           case CastValue::Type::INT_LIST:
           case CastValue::Type::STRING_LIST:
           {
+            LOGE << "STRING_LIST -> start " << column_name;
             CastValue v;
             Utilities::parseString(reinterpret_cast<const char*>(sqlite3_column_text(db_context.stmt, i)), v);
             properties_handler.setProperty(column_name, v , i);
+            LOGE << "STRING_LIST -> end" << column_name;
             break;
           }
           default:
@@ -478,7 +480,7 @@ bool SessionDB::readPropertiesHandler(IPropertiesHandler& properties_handler)
     db_context.stmt = nullptr;
   }
   closeSessionDB(db_context.db);
-
+  return true;
 }
 
 }
