@@ -478,7 +478,7 @@ bool SessionDB::readPropertiesHandler(IPropertiesHandler& properties_handler)
     db_context.stmt = nullptr;
   }
   closeSessionDB(db_context.db);
-
+  return true;
 }
 
 }
