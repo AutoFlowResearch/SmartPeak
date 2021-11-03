@@ -95,16 +95,22 @@ namespace SmartPeak
     {
       if (session_loaded_)
       {
-        LoadPropertiesHandlers load_layout(application_handler_);
-        load_layout.properties_handlers = properties_handlers_;
-        load_layout.process();
+        if (!application_handler_.filenames_.getSessionDB().getDBFilePath().empty())
+        {
+          LoadPropertiesHandlers load_layout(application_handler_);
+          load_layout.properties_handlers = properties_handlers_;
+          load_layout.process();
+        }
         session_loaded_ = false;
       }
       if (session_saved_)
       {
-        SavePropertiesHandlers save_properties_handlers(application_handler_);
-        save_properties_handlers.properties_handlers = properties_handlers_;
-        save_properties_handlers.process();
+        if (!application_handler_.filenames_.getSessionDB().getDBFilePath().empty())
+        {
+          SavePropertiesHandlers save_properties_handlers(application_handler_);
+          save_properties_handlers.properties_handlers = properties_handlers_;
+          save_properties_handlers.process();
+        }
         session_saved_ = false;
       }
     }

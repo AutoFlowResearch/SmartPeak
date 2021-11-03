@@ -260,6 +260,9 @@ std::string castValueToSqlString(const CastValue& cast_value)
 
 bool SessionDB::writePropertiesHandler(const IPropertiesHandler& properties_handler)
 {
+  auto table_name = properties_handler.getPropertiesHandlerName();
+  LOGD << "Writting " << table_name << " to session db.";
+
   std::ostringstream os;
   int rc;
   char* zErrMsg = nullptr;
@@ -273,8 +276,6 @@ bool SessionDB::writePropertiesHandler(const IPropertiesHandler& properties_hand
   }
 
   updateSessionInfo(*db);
-
-  auto table_name = properties_handler.getPropertiesHandlerName();
 
   db_context.table = table_name;
   db_context.db = *db;
@@ -368,6 +369,9 @@ bool SessionDB::writePropertiesHandler(const IPropertiesHandler& properties_hand
 
 bool SessionDB::readPropertiesHandler(IPropertiesHandler& properties_handler)
 {
+  auto table_name = properties_handler.getPropertiesHandlerName();
+  LOGD << "Reading " << table_name << " from session db.";
+
   std::ostringstream os;
   int rc;
   DBContext db_context;
@@ -382,7 +386,6 @@ bool SessionDB::readPropertiesHandler(IPropertiesHandler& properties_handler)
   updateSessionInfo(*db);
   displaySessionInfo();
 
-  auto table_name = properties_handler.getPropertiesHandlerName();
   db_context.table = table_name;
   db_context.db = *db;
 

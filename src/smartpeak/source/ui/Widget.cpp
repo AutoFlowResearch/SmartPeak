@@ -38,7 +38,7 @@ namespace SmartPeak
 
   std::string Widget::getPropertiesHandlerName() const
   {
-    return title_;
+    return "Layout " + title_;
   }
 
   std::map<std::string, CastValue::Type> Widget::getPropertiesSchema() const
