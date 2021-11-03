@@ -94,7 +94,7 @@ void getDummyTableEntries(Eigen::Tensor<std::string, 2>& rows_out)
                                                          meta_data, sample_types, std::set<std::string>(),
                                                          std::set<std::string>(), std::set<std::string>());
 }
-
+/*
 TEST(Widget, widget_constructors)
 {
   GenericTableWidget* generictablewidget_ptr = nullptr;
@@ -257,7 +257,7 @@ TEST(GraphicDataVizWidget, plotLimits)
   EXPECT_NEAR(plot_min_y, 98.910003662109375, 1e-6);
   EXPECT_NEAR(plot_max_y, 341, 1e-6);
 }
-
+*/
 class WorkflowWidget_Test : public WorkflowWidget
 {
 public:
@@ -337,7 +337,7 @@ public:
     return file_editor_fields_;
   }
 };
-
+/*
 TEST(SessionFilesWidget, SessionFilesWidget_Create)
 {
   ApplicationHandler application_handler;
@@ -529,9 +529,17 @@ TEST(SessionFilesWidget, SessionFilesWidget_Modify_FileContent)
     EXPECT_EQ(session_widget_test_modify.isToBeSaved(fef_m.first), (fef_m.first =="parameters"));
   }
 }
+*/
+#include <plog/Log.h>
+#include <plog/Appenders/ConsoleAppender.h>
+
+plog::ConsoleAppender<plog::TxtFormatter> consoleAppender;
 
 TEST(SessionFilesWidget, SessionFilesWidget_Modify_NoPopupError)
 {
+
+  plog::init(plog::debug, &consoleAppender);
+
   ApplicationHandler application_handler;
   WorkflowManager workflow_manager;
   Filenames filenames = Utilities::buildFilenamesFromDirectory(application_handler, SMARTPEAK_GET_TEST_DATA_PATH("workflow_csv_files"));
@@ -568,10 +576,10 @@ TEST(SessionFilesWidget, SessionFilesWidget_Modify_NoPopupError)
   EXPECT_EQ(session_widget_test_modify->visible_, false);
 
   // check data
-  EXPECT_EQ(application_handler.sequenceHandler_.getSequence().size(), 2);
+  ASSERT_EQ(application_handler.sequenceHandler_.getSequence().size(), 2);
   EXPECT_EQ(application_handler.sequenceHandler_.getSequence()[0].getRawData().getParameters().size(), 27);
 }
-
+/*
 TEST(SessionFilesWidget, LoadSessionWizard_PopupError)
 {
   ApplicationHandler application_handler;
@@ -669,3 +677,4 @@ TEST(SessionFilesWidget, SessionFilesWidget_EmbedAllFiles)
   ASSERT_NE(parameter3, nullptr);
   EXPECT_EQ(parameter3->getValueAsString(), "smoothed");
 }
+*/
