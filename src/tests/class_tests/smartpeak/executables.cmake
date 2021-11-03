@@ -24,6 +24,7 @@ set(core_executables_list
 	SequenceSegmentProcessor_test
 	SessionDB_test
 	SessionHandler_test
+	SessionLoaderFilter_test
 	Task_test
 	Utilities_test
 	WorkflowObservable_test
