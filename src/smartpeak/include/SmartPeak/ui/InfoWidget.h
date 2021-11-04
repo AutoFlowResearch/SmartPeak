@@ -72,13 +72,11 @@ namespace SmartPeak
 
     void setTransitions(const Eigen::Tensor<std::string, 2>* transitions) { transitions_ = transitions; };
 
-    void setFileLoadingDone(bool done, bool load_error)  { file_loading_is_done_ = done; file_load_error_ = load_error;};
     void clearErrorMessages() { error_messages_.clear(); };
     void addErrorMessage(const std::string& error_message) { error_messages_.push_back(error_message); };
 
   private:
     void drawWorkflowStatus();
-    void drawFileloadingStatus();
     void drawErrorMessages();
     void drawChromatograms();
     void drawSpectrums();
@@ -86,6 +84,7 @@ namespace SmartPeak
     void drawTransition();
     void drawLastRunTime();
     void drawWorkflowProgress();
+    void drawListOfErrors();
     std::string formattedTime(const std::chrono::steady_clock::duration& duration) const;
 
   protected:

@@ -109,13 +109,13 @@ namespace SmartPeak
       feature_explorer_data.checkbox_headers.setValues({ "plot", "table" });
     }
     const int n_cols = feature_table.headers_.size();
-    const int n_rows = metadatafloatToString.size();
+    const int n_rows = metadataFloatToString.size();
     // Make the feature explorer body
     if (feature_table.body_.dimension(0) != n_rows) {
       LOGD << "Making feature_table.body_";
       feature_table.body_.resize(n_rows, n_cols);
       int col = 0, row = 0;
-      for (const auto& metadata : metadatafloatToString) {
+      for (const auto& metadata : metadataFloatToString) {
         feature_table.body_(row, col) = metadata.second;
         col = 0;
         ++row;

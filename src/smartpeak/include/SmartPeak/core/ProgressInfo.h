@@ -70,6 +70,7 @@ namespace SmartPeak
     virtual void onApplicationProcessorCommandStart(size_t command_index, const std::string& command_name) override;
     virtual void onApplicationProcessorCommandEnd(size_t command_index, const std::string& command_name) override;
     virtual void onApplicationProcessorEnd() override;
+    virtual void onApplicationProcessorError(const std::string& error) override;
 
     /**
       ISequenceProcessorObserver
@@ -78,6 +79,7 @@ namespace SmartPeak
     virtual void onSequenceProcessorSampleStart(const std::string& sample) override;
     virtual void onSequenceProcessorSampleEnd(const std::string& sample) override;
     virtual void onSequenceProcessorEnd() override;
+    virtual void onSequenceProcessorError(const std::string& sample_name, const std::string& processor_name, const std::string& error) override;
 
     /**
       ISequenceSegmentProcessorObserver
@@ -86,6 +88,7 @@ namespace SmartPeak
     virtual void onSequenceSegmentProcessorSampleStart(const std::string& segment_name) override;
     virtual void onSequenceSegmentProcessorSampleEnd(const std::string& segment_name) override;
     virtual void onSequenceSegmentProcessorEnd() override;
+    virtual void onSequenceSegmentProcessorError(const std::string& segment_name, const std::string& processor_name, const std::string& error) override;
 
     /**
       ISampleGroupProcessorObserver
@@ -94,7 +97,8 @@ namespace SmartPeak
     virtual void onSampleGroupProcessorSampleStart(const std::string& segment_name) override;
     virtual void onSampleGroupProcessorSampleEnd(const std::string& segment_name) override;
     virtual void onSampleGroupProcessorEnd() override;
-  
+    virtual void onSampleGroupProcessorError(const std::string& group_name, const std::string& processor_name, const std::string& error) override;
+
   public:
 
     /**
@@ -141,6 +145,11 @@ namespace SmartPeak
     */
     std::chrono::steady_clock::duration lastRunTime() const { return last_run_time_; };
 
+    /**
+      @brief detailed about errors
+    */
+    const std::vector<std::string>& errors() const { return errors_; };
+
   private:
     void onRunningBatchEndItem(const std::string& item_name);
 
@@ -166,5 +175,6 @@ namespace SmartPeak
     };
     std::shared_ptr<RunningBatch> running_batch_;
     std::chrono::steady_clock::duration last_run_time_ = std::chrono::steady_clock::duration::zero();
+    std::vector<std::string> errors_;
   };
 }

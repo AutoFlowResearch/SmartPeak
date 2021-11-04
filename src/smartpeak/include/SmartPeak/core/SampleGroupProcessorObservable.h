@@ -75,6 +75,13 @@ namespace SmartPeak
         observer->onSampleGroupProcessorEnd();
       }
     }
+    void notifySampleGroupProcessorError(const std::string& group_name, const std::string& processor_name, const std::string& error)
+    {
+      for (auto& observer : observers_)
+      {
+        observer->onSampleGroupProcessorError(group_name, processor_name, error);
+      }
+    }
   protected:
     std::vector<ISampleGroupProcessorObserver*> observers_;
   };

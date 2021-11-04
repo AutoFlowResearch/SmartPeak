@@ -17,7 +17,7 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Bertrand Boudaud $
+// $Maintainer: Bertrand Boudaud, Ahmed Khalil $
 // $Authors: Bertrand Boudaud $
 // --------------------------------------------------------------------------
 
@@ -67,7 +67,27 @@ namespace SmartPeak
         }
         ImGui::EndCombo();
       }
-
+      
+      static FilePicker file_picker_;
+      
+      if (ImGui::Button("Choose folder"))
+      {
+        file_picker_.open("Choose folder to export plot", nullptr, SmartPeak::FilePicker::Mode::EDirectory, application_handler_);
+      }
+      file_picker_.draw();
+      ImGui::SameLine();
+      static int selected_format = 0;
+      static const char* formats[] = { "Save As PNG", "Save As PDF", "Save As HTML", "Save As SVG"};
+      ImGui::Combo(" ", &selected_format, formats, IM_ARRAYSIZE(formats));
+      ImGui::SameLine();
+      if (ImGui::Button("Save Plot"))
+      {
+        auto exported_plot = std::make_unique<PlotExporter>(
+          file_picker_.getPickedPathname().empty() ? application_handler_.main_dir_.string() : file_picker_.getPickedPathname(),
+          heatmap_data_, selected_format, PlotExporter::PlotType::HEATMAP);
+        exported_plot->plot();
+      }
+      ImGui::Spacing();
       // Check if we need to refresh the data
       Eigen::Tensor<std::string, 1> selected_sample_names = session_handler_.getSelectSampleNamesPlot();
       Eigen::Tensor<std::string, 1> selected_transitions = session_handler_.getSelectTransitionsPlot();

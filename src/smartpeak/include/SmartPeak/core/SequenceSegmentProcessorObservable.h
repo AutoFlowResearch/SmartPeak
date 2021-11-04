@@ -75,6 +75,13 @@ namespace SmartPeak
         observer->onSequenceSegmentProcessorEnd();
       }
     }
+    void notifySequenceSegmentProcessorError(const std::string& segment_name, const std::string& processor_name, const std::string& error)
+    {
+      for (auto& observer : observers_)
+      {
+        observer->onSequenceSegmentProcessorError(segment_name, processor_name, error);
+      }
+    }
   protected:
     std::vector<ISequenceSegmentProcessorObserver*> observers_;
   };
