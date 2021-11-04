@@ -1,5 +1,7 @@
-SmartPeak Command Line Tool
-===========================
+.. begin_smartpeak_cli_usage
+
+Using SmartPeak CLI
+----------------------------------------------------------------------------------------------------------
 
 This page describes command line tool for working with SmartPeak. SmartPeak CLI provides an equivalent of SmartPeak GUI application, 
 however with a possibility to run in headless mode.
@@ -350,3 +352,5 @@ In Bash
 The previous commands will pull the required image locally, mounts ``C:/data`` or ``$HOME/data`` to ``/sample-data`` in the container and destroys the container once exited (please omit ``--rm`` if you don't wish to do so).
 
 Inside the container you can execute ``SmartPeakCLI`` following the examples mentioned above.
+
+.. end_smartpeak_cli_usage
