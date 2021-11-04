@@ -276,10 +276,8 @@ namespace SmartPeak
     return process();
   }
 
-  bool LoadSession::process()
+  bool LoadSession::readFilenames()
   {
-    LOGD << "START LoadSession";
-
     if (!filenames_) // if filenames are not provided, we will take it from the DB.
     {
       LoadFilenames load_filenames(application_handler_);
@@ -297,7 +295,11 @@ namespace SmartPeak
     }
 
     filenames_->log();
+    return true;
+  }
 
+  bool LoadSession::readInputFiles()
+  {
     for (auto& loading_processor : application_handler_.loading_processors_)
     {
       // check if we need to use that loading processor
@@ -307,7 +309,7 @@ namespace SmartPeak
       for (const auto& file_id : loading_processor_filenames.getFileIds())
       {
         load_it |= (filenames_->isEmbedded(file_id)
-                || (!filenames_->getFullPath(file_id).empty()));
+          || (!filenames_->getFullPath(file_id).empty()));
       }
 
       if (load_it)
@@ -377,6 +379,74 @@ namespace SmartPeak
         }
       }
     }
+    return true;
+  }
+  
+  bool LoadSession::readLoadingWorkflow()
+  {
+    LoadPropertiesHandlers loading_workflow(application_handler_);
+    loading_workflow.properties_handlers = { &application_handler_.session_loader_filter };
+    if (!loading_workflow.process())
+    {
+      LOGE << "Failed to load loading workflow.";
+      return false;
+    }
+    return true;
+  }
+
+  bool LoadSession::runLoadingWorkflow()
+  {
+    std::vector<std::string> commands = application_handler_.session_loader_filter.getLoadingWorkflowCommands();
+    BuildCommandsFromNames buildCommandsFromNames(application_handler_);
+    buildCommandsFromNames.names_ = commands;
+    if (!buildCommandsFromNames.process()) {
+      LOGE << "Failed to create Commands, aborting.";
+      return false;
+    }
+    for (auto& cmd : buildCommandsFromNames.commands_)
+    {
+      for (auto& p : cmd.dynamic_filenames)
+      {
+        p.second.setTagValue(Filenames::Tag::MZML_INPUT_PATH, application_handler_.filenames_.getTagValue(Filenames::Tag::MZML_INPUT_PATH));
+        p.second.setTagValue(Filenames::Tag::FEATURES_INPUT_PATH, application_handler_.filenames_.getTagValue(Filenames::Tag::FEATURES_INPUT_PATH));
+        p.second.setTagValue(Filenames::Tag::FEATURES_OUTPUT_PATH, application_handler_.filenames_.getTagValue(Filenames::Tag::FEATURES_OUTPUT_PATH));
+      }
+    }
+    std::set<std::string> injection_names;
+    for (const auto& injection : application_handler_.sequenceHandler_.getSequence())
+    {
+      injection_names.insert(injection.getMetaData().getInjectionName());
+    }
+    const std::set<std::string> sequence_segment_names = {}; // session_handler_.getSelectSequenceSegmentNamesWorkflow(application_handler_.sequenceHandler_);
+    const std::set<std::string> sample_group_names = {}; // session_handler_.getSelectSampleGroupNamesWorkflow(application_handler_.sequenceHandler_);
+    workflow_manager_.addWorkflow(
+      application_handler_,
+      injection_names,
+      sequence_segment_names,
+      sample_group_names,
+      buildCommandsFromNames.commands_,
+      application_processor_observer_,
+      sequence_processor_observer_,
+      sequence_segment_processor_observer_,
+      sample_group_processor_observer_,
+      true // At the moment, we are blocking the process of the workflow. put this to true (and other works) to profit from the progress bar.
+    );
+    return true;
+  }
+
+  bool LoadSession::process()
+  {
+    LOGD << "START LoadSession";
+
+    if (!readFilenames())
+    {
+      return false;
+    }
+
+    if (!readInputFiles())
+    {
+      return false;
+    }
 
     if (!overrideParameters())
     {
@@ -398,64 +468,22 @@ namespace SmartPeak
       }
     }
 
-    bool success = true;
-
-    // Load Features
+    // Restore state: Load Features
     if (!application_handler_.filenames_.getSessionDB().getDBFilePath().empty())
     {
-      LoadPropertiesHandlers loading_workflow(application_handler_);
-      loading_workflow.properties_handlers = { &application_handler_.session_loader_filter };
-      if (!loading_workflow.process())
+      if (!readLoadingWorkflow())
       {
-        LOGE << "Failed to load loading workflow.";
-        success = false;
+        return false;
       }
-      else
+      if (!runLoadingWorkflow())
       {
-        std::vector<std::string> commands = application_handler_.session_loader_filter.getLoadingWorkflowCommands();
-        BuildCommandsFromNames buildCommandsFromNames(application_handler_);
-        buildCommandsFromNames.names_ = commands;
-        if (!buildCommandsFromNames.process()) {
-          LOGE << "Failed to create Commands, aborting.";
-          success = false;
-        }
-        else
-        {
-          for (auto& cmd : buildCommandsFromNames.commands_)
-          {
-            for (auto& p : cmd.dynamic_filenames)
-            {
-              p.second.setTagValue(Filenames::Tag::MZML_INPUT_PATH, application_handler_.filenames_.getTagValue(Filenames::Tag::MZML_INPUT_PATH));
-              p.second.setTagValue(Filenames::Tag::FEATURES_INPUT_PATH, application_handler_.filenames_.getTagValue(Filenames::Tag::FEATURES_INPUT_PATH));
-              p.second.setTagValue(Filenames::Tag::FEATURES_OUTPUT_PATH, application_handler_.filenames_.getTagValue(Filenames::Tag::FEATURES_OUTPUT_PATH));
-            }
-          }
-          std::set<std::string> injection_names;
-          for (const auto& injection : application_handler_.sequenceHandler_.getSequence())
-          {
-            injection_names.insert(injection.getMetaData().getInjectionName());
-          }
-          const std::set<std::string> sequence_segment_names = {}; // session_handler_.getSelectSequenceSegmentNamesWorkflow(application_handler_.sequenceHandler_);
-          const std::set<std::string> sample_group_names = {}; // session_handler_.getSelectSampleGroupNamesWorkflow(application_handler_.sequenceHandler_);
-          workflow_manager_.addWorkflow(
-            application_handler_,
-            injection_names,
-            sequence_segment_names,
-            sample_group_names,
-            buildCommandsFromNames.commands_,
-            application_processor_observer_,
-            sequence_processor_observer_,
-            sequence_segment_processor_observer_,
-            sample_group_processor_observer_,
-            true // At the moment, we are blocking the process of the workflow. put this to true (and other works) to profit from the progress bar.
-          );
-        }
+        return false;
       }
     }
 
     application_handler_.sequenceHandler_.notifySequenceUpdated();
     LOGD << "END LoadSession";
-    return success;
+    return true;
   }
 
   bool LoadPropertiesHandlers::process()

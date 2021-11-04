@@ -124,6 +124,10 @@ namespace SmartPeak
   protected:
     bool overrideFilenames();
     bool overrideParameters();
+    bool readFilenames();
+    bool readInputFiles();
+    bool readLoadingWorkflow();
+    bool runLoadingWorkflow();
     WorkflowManager& workflow_manager_;
     IApplicationProcessorObserver* application_processor_observer_;
     ISequenceProcessorObserver* sequence_processor_observer_;
