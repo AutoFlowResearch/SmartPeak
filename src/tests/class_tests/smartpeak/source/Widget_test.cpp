@@ -497,7 +497,7 @@ TEST(SessionFilesWidget, SessionFilesWidget_Modify_ChangeFromExternalToEmbedded)
   SaveSession save_session(application_handler);
   save_session.onFilePicked(db_path, &application_handler);
   auto session_widget_test_modify2 = std::make_shared<SessionFilesWidget>(application_handler, SessionFilesWidget::Mode::EModification, workflow_manager);
-  auto load_session_wizard_ = std::make_shared<LoadSessionWizard>(session_widget_test_modify2, workflow_manager);
+  auto load_session_wizard_ = std::make_shared<LoadSessionWizard>(session_widget_test_modify2, workflow_manager, application_handler);
   load_session_wizard_->onFilePicked(db_path, &application_handler);
   ParameterSet& parameter_set3 = application_handler.sequenceHandler_.getSequence().at(0).getRawData().getParameters();
   auto parameter3 = parameter_set3.findParameter("MRMFeatureFinderScoring", "TransitionGroupPicker:peak_integration");
@@ -561,7 +561,7 @@ TEST(SessionFilesWidget, SessionFilesWidget_Modify_NoPopupError)
 
   // load session
   auto session_widget_test_modify = std::make_shared<SessionFilesWidget>(application_handler, SessionFilesWidget::Mode::EModification, workflow_manager);
-  auto load_session_wizard_ = std::make_shared<LoadSessionWizard>(session_widget_test_modify, workflow_manager);
+  auto load_session_wizard_ = std::make_shared<LoadSessionWizard>(session_widget_test_modify, workflow_manager, application_handler);
   load_session_wizard_->onFilePicked(db_path, &application_handler);
   
   // popup should not be displayed
@@ -609,7 +609,7 @@ TEST(SessionFilesWidget, LoadSessionWizard_PopupError)
   // load session
   auto session_widget_test_modify = std::make_shared<SessionFilesWidget_Test>(application_handler, SessionFilesWidget::Mode::EModification, workflow_manager);
   auto session_widget_modify = std::static_pointer_cast<SessionFilesWidget>(session_widget_test_modify);
-  auto load_session_wizard_ = std::make_shared<LoadSessionWizard>(session_widget_modify, workflow_manager);
+  auto load_session_wizard_ = std::make_shared<LoadSessionWizard>(session_widget_modify, workflow_manager, application_handler);
   load_session_wizard_->onFilePicked(db_path, &application_handler);
 
   // check that the wizard is displayed.
@@ -661,7 +661,7 @@ TEST(SessionFilesWidget, SessionFilesWidget_EmbedAllFiles)
 
   auto session_widget_test_modify = std::make_shared<SessionFilesWidget_Test>(application_handler, SessionFilesWidget::Mode::EModification, workflow_manager);
   auto session_widget_modify = std::static_pointer_cast<SessionFilesWidget>(session_widget_test_modify);
-  auto load_session_wizard_ = std::make_shared<LoadSessionWizard>(session_widget_modify, workflow_manager);
+  auto load_session_wizard_ = std::make_shared<LoadSessionWizard>(session_widget_modify, workflow_manager, application_handler);
   load_session_wizard_->onFilePicked(db_path, &application_handler);
 
   ParameterSet& parameter_set3 = application_handler.sequenceHandler_.getSequence().at(0).getRawData().getParameters();

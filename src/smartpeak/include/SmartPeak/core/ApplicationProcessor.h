@@ -145,7 +145,7 @@ namespace SmartPeak
 
     /* IProcessorDescription */
     virtual std::string getName() const override { return "LOAD_PROPERTIES_HANDLERS"; }
-    virtual std::string getDescription() const override { return "Load a list of properties PropertiesHandlers."; }
+    virtual std::string getDescription() const override { return "Load a list of PropertiesHandlers."; }
 
     std::vector<IPropertiesHandler*> properties_handlers;
   };
@@ -160,7 +160,7 @@ namespace SmartPeak
 
     /* IProcessorDescription */
     virtual std::string getName() const override { return "SAVE_PROPERTIES_HANDLERS"; }
-    virtual std::string getDescription() const override { return "Save a list of properties PropertiesHandlers."; }
+    virtual std::string getDescription() const override { return "Save a list of PropertiesHandlers."; }
 
     std::vector<IPropertiesHandler*> properties_handlers;
   };

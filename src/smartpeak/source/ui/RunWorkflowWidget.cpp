@@ -55,7 +55,7 @@ namespace SmartPeak
       ImGui::PushID(11);
       if (ImGui::Button("Select"))
       {
-        popup_file_picker_ = std::make_tuple("mzML folder", std::make_shared<SetRawDataPathname>());
+        popup_file_picker_ = std::make_tuple("mzML folder", std::make_shared<SetRawDataPathname>(&application_handler_.filenames_));
       }
       ImGui::PopID();
 
@@ -67,7 +67,7 @@ namespace SmartPeak
       ImGui::PushID(22);
       if (ImGui::Button("Select"))
       {
-        popup_file_picker_ = std::make_tuple("Input features folder", std::make_shared<SetInputFeaturesPathname>());
+        popup_file_picker_ = std::make_tuple("Input features folder", std::make_shared<SetInputFeaturesPathname>(&application_handler_.filenames_));
       }
       ImGui::PopID();
 
@@ -80,7 +80,7 @@ namespace SmartPeak
       ImGui::PushID(33);
       if (ImGui::Button("Select"))
       {
-        popup_file_picker_ = std::make_tuple("Output features folder", std::make_shared<SetOutputFeaturesPathname>());
+        popup_file_picker_ = std::make_tuple("Output features folder", std::make_shared<SetOutputFeaturesPathname>(&application_handler_.filenames_));
       }
       ImGui::PopID();
 

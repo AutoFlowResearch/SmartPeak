@@ -29,6 +29,7 @@ set(sources_list_h
 	SequenceGroupsEditorWidget.h
 	SequenceTableWidget.h
 	SessionFilesWidget.h
+	SetInputOutputWidget.h
 	SpectraMSMSPlotWidget.h
 	SpectraPlotWidget.h
 	SplitWindow.h

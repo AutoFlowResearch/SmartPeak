@@ -132,6 +132,7 @@ int main(int argc, char** argv)
   auto load_session_wizard_ = std::make_shared<LoadSessionWizard>(
     session_files_widget_modify_,
     workflow_manager_,
+    application_handler_,
     &event_dispatcher,
     &event_dispatcher,
     &event_dispatcher,
@@ -289,7 +290,8 @@ int main(int argc, char** argv)
       create_session_widget_,
       run_workflow_widget_,
       about_widget_,
-      report_
+      report_,
+      load_session_wizard_->set_input_output_widget
   };
 
   split_window.setupLayoutLoader(layout_loader);
@@ -434,6 +436,7 @@ int main(int argc, char** argv)
         popup->draw();
       }
     }
+    load_session_wizard_->draw();
 
     // ======================================
     // Menu
