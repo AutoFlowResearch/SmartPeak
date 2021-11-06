@@ -17,7 +17,7 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Krzysztof Abram $
+// $Maintainer: Krzysztof Abram, Douglas McCloskey $
 // $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
 // --------------------------------------------------------------------------
 #include <SmartPeak/core/ConsoleHandler.h>

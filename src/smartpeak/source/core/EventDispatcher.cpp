@@ -17,7 +17,7 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Bertrand Boudaud, Ahmed Khalil $
+// $Maintainer: Bertrand Boudaud, Ahmed Khalil, Douglas McCloskey $
 // $Authors: Douglas McCloskey, Bertrand Boudaud $
 // --------------------------------------------------------------------------
 

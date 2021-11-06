@@ -123,7 +123,3 @@ Indeed the feature database willl show us that it is the maximum ``peak_apex_int
 .. image:: ../images/select_dilutions_featuresdb.png
 
 Now, in our dilution file, if we set trp-L.trp-L_1.Heavy to preferred dilution_factor 1, the result will be 137, which is the maximum ``peak_apex_int`` from the sample based on dilution 1.
-
-
-
-
