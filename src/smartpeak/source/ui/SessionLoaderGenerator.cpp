@@ -21,13 +21,13 @@
 // $Authors: Douglas McCloskey, Bertrand Boudaud $
 // --------------------------------------------------------------------------
 
-#include <SmartPeak/core/SessionLoaderFilter.h>
+#include <SmartPeak/core/SessionLoaderGenerator.h>
 #include <plog/Log.h>
 
 namespace SmartPeak
 {
 
-  void SessionLoaderFilter::onApplicationProcessorStart(const std::vector<std::string>& commands)
+  void SessionLoaderGenerator::onApplicationProcessorStart(const std::vector<std::string>& commands)
   {
     for (const auto& command : commands)
     {
@@ -58,17 +58,17 @@ namespace SmartPeak
     }
   }
 
-  std::string SessionLoaderFilter::getPropertiesHandlerName() const
+  std::string SessionLoaderGenerator::getPropertiesHandlerName() const
   {
     return "loading_workflow";
   }
 
-  std::map<std::string, CastValue::Type> SessionLoaderFilter::getPropertiesSchema() const
+  std::map<std::string, CastValue::Type> SessionLoaderGenerator::getPropertiesSchema() const
   {
     return { {"commands", CastValue::Type::STRING_LIST } };
   }
 
-  std::optional<CastValue> SessionLoaderFilter::getProperty(const std::string& property, const size_t row) const
+  std::optional<CastValue> SessionLoaderGenerator::getProperty(const std::string& property, const size_t row) const
   {
     if (property == "commands")
     {
@@ -77,7 +77,7 @@ namespace SmartPeak
     return std::nullopt;
   }
 
-  void SessionLoaderFilter::setProperty(const std::string& property, const CastValue& value, const size_t row)
+  void SessionLoaderGenerator::setProperty(const std::string& property, const CastValue& value, const size_t row)
   {
     int order = 0;
     for (const auto& command : value.sl_)
@@ -87,7 +87,7 @@ namespace SmartPeak
     }
   }
 
-  std::vector<std::string> SessionLoaderFilter::getLoadingWorkflowCommands() const
+  std::vector<std::string> SessionLoaderGenerator::getLoadingWorkflowCommands() const
   {
     std::vector<std::string> commands;
     for (const auto& [order, command] : loading_workflow_commands_)

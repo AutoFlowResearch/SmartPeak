@@ -24,17 +24,17 @@
 #include <gtest/gtest.h>
 #include <SmartPeak/test_config.h>
 #include <SmartPeak/io/SessionDB.h>
-#include <SmartPeak/core/SessionLoaderFilter.h>
+#include <SmartPeak/core/SessionLoaderGenerator.h>
 
 using namespace SmartPeak;
 using namespace std;
 
-TEST(SessionLoaderFilter, getLoadingWorkflowCommands)
+TEST(SessionLoaderGenerator, getLoadingWorkflowCommands)
 {
-  SessionLoaderFilter session_loader_filter;
-  EXPECT_TRUE(session_loader_filter.getLoadingWorkflowCommands().empty());
+  SessionLoaderGenerator session_loader_generator;
+  EXPECT_TRUE(session_loader_generator.getLoadingWorkflowCommands().empty());
 
-  session_loader_filter.onApplicationProcessorStart(
+  session_loader_generator.onApplicationProcessorStart(
     {
     "LOAD_RAW_DATA",
     "MAP_CHROMATOGRAMS",
@@ -47,7 +47,7 @@ TEST(SessionLoaderFilter, getLoadingWorkflowCommands)
     "STORE_FEATURES"
     }
   );
-  session_loader_filter.onApplicationProcessorEnd();
+  session_loader_generator.onApplicationProcessorEnd();
 
   std::vector<std::string> expected_loading_workflow =
   {
@@ -58,16 +58,16 @@ TEST(SessionLoaderFilter, getLoadingWorkflowCommands)
     "ZERO_CHROMATOGRAM_BASELINE"
   };
 
-  EXPECT_EQ(session_loader_filter.getLoadingWorkflowCommands(), expected_loading_workflow);
+  EXPECT_EQ(session_loader_generator.getLoadingWorkflowCommands(), expected_loading_workflow);
 }
 
-TEST(SessionLoaderFilter, WriteAndReadSessionLoaderFilter)
+TEST(SessionLoaderGenerator, WriteAndReadSessionLoaderFilter)
 {
   SessionDB session_db;
   auto path_db = std::tmpnam(nullptr);
   session_db.setDBFilePath(path_db);
 
-  SessionLoaderFilter session_loader_write_filter;
+  SessionLoaderGenerator session_loader_write_filter;
   session_loader_write_filter.onApplicationProcessorStart(
     {
     "LOAD_RAW_DATA",
@@ -84,7 +84,7 @@ TEST(SessionLoaderFilter, WriteAndReadSessionLoaderFilter)
   session_loader_write_filter.onApplicationProcessorEnd();
   session_db.writePropertiesHandler(session_loader_write_filter);
 
-  SessionLoaderFilter session_loader_read_filter;
+  SessionLoaderGenerator session_loader_read_filter;
   session_db.readPropertiesHandler(session_loader_read_filter);
 
   std::vector<std::string> expected_loading_workflow =

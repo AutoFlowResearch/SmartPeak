@@ -27,7 +27,7 @@
 #include <SmartPeak/core/RawDataProcessor.h>
 #include <SmartPeak/core/SequenceSegmentProcessor.h>
 #include <SmartPeak/core/SampleGroupProcessor.h>
-#include <SmartPeak/core/SessionLoaderFilter.h>
+#include <SmartPeak/core/SessionLoaderGenerator.h>
 #include <map>
 #include <string>
 #include <vector>
@@ -118,7 +118,7 @@ namespace SmartPeak
     Filenames             filenames_;
     std::vector<std::shared_ptr<IFilenamesHandler>> loading_processors_;
     std::vector<std::shared_ptr<IFilenamesHandler>> storing_processors_;
-    SessionLoaderFilter session_loader_filter;
+    SessionLoaderGenerator session_loader_generator;
 
   protected:
     std::map<std::string, bool> saved_files_;

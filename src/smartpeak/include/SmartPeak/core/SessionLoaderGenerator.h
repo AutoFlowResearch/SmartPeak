@@ -34,9 +34,9 @@ namespace SmartPeak
     the constructed workflow will be recorded in the session file and executed 
     while the session is loaded.
   */
-  struct SessionLoaderFilter : IPropertiesHandler, IApplicationProcessorObserver
+  struct SessionLoaderGenerator : IPropertiesHandler, IApplicationProcessorObserver
   {
-    SessionLoaderFilter() { };
+    SessionLoaderGenerator() { };
 
     /**
     IApplicationProcessorObserver

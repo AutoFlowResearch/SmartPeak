@@ -385,7 +385,7 @@ namespace SmartPeak
   bool LoadSession::readLoadingWorkflow()
   {
     LoadPropertiesHandlers loading_workflow(application_handler_);
-    loading_workflow.properties_handlers = { &application_handler_.session_loader_filter };
+    loading_workflow.properties_handlers = { &application_handler_.session_loader_generator };
     if (!loading_workflow.process())
     {
       LOGE << "Failed to load loading workflow.";
@@ -396,7 +396,7 @@ namespace SmartPeak
 
   bool LoadSession::runLoadingWorkflow()
   {
-    std::vector<std::string> commands = application_handler_.session_loader_filter.getLoadingWorkflowCommands();
+    std::vector<std::string> commands = application_handler_.session_loader_generator.getLoadingWorkflowCommands();
     BuildCommandsFromNames buildCommandsFromNames(application_handler_);
     buildCommandsFromNames.names_ = commands;
     if (!buildCommandsFromNames.process()) {
@@ -660,7 +660,7 @@ namespace SmartPeak
     bool success = true;
 
     SavePropertiesHandlers loading_workflow(application_handler_);
-    loading_workflow.properties_handlers = { &application_handler_.session_loader_filter };
+    loading_workflow.properties_handlers = { &application_handler_.session_loader_generator };
     if (!loading_workflow.process())
     {
       LOGE << "Failed to save loading workflow.";
