@@ -34,7 +34,7 @@
 */
 namespace SmartPeak
 {
-  struct LoadSessionWizard : Widget, IFilePickerHandler, ISetInputOutputWidgetObserver
+  struct LoadSessionWizard : IFilePickerHandler, ISetInputOutputWidgetObserver
   {
     LoadSessionWizard(std::shared_ptr<SessionFilesWidget>& session_files_widget_manage,
                       WorkflowManager& workflow_manager,
@@ -43,7 +43,6 @@ namespace SmartPeak
                       ISequenceProcessorObserver* sequence_processor_observer = nullptr,
                       ISequenceSegmentProcessorObserver* sequence_segment_processor_observer = nullptr,
                       ISampleGroupProcessorObserver* sample_group_processor_observer = nullptr) :
-      Widget("Load Session Wizard"),
       application_handler_(application_handler),
       session_files_widget_manage_(session_files_widget_manage),
       workflow_manager_(workflow_manager),
@@ -65,8 +64,6 @@ namespace SmartPeak
     IFilePickerHandler
     */
     bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
-
-    void draw() override;
 
     std::shared_ptr<SetInputOutputWidget> set_input_output_widget;
 

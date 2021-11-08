@@ -39,7 +39,6 @@ namespace SmartPeak
     auto main_dir = std::filesystem::path(filename).remove_filename().generic_string();
     loaded_filenames_->setTagValue(Filenames::Tag::MAIN_DIR, main_dir);
     missing_input_output_directories_ = missingInputOutputDirectories();
-    visible_ = true;
     if (missing_input_output_directories_)
     {
       set_input_output_widget->open(*loaded_filenames_, this);
@@ -93,7 +92,6 @@ namespace SmartPeak
         application_handler_.closeSession();
         load_session.notifyApplicationProcessorError("Failed to load session.");
       }
-      visible_ = false;
       load_session.notifyApplicationProcessorEnd();
     }
   }
@@ -122,7 +120,4 @@ namespace SmartPeak
     return false;
   }
 
-  void LoadSessionWizard::draw()
-  {
-  }
 }

@@ -436,7 +436,6 @@ int main(int argc, char** argv)
         popup->draw();
       }
     }
-    load_session_wizard_->draw();
 
     // ======================================
     // Menu
