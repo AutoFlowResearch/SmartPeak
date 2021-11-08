@@ -40,7 +40,7 @@ namespace SmartPeak
     void setXAndYSizes(const float& x, const float& y);
     void setWindowPercentages(const float& bottom_window_y_perc, const float& left_window_x_perc, const float& right_window_x_perc);
     void setWindowSizesAndPositions_(const float& bottom_window_y_perc, const float& left_window_x_perc, const float& right_window_x_perc);
-    void setWindowSizesAndPositions(const bool& show_top_window, const bool& show_bottom_window, const bool& show_left_window, const bool& show_right_window);
+    void setWindowsVisible(const bool& show_top_window, const bool& show_bottom_window, const bool& show_left_window, const bool& show_right_window);
     void setLeftWindowXSize(const float& left_window_x_size);
     void setTopWindowYSize(const float& top_window_y_size);
 

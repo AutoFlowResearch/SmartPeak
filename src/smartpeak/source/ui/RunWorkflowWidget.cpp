@@ -26,7 +26,6 @@
 #include <imgui.h>
 #include <misc/cpp/imgui_stdlib.h>
 #include <plog/Log.h>
-#include <SmartPeak/core/SharedProcessors.h>
 #include <filesystem>
 
 namespace SmartPeak

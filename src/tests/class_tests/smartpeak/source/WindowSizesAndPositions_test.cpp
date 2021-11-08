@@ -24,6 +24,7 @@
 #include <gtest/gtest.h>
 #include <SmartPeak/test_config.h>
 #include <SmartPeak/ui/WindowSizesAndPositions.h>
+#include <SmartPeak/io/SessionDB.h>
 #include <thread>
 
 using namespace SmartPeak;
@@ -74,7 +75,7 @@ TEST(WindowSizesAndPositions, setLeftWindowXSize)
   WindowSizesAndPositions win_size_and_pos;
   win_size_and_pos.setXAndYSizes(100, 100);
   win_size_and_pos.setLeftWindowXSize(10);
-  win_size_and_pos.setWindowSizesAndPositions(true, true, true, false);
+  win_size_and_pos.setWindowsVisible(true, true, true, false);
   EXPECT_NEAR(win_size_and_pos.bottom_window_y_size_, 20.5 , 1e-3);
   EXPECT_NEAR(win_size_and_pos.top_window_y_size_, 61.5, 1e-3);
   EXPECT_NEAR(win_size_and_pos.bottom_and_top_window_x_size_, 90, 1e-3);
@@ -94,7 +95,7 @@ TEST(WindowSizesAndPositions, setTopWindowYSize)
   WindowSizesAndPositions win_size_and_pos;
   win_size_and_pos.setXAndYSizes(100, 100);
   win_size_and_pos.setTopWindowYSize(10);
-  win_size_and_pos.setWindowSizesAndPositions(true, true, true, false);
+  win_size_and_pos.setWindowsVisible(true, true, true, false);
   EXPECT_NEAR(win_size_and_pos.bottom_window_y_size_, 72, 1e-3);
   EXPECT_NEAR(win_size_and_pos.top_window_y_size_, 10, 1e-3);
   EXPECT_NEAR(win_size_and_pos.bottom_and_top_window_x_size_, 75, 1e-3);
@@ -114,13 +115,13 @@ TEST(WindowSizesAndPositions, showHide)
   WindowSizesAndPositions win_size_and_pos;
   win_size_and_pos.setXAndYSizes(100, 100);
   win_size_and_pos.setTopWindowYSize(10);
-  win_size_and_pos.setWindowSizesAndPositions(true, true, true, false);
+  win_size_and_pos.setWindowsVisible(true, true, true, false);
   EXPECT_NEAR(win_size_and_pos.bottom_window_y_size_, 72, 1e-3);
   EXPECT_NEAR(win_size_and_pos.top_window_y_size_, 10, 1e-3);
-  win_size_and_pos.setWindowSizesAndPositions(true, false, true, false);
+  win_size_and_pos.setWindowsVisible(true, false, true, false);
   EXPECT_NEAR(win_size_and_pos.bottom_window_y_size_, 0, 1e-3);
   EXPECT_NEAR(win_size_and_pos.top_window_y_size_, 82, 1e-3);
-  win_size_and_pos.setWindowSizesAndPositions(true, true, true, false);
+  win_size_and_pos.setWindowsVisible(true, true, true, false);
   EXPECT_NEAR(win_size_and_pos.bottom_window_y_size_, 20.5, 1e-3);
   EXPECT_NEAR(win_size_and_pos.top_window_y_size_, 61.5, 1e-3);
 }
@@ -157,4 +158,22 @@ TEST(WindowSizesAndPositions, setWindowSizesAndPositions_)
   EXPECT_NEAR(win_size_and_pos.bottom_window_y_perc_, 0.25, 1e-3); // Defaults
   EXPECT_NEAR(win_size_and_pos.left_window_x_perc_, 0.25, 1e-3); // Defaults
   EXPECT_NEAR(win_size_and_pos.right_window_x_perc_, 0, 1e-3); // Defaults
+}
+
+TEST(WindowSizesAndPositions, widget_WriteAndReadWindowSizesAndPositions)
+{
+  WindowSizesAndPositions win_size_and_pos_write;
+  win_size_and_pos_write.setWindowPercentages(0.1, 0.3, 0.6);
+
+  SessionDB session_db;
+  auto path_db = std::tmpnam(nullptr);
+  session_db.setDBFilePath(path_db);
+
+  session_db.writePropertiesHandler(win_size_and_pos_write);
+
+  WindowSizesAndPositions win_size_and_pos_read;
+  session_db.readPropertiesHandler(win_size_and_pos_read);
+  EXPECT_FLOAT_EQ(win_size_and_pos_read.bottom_window_y_perc_, 0.1);
+  EXPECT_FLOAT_EQ(win_size_and_pos_read.left_window_x_perc_, 0.3);
+  EXPECT_FLOAT_EQ(win_size_and_pos_read.right_window_x_perc_, 0.6);
 }

@@ -106,6 +106,22 @@ TEST(Widget, widget_constructors)
   delete explorerwidget_ptr;
 }
 
+TEST(Widget, widget_WriteAndReadWidget)
+{
+  GenericTableWidget generictablewidget_write("empty_generic_table");
+  generictablewidget_write.visible_ = true;
+
+  SessionDB session_db;
+  auto path_db = std::tmpnam(nullptr);
+  session_db.setDBFilePath(path_db);
+
+  session_db.writePropertiesHandler(generictablewidget_write);
+
+  GenericTableWidget generictablewidget_read("empty_generic_table");
+  session_db.readPropertiesHandler(generictablewidget_read);
+  EXPECT_EQ(generictablewidget_read.visible_, true);
+}
+
 TEST(Widget, GenericTableWidget_sorter)
 {
   bool is_scanned =                 false;
@@ -211,6 +227,43 @@ public:
     return plotLimits();
   }
 
+  void wrapper_setCurrentRange(float range_min, float range_max)
+  {
+    current_range_.first = range_min;
+    current_range_.second = range_max;
+  }
+
+
+  std::tuple<float,float> wrapper_getCurrentRange() const
+  {
+    return current_range_;
+  }
+
+  void wrapper_setCompactView(bool enable)
+  {
+    compact_view_ = enable;
+  }
+
+  bool wrapper_getCompactView() const
+  {
+    return compact_view_;
+  }
+
+  void wrapper_setShowLegend(bool enable)
+  {
+    show_legend_ = enable;
+  }
+
+  bool wrapper_getShowLegend() const
+  {
+    return show_legend_;
+  }
+
+  void wrapper_updateRanges()
+  {
+    updateRanges();
+  }
+
 public:
   // setters for test
   void setGraphVizData(SessionHandler::GraphVizData& graph_viz_data)
@@ -256,6 +309,34 @@ TEST(GraphicDataVizWidget, plotLimits)
   EXPECT_NEAR(plot_max_x, 2.09, 1e-6);
   EXPECT_NEAR(plot_min_y, 98.910003662109375, 1e-6);
   EXPECT_NEAR(plot_max_y, 341, 1e-6);
+}
+
+TEST(GraphicDataVizWidget, WriteAndReadGraphViz)
+{
+  SmartPeak::SessionHandler session_handler;
+  SmartPeak::ApplicationHandler application_handler;
+  std::string id = "GraphicDataVizWidget";
+  std::string title = "GraphicDataVizWidget";
+  GraphicDataVizWidget_Test test_graphic_data_viz_write(session_handler, application_handler, id, title);
+  test_graphic_data_viz_write.wrapper_setMarkerPosition(42.0f);
+  test_graphic_data_viz_write.wrapper_setCurrentRange(10.0f, 100.0f);
+  test_graphic_data_viz_write.wrapper_setShowLegend(false);
+  test_graphic_data_viz_write.wrapper_setCompactView(false);
+
+  SessionDB session_db;
+  auto path_db = std::tmpnam(nullptr);
+  session_db.setDBFilePath(path_db);
+
+  session_db.writePropertiesHandler(test_graphic_data_viz_write);
+
+  GraphicDataVizWidget_Test test_graphic_data_viz_read(session_handler, application_handler, id, title);
+  session_db.readPropertiesHandler(test_graphic_data_viz_read);
+  test_graphic_data_viz_read.wrapper_updateRanges();
+  EXPECT_EQ(test_graphic_data_viz_read.wrapper_getShowLegend(), false);
+  EXPECT_EQ(test_graphic_data_viz_read.wrapper_getCompactView(), false);
+  const auto [current_range_min, current_range_max] = test_graphic_data_viz_read.wrapper_getCurrentRange();
+  EXPECT_FLOAT_EQ(current_range_min, 10.0f);
+  EXPECT_FLOAT_EQ(current_range_max, 100.0f);
 }
 
 class WorkflowWidget_Test : public WorkflowWidget
