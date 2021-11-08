@@ -34,6 +34,7 @@
 #include <SmartPeak/ui/WorkflowWidget.h>
 #include <SmartPeak/ui/SessionFilesWidget.h>
 #include <SmartPeak/ui/LoadSessionWizard.h>
+#include <SmartPeak/ui/SetInputOutputWidget.h>
 
 using namespace SmartPeak;
 
@@ -750,3 +751,98 @@ TEST(SessionFilesWidget, SessionFilesWidget_EmbedAllFiles)
   ASSERT_NE(parameter3, nullptr);
   EXPECT_EQ(parameter3->getValueAsString(), "smoothed");
 }
+
+class SetInputOutputWidget_Test : 
+  public SetInputOutputWidget,
+  public ISetInputOutputWidgetObserver
+{
+public:
+  SetInputOutputWidget_Test(ApplicationHandler& application_handler) :
+    SetInputOutputWidget(application_handler)
+  {};
+
+  /**
+  ISetInputOutputWidgetObserver
+  */
+  virtual void onInputOutputSet()
+  {
+    on_input_output_set_counter++;
+  }
+  virtual void onInputOutputCancel()
+  {
+    on_input_output_cancel_counter++;
+  }
+  int on_input_output_set_counter = 0;
+  int on_input_output_cancel_counter = 0;
+
+public:
+  // wrappers to protected methods
+  std::string& get_mzML_dir_edit_()
+  {
+    return mzML_dir_edit_;
+  };
+
+  std::string& get_features_in_dir_edit_()
+  {
+    return features_in_dir_edit_;
+  };
+
+  std::string& get_features_out_dir_edit_()
+  {
+    return features_out_dir_edit_;
+  };
+
+  void wrapper_setDirectories()
+  {
+    setDirectories();
+  }
+
+  void wrapper_cancel()
+  {
+    cancel();
+  }
+
+  bool get_one_missing_directory()
+  {
+    return one_missing_directory_;
+  }
+};
+
+TEST(SetInputOutputWidget, open)
+{
+  ApplicationHandler application_handler;
+  Filenames filenames = Utilities::buildFilenamesFromDirectory(application_handler, SMARTPEAK_GET_TEST_DATA_PATH("workflow_csv_files"));
+  SetInputOutputWidget_Test set_input_output_widget_test(application_handler);
+  EXPECT_EQ(set_input_output_widget_test.get_features_in_dir_edit_(), "");
+  EXPECT_EQ(set_input_output_widget_test.get_features_out_dir_edit_(), "");
+  EXPECT_EQ(set_input_output_widget_test.get_mzML_dir_edit_(), "");
+  EXPECT_EQ(set_input_output_widget_test.get_mzML_dir_edit_(), "");
+  EXPECT_EQ(set_input_output_widget_test.visible_, false);
+
+  set_input_output_widget_test.open(filenames, &set_input_output_widget_test);
+  EXPECT_EQ(set_input_output_widget_test.visible_, true);
+  EXPECT_EQ(set_input_output_widget_test.get_one_missing_directory(), false);
+}
+
+TEST(SetInputOutputWidget, setDirectories)
+{
+  ApplicationHandler application_handler;
+  Filenames filenames = Utilities::buildFilenamesFromDirectory(application_handler, SMARTPEAK_GET_TEST_DATA_PATH("workflow_csv_files"));
+  SetInputOutputWidget_Test set_input_output_widget_test(application_handler);
+  set_input_output_widget_test.open(filenames, &set_input_output_widget_test);
+  set_input_output_widget_test.wrapper_setDirectories();
+  EXPECT_EQ(set_input_output_widget_test.on_input_output_set_counter, 1);
+  EXPECT_EQ(set_input_output_widget_test.on_input_output_cancel_counter, 0);
+}
+
+TEST(SetInputOutputWidget, cancel)
+{
+  ApplicationHandler application_handler;
+  Filenames filenames = Utilities::buildFilenamesFromDirectory(application_handler, SMARTPEAK_GET_TEST_DATA_PATH("workflow_csv_files"));
+  SetInputOutputWidget_Test set_input_output_widget_test(application_handler);
+  set_input_output_widget_test.open(filenames, &set_input_output_widget_test);
+  set_input_output_widget_test.wrapper_cancel();
+  EXPECT_EQ(set_input_output_widget_test.on_input_output_set_counter, 0);
+  EXPECT_EQ(set_input_output_widget_test.on_input_output_cancel_counter, 1);
+}
+

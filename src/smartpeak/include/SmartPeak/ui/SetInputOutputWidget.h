@@ -46,7 +46,10 @@ namespace SmartPeak
 
     void open(Filenames& filenames, ISetInputOutputWidgetObserver* observer);
 
+  protected:
     void setEditField(int id, std::string label, std::string& edit_box, std::shared_ptr<IFilePickerHandler>& file_picker_handler);
+    void setDirectories();
+    void cancel();
 
   protected:
     Filenames* filenames_ = nullptr;

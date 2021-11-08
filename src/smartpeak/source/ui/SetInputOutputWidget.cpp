@@ -70,6 +70,7 @@ namespace SmartPeak
         ImGui::Text("");
       }
 
+      setEditFields();
       setEditField(1, "mzML folder", mzML_dir_edit_, set_raw_data_path_name);
       setEditField(2, "Input features folder", features_in_dir_edit_, set_input_features_path_name);
       setEditField(3, "Output features folder", features_out_dir_edit_, set_output_features_path_name);
@@ -89,15 +90,9 @@ namespace SmartPeak
       {
         if (!one_missing_directory_)
         {
-          filenames_->setTagValue(Filenames::Tag::MZML_INPUT_PATH, mzML_dir_edit_);
-          filenames_->setTagValue(Filenames::Tag::FEATURES_INPUT_PATH, features_in_dir_edit_);
-          filenames_->setTagValue(Filenames::Tag::FEATURES_OUTPUT_PATH, features_out_dir_edit_);
           visible_ = false;
           ImGui::CloseCurrentPopup();
-          if (observer_)
-          {
-            observer_->onInputOutputSet();
-          }
+          setDirectories();
         }
       }
       if (one_missing_directory_) ImGui::PopStyleVar();
@@ -106,10 +101,7 @@ namespace SmartPeak
       {
         visible_ = false;
         ImGui::CloseCurrentPopup();
-        if (observer_)
-        {
-          observer_->onInputOutputCancel();
-        }
+        cancel();
       }
       ImGui::EndPopup();
     }
@@ -148,6 +140,25 @@ namespace SmartPeak
     }
     ImGui::PopID();
     one_missing_directory_ |= !(directory_exists);
+  }
+
+  void SetInputOutputWidget::setDirectories()
+  {
+    filenames_->setTagValue(Filenames::Tag::MZML_INPUT_PATH, mzML_dir_edit_);
+    filenames_->setTagValue(Filenames::Tag::FEATURES_INPUT_PATH, features_in_dir_edit_);
+    filenames_->setTagValue(Filenames::Tag::FEATURES_OUTPUT_PATH, features_out_dir_edit_);
+    if (observer_)
+    {
+      observer_->onInputOutputSet();
+    }
+  }
+
+  void SetInputOutputWidget::cancel()
+  {
+    if (observer_)
+    {
+      observer_->onInputOutputCancel();
+    }
   }
 
 }
