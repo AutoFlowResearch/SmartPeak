@@ -2887,7 +2887,7 @@ TEST(RawDataProcessor, DDA)
   filenames.setFullPath("featureXML_i", SMARTPEAK_GET_TEST_DATA_PATH("dda_after_search.featureXML"));
   loadFeatures.process(rawDataHandler, params_1, filenames);
 
-  filenames.setFullPath("traML", std::tmpnam(nullptr));
+  filenames.setFullPath("output_traML", std::tmpnam(nullptr));
   DDA dda;
   dda.process(rawDataHandler, params_1, filenames);
 
