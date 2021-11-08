@@ -331,8 +331,11 @@ namespace SmartPeak
   {
     // reconstruct filenames to be used to construct the session
     Filenames filenames;
+    for (const auto& [tag_name, tag] : filenames_.getTagNames())
+    {
+      filenames.setTagValue(tag, filenames_.getTagValue(tag));
+    }
     filenames.getSessionDB() = filenames_.getSessionDB();
-    filenames.setTagValue(Filenames::Tag::MAIN_DIR, filenames_.getTagValue(Filenames::Tag::MAIN_DIR));
     for (const auto& fef : file_editor_fields_)
     {
       std::string path = fef.second.text_editor_;
