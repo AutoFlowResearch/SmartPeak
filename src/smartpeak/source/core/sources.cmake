@@ -26,6 +26,7 @@ set(sources_list
 	SequenceSegmentHandler.cpp
 	SequenceSegmentProcessor.cpp
 	SessionHandler.cpp
+	SessionLoaderGenerator.cpp
 	SharedProcessors.cpp
 	Utilities.cpp
 	WorkflowManager.cpp

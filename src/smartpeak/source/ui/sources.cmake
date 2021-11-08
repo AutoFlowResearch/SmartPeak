@@ -27,7 +27,6 @@ set(sources_list
 	SequenceGroupsEditorWidget.cpp
 	SequenceTableWidget.cpp
 	SessionFilesWidget.cpp
-	SessionLoaderGenerator.cpp
 	SetInputOutputWidget.cpp
 	SpectraMSMSPlotWidget.cpp
 	SpectraPlotWidget.cpp
