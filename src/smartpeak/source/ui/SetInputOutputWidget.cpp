@@ -70,7 +70,6 @@ namespace SmartPeak
         ImGui::Text("");
       }
 
-      setEditFields();
       setEditField(1, "mzML folder", mzML_dir_edit_, set_raw_data_path_name);
       setEditField(2, "Input features folder", features_in_dir_edit_, set_input_features_path_name);
       setEditField(3, "Output features folder", features_out_dir_edit_, set_output_features_path_name);
