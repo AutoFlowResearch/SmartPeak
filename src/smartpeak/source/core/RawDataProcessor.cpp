@@ -2605,7 +2605,7 @@ namespace SmartPeak
 
   void DDA::getFilenames(Filenames& filenames) const
   {
-    filenames.addFileName("traML", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}.traML");
+    filenames.addFileName("output_traML", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}.traML");
   };
 
   void DDA::process(RawDataHandler& rawDataHandler_IO,
@@ -2668,8 +2668,8 @@ namespace SmartPeak
     oms_params.setValue("output_format", "traML");
     oms_params.setValue("deisotoping:use_deisotoper", "true");
     targeted_spectra_extractor.setParameters(oms_params);
-    LOGI << "Storing: " << filenames_I.getFullPath("traML").generic_string();
-    targeted_spectra_extractor.storeSpectraTraML(filenames_I.getFullPath("traML").generic_string(), ms1_merged_features, ms2_merged_features);
+    LOGI << "Storing: " << filenames_I.getFullPath("output_traML").generic_string();
+    targeted_spectra_extractor.storeSpectraTraML(filenames_I.getFullPath("output_traML").generic_string(), ms1_merged_features, ms2_merged_features);
 
     // build MS1/MS2 features
     OpenMS::FeatureMap ms1_ms2_features;

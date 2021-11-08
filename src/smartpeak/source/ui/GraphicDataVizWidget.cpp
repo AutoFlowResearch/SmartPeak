@@ -331,6 +331,7 @@ namespace SmartPeak
     properties.emplace("current_range_.second", CastValue::Type::FLOAT);
     properties.emplace("compact_view_", CastValue::Type::BOOL);
     properties.emplace("show_legend_", CastValue::Type::BOOL);
+    properties.emplace("marker_position_", CastValue::Type::FLOAT);
     return properties;
   }
 
@@ -371,6 +372,10 @@ namespace SmartPeak
     {
       return show_legend_;
     }
+    if (property == "marker_position_")
+    {
+      return marker_position_ ? *marker_position_ : 0;
+    }
     return std::nullopt;
   }
 
@@ -408,6 +413,10 @@ namespace SmartPeak
       {
         serialized_range_->second = value.f_;
       }
+    }
+    if (property == "marker_position_")
+    {
+      marker_position_ = value.f_;
     }
   }
 }
