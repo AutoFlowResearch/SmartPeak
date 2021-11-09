@@ -1,33 +1,6 @@
 set(core_executables_list
-	ApplicationManager_test
-	ApplicationHandler_test
-	ApplicationProcessor_test
-	ApplicationSettings_test
-	CastValue_test
-	ConsoleHandler_test
-	EventDispatcher_test
-	FeatureFiltersUtils_test
-	Filenames_test  
-	ImEntry_test
-	InjectionHandler_test
-	MetaDataHandler_test
-	Parameters_test
-	ParametersObservable_test
-	ProgressInfo_test
-	RawDataHandler_test
-	RawDataProcessor_test
-	SampleGroupHandler_test
-	SampleGroupProcessor_test
-	SequenceHandler_test
 	SequenceProcessor_test
-	SequenceSegmentHandler_test
-	SequenceSegmentProcessor_test
-	SessionDB_test
-	SessionHandler_test
 	Task_test
-	Utilities_test
-	WorkflowObservable_test
-	WorkflowManager_test
 )
 
 set(io_executables_list
