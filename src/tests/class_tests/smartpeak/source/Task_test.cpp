@@ -55,7 +55,7 @@ public:
 
 /* ---------------------------------------------- */
 
-TEST(Task, Task_options_change_parameter)
+TEST(Task, Task_run_1_thread)
 {
   plog::ConsoleAppender<plog::TxtFormatter> consoleAppender;
 
@@ -72,7 +72,7 @@ TEST(Task, Task_options_change_parameter)
           "--allow-inconsistent",
           "--log-dir", ".",
           "--disable-colors",
-          "--parameter", "SequenceProcessor:n_thread=42"
+          "--parameter", "SequenceProcessor:n_thread=1"
   };
   try
   {
@@ -95,18 +95,88 @@ TEST(Task, Task_options_change_parameter)
   {
     LOG_ERROR << e.what();
   }
-/*
-  auto pa = cli::Parser{ args };
-  auto as = cli::ApplicationSettings{ pa };
-  auto am = cli::ApplicationManager{ as };
-  auto task = cli::InitializeApplicationSettings{};
-  EXPECT_TRUE(task(am));
-  auto ls = cli::LoadSession{};
-  EXPECT_TRUE(ls(am));
-  ASSERT_GT(am.get_application_handler().sequenceHandler_.getSequence().size(), 0);
-  auto parameters = am.get_application_handler().sequenceHandler_.getSequence().at(0).getRawData().getParameters();
-  auto parameter = parameters.findParameter("SequenceProcessor", "n_thread");
-  ASSERT_NE(parameter, nullptr);
-  ASSERT_EQ(parameter->getValueAsString(), "42");
-*/
+}
+
+TEST(Task, Task_run_2_threads)
+{
+  plog::ConsoleAppender<plog::TxtFormatter> consoleAppender;
+
+  // Init logger with all the appenders
+  plog::init(plog::debug, &consoleAppender);
+
+  namespace cli = SmartPeak::cli;
+  std::filesystem::path seq_path = SMARTPEAK_GET_EXAMPLES_DATA_PATH("LCMS_MRM_QCs");
+  std::string seq = std::string{ seq_path.lexically_normal().generic_string() };
+  std::vector<std::string> args = std::vector<std::string>{
+      "Task_test",
+          "--load-session", seq,
+          "--verbose",
+          "--allow-inconsistent",
+          "--log-dir", ".",
+          "--disable-colors",
+          "--parameter", "SequenceProcessor:n_thread=2"
+  };
+  try
+  {
+    auto pa = cli::Parser{ args };
+    auto as = cli::ApplicationSettings{ pa };
+    auto am = cli::ApplicationManager{ as };
+    am
+      .add(std::make_shared<cli::InitializeApplicationSettings>())
+      .add(std::make_shared<cli::InitializeLogger>())
+      .add(std::make_shared<cli::LoadSession>())
+      .add(std::make_shared<cli::InitializeWorkflowResources>())
+      .add(std::make_shared<cli::InitializeWorkflowSettings>())
+      .add(std::make_shared<cli::RunIntegrityChecks>())
+      .add(std::make_shared<cli::RunWorkflow>())
+      .add(std::make_shared<cli::ExportReport>());
+
+    am.run();
+  }
+  catch (const std::exception& e)
+  {
+    LOG_ERROR << e.what();
+  }
+}
+
+TEST(Task, Task_run_10_threads)
+{
+  plog::ConsoleAppender<plog::TxtFormatter> consoleAppender;
+
+  // Init logger with all the appenders
+  plog::init(plog::debug, &consoleAppender);
+
+  namespace cli = SmartPeak::cli;
+  std::filesystem::path seq_path = SMARTPEAK_GET_EXAMPLES_DATA_PATH("LCMS_MRM_QCs");
+  std::string seq = std::string{ seq_path.lexically_normal().generic_string() };
+  std::vector<std::string> args = std::vector<std::string>{
+      "Task_test",
+          "--load-session", seq,
+          "--verbose",
+          "--allow-inconsistent",
+          "--log-dir", ".",
+          "--disable-colors",
+          "--parameter", "SequenceProcessor:n_thread=10"
+  };
+  try
+  {
+    auto pa = cli::Parser{ args };
+    auto as = cli::ApplicationSettings{ pa };
+    auto am = cli::ApplicationManager{ as };
+    am
+      .add(std::make_shared<cli::InitializeApplicationSettings>())
+      .add(std::make_shared<cli::InitializeLogger>())
+      .add(std::make_shared<cli::LoadSession>())
+      .add(std::make_shared<cli::InitializeWorkflowResources>())
+      .add(std::make_shared<cli::InitializeWorkflowSettings>())
+      .add(std::make_shared<cli::RunIntegrityChecks>())
+      .add(std::make_shared<cli::RunWorkflow>())
+      .add(std::make_shared<cli::ExportReport>());
+
+    am.run();
+  }
+  catch (const std::exception& e)
+  {
+    LOG_ERROR << e.what();
+  }
 }
