@@ -20,6 +20,7 @@ SmartPeak
    guide/install
    guide/build
    guide/usage
+   guide/tutorials
 
 .. toctree::
    :caption: About Smartpeak
