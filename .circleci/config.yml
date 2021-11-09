@@ -292,8 +292,6 @@ jobs:
             refreshenv
             & 'C:\Program Files\cmake\bin\ctest.exe' -VV -F
             ThrowOnFailure "CTest failed!"
-            & 'C:\Program Files\cmake\bin\cpack.exe' -G NSIS64
-            ThrowOnFailure "CPack failed!"
             cd ~/SmartPeak
             $env:PYTHONPATH = $PWD.Path + "\tools"
             python -m unittest discover -s .\tools\smartpeak\

@@ -28,6 +28,16 @@
 #include <SmartPeak/cli/ApplicationManager.h>
 #include <SmartPeak/cli/Task.h>
 
+static bool plog_init = false;
+void init_plog()
+{
+  if (!plog_init)
+  {
+    static plog::ConsoleAppender<plog::TxtFormatter> consoleAppender;
+    plog::init(plog::debug, &consoleAppender);
+    plog_init = true;
+  }
+}
 
 struct TaskFixture : public ::testing::Test
 {
@@ -54,14 +64,10 @@ public:
 };
 
 /* ---------------------------------------------- */
-
+/*
 TEST(Task, Task_run_1_thread)
 {
-  plog::ConsoleAppender<plog::TxtFormatter> consoleAppender;
-
-  // Init logger with all the appenders
-  plog::init(plog::debug, &consoleAppender);
-
+  init_plog();
   namespace cli = SmartPeak::cli;
   std::filesystem::path seq_path = SMARTPEAK_GET_EXAMPLES_DATA_PATH("LCMS_MRM_QCs");
   std::string seq = std::string{ seq_path.lexically_normal().generic_string() };
@@ -99,11 +105,7 @@ TEST(Task, Task_run_1_thread)
 
 TEST(Task, Task_run_2_threads)
 {
-  plog::ConsoleAppender<plog::TxtFormatter> consoleAppender;
-
-  // Init logger with all the appenders
-  plog::init(plog::debug, &consoleAppender);
-
+  init_plog();
   namespace cli = SmartPeak::cli;
   std::filesystem::path seq_path = SMARTPEAK_GET_EXAMPLES_DATA_PATH("LCMS_MRM_QCs");
   std::string seq = std::string{ seq_path.lexically_normal().generic_string() };
@@ -138,14 +140,10 @@ TEST(Task, Task_run_2_threads)
     LOG_ERROR << e.what();
   }
 }
-
+*/
 TEST(Task, Task_run_10_threads)
 {
-  plog::ConsoleAppender<plog::TxtFormatter> consoleAppender;
-
-  // Init logger with all the appenders
-  plog::init(plog::debug, &consoleAppender);
-
+  init_plog();
   namespace cli = SmartPeak::cli;
   std::filesystem::path seq_path = SMARTPEAK_GET_EXAMPLES_DATA_PATH("LCMS_MRM_QCs");
   std::string seq = std::string{ seq_path.lexically_normal().generic_string() };
