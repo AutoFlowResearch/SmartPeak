@@ -1,6 +1,7 @@
 set(core_executables_list
 	SequenceProcessor_test
 	Task_test
+	Utilities_test
 )
 
 set(io_executables_list
