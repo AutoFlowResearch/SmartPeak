@@ -147,7 +147,7 @@ namespace SmartPeak
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START loadMSExperiment";
+    LOGD << "START loadMSExperiment " << filenames_I.getTag(Filenames::Tag::INPUT_MZML_FILENAME);
     getFilenames(filenames_I);
 
     // Note: unlike other processors,
@@ -174,7 +174,7 @@ namespace SmartPeak
             txt_name.replace(txt_name.cbegin() + pos + 1, txt_name.cend(), "txt"); // replace extension
           }
           OpenMS::ChromeleonFile chfh;
-          LOGI << "Loading: " << txt_name;
+          LOGI << "Loading ChromeleonFile: " << txt_name;
           chfh.load(txt_name, chromatograms);
           // If the peak height is less than 1.0 (which is quite common in RI and UV detection), 
           // the peak will not be picked, so we artificially scale the data by 1e3
@@ -191,20 +191,20 @@ namespace SmartPeak
             txt_name.replace(txt_name.cbegin() + pos + 1, txt_name.cend(), "xml"); // replace extension
           }
           OpenMS::FileHandler fh;
-          LOGI << "Loading: " << txt_name;
+          LOGI << "Loading XML1:" << txt_name;
           fh.loadExperiment(txt_name, chromatograms, OpenMS::FileTypes::MZXML);
         }
         else 
         {
           OpenMS::FileHandler fh;
-          LOGI << "Loading: " << filenames_I.getFullPath("mzML_i").generic_string();
+          LOGI << "Loading: XML2" << filenames_I.getFullPath("mzML_i").generic_string();
           fh.loadExperiment(filenames_I.getFullPath("mzML_i").generic_string(), chromatograms);
         }
       }
       else 
       {
         OpenMS::FileHandler fh;
-        LOGI << "Loading: " << filenames_I.getFullPath("mzML_i").generic_string();
+        LOGI << "Loading: XML3" << filenames_I.getFullPath("mzML_i").generic_string();
         fh.loadExperiment(filenames_I.getFullPath("mzML_i").generic_string(), chromatograms);
       }
     }
