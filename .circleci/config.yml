@@ -151,6 +151,7 @@ jobs:
             set -e -o pipefail
             cd ~/SmartPeak/smartpeak_release_build
             ctest -VV -F --timeout 1200
+            cp ~/Library/Logs/DiagnosticReports/* /tmp/artifacts
             cd ~/SmartPeak
             export PYTHONPATH="${PWD}/tools"
             python3 -m unittest discover -s ./tools/smartpeak
@@ -173,7 +174,6 @@ jobs:
             ls -l ~/Library/Logs/DiagnosticReports
             mkdir -p /tmp/artifacts
             cp ~/SmartPeak/smartpeak_release_build/*.dmg /tmp/artifacts
-            cp ~/Library/Logs/DiagnosticReports/* /tmp/artifacts
       - store_artifacts:
           path: /tmp/artifacts
 
