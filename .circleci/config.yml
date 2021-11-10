@@ -132,7 +132,8 @@ jobs:
             tar -xzf contrib_build.tar.gz
             sed -i '' 's/std::auto_ptr/std::unique_ptr/g' include/seqan/basic/test_system.h
             cd ~/OpenMS &&  mkdir openms_debug_build && cd openms_debug_build &&
-            cmake -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_STANDARD=14 -DCMAKE_CXX_EXTENSIONS=OFF -DCMAKE_PREFIX_PATH="$(brew --prefix qt5)" -DOPENMS_CONTRIB_LIBS=~/OpenMS/contrib_build/ -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Release -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF -DOpenMP_CXX_FLAGS="-Xpreprocessor -fopenmp -I/usr/local/opt/libomp/include" -DOpenMP_CXX_LIB_NAMES="omp" -DOpenMP_omp_LIBRARY=/usr/local/opt/libomp/lib/libomp.dylib ..
+#            cmake -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_STANDARD=14 -DCMAKE_CXX_EXTENSIONS=OFF -DCMAKE_PREFIX_PATH="$(brew --prefix qt5)" -DOPENMS_CONTRIB_LIBS=~/OpenMS/contrib_build/ -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Release -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF -DOpenMP_CXX_FLAGS="-Xpreprocessor -fopenmp -I/usr/local/opt/libomp/include" -DOpenMP_CXX_LIB_NAMES="omp" -DOpenMP_omp_LIBRARY=/usr/local/opt/libomp/lib/libomp.dylib ..
+            cmake -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_STANDARD=14 -DCMAKE_CXX_EXTENSIONS=OFF -DCMAKE_PREFIX_PATH="$(brew --prefix qt5)" -DOPENMS_CONTRIB_LIBS=~/OpenMS/contrib_build/ -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Release -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF ..
             make -j4 OpenMS
       - run:
           name: Building SmartPeak (Including SuperBuild)
