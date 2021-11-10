@@ -36,7 +36,7 @@ const unsigned int nb_files_in_data_directory = 68;
 
 TEST(utilities, getCallstack)
 {
-  std::string path = "~/Library/Logs/DiagnosticReports";
+  std::string path = "/Library/Logs/DiagnosticReports";
   std::cout << "Checking files in " << path << std::endl;
   try
   {
