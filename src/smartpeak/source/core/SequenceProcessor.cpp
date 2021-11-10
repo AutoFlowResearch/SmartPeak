@@ -130,7 +130,7 @@ namespace SmartPeak
     }
 
     // Launch
-    notifySequenceProcessorStart(injections.size());
+    // notifySequenceProcessorStart(injections.size());
     SequenceProcessorMultithread manager(
       injections,
       filenames_,
@@ -138,7 +138,7 @@ namespace SmartPeak
       this);
     int n_threads = nbThreads(injections);
     manager.spawn_workers(n_threads);
-    notifySequenceProcessorEnd();
+    //notifySequenceProcessorEnd();
   }
 
   void ProcessSequenceSegments::process(Filenames& filenames_I)
@@ -164,7 +164,7 @@ namespace SmartPeak
     }
 
     // Launch
-    notifySequenceSegmentProcessorStart(sequence_segments.size());
+    //notifySequenceSegmentProcessorStart(sequence_segments.size());
     SequenceSegmentProcessorMultithread manager(
       sequence_segments,
       (*sequenceHandler_IO),
@@ -174,7 +174,7 @@ namespace SmartPeak
     int n_threads = nbThreads(sequenceHandler_IO->getSequence());
     manager.spawn_workers(n_threads);
     sequenceHandler_IO->setSequenceSegments(sequence_segments);
-    notifySequenceSegmentProcessorEnd();
+    //notifySequenceSegmentProcessorEnd();
   }
 
   void processSegment(
@@ -218,7 +218,7 @@ namespace SmartPeak
       }
   
       SequenceSegmentHandler& sequence_seg {sequence_segment_[i]};
-      if (observable_) observable_->notifySequenceSegmentProcessorSampleStart(sequence_seg.getSequenceSegmentName());
+      //if (observable_) observable_->notifySequenceSegmentProcessorSampleStart(sequence_seg.getSequenceSegmentName());
       
       try {
         std::future<void> f = std::async(
@@ -238,6 +238,7 @@ namespace SmartPeak
         }
         catch (const WorkflowException& e)
         {
+          /*
           if (observable_)
           {
             observable_->notifySequenceSegmentProcessorError(
@@ -246,12 +247,13 @@ namespace SmartPeak
               e.what());
           }
           else
+          */
           {
             LOGE << "SequenceSegment [" << "i" << "]: " << typeid(e).name() << " : " << e.what();
           }
         }
           
-        if (observable_) observable_->notifySequenceSegmentProcessorSampleEnd(sequence_seg.getSequenceSegmentName());
+        //if (observable_) observable_->notifySequenceSegmentProcessorSampleEnd(sequence_seg.getSequenceSegmentName());
       }
       catch (const std::exception& e) {
         LOGE << "SequenceSegment [" << "i" << "]: " << typeid(e).name() << " : " << e.what();
@@ -268,7 +270,7 @@ namespace SmartPeak
       }
   
       SampleGroupHandler& sequence_seg {sample_group_[i]};
-      if (observable_) observable_->notifySampleGroupProcessorSampleStart(sequence_seg.getSampleGroupName());
+      //if (observable_) observable_->notifySampleGroupProcessorSampleStart(sequence_seg.getSampleGroupName());
       
       try {
         std::future<void> f = std::async(
@@ -288,6 +290,7 @@ namespace SmartPeak
         }
         catch (const WorkflowException& e)
         {
+          /*
           if (observable_)
           {
             observable_->notifySampleGroupProcessorError(
@@ -296,6 +299,7 @@ namespace SmartPeak
               e.what());
           }
           else
+          */
           {
             LOGE << "SampleGroup [" << "i" << "]: " << typeid(e).name() << " : " << e.what();
           }
@@ -329,7 +333,7 @@ namespace SmartPeak
     }
 
     // Launch
-    notifySampleGroupProcessorStart(sample_groups.size());
+    // notifySampleGroupProcessorStart(sample_groups.size());
     SampleGroupProcessorMultithread manager(
       sample_groups,
       (*sequenceHandler_IO),
@@ -339,7 +343,7 @@ namespace SmartPeak
     int n_threads = nbThreads(sequenceHandler_IO->getSequence());
     manager.spawn_workers(n_threads);
     sequenceHandler_IO->setSampleGroups(sample_groups);
-    notifySampleGroupProcessorEnd();
+    // notifySampleGroupProcessorEnd();
   }
 
   void processSampleGroup(
@@ -456,7 +460,7 @@ namespace SmartPeak
 
       // Launch the processing method
       InjectionHandler& injection { injections_[i] };
-      if (observable_) observable_->notifySequenceProcessorSampleStart(injection.getMetaData().getSampleName());
+      //if (observable_) observable_->notifySequenceProcessorSampleStart(injection.getMetaData().getSampleName());
       try {
         std::future<void> f = std::async(
           std::launch::async,
@@ -472,6 +476,7 @@ namespace SmartPeak
         }
         catch (const WorkflowException& e)
         {
+          /*
           if (observable_)
           {
             observable_->notifySequenceProcessorError(
@@ -480,11 +485,12 @@ namespace SmartPeak
               e.what());
           }
           else
+          */
           {
             LOGE << "Injection [" << i << "]: " << typeid(e).name() << " : " << e.what();
           }
         }
-        if (observable_) observable_->notifySequenceProcessorSampleEnd(injection.getMetaData().getSampleName());
+        //if (observable_) observable_->notifySequenceProcessorSampleEnd(injection.getMetaData().getSampleName());
       }
       catch (const std::exception& e) {
         LOGE << "Injection [" << i << "]: " << typeid(e).name() << " : " << e.what();

@@ -170,8 +170,10 @@ jobs:
       - run:
           name: Moving Package to artifacts folder
           command: |
+            ls -l ~/Library/Logs/DiagnosticReports
             mkdir -p /tmp/artifacts
             cp ~/SmartPeak/smartpeak_release_build/*.dmg /tmp/artifacts
+            cp ~/Library/Logs/DiagnosticReports/* /tmp/artifacts
       - store_artifacts:
           path: /tmp/artifacts
 
@@ -296,26 +298,6 @@ jobs:
             $env:PYTHONPATH = $PWD.Path + "\tools"
             python -m unittest discover -s .\tools\smartpeak\
             ThrowOnFailure "Python tests failed!"
-      - run:
-          name: Signing SmartPeak with trusted certificate
-          command: |
-            $ErrorActionPreference = "Stop"
-            cd ~/SmartPeak/smartpeak_release_build
-            git clone --branch main https://github.com/AutoFlowResearch/CodeSigning
-            Import-Module .\CodeSigning\CertCrypto.psm1
-            Unprotect-Cert '.\CodeSigning\CodeSigning_DTU_AIT_KIT_DTUDOC.pfx.AES' -KeyAsPlainText $env:PFX_AES -RemoveSource
-            certutil -p $env:PFX_PSWD -importpfx .\CodeSigning\CodeSigning_DTU_AIT_KIT_DTUDOC.pfx
-            & 'C:\Program Files (x86)\windows kits\10\bin\x64\signtool.exe' sign /v /sm /s My /n "DTU-AIT-DTUDOC client Plugin"  *.exe
-      - run:
-          name: Signing SmartPeak with trusted certificate
-          command: |
-            # $ErrorActionPreference = "Stop"
-            # cd ~/SmartPeak/smartpeak_release_build
-            # git clone --branch main https://github.com/AutoFlowResearch/CodeSigning
-            # Import-Module .\CodeSigning\CertCrypto.psm1
-            # Unprotect-Cert '.\CodeSigning\CodeSigning_DTU_AIT_KIT_DTUDOC.pfx.AES' -KeyAsPlainText $env:PFX_AES -RemoveSource
-            # certutil -p $env:PFX_PSWD -importpfx .\CodeSigning\CodeSigning_DTU_AIT_KIT_DTUDOC.pfx
-            # & 'C:\Program Files (x86)\windows kits\10\bin\x64\signtool.exe' sign /v /sm /s My /n "DTU-AIT-DTUDOC client Plugin"  *.exe
       - run:
           name: Preparing Artifact
           command: |
