@@ -129,7 +129,8 @@ namespace SmartPeak {
           }
         }
 
-        SmartPeak::LoadSession create_sequence(application_handler);
+        WorkflowManager workflow_manager;
+        SmartPeak::LoadSession create_sequence(application_handler, workflow_manager);
         create_sequence.filenames_override_ = filenames_override;
         create_sequence.parameters_override_ = parameters_override;
         if (std::filesystem::is_regular_file(application_settings.load_session))
@@ -141,7 +142,7 @@ namespace SmartPeak {
         {
           LOGW << "Loading session from directory - backward compatibility - deprecated, prefer loading from session file.";
           Filenames filenames_main = Utilities::buildFilenamesFromDirectory(application_handler, application_settings.load_session);
-          application_handler.main_dir_ = filenames_main.getTag(Filenames::Tag::MAIN_DIR);
+          application_handler.main_dir_ = filenames_main.getTagValue(Filenames::Tag::MAIN_DIR);
           create_sequence.filenames_ = filenames_main;
           return create_sequence.process();
         }
@@ -256,26 +257,26 @@ namespace SmartPeak {
       {
         mzml_dir = (application_handler.main_dir_ / mzml_dir).lexically_normal();
       }
-      application_handler.mzML_dir_ = mzml_dir;
+      application_handler.filenames_.setTagValue(Filenames::Tag::MZML_INPUT_PATH, mzml_dir.generic_string());
 
       std::filesystem::path features_out_dir = application_settings.features_out_dir;
       if (features_out_dir.is_relative())
       {
         features_out_dir = (application_handler.main_dir_ / features_out_dir).lexically_normal();
       }
-      application_handler.features_out_dir_ = features_out_dir;
+      application_handler.filenames_.setTagValue(Filenames::Tag::FEATURES_OUTPUT_PATH, features_out_dir.generic_string());
 
       std::filesystem::path features_in_dir = application_settings.features_in_dir;
       if (features_in_dir.is_relative())
       {
         features_in_dir = (application_handler.main_dir_ / features_in_dir).lexically_normal();
       }
-      application_handler.features_in_dir_ = features_in_dir;
+      application_handler.filenames_.setTagValue(Filenames::Tag::FEATURES_INPUT_PATH, features_in_dir.generic_string());
 
       auto paths = {
-          application_handler.mzML_dir_,
-          application_handler.features_in_dir_,
-          application_handler.features_out_dir_
+          application_handler.filenames_.getTagValue(Filenames::Tag::MZML_INPUT_PATH),
+          application_handler.filenames_.getTagValue(Filenames::Tag::FEATURES_INPUT_PATH),
+          application_handler.filenames_.getTagValue(Filenames::Tag::FEATURES_OUTPUT_PATH)
       };
       auto current_path = std::filesystem::path{};
       try
@@ -335,10 +336,10 @@ namespace SmartPeak {
       {
         for (auto& p : cmd.dynamic_filenames)
         {
-          p.second.setTag(Filenames::Tag::MAIN_DIR, application_handler.main_dir_.generic_string());
-          p.second.setTag(Filenames::Tag::MZML_INPUT_PATH, application_handler.mzML_dir_.generic_string());
-          p.second.setTag(Filenames::Tag::FEATURES_INPUT_PATH, application_handler.features_in_dir_.generic_string());
-          p.second.setTag(Filenames::Tag::FEATURES_OUTPUT_PATH, application_handler.features_out_dir_.generic_string());
+          p.second.setTagValue(Filenames::Tag::MAIN_DIR, application_handler.main_dir_.generic_string());
+          p.second.setTagValue(Filenames::Tag::MZML_INPUT_PATH, application_handler.filenames_.getTagValue(Filenames::Tag::MZML_INPUT_PATH));
+          p.second.setTagValue(Filenames::Tag::FEATURES_INPUT_PATH, application_handler.filenames_.getTagValue(Filenames::Tag::FEATURES_INPUT_PATH));
+          p.second.setTagValue(Filenames::Tag::FEATURES_OUTPUT_PATH, application_handler.filenames_.getTagValue(Filenames::Tag::FEATURES_OUTPUT_PATH));
         }
       }
     }

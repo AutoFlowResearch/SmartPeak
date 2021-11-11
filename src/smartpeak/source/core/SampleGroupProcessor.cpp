@@ -261,7 +261,7 @@ namespace SmartPeak
       std::filesystem::path dilution_file = params.at("MergeInjections").findParameter("select_preferred_dilutions_file")->getValueAsString();
       if (dilution_file.is_relative())
       {
-        dilution_file = (std::filesystem::path(filenames_I.getTag(Filenames::Tag::MAIN_DIR)) / dilution_file).lexically_normal();
+        dilution_file = (std::filesystem::path(filenames_I.getTagValue(Filenames::Tag::MAIN_DIR)) / dilution_file).lexically_normal();
       }
       try
       {

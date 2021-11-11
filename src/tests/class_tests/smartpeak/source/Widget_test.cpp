@@ -23,6 +23,7 @@
 
 #include <gtest/gtest.h>
 #include <SmartPeak/ui/Widget.h>
+#include <SmartPeak/ui/ExplorerWidget.h>
 #include <SmartPeak/test_config.h>
 #include <SmartPeak/io/SequenceParser.h>
 #include <SmartPeak/core/MetaDataHandler.h>
@@ -33,6 +34,7 @@
 #include <SmartPeak/ui/WorkflowWidget.h>
 #include <SmartPeak/ui/SessionFilesWidget.h>
 #include <SmartPeak/ui/LoadSessionWizard.h>
+#include <SmartPeak/ui/SetInputOutputWidget.h>
 
 using namespace SmartPeak;
 
@@ -103,6 +105,22 @@ TEST(Widget, widget_constructors)
   ExplorerWidget* explorerwidget_ptr = nullptr;
   EXPECT_NO_THROW(explorerwidget_ptr = new ExplorerWidget("empty_explorer_table"));
   delete explorerwidget_ptr;
+}
+
+TEST(Widget, widget_WriteAndReadWidget)
+{
+  GenericTableWidget generictablewidget_write("empty_generic_table");
+  generictablewidget_write.visible_ = true;
+
+  SessionDB session_db;
+  auto path_db = std::tmpnam(nullptr);
+  session_db.setDBFilePath(path_db);
+
+  session_db.writePropertiesHandler(generictablewidget_write);
+
+  GenericTableWidget generictablewidget_read("empty_generic_table");
+  session_db.readPropertiesHandler(generictablewidget_read);
+  EXPECT_EQ(generictablewidget_read.visible_, true);
 }
 
 TEST(Widget, GenericTableWidget_sorter)
@@ -191,10 +209,6 @@ public:
 
   virtual void updateData() override
   {
-//    GraphicDataVizWidget(SessionHandler& session_handler,
-//      ApplicationHandler& application_handler,
-//      const std::string& id,
-//      const std::string& title) :
   };
 
 public:
@@ -212,6 +226,43 @@ public:
   std::tuple<float, float, float, float> wrapper_plotLimits() const
   {
     return plotLimits();
+  }
+
+  void wrapper_setCurrentRange(float range_min, float range_max)
+  {
+    current_range_.first = range_min;
+    current_range_.second = range_max;
+  }
+
+
+  std::tuple<float,float> wrapper_getCurrentRange() const
+  {
+    return current_range_;
+  }
+
+  void wrapper_setCompactView(bool enable)
+  {
+    compact_view_ = enable;
+  }
+
+  bool wrapper_getCompactView() const
+  {
+    return compact_view_;
+  }
+
+  void wrapper_setShowLegend(bool enable)
+  {
+    show_legend_ = enable;
+  }
+
+  bool wrapper_getShowLegend() const
+  {
+    return show_legend_;
+  }
+
+  void wrapper_updateRanges()
+  {
+    updateRanges();
   }
 
 public:
@@ -261,6 +312,34 @@ TEST(GraphicDataVizWidget, plotLimits)
   EXPECT_NEAR(plot_max_y, 341, 1e-6);
 }
 
+TEST(GraphicDataVizWidget, WriteAndReadGraphViz)
+{
+  SmartPeak::SessionHandler session_handler;
+  SmartPeak::ApplicationHandler application_handler;
+  std::string id = "GraphicDataVizWidget";
+  std::string title = "GraphicDataVizWidget";
+  GraphicDataVizWidget_Test test_graphic_data_viz_write(session_handler, application_handler, id, title);
+  test_graphic_data_viz_write.wrapper_setMarkerPosition(42.0f);
+  test_graphic_data_viz_write.wrapper_setCurrentRange(10.0f, 100.0f);
+  test_graphic_data_viz_write.wrapper_setShowLegend(false);
+  test_graphic_data_viz_write.wrapper_setCompactView(false);
+
+  SessionDB session_db;
+  auto path_db = std::tmpnam(nullptr);
+  session_db.setDBFilePath(path_db);
+
+  session_db.writePropertiesHandler(test_graphic_data_viz_write);
+
+  GraphicDataVizWidget_Test test_graphic_data_viz_read(session_handler, application_handler, id, title);
+  session_db.readPropertiesHandler(test_graphic_data_viz_read);
+  test_graphic_data_viz_read.wrapper_updateRanges();
+  EXPECT_EQ(test_graphic_data_viz_read.wrapper_getShowLegend(), false);
+  EXPECT_EQ(test_graphic_data_viz_read.wrapper_getCompactView(), false);
+  const auto [current_range_min, current_range_max] = test_graphic_data_viz_read.wrapper_getCurrentRange();
+  EXPECT_FLOAT_EQ(current_range_min, 10.0f);
+  EXPECT_FLOAT_EQ(current_range_max, 100.0f);
+}
+
 class WorkflowWidget_Test : public WorkflowWidget
 {
 public:
@@ -308,8 +387,8 @@ TEST(WorkflowWidget, updateCommands)
 class SessionFilesWidget_Test : public SessionFilesWidget
 {
 public:
-  SessionFilesWidget_Test(ApplicationHandler& application_handler, SessionFilesWidget::Mode mode) :
-  SessionFilesWidget(application_handler, mode, nullptr)
+  SessionFilesWidget_Test(ApplicationHandler& application_handler, SessionFilesWidget::Mode mode, WorkflowManager& workflow_manager) :
+  SessionFilesWidget(application_handler, mode, workflow_manager, nullptr)
   {};
 
 public:
@@ -344,8 +423,9 @@ public:
 TEST(SessionFilesWidget, SessionFilesWidget_Create)
 {
   ApplicationHandler application_handler;
+  WorkflowManager workflow_manager;
   Filenames filenames = Utilities::buildFilenamesFromDirectory(application_handler, SMARTPEAK_GET_TEST_DATA_PATH("workflow_csv_files"));
-  SessionFilesWidget_Test session_widget_test(application_handler, SessionFilesWidget::Mode::ECreation);
+  SessionFilesWidget_Test session_widget_test(application_handler, SessionFilesWidget::Mode::ECreation, workflow_manager);
   
   session_widget_test.open(filenames);
   auto& file_editor_fields = session_widget_test.getEditorFileFields();
@@ -371,8 +451,9 @@ TEST(SessionFilesWidget, SessionFilesWidget_Create)
 TEST(SessionFilesWidget, SessionFilesWidget_isModified)
 {
   ApplicationHandler application_handler;
+  WorkflowManager workflow_manager;
   Filenames filenames = Utilities::buildFilenamesFromDirectory(application_handler, SMARTPEAK_GET_TEST_DATA_PATH("workflow_csv_files"));
-  SessionFilesWidget_Test session_widget_test(application_handler, SessionFilesWidget::Mode::ECreation);
+  SessionFilesWidget_Test session_widget_test(application_handler, SessionFilesWidget::Mode::ECreation, workflow_manager);
   session_widget_test.open(filenames);
   EXPECT_EQ(session_widget_test.isModified("parameters"), false);
 }
@@ -380,8 +461,9 @@ TEST(SessionFilesWidget, SessionFilesWidget_isModified)
 TEST(SessionFilesWidget, SessionFilesWidget_clearEntry)
 {
   ApplicationHandler application_handler;
+  WorkflowManager workflow_manager;
   Filenames filenames = Utilities::buildFilenamesFromDirectory(application_handler, SMARTPEAK_GET_TEST_DATA_PATH("workflow_csv_files"));
-  SessionFilesWidget_Test session_widget_test(application_handler, SessionFilesWidget::Mode::ECreation);
+  SessionFilesWidget_Test session_widget_test(application_handler, SessionFilesWidget::Mode::ECreation, workflow_manager);
   session_widget_test.open(filenames);
 
   auto& file_editor_fields = session_widget_test.getEditorFileFields();
@@ -399,8 +481,9 @@ TEST(SessionFilesWidget, SessionFilesWidget_clearEntry)
 TEST(SessionFilesWidget, SessionFilesWidget_doUpdateSession)
 {
   ApplicationHandler application_handler;
+  WorkflowManager workflow_manager;
   Filenames filenames = Utilities::buildFilenamesFromDirectory(application_handler, SMARTPEAK_GET_TEST_DATA_PATH("workflow_csv_files"));
-  SessionFilesWidget_Test session_widget_test(application_handler, SessionFilesWidget::Mode::ECreation);
+  SessionFilesWidget_Test session_widget_test(application_handler, SessionFilesWidget::Mode::ECreation, workflow_manager);
 
   session_widget_test.open(filenames);
   session_widget_test.doUpdateSession();
@@ -416,12 +499,13 @@ TEST(SessionFilesWidget, SessionFilesWidget_doUpdateSession)
 TEST(SessionFilesWidget, SessionFilesWidget_Modify_ChangeExternalFile)
 {
   ApplicationHandler application_handler;
+  WorkflowManager workflow_manager;
   Filenames filenames = Utilities::buildFilenamesFromDirectory(application_handler, SMARTPEAK_GET_TEST_DATA_PATH("workflow_csv_files"));
-  SessionFilesWidget_Test session_widget_test_create(application_handler, SessionFilesWidget::Mode::ECreation);
+  SessionFilesWidget_Test session_widget_test_create(application_handler, SessionFilesWidget::Mode::ECreation, workflow_manager);
   session_widget_test_create.open(filenames);
   session_widget_test_create.doUpdateSession();
 
-  SessionFilesWidget_Test session_widget_test_modify(application_handler, SessionFilesWidget::Mode::EModification);
+  SessionFilesWidget_Test session_widget_test_modify(application_handler, SessionFilesWidget::Mode::EModification, workflow_manager);
   session_widget_test_modify.open(application_handler.filenames_);
 
   auto& file_editor_fields = session_widget_test_modify.getEditorFileFields();
@@ -453,12 +537,13 @@ TEST(SessionFilesWidget, SessionFilesWidget_Modify_ChangeExternalFile)
 TEST(SessionFilesWidget, SessionFilesWidget_Modify_ChangeFromExternalToEmbedded)
 {
   ApplicationHandler application_handler;
+  WorkflowManager workflow_manager;
   Filenames filenames = Utilities::buildFilenamesFromDirectory(application_handler, SMARTPEAK_GET_TEST_DATA_PATH("workflow_csv_files"));
-  SessionFilesWidget_Test session_widget_test_create(application_handler, SessionFilesWidget::Mode::ECreation);
+  SessionFilesWidget_Test session_widget_test_create(application_handler, SessionFilesWidget::Mode::ECreation, workflow_manager);
   session_widget_test_create.open(filenames);
   session_widget_test_create.doUpdateSession();
 
-  SessionFilesWidget_Test session_widget_test_modify(application_handler, SessionFilesWidget::Mode::EModification);
+  SessionFilesWidget_Test session_widget_test_modify(application_handler, SessionFilesWidget::Mode::EModification, workflow_manager);
   session_widget_test_modify.open(application_handler.filenames_);
 
   auto& file_editor_fields = session_widget_test_modify.getEditorFileFields();
@@ -493,8 +578,8 @@ TEST(SessionFilesWidget, SessionFilesWidget_Modify_ChangeFromExternalToEmbedded)
   auto db_path = tmp_dir_path / "session.db";
   SaveSession save_session(application_handler);
   save_session.onFilePicked(db_path, &application_handler);
-  auto session_widget_test_modify2 = std::make_shared<SessionFilesWidget>(application_handler, SessionFilesWidget::Mode::EModification, nullptr);
-  auto load_session_wizard_ = std::make_shared<LoadSessionWizard>(session_widget_test_modify2, nullptr);
+  auto session_widget_test_modify2 = std::make_shared<SessionFilesWidget>(application_handler, SessionFilesWidget::Mode::EModification, workflow_manager);
+  auto load_session_wizard_ = std::make_shared<LoadSessionWizard>(session_widget_test_modify2, workflow_manager, application_handler);
   load_session_wizard_->onFilePicked(db_path, &application_handler);
   ParameterSet& parameter_set3 = application_handler.sequenceHandler_.getSequence().at(0).getRawData().getParameters();
   auto parameter3 = parameter_set3.findParameter("MRMFeatureFinderScoring", "TransitionGroupPicker:peak_integration");
@@ -505,8 +590,9 @@ TEST(SessionFilesWidget, SessionFilesWidget_Modify_ChangeFromExternalToEmbedded)
 TEST(SessionFilesWidget, SessionFilesWidget_Modify_FileContent)
 {
   ApplicationHandler application_handler;
+  WorkflowManager workflow_manager;
   Filenames filenames = Utilities::buildFilenamesFromDirectory(application_handler, SMARTPEAK_GET_TEST_DATA_PATH("workflow_csv_files"));
-  SessionFilesWidget_Test session_widget_test_create(application_handler, SessionFilesWidget::Mode::ECreation);
+  SessionFilesWidget_Test session_widget_test_create(application_handler, SessionFilesWidget::Mode::ECreation, workflow_manager);
   session_widget_test_create.open(filenames);
   session_widget_test_create.doUpdateSession();
 
@@ -516,7 +602,7 @@ TEST(SessionFilesWidget, SessionFilesWidget_Modify_FileContent)
   parameter_set.findParameter("AbsoluteQuantitation", "min_points")->setValueFromString("42");
   application_handler.sequenceHandler_.notifyParametersUpdated();
 
-  SessionFilesWidget_Test session_widget_test_modify(application_handler, SessionFilesWidget::Mode::EModification);
+  SessionFilesWidget_Test session_widget_test_modify(application_handler, SessionFilesWidget::Mode::EModification, workflow_manager);
   session_widget_test_modify.open(application_handler.filenames_);
   // only the parameter data source should be tagged as to be saved
   auto& file_editor_fields = session_widget_test_modify.getEditorFileFields();
@@ -529,8 +615,9 @@ TEST(SessionFilesWidget, SessionFilesWidget_Modify_FileContent)
 TEST(SessionFilesWidget, SessionFilesWidget_Modify_NoPopupError)
 {
   ApplicationHandler application_handler;
+  WorkflowManager workflow_manager;
   Filenames filenames = Utilities::buildFilenamesFromDirectory(application_handler, SMARTPEAK_GET_TEST_DATA_PATH("workflow_csv_files"));
-  SessionFilesWidget_Test session_widget_test_create(application_handler, SessionFilesWidget::Mode::ECreation);
+  SessionFilesWidget_Test session_widget_test_create(application_handler, SessionFilesWidget::Mode::ECreation, workflow_manager);
   session_widget_test_create.open(filenames);
 
   // Clear all, keep sequence and parameters both embedded
@@ -555,8 +642,8 @@ TEST(SessionFilesWidget, SessionFilesWidget_Modify_NoPopupError)
   save_session.onFilePicked(db_path, &application_handler);
 
   // load session
-  auto session_widget_test_modify = std::make_shared<SessionFilesWidget>(application_handler, SessionFilesWidget::Mode::EModification, nullptr);
-  auto load_session_wizard_ = std::make_shared<LoadSessionWizard>(session_widget_test_modify, nullptr);
+  auto session_widget_test_modify = std::make_shared<SessionFilesWidget>(application_handler, SessionFilesWidget::Mode::EModification, workflow_manager);
+  auto load_session_wizard_ = std::make_shared<LoadSessionWizard>(session_widget_test_modify, workflow_manager, application_handler);
   load_session_wizard_->onFilePicked(db_path, &application_handler);
   
   // popup should not be displayed
@@ -570,8 +657,9 @@ TEST(SessionFilesWidget, SessionFilesWidget_Modify_NoPopupError)
 TEST(SessionFilesWidget, LoadSessionWizard_PopupError)
 {
   ApplicationHandler application_handler;
+  WorkflowManager workflow_manager;
   Filenames filenames = Utilities::buildFilenamesFromDirectory(application_handler, SMARTPEAK_GET_TEST_DATA_PATH("workflow_csv_files"));
-  SessionFilesWidget_Test session_widget_test_create(application_handler, SessionFilesWidget::Mode::ECreation);
+  SessionFilesWidget_Test session_widget_test_create(application_handler, SessionFilesWidget::Mode::ECreation, workflow_manager);
   session_widget_test_create.open(filenames);
 
   // Clear all, keep sequence and parameters, sequence only embedded
@@ -601,9 +689,9 @@ TEST(SessionFilesWidget, LoadSessionWizard_PopupError)
   save_session.onFilePicked(db_path, &application_handler);
 
   // load session
-  auto session_widget_test_modify = std::make_shared<SessionFilesWidget_Test>(application_handler, SessionFilesWidget::Mode::EModification);
+  auto session_widget_test_modify = std::make_shared<SessionFilesWidget_Test>(application_handler, SessionFilesWidget::Mode::EModification, workflow_manager);
   auto session_widget_modify = std::static_pointer_cast<SessionFilesWidget>(session_widget_test_modify);
-  auto load_session_wizard_ = std::make_shared<LoadSessionWizard>(session_widget_modify, nullptr);
+  auto load_session_wizard_ = std::make_shared<LoadSessionWizard>(session_widget_modify, workflow_manager, application_handler);
   load_session_wizard_->onFilePicked(db_path, &application_handler);
 
   // check that the wizard is displayed.
@@ -622,8 +710,9 @@ TEST(SessionFilesWidget, SessionFilesWidget_EmbedAllFiles)
   // we just try to embed lot of file from different nature: parameters, feature filters files ...
   // Note: we save in working directory as this implies differrent cases compared to other test case above.
   ApplicationHandler application_handler;
+  WorkflowManager workflow_manager;
   Filenames filenames = Utilities::buildFilenamesFromDirectory(application_handler, SMARTPEAK_GET_TEST_DATA_PATH("workflow_csv_files"));
-  SessionFilesWidget_Test session_widget_test_create(application_handler, SessionFilesWidget::Mode::ECreation);
+  SessionFilesWidget_Test session_widget_test_create(application_handler, SessionFilesWidget::Mode::ECreation, workflow_manager);
   session_widget_test_create.open(filenames);
   auto& file_editor_fields = session_widget_test_create.getEditorFileFields();
   EXPECT_EQ(file_editor_fields.size(), 23);
@@ -652,9 +741,9 @@ TEST(SessionFilesWidget, SessionFilesWidget_EmbedAllFiles)
   SaveSession save_session(application_handler);
   save_session.onFilePicked(db_path, &application_handler);
 
-  auto session_widget_test_modify = std::make_shared<SessionFilesWidget_Test>(application_handler, SessionFilesWidget::Mode::EModification);
+  auto session_widget_test_modify = std::make_shared<SessionFilesWidget_Test>(application_handler, SessionFilesWidget::Mode::EModification, workflow_manager);
   auto session_widget_modify = std::static_pointer_cast<SessionFilesWidget>(session_widget_test_modify);
-  auto load_session_wizard_ = std::make_shared<LoadSessionWizard>(session_widget_modify, nullptr);
+  auto load_session_wizard_ = std::make_shared<LoadSessionWizard>(session_widget_modify, workflow_manager, application_handler);
   load_session_wizard_->onFilePicked(db_path, &application_handler);
 
   ParameterSet& parameter_set3 = application_handler.sequenceHandler_.getSequence().at(0).getRawData().getParameters();
@@ -662,3 +751,98 @@ TEST(SessionFilesWidget, SessionFilesWidget_EmbedAllFiles)
   ASSERT_NE(parameter3, nullptr);
   EXPECT_EQ(parameter3->getValueAsString(), "smoothed");
 }
+
+class SetInputOutputWidget_Test : 
+  public SetInputOutputWidget,
+  public ISetInputOutputWidgetObserver
+{
+public:
+  SetInputOutputWidget_Test(ApplicationHandler& application_handler) :
+    SetInputOutputWidget(application_handler)
+  {};
+
+  /**
+  ISetInputOutputWidgetObserver
+  */
+  virtual void onInputOutputSet()
+  {
+    on_input_output_set_counter++;
+  }
+  virtual void onInputOutputCancel()
+  {
+    on_input_output_cancel_counter++;
+  }
+  int on_input_output_set_counter = 0;
+  int on_input_output_cancel_counter = 0;
+
+public:
+  // wrappers to protected methods
+  std::string& get_mzML_dir_edit_()
+  {
+    return mzML_dir_edit_;
+  };
+
+  std::string& get_features_in_dir_edit_()
+  {
+    return features_in_dir_edit_;
+  };
+
+  std::string& get_features_out_dir_edit_()
+  {
+    return features_out_dir_edit_;
+  };
+
+  void wrapper_setDirectories()
+  {
+    setDirectories();
+  }
+
+  void wrapper_cancel()
+  {
+    cancel();
+  }
+
+  bool get_one_missing_directory()
+  {
+    return one_missing_directory_;
+  }
+};
+
+TEST(SetInputOutputWidget, open)
+{
+  ApplicationHandler application_handler;
+  Filenames filenames = Utilities::buildFilenamesFromDirectory(application_handler, SMARTPEAK_GET_TEST_DATA_PATH("workflow_csv_files"));
+  SetInputOutputWidget_Test set_input_output_widget_test(application_handler);
+  EXPECT_EQ(set_input_output_widget_test.get_features_in_dir_edit_(), "");
+  EXPECT_EQ(set_input_output_widget_test.get_features_out_dir_edit_(), "");
+  EXPECT_EQ(set_input_output_widget_test.get_mzML_dir_edit_(), "");
+  EXPECT_EQ(set_input_output_widget_test.get_mzML_dir_edit_(), "");
+  EXPECT_EQ(set_input_output_widget_test.visible_, false);
+
+  set_input_output_widget_test.open(filenames, &set_input_output_widget_test);
+  EXPECT_EQ(set_input_output_widget_test.visible_, true);
+  EXPECT_EQ(set_input_output_widget_test.get_one_missing_directory(), false);
+}
+
+TEST(SetInputOutputWidget, setDirectories)
+{
+  ApplicationHandler application_handler;
+  Filenames filenames = Utilities::buildFilenamesFromDirectory(application_handler, SMARTPEAK_GET_TEST_DATA_PATH("workflow_csv_files"));
+  SetInputOutputWidget_Test set_input_output_widget_test(application_handler);
+  set_input_output_widget_test.open(filenames, &set_input_output_widget_test);
+  set_input_output_widget_test.wrapper_setDirectories();
+  EXPECT_EQ(set_input_output_widget_test.on_input_output_set_counter, 1);
+  EXPECT_EQ(set_input_output_widget_test.on_input_output_cancel_counter, 0);
+}
+
+TEST(SetInputOutputWidget, cancel)
+{
+  ApplicationHandler application_handler;
+  Filenames filenames = Utilities::buildFilenamesFromDirectory(application_handler, SMARTPEAK_GET_TEST_DATA_PATH("workflow_csv_files"));
+  SetInputOutputWidget_Test set_input_output_widget_test(application_handler);
+  set_input_output_widget_test.open(filenames, &set_input_output_widget_test);
+  set_input_output_widget_test.wrapper_cancel();
+  EXPECT_EQ(set_input_output_widget_test.on_input_output_set_counter, 0);
+  EXPECT_EQ(set_input_output_widget_test.on_input_output_cancel_counter, 1);
+}
+

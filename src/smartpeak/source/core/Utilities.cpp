@@ -844,7 +844,7 @@ namespace SmartPeak
   Filenames Utilities::buildFilenamesFromDirectory(ApplicationHandler& application_handler, const std::filesystem::path& path)
   {
     Filenames filenames;
-    filenames.setTag(Filenames::Tag::MAIN_DIR, path.generic_string());
+    filenames.setTagValue(Filenames::Tag::MAIN_DIR, path.generic_string());
     for (const auto& filename_handler : application_handler.loading_processors_)
     {
       filename_handler->getFilenames(filenames);

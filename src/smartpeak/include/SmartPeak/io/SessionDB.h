@@ -30,7 +30,7 @@
 #include <vector>
 #include <optional>
 #include <plog/Log.h>
-
+#include <SmartPeak/iface/IPropertiesHandler.h>
 #include <OpenMS/DATASTRUCTURES/String.h>
 
 namespace SmartPeak
@@ -58,6 +58,18 @@ namespace SmartPeak
     {
       return session_file_name_;
     }
+
+    /**
+     * @brief Writes a IPropertiesHandler to the Session DB file.
+     * @return false if write failed.
+     */
+    bool writePropertiesHandler(const IPropertiesHandler& properties_handler);
+
+    /**
+     * @brief Reads a IPropertiesHandler from the Session DB file.
+     * @return false if read failed.
+     */
+    bool readPropertiesHandler(IPropertiesHandler& properties_handler);
 
     template<typename Value, typename ...Args>
     std::optional<DBContext> beginRead(const std::string& table_name, const Value& value, const Args& ...args);

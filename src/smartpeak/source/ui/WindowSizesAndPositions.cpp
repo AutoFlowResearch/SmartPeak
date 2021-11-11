@@ -25,6 +25,54 @@
 
 namespace SmartPeak
 {
+
+  std::string WindowSizesAndPositions::getPropertiesHandlerName() const
+  {
+    return "WindowSizesAndPositions";
+  }
+
+  std::map<std::string, CastValue::Type> WindowSizesAndPositions::getPropertiesSchema() const
+  {
+    std::map<std::string, CastValue::Type> properties;
+    properties.emplace("bottom_window_y_perc_", CastValue::Type::FLOAT);
+    properties.emplace("left_window_x_perc_", CastValue::Type::FLOAT);
+    properties.emplace("right_window_x_perc_", CastValue::Type::FLOAT);
+    return properties;
+  }
+
+  std::optional<CastValue> WindowSizesAndPositions::getProperty(const std::string& property, const size_t row) const
+  {
+    if (property == "bottom_window_y_perc_")
+    {
+      return bottom_window_y_perc_;
+    }
+    if (property == "left_window_x_perc_")
+    {
+      return left_window_x_perc_;
+    }
+    if (property == "right_window_x_perc_")
+    {
+      return right_window_x_perc_;
+    }
+    return std::nullopt;
+  }
+
+  void WindowSizesAndPositions::setProperty(const std::string& property, const CastValue& value, const size_t row)
+  {
+    if (property == "bottom_window_y_perc_")
+    {
+      bottom_window_y_perc_ = value.f_;
+    }
+    if (property == "left_window_x_perc_")
+    {
+      left_window_x_perc_ = value.f_;
+    }
+    if (property == "right_window_x_perc_")
+    {
+      right_window_x_perc_ = value.f_;
+    }
+  }
+
   void WindowSizesAndPositions::setXAndYSizes(const float & x, const float & y) {
     x_size_ = x; 
     y_size_ = y - main_menu_bar_y_size_;
@@ -57,7 +105,7 @@ namespace SmartPeak
     left_window_x_pos_ = 0;
     right_window_x_pos_ = left_window_x_size_ + bottom_and_top_window_x_size_;
   }
-  void WindowSizesAndPositions::setWindowSizesAndPositions(const bool& show_top_window, const bool& show_bottom_window, const bool& show_left_window, const bool& show_right_window) {
+  void WindowSizesAndPositions::setWindowsVisible(const bool& show_top_window, const bool& show_bottom_window, const bool& show_left_window, const bool& show_right_window) {
     // reset perc for bottom if needed
     if (!show_bottom_window_ && show_bottom_window)
     {

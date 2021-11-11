@@ -205,53 +205,41 @@ namespace SmartPeak
     if (std::count(valid_commands_raw_data_processor.begin(), valid_commands_raw_data_processor.end(), name_)) {
       const auto& method = n_to_raw_data_method_.at(name_);
       cmd_.setMethod(method);
-      Filenames method_filenames;
-      method_filenames.setTag(Filenames::Tag::MAIN_DIR, application_handler_.main_dir_.generic_string());
-      method_filenames.setTag(Filenames::Tag::MZML_INPUT_PATH, application_handler_.mzML_dir_.generic_string());
-      method_filenames.setTag(Filenames::Tag::FEATURES_INPUT_PATH, application_handler_.features_in_dir_.generic_string());
-      method_filenames.setTag(Filenames::Tag::FEATURES_OUTPUT_PATH, application_handler_.features_out_dir_.generic_string());
+      Filenames method_filenames = application_handler_.filenames_;
       for (const InjectionHandler& injection : application_handler_.sequenceHandler_.getSequence()) {
         const std::string& key = injection.getMetaData().getInjectionName();
         cmd_.dynamic_filenames[key] = method_filenames;
-        cmd_.dynamic_filenames[key].setTag(Filenames::Tag::INPUT_MZML_FILENAME, injection.getMetaData().getFilename());
-        cmd_.dynamic_filenames[key].setTag(Filenames::Tag::INPUT_INJECTION_NAME, key);
-        cmd_.dynamic_filenames[key].setTag(Filenames::Tag::OUTPUT_INJECTION_NAME, key);
-        cmd_.dynamic_filenames[key].setTag(Filenames::Tag::INPUT_GROUP_NAME, injection.getMetaData().getSampleGroupName());
-        cmd_.dynamic_filenames[key].setTag(Filenames::Tag::OUTPUT_GROUP_NAME, injection.getMetaData().getSampleGroupName());
+        cmd_.dynamic_filenames[key].setTagValue(Filenames::Tag::INPUT_MZML_FILENAME, injection.getMetaData().getFilename());
+        cmd_.dynamic_filenames[key].setTagValue(Filenames::Tag::INPUT_INJECTION_NAME, key);
+        cmd_.dynamic_filenames[key].setTagValue(Filenames::Tag::OUTPUT_INJECTION_NAME, key);
+        cmd_.dynamic_filenames[key].setTagValue(Filenames::Tag::INPUT_GROUP_NAME, injection.getMetaData().getSampleGroupName());
+        cmd_.dynamic_filenames[key].setTagValue(Filenames::Tag::OUTPUT_GROUP_NAME, injection.getMetaData().getSampleGroupName());
       }
     } else if (std::count(valid_commands_sequence_segment_processor.begin(), valid_commands_sequence_segment_processor.end(), name_)) {
       const auto& method = n_to_seq_seg_method_.at(name_);
       cmd_.setMethod(method);
-      Filenames method_filenames;
-      method_filenames.setTag(Filenames::Tag::MAIN_DIR, application_handler_.main_dir_.generic_string());
-      method_filenames.setTag(Filenames::Tag::MZML_INPUT_PATH, application_handler_.mzML_dir_.generic_string());
-      method_filenames.setTag(Filenames::Tag::FEATURES_INPUT_PATH, application_handler_.features_in_dir_.generic_string());
-      method_filenames.setTag(Filenames::Tag::FEATURES_OUTPUT_PATH, application_handler_.features_out_dir_.generic_string());
+      Filenames method_filenames = application_handler_.filenames_;
       for (const SequenceSegmentHandler& sequence_segment : application_handler_.sequenceHandler_.getSequenceSegments()) {
         const std::string& key = sequence_segment.getSequenceSegmentName();
         cmd_.dynamic_filenames[key] = method_filenames;
-        cmd_.dynamic_filenames[key].setTag(Filenames::Tag::INPUT_MZML_FILENAME, "");
-        cmd_.dynamic_filenames[key].setTag(Filenames::Tag::INPUT_INJECTION_NAME, key);
-        cmd_.dynamic_filenames[key].setTag(Filenames::Tag::OUTPUT_INJECTION_NAME, key);
-        cmd_.dynamic_filenames[key].setTag(Filenames::Tag::INPUT_GROUP_NAME, key);
-        cmd_.dynamic_filenames[key].setTag(Filenames::Tag::OUTPUT_GROUP_NAME, key);
+        cmd_.dynamic_filenames[key].setTagValue(Filenames::Tag::INPUT_MZML_FILENAME, "");
+        cmd_.dynamic_filenames[key].setTagValue(Filenames::Tag::INPUT_INJECTION_NAME, key);
+        cmd_.dynamic_filenames[key].setTagValue(Filenames::Tag::OUTPUT_INJECTION_NAME, key);
+        cmd_.dynamic_filenames[key].setTagValue(Filenames::Tag::INPUT_GROUP_NAME, key);
+        cmd_.dynamic_filenames[key].setTagValue(Filenames::Tag::OUTPUT_GROUP_NAME, key);
       }
     } else if (std::count(valid_commands_sample_group_processor.begin(), valid_commands_sample_group_processor.end(), name_)) {
       const auto& method = n_to_sample_group_method_.at(name_);
       cmd_.setMethod(method);
-      Filenames method_filenames;
-      method_filenames.setTag(Filenames::Tag::MAIN_DIR, application_handler_.main_dir_.generic_string());
-      method_filenames.setTag(Filenames::Tag::MZML_INPUT_PATH, application_handler_.mzML_dir_.generic_string());
-      method_filenames.setTag(Filenames::Tag::FEATURES_INPUT_PATH, application_handler_.features_in_dir_.generic_string());
-      method_filenames.setTag(Filenames::Tag::FEATURES_OUTPUT_PATH, application_handler_.features_out_dir_.generic_string());
+      Filenames method_filenames = application_handler_.filenames_;
       for (const SampleGroupHandler& sample_group : application_handler_.sequenceHandler_.getSampleGroups()) {
         const std::string& key = sample_group.getSampleGroupName();
         cmd_.dynamic_filenames[key] = method_filenames;
-        cmd_.dynamic_filenames[key].setTag(Filenames::Tag::INPUT_MZML_FILENAME, "");
-        cmd_.dynamic_filenames[key].setTag(Filenames::Tag::INPUT_INJECTION_NAME, key);
-        cmd_.dynamic_filenames[key].setTag(Filenames::Tag::OUTPUT_INJECTION_NAME, key);
-        cmd_.dynamic_filenames[key].setTag(Filenames::Tag::INPUT_GROUP_NAME, key);
-        cmd_.dynamic_filenames[key].setTag(Filenames::Tag::OUTPUT_GROUP_NAME, key);
+        cmd_.dynamic_filenames[key].setTagValue(Filenames::Tag::INPUT_MZML_FILENAME, "");
+        cmd_.dynamic_filenames[key].setTagValue(Filenames::Tag::INPUT_INJECTION_NAME, key);
+        cmd_.dynamic_filenames[key].setTagValue(Filenames::Tag::OUTPUT_INJECTION_NAME, key);
+        cmd_.dynamic_filenames[key].setTagValue(Filenames::Tag::INPUT_GROUP_NAME, key);
+        cmd_.dynamic_filenames[key].setTagValue(Filenames::Tag::OUTPUT_GROUP_NAME, key);
       }
     }
     else 
@@ -288,10 +276,8 @@ namespace SmartPeak
     return process();
   }
 
-  bool LoadSession::process()
+  bool LoadSession::readFilenames()
   {
-    LOGD << "START LoadSession";
-
     if (!filenames_) // if filenames are not provided, we will take it from the DB.
     {
       LoadFilenames load_filenames(application_handler_);
@@ -309,7 +295,11 @@ namespace SmartPeak
     }
 
     filenames_->log();
+    return true;
+  }
 
+  bool LoadSession::readInputFiles()
+  {
     for (auto& loading_processor : application_handler_.loading_processors_)
     {
       // check if we need to use that loading processor
@@ -319,7 +309,7 @@ namespace SmartPeak
       for (const auto& file_id : loading_processor_filenames.getFileIds())
       {
         load_it |= (filenames_->isEmbedded(file_id)
-                || (!filenames_->getFullPath(file_id).empty()));
+          || (!filenames_->getFullPath(file_id).empty()));
       }
 
       if (load_it)
@@ -389,6 +379,74 @@ namespace SmartPeak
         }
       }
     }
+    return true;
+  }
+  
+  bool LoadSession::readLoadingWorkflow()
+  {
+    LoadPropertiesHandlers loading_workflow(application_handler_);
+    loading_workflow.properties_handlers = { &application_handler_.session_loader_generator };
+    if (!loading_workflow.process())
+    {
+      LOGE << "Failed to load loading workflow.";
+      return false;
+    }
+    return true;
+  }
+
+  bool LoadSession::runLoadingWorkflow()
+  {
+    std::vector<std::string> commands = application_handler_.session_loader_generator.getLoadingWorkflowCommands();
+    BuildCommandsFromNames buildCommandsFromNames(application_handler_);
+    buildCommandsFromNames.names_ = commands;
+    if (!buildCommandsFromNames.process()) {
+      LOGE << "Failed to create Commands, aborting.";
+      return false;
+    }
+    for (auto& cmd : buildCommandsFromNames.commands_)
+    {
+      for (auto& p : cmd.dynamic_filenames)
+      {
+        p.second.setTagValue(Filenames::Tag::MZML_INPUT_PATH, application_handler_.filenames_.getTagValue(Filenames::Tag::MZML_INPUT_PATH));
+        p.second.setTagValue(Filenames::Tag::FEATURES_INPUT_PATH, application_handler_.filenames_.getTagValue(Filenames::Tag::FEATURES_INPUT_PATH));
+        p.second.setTagValue(Filenames::Tag::FEATURES_OUTPUT_PATH, application_handler_.filenames_.getTagValue(Filenames::Tag::FEATURES_OUTPUT_PATH));
+      }
+    }
+    std::set<std::string> injection_names;
+    for (const auto& injection : application_handler_.sequenceHandler_.getSequence())
+    {
+      injection_names.insert(injection.getMetaData().getInjectionName());
+    }
+    const std::set<std::string> sequence_segment_names = {};
+    const std::set<std::string> sample_group_names = {};
+    workflow_manager_.addWorkflow(
+      application_handler_,
+      injection_names,
+      sequence_segment_names,
+      sample_group_names,
+      buildCommandsFromNames.commands_,
+      application_processor_observer_,
+      sequence_processor_observer_,
+      sequence_segment_processor_observer_,
+      sample_group_processor_observer_,
+      true // At the moment, we are blocking the process of the workflow. put this to true (and other works) to profit from the progress bar.
+    );
+    return true;
+  }
+
+  bool LoadSession::process()
+  {
+    LOGD << "START LoadSession";
+
+    if (!readFilenames())
+    {
+      return false;
+    }
+
+    if (!readInputFiles())
+    {
+      return false;
+    }
 
     if (!overrideParameters())
     {
@@ -410,16 +468,53 @@ namespace SmartPeak
       }
     }
 
+    // Restore state: Load Features
+    if (!application_handler_.filenames_.getSessionDB().getDBFilePath().empty())
+    {
+      if (!readLoadingWorkflow())
+      {
+        return false;
+      }
+      if (!runLoadingWorkflow())
+      {
+        return false;
+      }
+    }
+
     application_handler_.sequenceHandler_.notifySequenceUpdated();
     LOGD << "END LoadSession";
     return true;
+  }
+
+  bool LoadPropertiesHandlers::process()
+  {
+    LOGD << "START LoadPropertiesHandlers";
+    bool success = true;
+    for (auto properties_handler : properties_handlers)
+    {
+      success &= application_handler_.filenames_.getSessionDB().readPropertiesHandler(*properties_handler);
+    }
+    LOGD << "END LoadPropertiesHandlers";
+    return success;
+  }
+
+  bool SavePropertiesHandlers::process()
+  {
+    LOGD << "START SavePropertiesHandlers";
+    bool success = true;
+    for (auto properties_handler : properties_handlers)
+    {
+      success &= application_handler_.filenames_.getSessionDB().writePropertiesHandler(*properties_handler);
+    }
+    LOGD << "END SavePropertiesHandlers";
+    return success;
   }
 
   bool LoadSession::overrideFilenames()
   {
     if (filenames_override_)
     {
-      filenames_override_->setTag(Filenames::Tag::MAIN_DIR, filenames_->getTag(Filenames::Tag::MAIN_DIR));
+      filenames_override_->setTagValue(Filenames::Tag::MAIN_DIR, filenames_->getTagValue(Filenames::Tag::MAIN_DIR));
       const auto& src = filenames_->getFileIds();
       for (const auto& file_id : filenames_override_->getFileIds())
       {
@@ -507,6 +602,7 @@ namespace SmartPeak
   {
     LOGD << "START SaveSession";
 
+    notifyApplicationProcessorStart({ getName() }); // we need to use the workflow manager to profit from the progressbar
     StoreFilenames store_filenames(application_handler_);
     store_filenames.process();
 
@@ -561,8 +657,19 @@ namespace SmartPeak
       }
     }
 
+    bool success = true;
+
+    SavePropertiesHandlers loading_workflow(application_handler_);
+    loading_workflow.properties_handlers = { &application_handler_.session_loader_generator };
+    if (!loading_workflow.process())
+    {
+      LOGE << "Failed to save loading workflow.";
+      success = false;
+    }
+
+    notifyApplicationProcessorEnd();
     LOGD << "END SaveSession";
-    return true;
+    return success;
   }
 
   bool LoadFilenames::process()
@@ -574,7 +681,7 @@ namespace SmartPeak
       return false;
     }
     // reset main dir
-    (*filenames).setTag(Filenames::Tag::MAIN_DIR, application_handler_.main_dir_.generic_string());
+    (*filenames).setTagValue(Filenames::Tag::MAIN_DIR, application_handler_.main_dir_.generic_string());
     (*filenames).getSessionDB().setDBFilePath(application_handler_.filenames_.getSessionDB().getDBFilePath());
     application_handler_.filenames_ = *filenames;
     LOGD << "END LoadFilenames";
@@ -614,6 +721,27 @@ namespace SmartPeak
       filenames.setEmbedded(file_id, embedded != 0);
     };
     filenames.getSessionDB().endRead(*db_context);
+
+    db_context = filenames.getSessionDB().beginRead(
+      "filenames_tags",
+      "tag",
+      "value"
+    );
+    if (!db_context)
+    {
+      return std::nullopt;
+    }
+    std::string tag;
+    std::string value;
+    while (filenames.getSessionDB().read(
+      *db_context,
+      tag,
+      value
+    ))
+    {
+      filenames.setTagValue(filenames.getTagNames().at(tag), value);
+    };
+    filenames.getSessionDB().endRead(*db_context);
     return filenames;
   }
 
@@ -641,6 +769,26 @@ namespace SmartPeak
       );
     }
     application_handler_.filenames_.getSessionDB().endWrite(*db_context);
+
+    db_context = application_handler_.filenames_.getSessionDB().beginWrite(
+      "filenames_tags",
+      "tag", "TEXT",
+      "value", "TEXT"
+    );
+    if (!db_context)
+    {
+      return false;
+    }
+    for (const auto& tag_name : application_handler_.filenames_.getTagNames())
+    {
+      application_handler_.filenames_.getSessionDB().write(
+        *db_context,
+        tag_name.first,
+        application_handler_.filenames_.getTagValue(tag_name.second)
+      );
+    }
+    application_handler_.filenames_.getSessionDB().endWrite(*db_context);
+
     LOGD << "END StoreFilenames";
     return true;
   }

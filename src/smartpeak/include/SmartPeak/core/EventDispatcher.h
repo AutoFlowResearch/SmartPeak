@@ -83,13 +83,17 @@ namespace SmartPeak
     virtual void onFeaturesUpdated() override;
 
     /**
-      ISequenceSegmentProcessorObserver
+      ISequenceProcessorObserver
     */
     virtual void onSequenceProcessorStart(const size_t nb_injections) override;
     virtual void onSequenceProcessorSampleStart(const std::string& sample_name) override;
     virtual void onSequenceProcessorSampleEnd(const std::string& sample_name) override;
     virtual void onSequenceProcessorEnd() override;
     virtual void onSequenceProcessorError(const std::string& sample_name, const std::string& processor_name, const std::string& error) override;
+
+    /**
+      ISequenceSegmentProcessorObserver
+    */
     virtual void onSequenceSegmentProcessorStart(const size_t nb_segments) override;
     virtual void onSequenceSegmentProcessorSampleStart(const std::string& segment_name) override;
     virtual void onSequenceSegmentProcessorSampleEnd(const std::string& segment_name) override;

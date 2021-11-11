@@ -9,12 +9,14 @@ set(sources_list
 	ChromatogramTICPlotWidget.cpp
 	ChromatogramXICPlotWidget.cpp
 	CreateSessionWidget.cpp
+	ExplorerWidget.cpp
 	FilePicker.cpp
 	GraphicDataVizWidget.cpp
 	GuiAppender.cpp
 	Heatmap2DWidget.cpp
 	ImEntry.cpp
 	InfoWidget.cpp
+	LayoutLoader.cpp
 	LoadSessionWizard.cpp
 	LogWidget.cpp
 	ParameterEditorWidget.cpp
@@ -26,8 +28,10 @@ set(sources_list
 	SequenceGroupsEditorWidget.cpp
 	SequenceTableWidget.cpp
 	SessionFilesWidget.cpp
+	SetInputOutputWidget.cpp
 	SpectraMSMSPlotWidget.cpp
 	SpectraPlotWidget.cpp
+	SplitWindow.cpp
 	StatisticsWidget.cpp
 	Widget.cpp
 	WindowSizesAndPositions.cpp

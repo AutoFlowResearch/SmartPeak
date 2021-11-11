@@ -29,43 +29,94 @@ namespace SmartPeak
 {
   bool LoadSessionWizard::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
   {
-    auto filenames = LoadFilenames::loadFilenamesFromDB(filename);
-    auto main_dir = std::filesystem::path(filename).remove_filename().generic_string();
-    filenames->setTag(Filenames::Tag::MAIN_DIR, main_dir);
-    // Popup Session Files management if some files are not existing
-    if (filenames)
+    loaded_filenames_ = LoadFilenames::loadFilenamesFromDB(filename);
+    if (!loaded_filenames_)
     {
-      bool missing_file = false;
-      for (const auto& file_id : (*filenames).getFileIds())
-      {
-        const auto full_path = (*filenames).getFullPath(file_id);
-        if ((!(*filenames).isEmbedded(file_id)) && (!full_path.empty()) && (!std::filesystem::exists(full_path)))
-        {
-          missing_file = true;
-          break;
-        }
-      }
-      if (missing_file)
-      {
-        session_files_widget_manage_->open(*filenames);
-      }
-      else
-      {
-        application_handler->closeSession();
-        application_handler->filenames_ = *filenames;
-        application_handler->main_dir_ = filenames->getTag(Filenames::Tag::MAIN_DIR);
-        LoadSession load_session(*application_handler);
-        load_session.addApplicationProcessorObserver(application_observer_);
-        load_session.filenames_ = filenames;
-        load_session.notifyApplicationProcessorStart({}); // we need a proper loading in thread to profit from the progressbar
-        if (!load_session.process())
-        {
-          // load failed
-          application_handler->closeSession();
-        }
-        load_session.notifyApplicationProcessorEnd();
-      }
+      LOGE << "Failed to load input filenames list from session DB. Loading aborted.";
+      return false;
+    }
+    // Popup Session Files management if some files are not existing
+    auto main_dir = std::filesystem::path(filename).remove_filename().generic_string();
+    loaded_filenames_->setTagValue(Filenames::Tag::MAIN_DIR, main_dir);
+    missing_input_output_directories_ = missingInputOutputDirectories();
+    if (missing_input_output_directories_)
+    {
+      set_input_output_widget->open(*loaded_filenames_, this);
+    }
+    else
+    {
+      onInputOutputSet();
     }
     return true;
   };
+
+  bool LoadSessionWizard::missingInputFileNames()
+  {
+    for (const auto& file_id : (*loaded_filenames_).getFileIds())
+    {
+      const auto full_path = (*loaded_filenames_).getFullPath(file_id);
+      if ((!(*loaded_filenames_).isEmbedded(file_id)) && (!full_path.empty()) && (!std::filesystem::exists(full_path)))
+      {
+        return true;
+        break;
+      }
+    }
+    return false;
+  }
+
+  void LoadSessionWizard::onInputOutputSet()
+  {
+    missing_input_file_ = missingInputFileNames();
+    if (missing_input_file_)
+    {
+      session_files_widget_manage_->open(*loaded_filenames_);
+    }
+    else
+    {
+      application_handler_.closeSession();
+      application_handler_.filenames_ = *loaded_filenames_;
+      application_handler_.main_dir_ = loaded_filenames_->getTagValue(Filenames::Tag::MAIN_DIR);
+      LoadSession load_session(
+        application_handler_,
+        workflow_manager_,
+        application_processor_observer_,
+        sequence_processor_observer_,
+        sequence_segment_processor_observer_,
+        sample_group_processor_observer_);
+      load_session.addApplicationProcessorObserver(application_processor_observer_);
+      load_session.filenames_ = loaded_filenames_;
+      load_session.notifyApplicationProcessorStart({ load_session.getName() }); // we need to use the workflow manager to profit from the progressbar
+      if (!load_session.process())
+      {
+        // load failed
+        application_handler_.closeSession();
+        load_session.notifyApplicationProcessorError("Failed to load session.");
+      }
+      load_session.notifyApplicationProcessorEnd();
+    }
+  }
+
+  void LoadSessionWizard::onInputOutputCancel()
+  {
+  }
+
+  bool LoadSessionWizard::missingInputOutputDirectories()
+  {
+    std::vector<Filenames::Tag> tag_to_check = { 
+      Filenames::Tag::FEATURES_INPUT_PATH, 
+      Filenames::Tag::FEATURES_OUTPUT_PATH, 
+      Filenames::Tag::MZML_INPUT_PATH
+    };
+    for (const auto& tag : tag_to_check)
+    {
+      const auto tag_path = std::filesystem::path((*loaded_filenames_).getTagValue(tag));
+      if ((!tag_path.empty()) && (!std::filesystem::exists(tag_path)))
+      {
+        return true;
+        break;
+      }
+    }
+    return false;
+  }
+
 }

@@ -17,60 +17,81 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Douglas McCloskey $
-// $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
+// $Maintainer: Douglas McCloskey, Ahmed Khalil, Bertrand Boudaud $
+// $Authors: Douglas McCloskey $
 // --------------------------------------------------------------------------
 
 #pragma once
 
+
+#include <imgui.h>
+#include <SmartPeak/core/SessionHandler.h>
+#include <SmartPeak/ui/Widget.h>
+#include <SmartPeak/ui/ImEntry.h>
+#include <SmartPeak/ui/Help.h>
+#include <unsupported/Eigen/CXX11/Tensor>
+#include <SmartPeak/iface/ISequenceSegmentObserver.h>
+#include <SmartPeak/iface/IFeaturesObserver.h>
 #include <SmartPeak/iface/IPropertiesHandler.h>
+
+#include <string>
+#include <utility>
+#include <vector>
+#include <functional>
 
 namespace SmartPeak
 {
-  struct WindowSizesAndPositions : public IPropertiesHandler {
+  extern bool enable_quick_help;
+
+  /**
+    @brief ExplorerWidget is a table widgets that also exposes a set of checkboxes (possibly one column for each functionality) associated with each lines.
+  */
+  class ExplorerWidget :
+      public GenericTableWidget,
+      public ISequenceObserver,
+      public IFeaturesObserver
+    {
+    public:
+      ExplorerWidget(const std::string& table_id, const std::string title ="", SequenceObservable* sequence_observable = nullptr)
+        :GenericTableWidget(table_id, title)
+      {
+        if (sequence_observable)
+        {
+          sequence_observable->addSequenceObserver(this);
+        }
+      };
+    /*
+    @brief Show the explorer
+
+    @param[in] headers Column header names
+    @param[in,out] columns Table body or matrix
+    @param[in,out] checked_rows What rows are checked/filtered
+    */
+    void draw() override;
 
     /**
-      IPropertiesHandler
+    ISequenceObserver
     */
-    virtual std::string getPropertiesHandlerName() const override;
+    virtual void onSequenceUpdated() override;
+    
+    /**
+    IFeaturesObserver
+    */
+    virtual void onFeaturesUpdated() override;
+
+    /**
+    IPropertiesHandler
+    */
     virtual std::map<std::string, CastValue::Type> getPropertiesSchema() const override;
     virtual std::optional<CastValue> getProperty(const std::string& property, const size_t row) const override;
     virtual void setProperty(const std::string& property, const CastValue& value, const size_t row) override;
 
-    void setXAndYSizes(const float& x, const float& y);
-    void setWindowPercentages(const float& bottom_window_y_perc, const float& left_window_x_perc, const float& right_window_x_perc);
-    void setWindowSizesAndPositions_(const float& bottom_window_y_perc, const float& left_window_x_perc, const float& right_window_x_perc);
-    void setWindowsVisible(const bool& show_top_window, const bool& show_bottom_window, const bool& show_left_window, const bool& show_right_window);
-    void setLeftWindowXSize(const float& left_window_x_size);
-    void setTopWindowYSize(const float& top_window_y_size);
+    Eigen::Tensor<std::string, 1> checkbox_headers_;
+    Eigen::Tensor<bool, 2> *checkbox_columns_ = nullptr;
 
-    // Absolute application size
-    float main_menu_bar_y_size_ = 18.0f;
-    float y_size_ = 0;
-    float x_size_ = 0;
+    std::map<int, std::vector<bool>> serialized_checkboxes_;
 
-    // Absolute window sizes
-    float bottom_window_y_size_ = 0;
-    float bottom_and_top_window_x_size_ = 0;
-    float top_window_y_size_ = 0;
-    float left_and_right_window_y_size_ = 0;
-    float left_window_x_size_ = 0;
-    float right_window_x_size_ = 0;
-
-    // Absolute window positions
-    float bottom_window_y_pos_ = 0;
-    float bottom_and_top_window_x_pos_ = 0;
-    float top_window_y_pos_ = 0;
-    float left_and_right_window_y_pos_ = 0;
-    float left_window_x_pos_ = 0;
-    float right_window_x_pos_ = 0;
-
-    // Relative percent offsets of the window sizes
-    float bottom_window_y_perc_ = 0.25;
-    float left_window_x_perc_ = 0.25;
-    float right_window_x_perc_ = 0;
-
-  private:
-    bool show_bottom_window_ = true;
+    ImGuiTextFilter filter_;
   };
+
 }

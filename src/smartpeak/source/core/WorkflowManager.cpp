@@ -127,6 +127,7 @@ namespace SmartPeak {
   void WorkflowManager::updateApplicationHandler(ApplicationHandler& source_app_handler)
   {
     // update the status for this workflow, to be used from the main thread (gui, client)
+    application_handler_.session_loader_generator = source_app_handler.session_loader_generator;
     source_app_handler = std::move(application_handler_);
   }
 

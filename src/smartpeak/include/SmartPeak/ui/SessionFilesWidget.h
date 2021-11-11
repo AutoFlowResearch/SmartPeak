@@ -41,7 +41,14 @@ namespace SmartPeak
       EModification
     };
 
-    SessionFilesWidget(ApplicationHandler& application_handler, SessionFilesWidget::Mode mode, IApplicationProcessorObserver* application_observer);
+    SessionFilesWidget(
+      ApplicationHandler& application_handler,
+      SessionFilesWidget::Mode mode,
+      WorkflowManager& workflow_manager,
+      IApplicationProcessorObserver* application_processor_observer = nullptr,
+      ISequenceProcessorObserver* sequence_processor_observer = nullptr,
+      ISequenceSegmentProcessorObserver* sequence_segment_processor_observer = nullptr,
+      ISampleGroupProcessorObserver* sample_group_processor_observer = nullptr);
 
     void draw() override;
     void open(const Filenames& filenames, const std::set<std::string>& requirements = {});
@@ -68,6 +75,7 @@ namespace SmartPeak
     std::map<std::string, std::filesystem::path> hints_;
     Mode mode_;
     std::set<std::string> requirements_;
+    WorkflowManager& workflow_manager_;
 
   protected:
     virtual void doUpdateSession();
@@ -101,7 +109,10 @@ namespace SmartPeak
     bool one_missing_requirement_ = false;
     bool one_invalid_ = false;
     int id_ = 1;
-    IApplicationProcessorObserver* application_observer_ = nullptr;
     static std::vector<std::string> file_modes_strings_;
+    IApplicationProcessorObserver* application_processor_observer_;
+    ISequenceProcessorObserver* sequence_processor_observer_;
+    ISequenceSegmentProcessorObserver* sequence_segment_processor_observer_;
+    ISampleGroupProcessorObserver* sample_group_processor_observer_;
   };
 }

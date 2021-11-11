@@ -18,59 +18,48 @@
 //
 // --------------------------------------------------------------------------
 // $Maintainer: Douglas McCloskey $
-// $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
+// $Authors: Douglas McCloskey, Bertrand Boudaud $
 // --------------------------------------------------------------------------
 
 #pragma once
 
+#include <SmartPeak/iface/IApplicationProcessorObserver.h>
 #include <SmartPeak/iface/IPropertiesHandler.h>
 
 namespace SmartPeak
 {
-  struct WindowSizesAndPositions : public IPropertiesHandler {
+  /**
+    This class records the executed workflow in order to be able to
+    construct a workflow capable of restoring the state.
+    the constructed workflow will be recorded in the session file and executed 
+    while the session is loaded.
+  */
+  struct SessionLoaderGenerator : IPropertiesHandler, IApplicationProcessorObserver
+  {
+    SessionLoaderGenerator() { };
 
     /**
-      IPropertiesHandler
+    IApplicationProcessorObserver
+    */
+    virtual void onApplicationProcessorStart(const std::vector<std::string>& commands) override;
+    virtual void onApplicationProcessorCommandStart(size_t command_index, const std::string& command_name) override {};
+    virtual void onApplicationProcessorCommandEnd(size_t command_index, const std::string& command_name) override {};
+    virtual void onApplicationProcessorEnd() override {};
+    virtual void onApplicationProcessorError(const std::string& error) override {};
+
+    /**
+    IPropertiesHandler
     */
     virtual std::string getPropertiesHandlerName() const override;
     virtual std::map<std::string, CastValue::Type> getPropertiesSchema() const override;
     virtual std::optional<CastValue> getProperty(const std::string& property, const size_t row) const override;
     virtual void setProperty(const std::string& property, const CastValue& value, const size_t row) override;
 
-    void setXAndYSizes(const float& x, const float& y);
-    void setWindowPercentages(const float& bottom_window_y_perc, const float& left_window_x_perc, const float& right_window_x_perc);
-    void setWindowSizesAndPositions_(const float& bottom_window_y_perc, const float& left_window_x_perc, const float& right_window_x_perc);
-    void setWindowsVisible(const bool& show_top_window, const bool& show_bottom_window, const bool& show_left_window, const bool& show_right_window);
-    void setLeftWindowXSize(const float& left_window_x_size);
-    void setTopWindowYSize(const float& top_window_y_size);
+    void clear() { loading_workflow_commands_.clear(); }
 
-    // Absolute application size
-    float main_menu_bar_y_size_ = 18.0f;
-    float y_size_ = 0;
-    float x_size_ = 0;
+    std::vector<std::string> getLoadingWorkflowCommands() const;
 
-    // Absolute window sizes
-    float bottom_window_y_size_ = 0;
-    float bottom_and_top_window_x_size_ = 0;
-    float top_window_y_size_ = 0;
-    float left_and_right_window_y_size_ = 0;
-    float left_window_x_size_ = 0;
-    float right_window_x_size_ = 0;
-
-    // Absolute window positions
-    float bottom_window_y_pos_ = 0;
-    float bottom_and_top_window_x_pos_ = 0;
-    float top_window_y_pos_ = 0;
-    float left_and_right_window_y_pos_ = 0;
-    float left_window_x_pos_ = 0;
-    float right_window_x_pos_ = 0;
-
-    // Relative percent offsets of the window sizes
-    float bottom_window_y_perc_ = 0.25;
-    float left_window_x_perc_ = 0.25;
-    float right_window_x_perc_ = 0;
-
-  private:
-    bool show_bottom_window_ = true;
+  protected:
+    std::map<int, std::string> loading_workflow_commands_;
   };
 }

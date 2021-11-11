@@ -30,7 +30,9 @@
 #include <SmartPeak/iface/ISequenceSegmentProcessorObserver.h>
 #include <SmartPeak/iface/ISampleGroupProcessorObserver.h>
 #include <SmartPeak/core/ApplicationProcessorObservable.h>
+#include <SmartPeak/core/WorkflowManager.h>
 #include <SmartPeak/core/Parameters.h>
+#include <SmartPeak/iface/IPropertiesHandler.h>
 #include <string>
 #include <vector>
 
@@ -97,7 +99,20 @@ namespace SmartPeak
     bool             checkConsistency = true;         /// Check consistency of data contained in files
 
     LoadSession() = default;
-    explicit LoadSession(ApplicationHandler& application_handler) : ApplicationProcessor(application_handler) {}
+    explicit LoadSession(
+      ApplicationHandler& application_handler, 
+      WorkflowManager& workflow_manager,
+      IApplicationProcessorObserver* application_processor_observer = nullptr,
+      ISequenceProcessorObserver* sequence_processor_observer = nullptr,
+      ISequenceSegmentProcessorObserver* sequence_segment_processor_observer = nullptr,
+      ISampleGroupProcessorObserver* sample_group_processor_observer = nullptr)
+      : ApplicationProcessor(application_handler),
+        workflow_manager_(workflow_manager),
+        application_processor_observer_(application_processor_observer),
+        sequence_processor_observer_(sequence_processor_observer),
+        sequence_segment_processor_observer_(sequence_segment_processor_observer),
+        sample_group_processor_observer_(sample_group_processor_observer)
+    {}
 
     /* ApplicationProcessor */
     bool process() override;
@@ -109,6 +124,45 @@ namespace SmartPeak
   protected:
     bool overrideFilenames();
     bool overrideParameters();
+    bool readFilenames();
+    bool readInputFiles();
+    bool readLoadingWorkflow();
+    bool runLoadingWorkflow();
+    WorkflowManager& workflow_manager_;
+    IApplicationProcessorObserver* application_processor_observer_;
+    ISequenceProcessorObserver* sequence_processor_observer_;
+    ISequenceSegmentProcessorObserver* sequence_segment_processor_observer_;
+    ISampleGroupProcessorObserver* sample_group_processor_observer_;
+  };
+
+  struct LoadPropertiesHandlers : ApplicationProcessor
+  {
+    LoadPropertiesHandlers() = default;
+    explicit LoadPropertiesHandlers(ApplicationHandler& application_handler) : ApplicationProcessor(application_handler) {}
+
+    /* ApplicationProcessor */
+    bool process() override;
+
+    /* IProcessorDescription */
+    virtual std::string getName() const override { return "LOAD_PROPERTIES_HANDLERS"; }
+    virtual std::string getDescription() const override { return "Load a list of PropertiesHandlers."; }
+
+    std::vector<IPropertiesHandler*> properties_handlers;
+  };
+
+  struct SavePropertiesHandlers : ApplicationProcessor
+  {
+    SavePropertiesHandlers() = default;
+    explicit SavePropertiesHandlers(ApplicationHandler& application_handler) : ApplicationProcessor(application_handler) {}
+
+    /* ApplicationProcessor */
+    bool process() override;
+
+    /* IProcessorDescription */
+    virtual std::string getName() const override { return "SAVE_PROPERTIES_HANDLERS"; }
+    virtual std::string getDescription() const override { return "Save a list of PropertiesHandlers."; }
+
+    std::vector<IPropertiesHandler*> properties_handlers;
   };
 
   struct SaveSession : ApplicationProcessor, IFilePickerHandler
