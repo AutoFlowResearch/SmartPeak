@@ -31,22 +31,26 @@
 
 namespace SmartPeak
 {
+  /**
+  * @brief The SplitWindow holds 4 sub windows: left, right, top and bottom.
+  */
   class SplitWindow final : public Widget
   {
   public:
     SplitWindow() :
       Widget("SplitWindow")
-    {
-    };
+    { };
 
     void draw() override;
 
-    std::vector<std::shared_ptr<Widget>> top_windows;
-    std::vector<std::shared_ptr<Widget>> bottom_windows;
-    std::vector<std::shared_ptr<Widget>> left_windows;
-
+    /**
+    * @brief Fills the layoutLoader with the sub windows of the SplitWindow
+    */
     void setupLayoutLoader(LayoutLoader& layout_loader);
 
     WindowSizesAndPositions win_size_and_pos;
+    std::vector<std::shared_ptr<Widget>> top_windows;
+    std::vector<std::shared_ptr<Widget>> bottom_windows;
+    std::vector<std::shared_ptr<Widget>> left_windows;
   };
 }

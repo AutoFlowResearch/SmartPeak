@@ -31,12 +31,25 @@
 
 namespace SmartPeak
 {
+  /**
+  * SetInputOutputWidget's Observer class.
+  */
   struct ISetInputOutputWidgetObserver
   {
+    /**
+    * @brief User has set directories and pressed ok button
+    */
     virtual void onInputOutputSet() = 0;
+
+    /**
+    * @brief User has pressed the cancel button
+    */
     virtual void onInputOutputCancel() = 0;
   };
 
+  /**
+  * @brief A widget that shows the workflow's input and output directories, and allow the user to edit them.
+  */
   class SetInputOutputWidget : public Widget
   {
   public:

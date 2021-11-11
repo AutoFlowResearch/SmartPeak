@@ -30,12 +30,40 @@
 
 namespace SmartPeak
 {
+  /**
+  * Interface for classes that exposes properties in order to be serialized/deserialized from a session.
+  */
   struct IPropertiesHandler
   {
+    /**
+      @brief Returns the name of the properties container
+      @return name of the properties container
+
+      The name must be unique across all the instances of the session.
+    */
     virtual std::string getPropertiesHandlerName() const = 0;
+
+    /**
+      @brief Returns the list of properties, name of the property, and its type.
+      @return a map of name/type
+    */
     virtual std::map<std::string, CastValue::Type> getPropertiesSchema() const = 0;
+
+    /**
+      @brief In case the IPropertiesHandler is a table, returns the number of rows.
+      @return number of rows
+    */
     virtual size_t getNbRows() const { return 1; };
+
+    /**
+      @brief Returns the property value based on the name. 
+      @return the property value, as CastValue, std::nullopt if the property does not exists.
+    */
     virtual std::optional<CastValue> getProperty(const std::string& property, const size_t row = 0) const = 0;
+
+    /**
+      @brief Sets the property value based on the name.
+    */
     virtual void setProperty(const std::string& property, const CastValue& value, const size_t row) = 0;
   };
 }

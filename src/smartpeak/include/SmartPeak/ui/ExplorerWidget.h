@@ -39,21 +39,12 @@
 #include <vector>
 #include <functional>
 
-/**
-Generic and base classes for Widgets
-*/
-
 namespace SmartPeak
 {
   extern bool enable_quick_help;
 
   /**
-    @brief Base class for all tables
-
-    TODO: features
-    - row highlighting on focus
-    - searching
-    - color coding of rows by status
+    @brief ExplorerWidget is a table widgets that also exposes a set of checkboxes (possibly one column for each functionality) associated with each lines.
   */
   class ExplorerWidget :
       public GenericTableWidget,

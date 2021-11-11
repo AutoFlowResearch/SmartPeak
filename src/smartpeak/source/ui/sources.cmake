@@ -16,6 +16,7 @@ set(sources_list
 	Heatmap2DWidget.cpp
 	ImEntry.cpp
 	InfoWidget.cpp
+	LayoutLoader.cpp
 	LoadSessionWizard.cpp
 	LogWidget.cpp
 	ParameterEditorWidget.cpp

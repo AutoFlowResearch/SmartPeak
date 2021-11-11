@@ -299,7 +299,6 @@ bool SessionDB::writePropertiesHandler(const IPropertiesHandler& properties_hand
   std::string separator;
   for (const auto& [column_name, column_type] : properties)
   {
-    // beginWrite(os, db_context.columns, value, value_type, args...);
     os << separator;
     os << "\"" << column_name << "\"";
     os << " ";

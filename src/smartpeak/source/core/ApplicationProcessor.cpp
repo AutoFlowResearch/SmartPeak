@@ -417,8 +417,8 @@ namespace SmartPeak
     {
       injection_names.insert(injection.getMetaData().getInjectionName());
     }
-    const std::set<std::string> sequence_segment_names = {}; // session_handler_.getSelectSequenceSegmentNamesWorkflow(application_handler_.sequenceHandler_);
-    const std::set<std::string> sample_group_names = {}; // session_handler_.getSelectSampleGroupNamesWorkflow(application_handler_.sequenceHandler_);
+    const std::set<std::string> sequence_segment_names = {};
+    const std::set<std::string> sample_group_names = {};
     workflow_manager_.addWorkflow(
       application_handler_,
       injection_names,

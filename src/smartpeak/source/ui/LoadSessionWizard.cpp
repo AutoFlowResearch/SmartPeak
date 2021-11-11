@@ -98,7 +98,6 @@ namespace SmartPeak
 
   void LoadSessionWizard::onInputOutputCancel()
   {
-
   }
 
   bool LoadSessionWizard::missingInputOutputDirectories()

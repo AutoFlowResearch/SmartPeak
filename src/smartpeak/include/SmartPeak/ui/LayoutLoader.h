@@ -25,8 +25,6 @@
 
 #include <SmartPeak/core/ApplicationHandler.h>
 #include <SmartPeak/iface/IApplicationProcessorObserver.h>
-#include <SmartPeak/core/ApplicationProcessor.h>
-
 
 namespace SmartPeak
 {
@@ -39,84 +37,24 @@ namespace SmartPeak
   */
   struct LayoutLoader : IApplicationProcessorObserver
   {
-    LayoutLoader(ApplicationHandler& application_handler) :
-      application_handler_(application_handler)
-    { };
+    LayoutLoader(ApplicationHandler& application_handler);
 
     /**
     IApplicationProcessorObserver
     */
-    virtual void onApplicationProcessorStart(const std::vector<std::string>& commands) override
-    {
-      if ((commands.size() == 1) && (commands.at(0) == "LOAD_SESSION"))
-      {
-        loading_session_ = true;
-        session_loaded_ = false;
-      }
-      else if ((commands.size() == 1) && (commands.at(0) == "SAVE_SESSION"))
-      {
-        saving_session_ = true;
-        session_saved_ = false;
-      }
-    };
-    virtual void onApplicationProcessorCommandStart(size_t command_index, const std::string& command_name) override { };
-    virtual void onApplicationProcessorCommandEnd(size_t command_index, const std::string& command_name) override { };
-    virtual void onApplicationProcessorEnd() override 
-    {
-      if (loading_session_)
-      {
-        loading_session_ = false;
-        session_loaded_ = true;
-      }
-      if (saving_session_)
-      {
-        saving_session_ = false;
-        session_saved_ = true;
-      }
-    };
-    virtual void onApplicationProcessorError(const std::string& error) override
-    {
-      if (loading_session_)
-      {
-        loading_session_ = false;
-        session_loaded_ = false;
-      }
-      if (saving_session_)
-      {
-        saving_session_ = false;
-        session_saved_ = false;
-      }
-    };
+    virtual void onApplicationProcessorStart(const std::vector<std::string>& commands) override;
+    virtual void onApplicationProcessorCommandStart(size_t command_index, const std::string& command_name) override;
+    virtual void onApplicationProcessorCommandEnd(size_t command_index, const std::string& command_name) override;
+    virtual void onApplicationProcessorEnd() override;
+    virtual void onApplicationProcessorError(const std::string& error) override;
 
     /**
     * @brief will load / save the layout if the session has just been loaded (to call once ui is ready to be setup).
     */
-    void process()
-    {
-      if (session_loaded_)
-      {
-        if (!application_handler_.filenames_.getSessionDB().getDBFilePath().empty())
-        {
-          LoadPropertiesHandlers load_layout(application_handler_);
-          load_layout.properties_handlers = properties_handlers_;
-          load_layout.process();
-        }
-        session_loaded_ = false;
-      }
-      if (session_saved_)
-      {
-        if (!application_handler_.filenames_.getSessionDB().getDBFilePath().empty())
-        {
-          SavePropertiesHandlers save_properties_handlers(application_handler_);
-          save_properties_handlers.properties_handlers = properties_handlers_;
-          save_properties_handlers.process();
-        }
-        session_saved_ = false;
-      }
-    }
+    void process();
 
     std::vector<IPropertiesHandler*> properties_handlers_;
-
+  
   protected:
     bool session_loaded_ = false;
     bool loading_session_ = false;

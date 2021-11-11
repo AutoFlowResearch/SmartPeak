@@ -55,6 +55,14 @@ namespace SmartPeak
       {
         loading_workflow_commands_.emplace(22, "ZERO_CHROMATOGRAM_BASELINE");
       }
+      else if (command == "MERGE_SPECTRA")
+      {
+        loading_workflow_commands_.emplace(22, "MERGE_SPECTRA");
+      }
+      else if (command == "EXTRACT_SPECTRA_WINDOWS")
+      {
+        loading_workflow_commands_.emplace(22, "EXTRACT_SPECTRA_WINDOWS");
+      }
     }
   }
 

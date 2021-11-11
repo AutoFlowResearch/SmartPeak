@@ -59,7 +59,16 @@ namespace SmartPeak
       return session_file_name_;
     }
 
+    /**
+     * @brief Writes a IPropertiesHandler to the Session DB file.
+     * @return false if write failed.
+     */
     bool writePropertiesHandler(const IPropertiesHandler& properties_handler);
+
+    /**
+     * @brief Reads a IPropertiesHandler from the Session DB file.
+     * @return false if read failed.
+     */
     bool readPropertiesHandler(IPropertiesHandler& properties_handler);
 
     template<typename Value, typename ...Args>
