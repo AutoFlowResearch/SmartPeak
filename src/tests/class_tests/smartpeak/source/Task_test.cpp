@@ -248,7 +248,7 @@ TEST(Task, Task_options_change_output_dirs)
   EXPECT_TRUE(std::filesystem::exists(report_output_dir / "FeatureDB.csv"));
 }
 
-TEST(Task, Task_run_LCMS_MRM_QCs_example_10_threads)
+TEST(Task, Task_run_LCMS_MRM_QCs_example_20_threads)
 {
   namespace cli = SmartPeak::cli;
   std::filesystem::path seq_path = SMARTPEAK_GET_EXAMPLES_DATA_PATH("LCMS_MRM_QCs");
@@ -261,7 +261,7 @@ TEST(Task, Task_run_LCMS_MRM_QCs_example_10_threads)
           "--log-dir", ".",
           "--disable-colors",
           "-no-pg",
-          "--parameter", "SequenceProcessor:n_thread=10"
+          "--parameter", "SequenceProcessor:n_thread=20"
   };
   auto pa = cli::Parser{ args };
   auto as = cli::ApplicationSettings{ pa };
