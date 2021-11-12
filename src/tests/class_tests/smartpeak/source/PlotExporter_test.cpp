@@ -68,6 +68,8 @@ TEST(PlotExporter, plot)
   heatmap_data_.feat_heatmap_data(1,0) = 40322.7;
   heatmap_data_.feat_heatmap_data(1,1) = 15318.3;
   heatmap_data_.feat_heatmap_data(1,2) = 5287.02;
+  heatmap_data_.feat_value_min_ = 5287.02;
+  heatmap_data_.feat_value_max_ = 93856.1;
   
   bool is_successful = false;
 
