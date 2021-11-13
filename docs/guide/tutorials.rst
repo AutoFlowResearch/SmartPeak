@@ -3,8 +3,8 @@ Tutorials & Demos
 
 This section covers a breadth of walkthroughs using different datasets and analytical techniques.
 
-Data Steps
-----------
+Structure of Data Sets
+----------------------
 
 SmartPeak is optimised to process data set folders with the following structure :
 
@@ -146,7 +146,7 @@ Objectives
 #. Creating an optimized SmartPeak input templates for running the workflow.
 
 The Workflows include
-~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
 
 #. Calculating the calibration curves using Standards
 #. Processing Unknowns
@@ -224,7 +224,7 @@ Targeted quantitation with LC-MS/MS 6500 Non-polar
 
 
 Targeted flux analysis with LC-MS/MS 5500 QTRAP
-----------------------------------------------
+-----------------------------------------------
 
 
 
