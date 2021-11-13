@@ -18,13 +18,13 @@ copyright   = '2021, SmartPeak Team'
 author      = 'SmartPeak Team'
 
 extensions              = [ 
-                           "breathe", 
+                            "breathe",
                             "exhale",
                             "sphinx.ext.todo",
                             "sphinx.ext.autodoc",
                             "sphinx.ext.intersphinx",
-                            "sphinx.ext.viewcode"
-                            # "sphinx_tabs.tabs"
+                            "sphinx.ext.viewcode",
+                            "sphinx.ext.autosectionlabel"
                             ]
 
 todo_include_todos      = True
