@@ -704,6 +704,37 @@ TEST(SessionFilesWidget, LoadSessionWizard_PopupError)
   }
 }
 
+TEST(SessionFilesWidget, LoadSessionWizard_IncorrectSessionFile)
+{
+  ApplicationHandler application_handler;
+  WorkflowManager workflow_manager;
+
+  struct TestApplicationObserver : IApplicationProcessorObserver
+  {
+    virtual void onApplicationProcessorStart(const std::vector<std::string>& commands) override {}
+    virtual void onApplicationProcessorCommandStart(size_t command_index, const std::string& command_name) override {}
+    virtual void onApplicationProcessorCommandEnd(size_t command_index, const std::string& command_name) override {}
+    virtual void onApplicationProcessorEnd() override {}
+    virtual void onApplicationProcessorError(const std::string& error) override 
+    {
+      error_ = error;
+    }
+    std::string error_;
+  };
+  // load session (incorrect file: we will use one parameter file instead)
+  TestApplicationObserver test_application_observer;
+  auto session_widget_test_modify = std::make_shared<SessionFilesWidget_Test>(application_handler, SessionFilesWidget::Mode::EModification, workflow_manager);
+  auto session_widget_modify = std::static_pointer_cast<SessionFilesWidget>(session_widget_test_modify);
+  auto load_session_wizard_ = std::make_shared<LoadSessionWizard>(
+    session_widget_modify,
+    workflow_manager,
+    application_handler,
+    &test_application_observer);
+  auto db_path = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_params_2.csv");
+  load_session_wizard_->onFilePicked(db_path, &application_handler);
+  EXPECT_EQ(test_application_observer.error_, "Failed to load session file.");
+}
+
 TEST(SessionFilesWidget, SessionFilesWidget_EmbedAllFiles)
 {
   // More integration test like, 

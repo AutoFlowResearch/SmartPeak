@@ -32,7 +32,7 @@ namespace SmartPeak
     loaded_filenames_ = LoadFilenames::loadFilenamesFromDB(filename);
     if (!loaded_filenames_)
     {
-      LOGE << "Failed to load input filenames list from session DB. Loading aborted.";
+      notifyApplicationProcessorError("Failed to load session file.");
       return false;
     }
     // Popup Session Files management if some files are not existing
