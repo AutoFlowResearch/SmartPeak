@@ -158,7 +158,7 @@ jobs:
       - run:
           name: Running SmartPeak Examples
           command: |
-            ~/SmartPeak/.circleci/run_examples.sh ~/smartpeak_release_build/bin
+            ~/SmartPeak/.circleci/run_examples.sh ~/SmartPeak/smartpeak_release_build/bin
       - run:
           name: Packing SmartPeak
           command: |
