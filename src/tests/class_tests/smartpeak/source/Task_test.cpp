@@ -247,32 +247,3 @@ TEST(Task, Task_options_change_output_dirs)
   EXPECT_TRUE(er(am));
   EXPECT_TRUE(std::filesystem::exists(report_output_dir / "FeatureDB.csv"));
 }
-
-TEST(Task, Task_run_LCMS_MRM_QCs_example_20_threads)
-{
-  namespace cli = SmartPeak::cli;
-  std::filesystem::path seq_path = SMARTPEAK_GET_EXAMPLES_DATA_PATH("LCMS_MRM_QCs");
-  std::string seq = std::string{ seq_path.lexically_normal().generic_string() };
-  std::vector<std::string> args = std::vector<std::string>{
-      "Task_test",
-          "--load-session", seq,
-          "--verbose",
-          "--allow-inconsistent",
-          "--log-dir", ".",
-          "--disable-colors",
-          "-no-pg",
-          "--parameter", "SequenceProcessor:n_thread=20"
-  };
-  auto pa = cli::Parser{ args };
-  auto as = cli::ApplicationSettings{ pa };
-  auto am = cli::ApplicationManager{ as };
-  am
-    .add(std::make_shared<cli::InitializeApplicationSettings>())
-    .add(std::make_shared<cli::LoadSession>())
-    .add(std::make_shared<cli::InitializeWorkflowResources>())
-    .add(std::make_shared<cli::InitializeWorkflowSettings>())
-    .add(std::make_shared<cli::RunIntegrityChecks>())
-    .add(std::make_shared<cli::RunWorkflow>())
-    .add(std::make_shared<cli::ExportReport>());
-  am.run();
-}

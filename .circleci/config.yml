@@ -109,7 +109,7 @@ jobs:
             brew remove yarn node
             brew install cmake qt5 sdl2
             brew install cppcheck gnuplot
-            pip3 install -r tools/smartpeak/requirements.txt
+            brew install libomp            pip3 install -r tools/smartpeak/requirements.txt
       - run:
           name: "Pull latest (only release)"
           command: |

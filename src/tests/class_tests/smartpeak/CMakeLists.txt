@@ -6,7 +6,6 @@ project("SmartPeak_class_tests_smartpeak")
 #------------------------------------------------------------------------------
 # Configure test file to get the TEST_DATA_PATH into the tests
 set(CF_SMARTPEAK_TEST_DATA_PATH "${PROJECT_SOURCE_DIR}/data/")
-set(CF_SMARTPEAK_EXAMPLES_DATA_PATH "${PROJECT_SOURCE_DIR}/../../../examples/data/")
 set (CONFIGURED_TEST_CONFIG_H "${PROJECT_BINARY_DIR}/include/SmartPeak/test_config.h")
 configure_file(${PROJECT_SOURCE_DIR}/include/SmartPeak/test_config.h.in ${CONFIGURED_TEST_CONFIG_H})
 
