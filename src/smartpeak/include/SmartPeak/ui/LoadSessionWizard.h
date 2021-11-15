@@ -23,6 +23,7 @@
 #pragma once
 
 #include <SmartPeak/iface/IFilePickerHandler.h>
+#include <SmartPeak/core/ApplicationProcessorObservable.h>
 #include <SmartPeak/ui/SessionFilesWidget.h>
 #include <SmartPeak/ui/SetInputOutputWidget.h>
 #include <string>
@@ -34,7 +35,10 @@
 */
 namespace SmartPeak
 {
-  struct LoadSessionWizard : IFilePickerHandler, ISetInputOutputWidgetObserver
+  struct LoadSessionWizard : 
+    IFilePickerHandler, 
+    ISetInputOutputWidgetObserver,
+    ApplicationProcessorObservable
   {
     LoadSessionWizard(std::shared_ptr<SessionFilesWidget>& session_files_widget_manage,
                       WorkflowManager& workflow_manager,
@@ -52,6 +56,7 @@ namespace SmartPeak
       sample_group_processor_observer_(sample_group_processor_observer)
     {
       set_input_output_widget = std::make_shared<SetInputOutputWidget>(application_handler);
+      addApplicationProcessorObserver(application_processor_observer_);
     };
 
     /**
