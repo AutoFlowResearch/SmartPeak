@@ -156,6 +156,10 @@ jobs:
             export PYTHONPATH="${PWD}/tools"
             python3 -m unittest discover -s ./tools/smartpeak
       - run:
+          name: Running SmartPeak Examples
+          command: |
+            ~/SmartPeak/.circleci/run_examples.sh ~/smartpeak_release_build/bin
+      - run:
           name: Packing SmartPeak
           command: |
             set +e
