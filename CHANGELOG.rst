@@ -1,6 +1,24 @@
 SmartPeak Changelog
 ===================
 
+v1.17.0 (2020-11-16)
+--------------------
+
+Features
+~~~~~~~~
+- Save layout in session `(#452) <https://github.com/AutoFlowResearch/SmartPeak/pull/452>`_
+
+Fix
+~~~
+- Read the Docs maintenance `(#447) <https://github.com/AutoFlowResearch/SmartPeak/pull/447>`_
+- Display error in info panel when user select incorrect file for session file. `(#456) <https://github.com/AutoFlowResearch/SmartPeak/pull/456>`_
+- Fix/fix sample group processing - processors can run into infinite loop. `(#450) <https://github.com/AutoFlowResearch/SmartPeak/pull/450>`_
+- Enabled OpenMP for MacOS builds (fix crash when running multithreaded workflows) `(#455) <https://github.com/AutoFlowResearch/SmartPeak/pull/455>`_
+
+Changes
+~~~~~~~
+- Modifying start menu title to include SmartPeakGUI version `(#451) <https://github.com/AutoFlowResearch/SmartPeak/pull/451>`_
+
 v1.16.0 (2020-10-25)
 --------------------
 
