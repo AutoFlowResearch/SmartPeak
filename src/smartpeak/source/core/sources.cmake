@@ -17,7 +17,6 @@ set(sources_list
 	Parameters.cpp
 	ProgessInfo.cpp
 	RawDataHandler.cpp
-	RawDataProcessor.cpp
 	SampleGroupHandler.cpp
 	SampleGroupProcessor.cpp
 	SampleType.cpp
