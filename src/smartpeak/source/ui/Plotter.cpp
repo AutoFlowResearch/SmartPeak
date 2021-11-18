@@ -173,11 +173,10 @@ namespace SmartPeak {
       file_height_(800),
       gnuplot_path_("gnuplot")
   {
-    //PNG=0, PDF=1, HTML=2, SVG=3
+    //PNG=0, PDF=1, SVG=2
     if (format == 0) plot_PNG_ = true;
     if (format == 1) plot_PDF_ = true;
-    if (format == 2) plot_HTML_ = true;
-    if (format == 3) plot_SVG_ = true;
+    if (format == 2) plot_SVG_ = true;
   }
 
   PlotExporter::PlotExporter(std::string output_path, SessionHandler::HeatMapData& heatmap_data, int format, PlotType plot_type)
@@ -192,11 +191,10 @@ namespace SmartPeak {
       file_height_(800),
       gnuplot_path_("gnuplot")
   {
-    //PNG=0, PDF=1, HTML=2, SVG=3
+    //PNG=0, PDF=1, SVG=2
     if (format == 0) plot_PNG_ = true;
     if (format == 1) plot_PDF_ = true;
-    if (format == 2) plot_HTML_ = true;
-    if (format == 3) plot_SVG_ = true;
+    if (format == 2) plot_SVG_ = true;
   }
 
   bool PlotExporter::plot()
@@ -260,9 +258,6 @@ namespace SmartPeak {
      }
      if (plot_PDF_) {
        generatePDF_();
-     }
-     if (plot_HTML_) {
-       generateHTML_();
      }
      if (plot_SVG_) {
        generateSVG_();
@@ -391,32 +386,6 @@ namespace SmartPeak {
       generatePlot_(fout, filename, ExportedFormat::PDF);
       fout.close();
       plot_PDF_ = false;
-    } else {
-      LOGE << "Failed to save plot to disk.";
-    }
-  }
-
-  void PlotExporter::generateHTML_()
-  {
-    std::string filename = output_path_+this->filename+"-html.gpi";
-    std::string exported_plot = output_path_+this->filename+".html";
-    std::ofstream fout(filename.c_str());
-    
-    if (fout.is_open()) {
-      appendFileHeader_(fout);
-      if (isTermAvailable_("cairo")) {
-        fout << "set terminal canvas dashed enhanced" << std::endl;
-        fout << "set output '" << exported_plot << "'" << std::endl;
-        if (with_grid_) {
-          setGrid_(fout);
-        }
-        for (uint i = 0; i < plotlines_properties_.size(); ++i) {
-          fout << plotlines_properties_[i].plotStyler() << std::endl;
-        }
-      }
-      generatePlot_(fout, filename, ExportedFormat::HTML);
-      fout.close();
-      plot_HTML_ = false;
     } else {
       LOGE << "Failed to save plot to disk.";
     }

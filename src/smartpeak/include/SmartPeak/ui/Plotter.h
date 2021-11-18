@@ -115,7 +115,6 @@ namespace SmartPeak {
     enum class ExportedFormat {
       PNG,
       PDF,
-      HTML,
       SVG
     };
   
@@ -172,11 +171,6 @@ namespace SmartPeak {
     void generatePDF_();
     
     /*
-    @brief generates HTML plots
-    */
-    void generateHTML_();
-    
-    /*
     @brief generates SVG plots
     */
     void generateSVG_();
@@ -220,7 +214,6 @@ namespace SmartPeak {
     
     bool plot_PNG_  = false;
     bool plot_PDF_  = false;
-    bool plot_HTML_ = false;
     bool plot_SVG_  = false;
   };
 }

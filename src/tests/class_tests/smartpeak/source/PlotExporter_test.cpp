@@ -73,7 +73,7 @@ TEST(PlotExporter, plot)
   
   bool is_successful = false;
 
-  //PNG=0, PDF=1, HTML=2, SVG=3
+  //PNG=0, PDF=1, SVG=2
   auto curve_png = std::make_unique<SmartPeak::PlotExporter>(main_path.string(), graph_viz_data_, 0,
                                                                 SmartPeak::PlotExporter::PlotType::CURVE);
   curve_png->setGNUPLOTPath(gnuplot_path);
@@ -87,7 +87,6 @@ TEST(PlotExporter, plot)
   EXPECT_TRUE(heatmap_png->plot());
   EXPECT_TRUE(std::filesystem::exists(main_path / "smartpeak-exported-plot.png"));
   EXPECT_TRUE(std::filesystem::file_size(main_path / "smartpeak-exported-plot.png") > 5000 );
-  
   
   auto curve_pdf = std::make_unique<SmartPeak::PlotExporter>(main_path.string(), graph_viz_data_, 1,
                                                                 SmartPeak::PlotExporter::PlotType::CURVE);
@@ -103,30 +102,14 @@ TEST(PlotExporter, plot)
   EXPECT_TRUE(std::filesystem::exists(main_path / "smartpeak-exported-plot.pdf"));
   EXPECT_TRUE(std::filesystem::file_size(main_path / "smartpeak-exported-plot.pdf") > 10000 );
   
-  
-  auto curve_html = std::make_unique<SmartPeak::PlotExporter>(main_path.string(), graph_viz_data_, 2,
-                                                                 SmartPeak::PlotExporter::PlotType::CURVE);
-  curve_html->setGNUPLOTPath(gnuplot_path);
-  EXPECT_TRUE(curve_html->plot());
-  EXPECT_TRUE(std::filesystem::exists(main_path / "smartpeak-exported-plot.html"));
-  EXPECT_TRUE(std::filesystem::file_size(main_path / "smartpeak-exported-plot.html") > 5000 );
-  
-  auto heatmap_html = std::make_unique<SmartPeak::PlotExporter>(main_path.string(), heatmap_data_, 2,
-                                                                 SmartPeak::PlotExporter::PlotType::HEATMAP);
-  heatmap_html->setGNUPLOTPath(gnuplot_path);
-  EXPECT_TRUE(heatmap_html->plot());
-  EXPECT_TRUE(std::filesystem::exists(main_path / "smartpeak-exported-plot.html"));
-  EXPECT_TRUE(std::filesystem::file_size(main_path / "smartpeak-exported-plot.html") > 5000 );
-  
-  
-  auto curve_svg = std::make_unique<SmartPeak::PlotExporter>(main_path.string(), graph_viz_data_, 3,
+  auto curve_svg = std::make_unique<SmartPeak::PlotExporter>(main_path.string(), graph_viz_data_, 2,
                                                                 SmartPeak::PlotExporter::PlotType::CURVE);
   curve_svg->setGNUPLOTPath(gnuplot_path);
   EXPECT_TRUE(curve_svg->plot());
   EXPECT_TRUE(std::filesystem::exists(main_path / "smartpeak-exported-plot.svg"));
   EXPECT_TRUE(std::filesystem::file_size(main_path / "smartpeak-exported-plot.svg") > 25000 );
   
-  auto heatmap_svg = std::make_unique<SmartPeak::PlotExporter>(main_path.string(), heatmap_data_, 3,
+  auto heatmap_svg = std::make_unique<SmartPeak::PlotExporter>(main_path.string(), heatmap_data_, 2,
                                                                 SmartPeak::PlotExporter::PlotType::HEATMAP);
   heatmap_svg->setGNUPLOTPath(gnuplot_path);
   EXPECT_TRUE(heatmap_svg->plot());
