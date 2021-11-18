@@ -213,16 +213,6 @@ Targeted quantitation with LC-MS/MS 5500 QTRAP RapidRIP
 
 
 
-Targeted quantitation with LC-MS/MS 6500 Polar
-----------------------------------------------
-
-
-
-Targeted quantitation with LC-MS/MS 6500 Non-polar
---------------------------------------------------
-
-
-
 Targeted flux analysis with LC-MS/MS 5500 QTRAP
 -----------------------------------------------
 
