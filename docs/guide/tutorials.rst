@@ -75,18 +75,38 @@ SmartPeak is optimised to process data set folders with the following structure 
 #. features
 	This folder contains features info either in the 
 	`featureXML <https://raw.githubusercontent.com/OpenMS/OpenMS/develop/share/OpenMS/SCHEMAS/FeatureXML_1_9.xsd>`_ format or in 
-	`Chromeleon CDS7 TXT <https://www.thermofisher.com/order/catalog/product/CHROMELEON7>`_ format.
+	`Chromeleon CDS7 TXT <https://www.thermofisher.com/order/catalog/product/CHROMELEON7>`_ format. 
+	Features contain the processed results of a single sample after applying a workflow and running the command ``STORE_FEATURES`` and
+	can be stored at both the sample (i.e., injection) or the sample group (merged injections) level.
 |
 
 #. mzML
-	This folder contains `mzML <https://www.psidev.info/mzML>`_ files which descripes raw spectrometer value, 
-	a single mzML file usually encapsulates all the
-	information extracted from a single MS run.
+	This folder contains mass spectrometry data files in the most widely open-source format : `mzML <https://www.psidev.info/mzML>`_ 
+	which descripes raw spectrometer value, a single mzML file usually encapsulates all the information extracted from a single MS run.
+
+	Converting raw files to the ``mzML`` format
+	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	`Proteowizard <https://proteowizard.sourceforge.io/download.html>`_ is a toolkit to view and convert mass spectrometry
+	data. The tools kit includes SeeMS and MSConvert to visualize MS data and convert to and from ``mzML`` file format respectively.
+
+	Once installed, you will be presented with the following window:
+
+	.. image:: ../images/msconvert.png
+
+	To convert mass spectrometry files, please follow the steps below:
+
+	#. Select the file you wish to convert.
+	#. Add the selected file to the list of files to process.
+	#. Select the output directory where the converted files will be saved.
+	#. Select the output format, providing an extension to the file in not mandatory.
+	#. Check/uncheck compression and packaging options if desired.
+	#. Select how many files you wish to convert at once, then hit the "Start" button.
+
 
 |
 
 #. parameters.csv
-	This file contains a list of parameters for the RawDataProcessor functions,
+	This file contains a list of parameters for the workflow steps as well as various other application settings,
 	the header including a sample entry is shown below:
 
 	.. table:: parameters.csv Headers
@@ -103,7 +123,8 @@ SmartPeak is optimised to process data set folders with the following structure 
 
 #. quantitationMethods.csv
 	This file contains information about various quantitation methods and their values,
-	the header including a sample entry is shown below:
+	and is required for absolute quantitation.
+	The header including a sample entry is shown below:
 
 	.. table:: quantitationMethods.csv Headers
 		:widths: auto
@@ -118,41 +139,52 @@ SmartPeak is optimised to process data set folders with the following structure 
 |
 
 #. sequence.csv
-	A list of injections are store in this file following the header schema :
-	``sample_name,sample_group_name,sequence_segment_name,sample_type,``
-	``original_filename,batch_name,rack_number,plate_number,pos_number,``
-	``inj_number,dilution_factor,inj_volume,inj_volume_units,operator_name,``
-	``acq_method_name,proc_method_name,acquisition_date_and_time,scan_polarity,``
-	``scan_mass_low,scan_mass_high``.
-	A sample entry may look like the following :
-	``170808_Jonathan_yeast_Sacc2_1x,group1,sequence1,Unknown,``
-	``170808_Jonathan_yeast_Sacc2_1x,BatchName,,,,2,,3,uL,,MethodName,,,,,``.
+	This file contains information about all the injections in the data set and their values,
+	fields such as `sample_name` and `original_filename` refer to the files names stored in the `mzML` folder.
+	The header including a sample entry is shown below:
+
+	.. table:: parameters.csv Headers
+		:widths: auto
+
+		============================== ================= ===================== =========== ============================== ========== =========== ============ ========== ========== =============== ========== ================ ============= =============== ================ ========================= ============= ============= ==============
+		sample_name                    sample_group_name sequence_segment_name sample_type original_filename              batch_name rack_number plate_number pos_number inj_number dilution_factor inj_volume inj_volume_units operator_name acq_method_name proc_method_name acquisition_date_and_time scan_polarity scan_mass_low scan_mass_high
+		============================== ================= ===================== =========== ============================== ========== =========== ============ ========== ========== =============== ========== ================ ============= =============== ================ ========================= ============= ============= ==============
+		170808_Jonathan_yeast_Sacc2_1x group1            sequence1             Unknown     170808_Jonathan_yeast_Sacc2_1x BatchName                                      2                          3          uL                             MethodName
+		\-                             \-                \-                    \-          \-                             \-         \-          \-           \-         \-         \-              \-         \-               \-            \-              \-               \-                        \-            \-            \-
+		============================== ================= ===================== =========== ============================== ========== =========== ============ ========== ========== =============== ========== ================ ============= =============== ================ ========================= ============= ============= ==============
 
 |
 
 #. standardsConcentrations.csv
-	This file contains a list of sample names and component names along with 
-	concentration values and dilution factors. The header has
-	the following format : 
-	``sample_name,component_name,IS_component_name,actual_concentration,``
-	``IS_actual_concentration,concentration_units,dilution_factor``.
-	With a sample row that may look like the following :
-	``0p5ug,Serotonin,,0.5,1,ug/mL,1``
+	This file contains information about concentration values fot the provided samples/components,
+	this file is required for automated calibration curve fitting.
+	The header including a sample entry is shown below:
+
+	.. table:: standardsConcentrations.csv Headers
+		:widths: auto
+
+		================= =================== =================== ==================== ======================= =================== ===============
+		sample_name       component_name      IS_component_name   actual_concentration IS_actual_concentration concentration_units dilution_factor
+		================= =================== =================== ==================== ======================= =================== ===============
+		150516_CM1_Level1 23dpg.23dpg_1.Light 23dpg.23dpg_1.Heavy 0                    1                       uM                  1
+		\-                \-                  \-                  \-                   \-                      \-                  \-
+		================= =================== =================== ==================== ======================= =================== ===============
 
 |
 
 #. traML.csv
-	This file contains a list of proteins with peptide names, the header 
-	follows the following format :
-	``ProteinName,FullPeptideName,transition_group_id,transition_name,``
-	``RetentionTime,Annotation,PrecursorMz,MS1 Res,ProductMz,MS2 Res,Dwell,``
-	``Fragmentor,Collision Energy,Cell Accelerator Voltage,LibraryIntensity,decoy,``
-	``PeptideSequence,LabelType,PrecursorCharge,FragmentCharge,FragmentType,``
-	``FragmentSeriesNumber,quantifying_transition,identifying_transition,``
-	``detecting_transition``.
-	With a sample entry that may look like the following :
-	``Serotonin,,Serotonin,Serotonin,1.87,112.2,0,``
-	``Unit,0,Unit,,,,,1,0,,Light,1,1,,1,TRUE,FALSE,TRUE``.
+	This file contains a summary of the proteins or metabolites with transition names and other related information,
+	the header including a sample entry is shown below:
+
+	.. table:: traML.csv Headers
+		:widths: auto
+
+		=========== =============== =================== =================== ============= ========== =========== ======= ========= ======= ===== ========== ================ ======================== ================ ===== =============== ========= =============== ============== ============ ==================== ====================== ====================== ====================
+		ProteinName FullPeptideName transition_group_id transition_name     RetentionTime Annotation PrecursorMz MS1 Res ProductMz MS2 Res Dwell Fragmentor Collision Energy Cell Accelerator Voltage LibraryIntensity decoy PeptideSequence LabelType PrecursorCharge FragmentCharge FragmentType FragmentSeriesNumber quantifying_transition identifying_transition detecting_transition
+		=========== =============== =================== =================== ============= ========== =========== ======= ========= ======= ===== ========== ================ ======================== ================ ===== =============== ========= =============== ============== ============ ==================== ====================== ====================== ====================
+		arg-L                       arg-L               arg-L.arg-L_1.Heavy 45.85610358              179         Unit    136       Unit                                                               1                0                     Heavy     1               1                           1                    TRUE                   FALSE                  TRUE
+		\-          \-              \-                  \-                  \-            \-         \-          \-      \-        \-      \-    \-         \-               \-                       \-               \-    \-              \-        \-              \-             \-           \-                   \-                     \-                     \-
+		=========== =============== =================== =================== ============= ========== =========== ======= ========= ======= ===== ========== ================ ======================== ================ ===== =============== ========= =============== ============== ============ ==================== ====================== ====================== ====================
 
 |
 
@@ -161,13 +193,14 @@ SmartPeak is optimised to process data set folders with the following structure 
 	are listed in this file under the column ``command_name``. 
 	A full list of the commands can be found in :ref:`Workflow Commands`.
 
+|
 
 Targeted quantitation with HPLC data
 ------------------------------------
 
 This tutorial walks you through the workflow for analyzing targeted HPLC data
- starting from input file generation, to processing the data in SmartPeak, 
- to reviewing the data in SmartPeak, to reporting the results for later use.
+starting from input file generation, to processing the data in SmartPeak, 
+to reviewing the data in SmartPeak, to reporting the results for later use.
 
 Objectives
 ~~~~~~~~~~
