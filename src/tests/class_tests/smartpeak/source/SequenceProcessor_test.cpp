@@ -27,6 +27,8 @@
 #include <SmartPeak/core/ApplicationHandler.h>
 #include <SmartPeak/core/ApplicationProcessor.h>
 #include <SmartPeak/core/Filenames.h>
+#include <SmartPeak/core/RawDataProcessors/LoadRawData.h>
+#include <SmartPeak/core/RawDataProcessors/LoadFeatures.h>
 #include <filesystem>
 
 using namespace SmartPeak;

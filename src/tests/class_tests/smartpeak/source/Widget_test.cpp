@@ -35,6 +35,7 @@
 #include <SmartPeak/ui/SessionFilesWidget.h>
 #include <SmartPeak/ui/LoadSessionWizard.h>
 #include <SmartPeak/ui/SetInputOutputWidget.h>
+#include <SmartPeak/core/RawDataProcessors/LoadFeatures.h>
 
 using namespace SmartPeak;
 

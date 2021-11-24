@@ -27,6 +27,8 @@
 #include <SmartPeak/core/SequenceProcessor.h>
 #include <SmartPeak/core/ApplicationProcessor.h>
 #include <SmartPeak/core/Utilities.h>
+#include <SmartPeak/core/RawDataProcessors/LoadFeatures.h>
+#include <SmartPeak/core/RawDataProcessors/LoadRawData.h>
 
 using namespace SmartPeak;
 using namespace std;

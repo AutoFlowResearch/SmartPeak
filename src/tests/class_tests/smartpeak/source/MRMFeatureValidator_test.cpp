@@ -29,6 +29,7 @@
 #include <SmartPeak/io/ParametersParser.h>
 #include <SmartPeak/core/RawDataHandler.h>
 #include <SmartPeak/core/RawDataProcessor.h>
+#include <SmartPeak/core/RawDataProcessors/LoadValidationData.h>
 
 using namespace SmartPeak;
 using namespace std;

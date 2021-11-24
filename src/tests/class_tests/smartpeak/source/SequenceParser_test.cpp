@@ -29,6 +29,7 @@
 #include <SmartPeak/core/RawDataProcessor.h>
 #include <SmartPeak/core/SampleType.h>
 #include <SmartPeak/core/ApplicationHandler.h>
+#include <SmartPeak/core/RawDataProcessors/LoadFeatures.h>
 
 using namespace SmartPeak;
 using namespace std;

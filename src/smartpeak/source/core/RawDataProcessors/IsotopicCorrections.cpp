@@ -20,7 +20,7 @@
 // $Maintainer: Douglas McCloskey $
 // $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
 // --------------------------------------------------------------------------
-#include <SmartPeak/core/RawDataProcessor.h>
+#include <SmartPeak/core/RawDataProcessors/IsotopicCorrections.h>
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/Utilities.h>
 #include <SmartPeak/core/FeatureFiltersUtils.h>

@@ -5,6 +5,7 @@
 #include <SmartPeak/pipelines/LCMS_MRM_Unknown_example.h>
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/Utilities.h>
+#include <SmartPeak/core/RawDataProcessors/LoadFeatures.h>
 
 using namespace SmartPeak;
 using namespace std;

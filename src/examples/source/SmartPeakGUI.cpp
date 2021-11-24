@@ -58,6 +58,8 @@
 #include <SmartPeak/ui/LayoutLoader.h>
 #include <SmartPeak/ui/SplitWindow.h>
 #include <SmartPeak/core/EventDispatcher.h>
+#include <SmartPeak/core/RawDataProcessors/StoreParameters.h>
+#include <SmartPeak/core/RawDataProcessors/StoreValidationData.h>
 #include <plog/Log.h>
 #include <plog/Appenders/ConsoleAppender.h>
 #include <plog/Appenders/ColorConsoleAppender.h>

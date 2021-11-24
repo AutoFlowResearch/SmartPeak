@@ -25,6 +25,11 @@
 #include <SmartPeak/core/ApplicationProcessor.h>
 #include <SmartPeak/core/SharedProcessors.h>
 #include <SmartPeak/core/SequenceProcessor.h>
+#include <SmartPeak/core/RawDataProcessors/LoadTransitions.h>
+#include <SmartPeak/core/RawDataProcessors/LoadParameters.h>
+#include <SmartPeak/core/RawDataProcessors/LoadValidationData.h>
+#include <SmartPeak/core/RawDataProcessors/StoreParameters.h>
+#include <SmartPeak/core/RawDataProcessors/StoreValidationData.h>
 
 namespace SmartPeak
 {
