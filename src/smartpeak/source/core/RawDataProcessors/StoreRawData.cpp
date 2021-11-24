@@ -23,9 +23,8 @@
 #include <SmartPeak/core/RawDataProcessor.h>
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/Utilities.h>
-#include <SmartPeak/core/ApplicationHandler.h>
 #include <SmartPeak/core/FeatureFiltersUtils.h>
-#include <SmartPeak/io/InputDataValidation.h> // check filenames and headers
+#include <SmartPeak/io/InputDataValidation.h>
 
 #include <OpenMS/FORMAT/MzMLFile.h>
 

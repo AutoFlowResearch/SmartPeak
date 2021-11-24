@@ -23,10 +23,9 @@
 #include <SmartPeak/core/RawDataProcessor.h>
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/Utilities.h>
-#include <SmartPeak/core/ApplicationHandler.h>
 #include <SmartPeak/core/FeatureFiltersUtils.h>
 
-#include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureFilter.h>  // feature filter/QC
+#include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureFilter.h>
 
 #include <plog/Log.h>
 

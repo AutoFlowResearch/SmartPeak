@@ -23,7 +23,6 @@
 #include <SmartPeak/core/RawDataProcessor.h>
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/Utilities.h>
-#include <SmartPeak/core/ApplicationHandler.h>
 #include <SmartPeak/core/FeatureFiltersUtils.h>
 
 #include <OpenMS/KERNEL/SpectrumHelper.h>
