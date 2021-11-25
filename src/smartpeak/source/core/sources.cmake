@@ -23,6 +23,7 @@ set(sources_list
 	SequenceHandler.cpp
 	SequenceProcessor.cpp
 	SequenceSegmentHandler.cpp
+	SequenceSegmentProcessor.cpp
 	SessionHandler.cpp
 	SessionLoaderGenerator.cpp
 	SharedProcessors.cpp

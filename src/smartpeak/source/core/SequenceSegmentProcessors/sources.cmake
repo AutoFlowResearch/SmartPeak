@@ -18,8 +18,6 @@ set(sources_list
 	LoadFeatureRSDQCs.cpp
 	LoadQuantitationMethods.cpp
 	LoadStandardsConcentrations.cpp
-	SequenceSegmentProcessor.cpp
-	sources.cmake
 	StoreFeatureBackgroundEstimations.cpp
 	StoreFeatureBackgroundFilters.cpp
 	StoreFeatureBackgroundQCs.cpp

@@ -37,7 +37,6 @@ set(sources_list
 	SearchAccurateMass.cpp
 	SearchSpectrum.cpp
 	SelectFeatures.cpp
-	sources.cmake
 	StoreAnnotations.cpp
 	StoreFeatureFiltersRDP.cpp
 	StoreFeatureQCsRDP.cpp
