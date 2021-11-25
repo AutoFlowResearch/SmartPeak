@@ -78,6 +78,7 @@ SmartPeak is optimised to process data set folders with the following structure 
 	`Chromeleon CDS7 TXT <https://www.thermofisher.com/order/catalog/product/CHROMELEON7>`_ format. 
 	Features contain the processed results of a single sample after applying a workflow and running the command ``STORE_FEATURES`` and
 	can be stored at both the sample (i.e., injection) or the sample group (merged injections) level.
+
 |
 
 #. mzML
@@ -292,6 +293,23 @@ The workflow steps for HPLC UV Unknowns are :
 	* SELECT_FEATURES
 	* STORE_FEATURES
 
+	To inspect the features for the selected transition groups, select "Features (line)" from the view menu
+	then open the features tab (can be opened from the view menu as well) to select the "asymetry_factors" and "logSN"
+	in the plot column. The line plot illistrates the value for each transition group and feature as shown below:
+
+	.. image:: ../images/hplc_uv_unknowns_features_line.png
+
+	The features can also be plotted as a heatmap, under "view" select "Features (heatmap)" then select the "asymetry_factors"
+	feature to display transition groups as a heatmap and compare the values from the same injection as shown below:
+
+	.. image:: ../images/hplc_uv_unknowns_features_heatmap.png
+
+	To plot the intensities over time for given injections and transitions, view the "chromatogram" from the "view" menu
+	then select the injections and transitions to plot from their respective tabs on the left. The following shows the chromatogram
+	for two injections using Antranilicacid and 5-HTP2 transitions and their intensity differences over time.
+
+	.. image:: ../images/hplc_uv_unknowns_chromatogram.png
+
 #. Running the workflow in SmartPeak
 
 	To run the analysis, please follow the steps for 
@@ -339,11 +357,6 @@ Non-targeted FIA-MS analysis with Thermo Orbitrap
 
 
 Non-targeted LC-MS/MS DDA analysis with Thermo Orbitrap
--------------------------------------------------------
-
-
-
-Non-targeted LC-MS/MS DIA analysis with Thermo Orbitrap
 -------------------------------------------------------
 
 
