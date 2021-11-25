@@ -24,7 +24,7 @@
 #include <gtest/gtest.h>
 #include <SmartPeak/test_config.h>
 #include <SmartPeak/core/FeatureFiltersUtils.h>
-#include <SmartPeak/core/ApplicationProcessor.h>
+#include <SmartPeak/core/FeatureFiltersUtilsMode.h>
 
 using namespace SmartPeak;
 using namespace std;

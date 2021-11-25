@@ -27,13 +27,13 @@
 #include <plog/Log.h>
 
 #include <SmartPeak/core/ApplicationHandler.h>
-#include <SmartPeak/core/ApplicationProcessor.h>
 #include <SmartPeak/core/WorkflowManager.h>
 #include <SmartPeak/core/SessionHandler.h>
 #include <SmartPeak/core/FeatureMetadata.h>
 #include <SmartPeak/core/SharedProcessors.h>
 #include <SmartPeak/io/SequenceParser.h>
 #include <SmartPeak/io/InputDataValidation.h>
+#include <SmartPeak/core/ApplicationProcessors/BuildCommandsFromNames.h>
 
 #include <SmartPeak/cli/ApplicationManager.h>
 

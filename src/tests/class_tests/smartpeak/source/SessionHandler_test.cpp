@@ -25,8 +25,13 @@
 #include <SmartPeak/test_config.h>
 #include <SmartPeak/core/SessionHandler.h>
 #include <SmartPeak/core/SequenceProcessor.h>
-#include <SmartPeak/core/ApplicationProcessor.h>
 #include <SmartPeak/core/Utilities.h>
+#include <SmartPeak/core/RawDataProcessors/LoadFeatures.h>
+#include <SmartPeak/core/RawDataProcessors/LoadRawData.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/StoreFeatureRSDEstimations.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/EstimateFeatureBackgroundInterferences.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/EstimateFeatureRSDs.h>
+#include <SmartPeak/core/ApplicationProcessors/LoadSession.h>
 
 using namespace SmartPeak;
 using namespace std;

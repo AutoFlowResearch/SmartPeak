@@ -22,9 +22,16 @@
 // --------------------------------------------------------------------------
 
 #include <SmartPeak/core/ApplicationHandler.h>
-#include <SmartPeak/core/ApplicationProcessor.h>
 #include <SmartPeak/core/SequenceHandler.h>
 #include <SmartPeak/core/SequenceProcessor.h>
+#include <SmartPeak/core/RawDataProcessors/LoadRawData.h>
+#include <SmartPeak/core/RawDataProcessors/ExtractSpectraWindows.h>
+#include <SmartPeak/core/RawDataProcessors/MergeSpectra.h>
+#include <SmartPeak/core/RawDataProcessors/PickMS1Features.h>
+#include <SmartPeak/core/RawDataProcessors/SearchAccurateMass.h>
+#include <SmartPeak/core/RawDataProcessors/StoreAnnotations.h>
+#include <SmartPeak/core/RawDataProcessors/StoreFeatures.h>
+#include <SmartPeak/core/ApplicationProcessors/LoadSession.h>
 
 using namespace SmartPeak;
 

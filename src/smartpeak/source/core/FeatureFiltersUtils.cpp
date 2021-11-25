@@ -23,7 +23,9 @@
 
 #include <SmartPeak/core/FeatureFiltersUtils.h>
 #include <SmartPeak/core/ApplicationHandler.h>
+#include <SmartPeak/core/FeatureFiltersUtilsMode.h>
 #include <SmartPeak/io/InputDataValidation.h>
+
 #include <algorithm>
 #include <iostream>
 #include <numeric>

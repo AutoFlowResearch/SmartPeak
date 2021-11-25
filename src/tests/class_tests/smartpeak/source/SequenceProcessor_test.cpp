@@ -25,8 +25,12 @@
 #include <SmartPeak/test_config.h>
 #include <SmartPeak/core/SequenceProcessor.h>
 #include <SmartPeak/core/ApplicationHandler.h>
-#include <SmartPeak/core/ApplicationProcessor.h>
 #include <SmartPeak/core/Filenames.h>
+#include <SmartPeak/core/RawDataProcessors/LoadRawData.h>
+#include <SmartPeak/core/RawDataProcessors/LoadFeatures.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/CalculateCalibration.h>
+#include <SmartPeak/core/SampleGroupProcessors/MergeInjections.h>
+#include <SmartPeak/core/ApplicationProcessors/LoadSession.h>
 #include <filesystem>
 
 using namespace SmartPeak;

@@ -26,7 +26,6 @@
 #include <string>
 #include <vector>
 #include <SmartPeak/core/ApplicationHandler.h>
-#include <SmartPeak/core/ApplicationProcessor.h>
 #include <SmartPeak/core/SequenceProcessor.h>
 #include <SmartPeak/core/WorkflowManager.h>
 #include <SmartPeak/core/SessionHandler.h>
@@ -58,6 +57,19 @@
 #include <SmartPeak/ui/LayoutLoader.h>
 #include <SmartPeak/ui/SplitWindow.h>
 #include <SmartPeak/core/EventDispatcher.h>
+#include <SmartPeak/core/RawDataProcessors/StoreParameters.h>
+#include <SmartPeak/core/RawDataProcessors/StoreValidationData.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/StoreFeatureBackgroundEstimations.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/StoreFeatureBackgroundFilters.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/StoreFeatureBackgroundQCs.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/StoreFeatureFilters.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/StoreFeatureQCs.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/StoreFeatureRSDEstimations.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/StoreFeatureRSDFilters.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/StoreFeatureRSDQCs.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/StoreQuantitationMethods.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/StoreStandardsConcentrations.h>
+#include <SmartPeak/core/ApplicationProcessors/SaveSession.h>
 #include <plog/Log.h>
 #include <plog/Appenders/ConsoleAppender.h>
 #include <plog/Appenders/ColorConsoleAppender.h>

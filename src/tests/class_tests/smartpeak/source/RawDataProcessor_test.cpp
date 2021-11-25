@@ -26,13 +26,55 @@
 #include <gtest/gtest.h>
 #include <SmartPeak/core/RawDataProcessor.h>
 #include <SmartPeak/core/SequenceSegmentProcessor.h>
+#include <SmartPeak/io/InputDataValidation.h> // check filenames and headers
+#include <SmartPeak/core/RawDataProcessors/LoadRawData.h>
+#include <SmartPeak/core/RawDataProcessors/LoadFeatures.h>
+#include <SmartPeak/core/RawDataProcessors/LoadTransitions.h>
+#include <SmartPeak/core/RawDataProcessors/PickMRMFeatures.h>
+#include <SmartPeak/core/RawDataProcessors/FilterFeatures.h>
+#include <SmartPeak/core/RawDataProcessors/SelectFeatures.h>
+#include <SmartPeak/core/RawDataProcessors/ValidateFeatures.h>
+#include <SmartPeak/core/RawDataProcessors/QuantifyFeatures.h>
+#include <SmartPeak/core/RawDataProcessors/CheckFeatures.h>
+#include <SmartPeak/core/RawDataProcessors/StoreFeatures.h>
+#include <SmartPeak/core/RawDataProcessors/MapChromatograms.h>
+#include <SmartPeak/core/RawDataProcessors/ZeroChromatogramBaseline.h>
+#include <SmartPeak/core/RawDataProcessors/ExtractChromatogramWindows.h>
+#include <SmartPeak/core/RawDataProcessors/FitFeaturesEMG.h>
+#include <SmartPeak/core/RawDataProcessors/FilterFeaturesRSDs.h>
+#include <SmartPeak/core/RawDataProcessors/CheckFeaturesRSDs.h>
+#include <SmartPeak/core/RawDataProcessors/FilterFeaturesBackgroundInterferences.h>
+#include <SmartPeak/core/RawDataProcessors/CheckFeaturesBackgroundInterferences.h>
+#include <SmartPeak/core/RawDataProcessors/ExtractSpectraWindows.h>
+#include <SmartPeak/core/RawDataProcessors/MergeSpectra.h>
+#include <SmartPeak/core/RawDataProcessors/PickMS1Features.h>
+#include <SmartPeak/core/RawDataProcessors/PickMS2Features.h>
+#include <SmartPeak/core/RawDataProcessors/SearchAccurateMass.h>
+#include <SmartPeak/core/RawDataProcessors/MergeFeatures.h>
+#include <SmartPeak/core/RawDataProcessors/LoadAnnotations.h>
+#include <SmartPeak/core/RawDataProcessors/SearchSpectrum.h>
+#include <SmartPeak/core/RawDataProcessors/DDA.h>
+#include <SmartPeak/core/RawDataProcessors/StoreAnnotations.h>
+#include <SmartPeak/core/RawDataProcessors/ClearData.h>
+#include <SmartPeak/core/RawDataProcessors/StoreRawData.h>
+#include <SmartPeak/core/RawDataProcessors/CalculateMDVs.h>
+#include <SmartPeak/core/RawDataProcessors/IsotopicCorrections.h>
+#include <SmartPeak/core/RawDataProcessors/CalculateIsotopicPurities.h>
+#include <SmartPeak/core/RawDataProcessors/CalculateMDVAccuracies.h>
+#include <SmartPeak/core/RawDataProcessors/LoadParameters.h>
+#include <SmartPeak/core/RawDataProcessors/LoadFeatureFiltersRDP.h>
+#include <SmartPeak/core/RawDataProcessors/LoadFeatureQCsRDP.h>
+#include <SmartPeak/core/RawDataProcessors/LoadValidationData.h>
+#include <SmartPeak/core/RawDataProcessors/StoreFeatureFiltersRDP.h>
+#include <SmartPeak/core/RawDataProcessors/StoreFeatureQCsRDP.h>
+#include <SmartPeak/core/RawDataProcessors/PlotFeatures.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/LoadQuantitationMethods.h>
+
 #include <OpenMS/ANALYSIS/OPENSWATH/DATAACCESS/DataAccessHelper.h>
 #include <OpenMS/FORMAT/MRMFeatureQCFile.h>  // load featureFilter and featureQC
 #include <OpenMS/ANALYSIS/OPENSWATH/TransitionTSVFile.h>  // load traML
 #include <OpenMS/FORMAT/FeatureXMLFile.h>  // load/store featureXML
-#include <SmartPeak/io/InputDataValidation.h> // check filenames and headers
 #include <OpenMS/FORMAT/TraMLFile.h>
-
 #include <OpenMS/FORMAT/MzMLFile.h>
 
 using namespace SmartPeak;

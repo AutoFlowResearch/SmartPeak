@@ -22,8 +22,8 @@
 // --------------------------------------------------------------------------
 
 #include <SmartPeak/core/WorkflowManager.h>
-#include <SmartPeak/core/ApplicationHandler.h>
 #include <SmartPeak/core/ApplicationProcessor.h>
+#include <SmartPeak/core/ApplicationHandler.h>
 #include <thread>
 #include <future>
 

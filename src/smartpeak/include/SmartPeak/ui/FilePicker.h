@@ -28,7 +28,6 @@
 #include <vector>
 #include <filesystem>
 #include <atomic>
-#include <SmartPeak/core/ApplicationProcessor.h>
 #include <SmartPeak/core/Utilities.h>
 #include <SmartPeak/ui/Widget.h>
 #include <SmartPeak/ui/ImEntry.h>

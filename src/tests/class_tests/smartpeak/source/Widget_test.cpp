@@ -27,7 +27,6 @@
 #include <SmartPeak/test_config.h>
 #include <SmartPeak/io/SequenceParser.h>
 #include <SmartPeak/core/MetaDataHandler.h>
-#include <SmartPeak/core/RawDataProcessor.h>
 #include <SmartPeak/core/SampleType.h>
 #include <SmartPeak/core/WorkflowManager.h>
 #include <SmartPeak/ui/GraphicDataVizWidget.h>
@@ -35,6 +34,8 @@
 #include <SmartPeak/ui/SessionFilesWidget.h>
 #include <SmartPeak/ui/LoadSessionWizard.h>
 #include <SmartPeak/ui/SetInputOutputWidget.h>
+#include <SmartPeak/core/RawDataProcessors/LoadFeatures.h>
+#include <SmartPeak/core/ApplicationProcessors/SaveSession.h>
 
 using namespace SmartPeak;
 

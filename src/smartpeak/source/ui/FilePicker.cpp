@@ -21,7 +21,6 @@
 // $Authors: Douglas McCloskey, Ahmed Khalil, Pasquale Domenico Colaianni $
 // --------------------------------------------------------------------------
 
-#include <SmartPeak/core/ApplicationProcessor.h>
 #include <SmartPeak/ui/FilePicker.h>
 #include <SmartPeak/core/Utilities.h>
 #include <future>

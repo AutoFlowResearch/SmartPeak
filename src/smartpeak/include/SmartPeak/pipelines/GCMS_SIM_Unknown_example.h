@@ -22,12 +22,21 @@
 // --------------------------------------------------------------------------
 
 #include <SmartPeak/core/ApplicationHandler.h>
-#include <SmartPeak/core/ApplicationProcessor.h>
 #include <SmartPeak/core/FeatureMetadata.h>
 #include <SmartPeak/core/SampleType.h>
 #include <SmartPeak/core/SequenceHandler.h>
 #include <SmartPeak/core/SequenceProcessor.h>
 #include <SmartPeak/io/SequenceParser.h>
+#include <SmartPeak/core/RawDataProcessors/LoadRawData.h>
+#include <SmartPeak/core/RawDataProcessors/MapChromatograms.h>
+#include <SmartPeak/core/RawDataProcessors/ExtractChromatogramWindows.h>
+#include <SmartPeak/core/RawDataProcessors/PickMRMFeatures.h>
+#include <SmartPeak/core/RawDataProcessors/FilterFeatures.h>
+#include <SmartPeak/core/RawDataProcessors/SelectFeatures.h>
+#include <SmartPeak/core/RawDataProcessors/QuantifyFeatures.h>
+#include <SmartPeak/core/RawDataProcessors/CheckFeatures.h>
+#include <SmartPeak/core/RawDataProcessors/StoreFeatures.h>
+#include <SmartPeak/core/ApplicationProcessors/LoadSession.h>
 
 using namespace SmartPeak;
 
