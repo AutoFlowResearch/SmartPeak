@@ -60,6 +60,16 @@
 #include <SmartPeak/core/EventDispatcher.h>
 #include <SmartPeak/core/RawDataProcessors/StoreParameters.h>
 #include <SmartPeak/core/RawDataProcessors/StoreValidationData.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/StoreFeatureBackgroundEstimations.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/StoreFeatureBackgroundFilters.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/StoreFeatureBackgroundQCs.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/StoreFeatureFilters.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/StoreFeatureQCs.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/StoreFeatureRSDEstimations.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/StoreFeatureRSDFilters.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/StoreFeatureRSDQCs.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/StoreQuantitationMethods.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/StoreStandardsConcentrations.h>
 #include <plog/Log.h>
 #include <plog/Appenders/ConsoleAppender.h>
 #include <plog/Appenders/ColorConsoleAppender.h>

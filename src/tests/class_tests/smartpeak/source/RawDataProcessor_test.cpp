@@ -68,6 +68,7 @@
 #include <SmartPeak/core/RawDataProcessors/StoreFeatureFiltersRDP.h>
 #include <SmartPeak/core/RawDataProcessors/StoreFeatureQCsRDP.h>
 #include <SmartPeak/core/RawDataProcessors/PlotFeatures.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/LoadQuantitationMethods.h>
 
 #include <OpenMS/ANALYSIS/OPENSWATH/DATAACCESS/DataAccessHelper.h>
 #include <OpenMS/FORMAT/MRMFeatureQCFile.h>  // load featureFilter and featureQC

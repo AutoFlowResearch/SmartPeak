@@ -21,7 +21,7 @@
 // $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
 // --------------------------------------------------------------------------
 
-#include <SmartPeak/core/SequenceSegmentProcessor.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/StoreFeatureFilters.h>
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/MetaDataHandler.h>
 #include <SmartPeak/core/SampleType.h>

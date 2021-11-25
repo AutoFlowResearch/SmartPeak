@@ -29,6 +29,9 @@
 #include <SmartPeak/core/Utilities.h>
 #include <SmartPeak/core/RawDataProcessors/LoadFeatures.h>
 #include <SmartPeak/core/RawDataProcessors/LoadRawData.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/StoreFeatureRSDEstimations.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/EstimateFeatureBackgroundInterferences.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/EstimateFeatureRSDs.h>
 
 using namespace SmartPeak;
 using namespace std;
