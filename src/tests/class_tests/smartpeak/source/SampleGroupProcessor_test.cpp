@@ -24,6 +24,9 @@
 #include <gtest/gtest.h>
 #include <SmartPeak/test_config.h>
 #include <SmartPeak/core/SampleGroupProcessor.h>
+#include <SmartPeak/core/SampleGroupProcessors/MergeInjections.h>
+#include <SmartPeak/core/SampleGroupProcessors/LoadFeaturesSampleGroup.h>
+#include <SmartPeak/core/SampleGroupProcessors/StoreFeaturesSampleGroup.h>
 
 using namespace SmartPeak;
 using namespace std;

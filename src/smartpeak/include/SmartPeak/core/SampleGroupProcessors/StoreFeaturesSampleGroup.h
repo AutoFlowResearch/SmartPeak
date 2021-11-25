@@ -21,49 +21,31 @@
 // $Authors: Douglas McCloskey $
 // --------------------------------------------------------------------------
 
-#include <SmartPeak/core/SampleGroupProcessors/LoadFeaturesSampleGroup.h>
-#include <SmartPeak/io/InputDataValidation.h>
-#include <OpenMS/FORMAT/FeatureXMLFile.h>
+#pragma once
+
+#include <SmartPeak/core/SampleGroupProcessor.h>
 
 namespace SmartPeak
 {
 
-  ParameterSet LoadFeaturesSampleGroup::getParameterSchema() const
+  struct StoreFeaturesSampleGroup : SampleGroupProcessor
   {
-    return ParameterSet();
-  }
+    /* IProcessorDescription */
+    virtual std::string getName() const override { return "STORE_FEATURES_SAMPLE_GROUP"; }
+    virtual std::string getDescription() const override { return "Store the features for the sample group."; }
+    virtual ParameterSet getParameterSchema() const override;
 
-  void LoadFeaturesSampleGroup::getFilenames(Filenames& filenames) const
-  {
-    filenames.addFileName("featureXMLSampleGroup_i", "${FEATURES_INPUT_PATH}/${INPUT_GROUP_NAME}.featureXML");
+    /**
+      Store the features for the sample group.
+    */
+    void process(
+      SampleGroupHandler& sampleGroupHandler_IO,
+      const SequenceHandler& sequenceHandler_I,
+      const ParameterSet& params_I,
+      Filenames& filenames_I
+    ) const override;
+
+    /* IFilenamesHandler */
+    virtual void getFilenames(Filenames& filenames) const override;
   };
-
-  void LoadFeaturesSampleGroup::process(SampleGroupHandler& sampleGroupHandler_IO,
-    const SequenceHandler& sequenceHandler_I,
-    const ParameterSet& params_I,
-    Filenames& filenames_I
-  ) const
-  {
-    LOGD << "START LoadFeaturesSampleGroup";
-    getFilenames(filenames_I);
-
-    if (!InputDataValidation::prepareToLoad(filenames_I, "featureXMLSampleGroup_i"))
-    {
-      throw std::invalid_argument("Failed to load input file");
-    }
-
-    try {
-      OpenMS::FeatureXMLFile featurexml;
-      featurexml.load(filenames_I.getFullPath("featureXMLSampleGroup_i").generic_string(), sampleGroupHandler_IO.getFeatureMap());
-    }
-    catch (const std::exception& e) {
-      LOGE << e.what();
-      sampleGroupHandler_IO.getFeatureMap().clear();
-      LOGE << "feature map clear";
-      throw e;
-    }
-
-    LOGD << "END LoadFeaturesSampleGroup";
-  }
-
 }

@@ -21,49 +21,42 @@
 // $Authors: Douglas McCloskey $
 // --------------------------------------------------------------------------
 
-#include <SmartPeak/core/SampleGroupProcessors/LoadFeaturesSampleGroup.h>
+#include <SmartPeak/core/SampleGroupProcessors/StoreFeaturesSampleGroup.h>
 #include <SmartPeak/io/InputDataValidation.h>
 #include <OpenMS/FORMAT/FeatureXMLFile.h>
 
 namespace SmartPeak
 {
 
-  ParameterSet LoadFeaturesSampleGroup::getParameterSchema() const
+  ParameterSet StoreFeaturesSampleGroup::getParameterSchema() const
   {
     return ParameterSet();
   }
 
-  void LoadFeaturesSampleGroup::getFilenames(Filenames& filenames) const
+  void StoreFeaturesSampleGroup::getFilenames(Filenames& filenames) const
   {
-    filenames.addFileName("featureXMLSampleGroup_i", "${FEATURES_INPUT_PATH}/${INPUT_GROUP_NAME}.featureXML");
+    filenames.addFileName("featureXMLSampleGroup_o", "${FEATURES_OUTPUT_PATH}/${OUTPUT_GROUP_NAME}.featureXML");
   };
 
-  void LoadFeaturesSampleGroup::process(SampleGroupHandler& sampleGroupHandler_IO,
+  void StoreFeaturesSampleGroup::process(SampleGroupHandler& sampleGroupHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START LoadFeaturesSampleGroup";
+    LOGD << "START storeFeaturesSampleGroup";
     getFilenames(filenames_I);
 
-    if (!InputDataValidation::prepareToLoad(filenames_I, "featureXMLSampleGroup_i"))
+    if (!InputDataValidation::prepareToStore(filenames_I, "featureXMLSampleGroup_o"))
     {
-      throw std::invalid_argument("Failed to load input file");
+      throw std::invalid_argument("Failed to store output file");
     }
 
-    try {
-      OpenMS::FeatureXMLFile featurexml;
-      featurexml.load(filenames_I.getFullPath("featureXMLSampleGroup_i").generic_string(), sampleGroupHandler_IO.getFeatureMap());
-    }
-    catch (const std::exception& e) {
-      LOGE << e.what();
-      sampleGroupHandler_IO.getFeatureMap().clear();
-      LOGE << "feature map clear";
-      throw e;
-    }
+    // Store outfile as featureXML
+    OpenMS::FeatureXMLFile featurexml;
+    featurexml.store(filenames_I.getFullPath("featureXMLSampleGroup_o").generic_string(), sampleGroupHandler_IO.getFeatureMap());
 
-    LOGD << "END LoadFeaturesSampleGroup";
+    LOGD << "END storeFeaturesSampleGroup";
   }
 
 }

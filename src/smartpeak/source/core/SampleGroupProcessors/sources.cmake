@@ -5,6 +5,7 @@ set(directory source/core/SampleGroupProcessors)
 set(sources_list
 	LoadFeaturesSampleGroup.cpp
 	MergeInjections.cpp
+	StoreFeaturesSampleGroup.cpp
 )
 
 ### add path to the filenames

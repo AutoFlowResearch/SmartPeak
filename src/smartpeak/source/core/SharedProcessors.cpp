@@ -86,6 +86,10 @@
 #include <SmartPeak/core/SequenceSegmentProcessors/StoreStandardsConcentrations.h>
 #include <SmartPeak/core/SequenceSegmentProcessors/TransferLOQToFeatureFilters.h>
 #include <SmartPeak/core/SequenceSegmentProcessors/TransferLOQToFeatureQCs.h>
+#include <SmartPeak/core/SampleGroupProcessors/MergeInjections.h>
+#include <SmartPeak/core/SampleGroupProcessors/LoadFeaturesSampleGroup.h>
+#include <SmartPeak/core/SampleGroupProcessors/StoreFeaturesSampleGroup.h>
+
 
 #include <map>
 #include <memory>

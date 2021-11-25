@@ -16,6 +16,7 @@ set(SmartPeak_sources_h  CACHE INTERNAL "This variable should hold all SmartPeak
 include(include/SmartPeak/core/sources.cmake)
 include(include/SmartPeak/core/RawDataProcessors/sources.cmake)
 include(include/SmartPeak/core/SequenceSegmentProcessors/sources.cmake)
+include(include/SmartPeak/core/SampleGroupProcessors/sources.cmake)
 include(include/SmartPeak/cli/sources.cmake)
 include(include/SmartPeak/iface/sources.cmake)
 include(include/SmartPeak/algorithm/sources.cmake)

@@ -21,13 +21,9 @@
 // $Authors: Douglas McCloskey $
 // --------------------------------------------------------------------------
 
-#include <SmartPeak/core/SampleGroupProcessor.h>
-#include <SmartPeak/core/SequenceHandler.h>
+#include <SmartPeak/core/SampleGroupProcessors/MergeInjections.h>
 #include <SmartPeak/core/FeatureMetadata.h>
-#include <SmartPeak/io/InputDataValidation.h>
-#include <OpenMS/FORMAT/FeatureXMLFile.h>
 #include <SmartPeak/io/SelectDilutionsParser.h>
-#include <plog/Log.h>
 
 namespace SmartPeak
 {
