@@ -24,7 +24,6 @@
 #pragma once
 
 #include <SmartPeak/core/Filenames.h>
-#include <SmartPeak/core/MetaDataHandler.h>
 #include <SmartPeak/core/SampleType.h>
 #include <SmartPeak/core/SequenceHandler.h>
 #include <SmartPeak/core/SequenceSegmentHandler.h>
@@ -33,7 +32,6 @@
 #include <SmartPeak/core/Parameters.h>
 #include <SmartPeak/core/SequenceSegmentObservable.h>
 #include <SmartPeak/iface/IFilePickerHandler.h>
-#include <SmartPeak/core/FeatureFiltersUtilsMode.h>
 
 namespace SmartPeak
 {

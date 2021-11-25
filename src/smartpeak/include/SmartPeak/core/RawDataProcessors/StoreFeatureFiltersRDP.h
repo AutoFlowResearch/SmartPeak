@@ -23,18 +23,9 @@
 
 #pragma once
 
-#include <SmartPeak/core/Filenames.h>
-#include <SmartPeak/core/MetaDataHandler.h>
-#include <SmartPeak/core/RawDataHandler.h>
-#include <SmartPeak/core/Parameters.h>
-#include <SmartPeak/iface/IProcessorDescription.h>
-#include <SmartPeak/core/WorkflowObservable.h>
-#include <SmartPeak/core/ParametersObservable.h>
-#include <SmartPeak/core/TransitionsObservable.h>
-#include <SmartPeak/iface/IFilePickerHandler.h>
-#include <SmartPeak/iface/IFilenamesHandler.h>
-#include <SmartPeak/core/FeatureFiltersUtilsMode.h>
 #include <SmartPeak/core/RawDataProcessor.h>
+#include <SmartPeak/core/FeatureFiltersUtilsMode.h>
+#include <SmartPeak/core/ApplicationHandler.h>
 
 #include <map>
 #include <vector>

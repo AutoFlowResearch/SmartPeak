@@ -24,6 +24,7 @@
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/Utilities.h>
 #include <SmartPeak/core/FeatureFiltersUtils.h>
+#include <SmartPeak/core/FeatureFiltersUtilsMode.h>
 
 #include <plog/Log.h>
 
