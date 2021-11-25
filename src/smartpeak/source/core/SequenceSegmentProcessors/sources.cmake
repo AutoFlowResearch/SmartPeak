@@ -3,7 +3,35 @@ set(directory source/core/SequenceSegmentProcessors)
 
 ### list all filenames of the directory here
 set(sources_list
+	CalculateCalibration.cpp
+	EstimateFeatureBackgroundInterferences.cpp
+	EstimateFeatureFilterValues.cpp
+	EstimateFeatureQCValues.cpp
+	EstimateFeatureRSDs.cpp
+	LoadFeatureBackgroundEstimations.cpp
+	LoadFeatureBackgroundFilters.cpp
+	LoadFeatureBackgroundQCs.cpp
+	LoadFeatureFilters.cpp
+	LoadFeatureQCs.cpp
+	LoadFeatureRSDEstimations.cpp
+	LoadFeatureRSDFilters.cpp
+	LoadFeatureRSDQCs.cpp
+	LoadQuantitationMethods.cpp
+	LoadStandardsConcentrations.cpp
 	SequenceSegmentProcessor.cpp
+	sources.cmake
+	StoreFeatureBackgroundEstimations.cpp
+	StoreFeatureBackgroundFilters.cpp
+	StoreFeatureBackgroundQCs.cpp
+	StoreFeatureFilters.cpp
+	StoreFeatureQCs.cpp
+	StoreFeatureRSDEstimations.cpp
+	StoreFeatureRSDFilters.cpp
+	StoreFeatureRSDQCs.cpp
+	StoreQuantitationMethods.cpp
+	StoreStandardsConcentrations.cpp
+	TransferLOQToFeatureFilters.cpp
+	TransferLOQToFeatureQCs.cpp
 )
 
 ### add path to the filenames

@@ -41,41 +41,55 @@
 namespace SmartPeak
 {
 
-  void SequenceSegmentProcessor::getSampleIndicesBySampleType(
-    const SequenceSegmentHandler& sequenceSegmentHandler,
-    const SequenceHandler& sequenceHandler,
-    const SampleType sampleType,
-    std::vector<size_t>& sampleIndices
-  )
+  std::vector<std::string> LoadFeatureRSDEstimations::getRequirements() const
   {
-    sampleIndices.clear();
-    for (const size_t index : sequenceSegmentHandler.getSampleIndices()) {
-      if (sequenceHandler.getSequence().at(index).getMetaData().getSampleType() == sampleType) {
-        sampleIndices.push_back(index);
-      }
-    }
+    return { "sequence", "traML" };
   }
 
-  void SequenceSegmentProcessor::processForAllSegments(
-    std::vector<SmartPeak::SequenceSegmentHandler>& sequence_segment_handlers,
-    SequenceSegmentObservable* sequence_segment_observable,
-    Filenames& filenames)
+  ParameterSet LoadFeatureRSDEstimations::getParameterSchema() const
   {
-    for (SequenceSegmentHandler& sequence_segment_handler : sequence_segment_handlers) {
-      sequence_segment_observable_ = sequence_segment_observable;
-      process(sequence_segment_handler, SequenceHandler(), {}, filenames);
-    }
+    return ParameterSet();
   }
 
-  std::string SequenceSegmentProcessor::constructFilename(const std::string& filename, bool static_filename) const
+  void LoadFeatureRSDEstimations::getFilenames(Filenames& filenames) const
   {
-    if (static_filename)
+    if (feature_filter_mode_ & FeatureFiltersUtilsMode::EFeatureFiltersModeGroup)
     {
-      return "${MAIN_DIR}/" + filename;
+      filenames.addFileName("featureRSDEstimationComponentGroups",
+        constructFilename("featureRSDEstimationComponentGroups.csv", static_filenames_),
+        "Feature RSD Estimation Component Groups",
+        true,
+        true);
     }
-    else
+    else if (feature_filter_mode_ & FeatureFiltersUtilsMode::EFeatureFiltersModeComponent)
     {
-      return "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}_" + filename;
+      filenames.addFileName("featureRSDEstimationComponents",
+        constructFilename("featureRSDEstimationComponents.csv", static_filenames_),
+        "Feature RSD Estimation Component",
+        true,
+        true);
     }
+  };
+
+  void LoadFeatureRSDEstimations::process(
+    SequenceSegmentHandler& sequenceSegmentHandler_IO,
+    const SequenceHandler& sequenceHandler_I,
+    const ParameterSet& params_I,
+    Filenames& filenames_I
+  ) const
+  {
+    LOGD << "START loadFeatureRSDEstimation";
+    getFilenames(filenames_I);
+    FeatureFiltersUtils::loadFeatureFilters(
+      "featureRSDEstimationComponents",
+      "featureRSDEstimationComponentGroups",
+      filenames_I,
+      sequenceSegmentHandler_IO.getFeatureRSDEstimations(),
+      nullptr,
+      nullptr,
+      feature_filter_mode_
+    );
+    LOGD << "END loadFeatureRSDEstimation";
   }
+
 }

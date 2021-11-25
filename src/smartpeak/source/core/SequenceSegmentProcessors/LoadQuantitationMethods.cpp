@@ -41,41 +41,62 @@
 namespace SmartPeak
 {
 
-  void SequenceSegmentProcessor::getSampleIndicesBySampleType(
-    const SequenceSegmentHandler& sequenceSegmentHandler,
-    const SequenceHandler& sequenceHandler,
-    const SampleType sampleType,
-    std::vector<size_t>& sampleIndices
-  )
+  std::vector<std::string> LoadQuantitationMethods::getRequirements() const
   {
-    sampleIndices.clear();
-    for (const size_t index : sequenceSegmentHandler.getSampleIndices()) {
-      if (sequenceHandler.getSequence().at(index).getMetaData().getSampleType() == sampleType) {
-        sampleIndices.push_back(index);
-      }
-    }
+    return { "sequence", "traML" };
   }
 
-  void SequenceSegmentProcessor::processForAllSegments(
-    std::vector<SmartPeak::SequenceSegmentHandler>& sequence_segment_handlers,
-    SequenceSegmentObservable* sequence_segment_observable,
-    Filenames& filenames)
+  ParameterSet LoadQuantitationMethods::getParameterSchema() const
   {
-    for (SequenceSegmentHandler& sequence_segment_handler : sequence_segment_handlers) {
-      sequence_segment_observable_ = sequence_segment_observable;
-      process(sequence_segment_handler, SequenceHandler(), {}, filenames);
-    }
+    return ParameterSet();
   }
 
-  std::string SequenceSegmentProcessor::constructFilename(const std::string& filename, bool static_filename) const
+  void LoadQuantitationMethods::getFilenames(Filenames& filenames) const
   {
-    if (static_filename)
+    filenames.addFileName("quantitationMethods", constructFilename("quantitationMethods.csv", static_filenames_), "Quantitation Methods");
+  };
+
+  bool LoadQuantitationMethods::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
+  {
+    if (application_handler->sequenceHandler_.getSequence().size() == 0)
     {
-      return "${MAIN_DIR}/" + filename;
+      LOGE << "File cannot be loaded without first loading the sequence.";
+      return false;
     }
-    else
-    {
-      return "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}_" + filename;
-    }
+    Filenames filenames;
+    filenames.setFullPath("quantitationMethods", filename);
+    processForAllSegments(application_handler->sequenceHandler_.getSequenceSegments(),
+      &(application_handler->sequenceHandler_),
+      filenames);
+    return true;
   }
+
+  void LoadQuantitationMethods::process(
+    SequenceSegmentHandler& sequenceSegmentHandler_IO,
+    const SequenceHandler& sequenceHandler_I,
+    const ParameterSet& params_I,
+    Filenames& filenames_I
+  ) const
+  {
+    LOGD << "START loadQuantitationMethods";
+    getFilenames(filenames_I);
+
+    if (!InputDataValidation::prepareToLoad(filenames_I, "quantitationMethods"))
+    {
+      throw std::invalid_argument("Failed to load input file");
+    }
+
+    try {
+      OpenMS::AbsoluteQuantitationMethodFile AQMf;
+      AQMf.load(filenames_I.getFullPath("quantitationMethods").generic_string(), sequenceSegmentHandler_IO.getQuantitationMethods());
+      if (sequence_segment_observable_) sequence_segment_observable_->notifyQuantitationMethodsUpdated();
+    }
+    catch (const std::exception& e) {
+      LOGE << e.what();
+      sequenceSegmentHandler_IO.getQuantitationMethods().clear();
+      LOGI << "quantitation methods clear";
+    }
+    LOGD << "END loadQuantitationMethods";
+  }
+
 }

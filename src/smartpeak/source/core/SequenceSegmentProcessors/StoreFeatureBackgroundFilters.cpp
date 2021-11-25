@@ -41,41 +41,66 @@
 namespace SmartPeak
 {
 
-  void SequenceSegmentProcessor::getSampleIndicesBySampleType(
-    const SequenceSegmentHandler& sequenceSegmentHandler,
-    const SequenceHandler& sequenceHandler,
-    const SampleType sampleType,
-    std::vector<size_t>& sampleIndices
-  )
+  std::vector<std::string> StoreFeatureBackgroundFilters::getRequirements() const
   {
-    sampleIndices.clear();
-    for (const size_t index : sequenceSegmentHandler.getSampleIndices()) {
-      if (sequenceHandler.getSequence().at(index).getMetaData().getSampleType() == sampleType) {
-        sampleIndices.push_back(index);
-      }
-    }
+    return { "sequence", "traML" };
   }
 
-  void SequenceSegmentProcessor::processForAllSegments(
-    std::vector<SmartPeak::SequenceSegmentHandler>& sequence_segment_handlers,
-    SequenceSegmentObservable* sequence_segment_observable,
-    Filenames& filenames)
+  ParameterSet StoreFeatureBackgroundFilters::getParameterSchema() const
   {
-    for (SequenceSegmentHandler& sequence_segment_handler : sequence_segment_handlers) {
-      sequence_segment_observable_ = sequence_segment_observable;
-      process(sequence_segment_handler, SequenceHandler(), {}, filenames);
-    }
+    return ParameterSet();
   }
 
-  std::string SequenceSegmentProcessor::constructFilename(const std::string& filename, bool static_filename) const
+  bool StoreFeatureBackgroundFilters::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
   {
-    if (static_filename)
+    Filenames filenames;
+    if (!FeatureFiltersUtils::onFilePicked(
+      filename,
+      application_handler,
+      filenames,
+      "featureBackgroundFilterComponents",
+      "featureBackgroundFilterComponentGroups",
+      feature_filter_mode_))
     {
-      return "${MAIN_DIR}/" + filename;
+      return false;
     }
-    else
-    {
-      return "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}_" + filename;
-    }
+    sequence_segment_observable_ = &application_handler->sequenceHandler_;
+    process(application_handler->sequenceHandler_.getSequenceSegments()[0], SequenceHandler(), {}, filenames);
+    return true;
   }
+
+  void StoreFeatureBackgroundFilters::getFilenames(Filenames& filenames) const
+  {
+    if (feature_filter_mode_ & FeatureFiltersUtilsMode::EFeatureFiltersModeGroup)
+    {
+      filenames.addFileName("featureBackgroundFilterComponentGroups",
+                            constructFilename("featureBackgroundFilterComponentGroups.csv", static_filenames_),
+                            "Components Group % Background Filters");
+    }
+    else if (feature_filter_mode_ & FeatureFiltersUtilsMode::EFeatureFiltersModeComponent)
+    {
+      filenames.addFileName("featureBackgroundFilterComponents",
+                            constructFilename("featureBackgroundFilterComponents.csv", static_filenames_),
+                            "Components % Background Filters");
+    }
+  };
+
+  void StoreFeatureBackgroundFilters::process(
+    SequenceSegmentHandler& sequenceSegmentHandler_IO,
+    const SequenceHandler& sequenceHandler_I,
+    const ParameterSet& params_I,
+    Filenames& filenames_I
+  ) const
+  {
+    LOGD << "START storeFeatureBackgroundFilter";
+    getFilenames(filenames_I);
+    FeatureFiltersUtils::storeFeatureFilters(
+      "featureBackgroundFilterComponents",
+      "featureBackgroundFilterComponentGroups",
+      filenames_I,
+      sequenceSegmentHandler_IO.getFeatureBackgroundFilter(),
+      feature_filter_mode_);
+    LOGD << "END storeFeatureBackgroundFilter";
+  }
+
 }
