@@ -29,6 +29,9 @@
 
 #include <SmartPeak/core/ApplicationProcessor.h>
 #include <SmartPeak/core/SequenceProcessor.h>
+#include <SmartPeak/core/ApplicationProcessors/BuildCommandsFromNames.h>
+#include <SmartPeak/core/ApplicationProcessors/LoadSession.h>
+
 #include <filesystem>
 
 

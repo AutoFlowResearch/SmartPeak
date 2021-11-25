@@ -30,6 +30,7 @@
 #include <SmartPeak/core/Utilities.h>
 #include <SmartPeak/core/RawDataProcessors/LoadTransitions.h>
 #include <SmartPeak/core/SequenceSegmentProcessors/LoadQuantitationMethods.h>
+#include <SmartPeak/core/ApplicationProcessors/LoadSession.h>
 
 using namespace SmartPeak;
 using namespace std;

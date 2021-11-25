@@ -23,40 +23,24 @@
 
 #pragma once
 
-#include <SmartPeak/ui/Widget.h>
-#include <SmartPeak/ui/WorkflowStepWidget.h>
-#include <SmartPeak/core/ApplicationHandler.h>
-#include <SmartPeak/core/WorkflowManager.h>
 #include <SmartPeak/core/ApplicationProcessor.h>
-#include <SmartPeak/core/ApplicationProcessors/BuildCommandsFromNames.h>
-#include <string>
-#include <vector>
 
 namespace SmartPeak
 {
-  class WorkflowWidget : public Widget
+
+  struct LoadFilenames : ApplicationProcessor
   {
-  public:
+    LoadFilenames() = default;
+    explicit LoadFilenames(ApplicationHandler& application_handler) : ApplicationProcessor(application_handler) {}
 
-    WorkflowWidget(const std::string title, ApplicationHandler& application_handler, WorkflowManager& workflow_manager)
-      : Widget(title),
-      application_handler_(application_handler),
-      workflow_step_widget_(application_handler),
-      workflow_manager_(workflow_manager),
-      buildCommandsFromNames_(application_handler)
-    {
-    };
+    /* ApplicationProcessor */
+    bool process() override;
 
-    void draw() override;
+    /* IProcessorDescription */
+    virtual std::string getName() const override { return "LOAD_FILENAMES"; }
+    virtual std::string getDescription() const override { return "Load Filenames from the DB"; }
 
-  protected:
-    virtual void updatecommands();
-
-  protected:
-    ApplicationHandler& application_handler_;
-    WorkflowStepWidget workflow_step_widget_;
-    WorkflowManager& workflow_manager_;
-    BuildCommandsFromNames buildCommandsFromNames_;
-    bool error_building_commands_ = false;
+    static std::optional<Filenames> loadFilenamesFromDB(const std::filesystem::path& path_db);
   };
+
 }

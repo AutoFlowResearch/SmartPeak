@@ -32,6 +32,7 @@
 #include <SmartPeak/core/SequenceSegmentProcessors/StoreFeatureRSDEstimations.h>
 #include <SmartPeak/core/SequenceSegmentProcessors/EstimateFeatureBackgroundInterferences.h>
 #include <SmartPeak/core/SequenceSegmentProcessors/EstimateFeatureRSDs.h>
+#include <SmartPeak/core/ApplicationProcessors/LoadSession.h>
 
 using namespace SmartPeak;
 using namespace std;

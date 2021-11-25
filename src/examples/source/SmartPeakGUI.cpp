@@ -70,6 +70,7 @@
 #include <SmartPeak/core/SequenceSegmentProcessors/StoreFeatureRSDQCs.h>
 #include <SmartPeak/core/SequenceSegmentProcessors/StoreQuantitationMethods.h>
 #include <SmartPeak/core/SequenceSegmentProcessors/StoreStandardsConcentrations.h>
+#include <SmartPeak/core/ApplicationProcessors/SaveSession.h>
 #include <plog/Log.h>
 #include <plog/Appenders/ConsoleAppender.h>
 #include <plog/Appenders/ColorConsoleAppender.h>

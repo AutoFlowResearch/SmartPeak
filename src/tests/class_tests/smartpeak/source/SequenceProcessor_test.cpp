@@ -31,6 +31,7 @@
 #include <SmartPeak/core/RawDataProcessors/LoadFeatures.h>
 #include <SmartPeak/core/SequenceSegmentProcessors/CalculateCalibration.h>
 #include <SmartPeak/core/SampleGroupProcessors/MergeInjections.h>
+#include <SmartPeak/core/ApplicationProcessors/LoadSession.h>
 #include <filesystem>
 
 using namespace SmartPeak;

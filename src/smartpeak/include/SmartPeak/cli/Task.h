@@ -34,6 +34,7 @@
 #include <SmartPeak/core/SharedProcessors.h>
 #include <SmartPeak/io/SequenceParser.h>
 #include <SmartPeak/io/InputDataValidation.h>
+#include <SmartPeak/core/ApplicationProcessors/BuildCommandsFromNames.h>
 
 #include <SmartPeak/cli/ApplicationManager.h>
 

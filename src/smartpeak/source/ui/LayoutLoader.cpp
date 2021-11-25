@@ -25,6 +25,8 @@
 
 #include <SmartPeak/ui/LayoutLoader.h>
 #include <SmartPeak/core/ApplicationProcessor.h>
+#include <SmartPeak/core/ApplicationProcessors/SavePropertiesHandlers.h>
+#include <SmartPeak/core/ApplicationProcessors/LoadPropertiesHandlers.h>
 
 namespace SmartPeak
 {

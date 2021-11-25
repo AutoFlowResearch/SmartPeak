@@ -27,6 +27,8 @@
 #include <SmartPeak/core/ApplicationProcessor.h>
 #include <SmartPeak/core/SequenceProcessor.h>
 #include <SmartPeak/core/Filenames.h>
+#include <SmartPeak/core/ApplicationProcessors/BuildCommandsFromNames.h>
+#include <SmartPeak/core/ApplicationProcessors/CreateCommand.h>
 #include <filesystem>
 
 using namespace SmartPeak;

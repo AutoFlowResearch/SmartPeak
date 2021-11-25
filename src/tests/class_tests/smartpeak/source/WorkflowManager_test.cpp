@@ -25,6 +25,8 @@
 #include <SmartPeak/test_config.h>
 #include <SmartPeak/core/WorkflowManager.h>
 #include <SmartPeak/core/ApplicationProcessor.h>
+#include <SmartPeak/core/ApplicationProcessors/BuildCommandsFromNames.h>
+
 
 using namespace SmartPeak;
 using namespace std;

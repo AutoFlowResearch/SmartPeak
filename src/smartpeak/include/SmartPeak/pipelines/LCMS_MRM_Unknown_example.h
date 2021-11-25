@@ -36,6 +36,7 @@
 #include <SmartPeak/core/RawDataProcessors/QuantifyFeatures.h>
 #include <SmartPeak/core/RawDataProcessors/CheckFeatures.h>
 #include <SmartPeak/core/RawDataProcessors/StoreFeatures.h>
+#include <SmartPeak/core/ApplicationProcessors/LoadSession.h>
 
 using namespace SmartPeak;
 

@@ -26,6 +26,7 @@
 #include <imgui.h>
 #include <plog/Log.h>
 #include <SmartPeak/core/SharedProcessors.h>
+#include <SmartPeak/core/ApplicationProcessors/BuildCommandsFromNames.h>
 
 namespace SmartPeak
 {

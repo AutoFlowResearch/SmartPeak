@@ -32,6 +32,7 @@
 #include <SmartPeak/core/RawDataProcessors/SearchAccurateMass.h>
 #include <SmartPeak/core/RawDataProcessors/StoreAnnotations.h>
 #include <SmartPeak/core/RawDataProcessors/StoreFeatures.h>
+#include <SmartPeak/core/ApplicationProcessors/LoadSession.h>
 
 using namespace SmartPeak;
 

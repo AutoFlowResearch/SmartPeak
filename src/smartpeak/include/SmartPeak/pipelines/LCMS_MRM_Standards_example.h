@@ -38,6 +38,7 @@
 #include <SmartPeak/core/RawDataProcessors/QuantifyFeatures.h>
 #include <SmartPeak/core/SequenceSegmentProcessors/StoreQuantitationMethods.h>
 #include <SmartPeak/core/SequenceSegmentProcessors/CalculateCalibration.h>
+#include <SmartPeak/core/ApplicationProcessors/LoadSession.h>
 
 using namespace SmartPeak;
 

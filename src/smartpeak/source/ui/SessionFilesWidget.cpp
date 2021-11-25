@@ -25,6 +25,7 @@
 #include <SmartPeak/core/ApplicationProcessor.h>
 #include <SmartPeak/core/SharedProcessors.h>
 #include <SmartPeak/core/SequenceProcessor.h>
+#include <SmartPeak/core/ApplicationProcessors/LoadSession.h>
 
 #include <imgui.h>
 #include <plog/Log.h>

@@ -51,6 +51,8 @@
 #include <SmartPeak/core/SequenceSegmentProcessors/StoreFeatureRSDQCs.h>
 #include <SmartPeak/core/SequenceSegmentProcessors/StoreQuantitationMethods.h>
 #include <SmartPeak/core/SequenceSegmentProcessors/StoreStandardsConcentrations.h>
+#include <SmartPeak/core/ApplicationProcessors/BuildCommandsFromNames.h>
+
 
 namespace SmartPeak
 {
