@@ -29,13 +29,8 @@
 #include <SmartPeak/core/Utilities.h>
 #include <SmartPeak/core/ApplicationHandler.h>
 #include <SmartPeak/core/FeatureFiltersUtils.h>
-#include <OpenMS/ANALYSIS/QUANTITATION/AbsoluteQuantitation.h>
-#include <OpenMS/METADATA/AbsoluteQuantitationStandards.h>
-#include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureFilter.h>
 #include <SmartPeak/io/InputDataValidation.h>
-#include <OpenMS/FORMAT/AbsoluteQuantitationStandardsFile.h>
-#include <OpenMS/FORMAT/AbsoluteQuantitationMethodFile.h>
-#include <OpenMS/FORMAT/MRMFeatureQCFile.h>  // load featureFilter and featureQC
+
 #include <plog/Log.h>
 
 namespace SmartPeak
