@@ -100,7 +100,7 @@ TEST(PlotExporter, plot)
   heatmap_pdf->setGNUPLOTPath(gnuplot_path);
   EXPECT_TRUE(heatmap_pdf->plot());
   EXPECT_TRUE(std::filesystem::exists(main_path / "smartpeak-exported-plot.pdf"));
-  EXPECT_TRUE(std::filesystem::file_size(main_path / "smartpeak-exported-plot.pdf") > 10000 );
+  EXPECT_TRUE(std::filesystem::file_size(main_path / "smartpeak-exported-plot.pdf") > 1000 );
   
   auto curve_svg = std::make_unique<SmartPeak::PlotExporter>(main_path.string(), graph_viz_data_, 2,
                                                                 SmartPeak::PlotExporter::PlotType::CURVE);
