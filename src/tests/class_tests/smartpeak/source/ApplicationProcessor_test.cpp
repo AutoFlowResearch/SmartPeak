@@ -24,7 +24,6 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include <SmartPeak/test_config.h>
-#include <SmartPeak/core/ApplicationProcessor.h>
 #include <SmartPeak/core/SequenceProcessor.h>
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/ApplicationProcessors/BuildCommandsFromNames.h>

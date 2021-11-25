@@ -21,7 +21,6 @@
 // $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
 // --------------------------------------------------------------------------
 
-#include <SmartPeak/core/ApplicationProcessor.h>
 #include <SmartPeak/ui/ParametersTableWidget.h>
 #include <algorithm>
 #include <map>

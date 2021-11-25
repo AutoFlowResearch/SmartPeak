@@ -22,7 +22,6 @@
 // --------------------------------------------------------------------------
 
 #include <SmartPeak/ui/LoadSessionWizard.h>
-#include <SmartPeak/core/ApplicationProcessor.h>
 #include <SmartPeak/core/ApplicationProcessors/LoadSession.h>
 #include <SmartPeak/core/ApplicationProcessors/LoadFilenames.h>
 #include <plog/Log.h>

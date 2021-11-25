@@ -22,7 +22,6 @@
 // --------------------------------------------------------------------------
 
 #include <SmartPeak/ui/SessionFilesWidget.h>
-#include <SmartPeak/core/ApplicationProcessor.h>
 #include <SmartPeak/core/SharedProcessors.h>
 #include <SmartPeak/core/SequenceProcessor.h>
 #include <SmartPeak/core/ApplicationProcessors/LoadSession.h>

@@ -22,7 +22,6 @@
 // --------------------------------------------------------------------------
 
 #include <SmartPeak/core/ApplicationHandler.h>
-#include <SmartPeak/core/ApplicationProcessor.h>
 #include <SmartPeak/core/FeatureMetadata.h>
 #include <SmartPeak/core/SampleType.h>
 #include <SmartPeak/core/SequenceHandler.h>

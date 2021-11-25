@@ -27,7 +27,6 @@
 #include <SmartPeak/iface/ISampleGroupProcessorObserver.h>
 #include <SmartPeak/iface/ISequenceSegmentProcessorObserver.h>
 
-#include <SmartPeak/core/ApplicationProcessor.h>
 #include <SmartPeak/core/SequenceProcessor.h>
 #include <SmartPeak/core/ApplicationProcessors/BuildCommandsFromNames.h>
 #include <SmartPeak/core/ApplicationProcessors/LoadSession.h>

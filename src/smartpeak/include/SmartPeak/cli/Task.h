@@ -27,7 +27,6 @@
 #include <plog/Log.h>
 
 #include <SmartPeak/core/ApplicationHandler.h>
-#include <SmartPeak/core/ApplicationProcessor.h>
 #include <SmartPeak/core/WorkflowManager.h>
 #include <SmartPeak/core/SessionHandler.h>
 #include <SmartPeak/core/FeatureMetadata.h>

@@ -22,7 +22,6 @@
 // --------------------------------------------------------------------------
 
 #include <SmartPeak/ui/WorkflowStepWidget.h>
-#include <SmartPeak/core/ApplicationProcessor.h>
 #include <imgui.h>
 #include <plog/Log.h>
 #include <SmartPeak/core/SharedProcessors.h>

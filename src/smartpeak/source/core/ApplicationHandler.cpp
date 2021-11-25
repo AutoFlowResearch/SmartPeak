@@ -22,7 +22,6 @@
 // --------------------------------------------------------------------------
 
 #include <SmartPeak/core/ApplicationHandler.h>
-#include <SmartPeak/core/ApplicationProcessor.h>
 #include <SmartPeak/core/SharedProcessors.h>
 #include <SmartPeak/core/SequenceProcessor.h>
 #include <SmartPeak/core/RawDataProcessors/LoadTransitions.h>

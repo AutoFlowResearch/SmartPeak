@@ -23,6 +23,7 @@
 #pragma once
 
 #include <SmartPeak/iface/IFilePickerHandler.h>
+#include <SmartPeak/core/ApplicationHandler.h>
 #include <SmartPeak/core/ApplicationProcessorObservable.h>
 #include <SmartPeak/ui/SessionFilesWidget.h>
 #include <SmartPeak/ui/SetInputOutputWidget.h>

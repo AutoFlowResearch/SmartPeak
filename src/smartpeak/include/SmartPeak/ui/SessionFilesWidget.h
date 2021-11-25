@@ -24,6 +24,7 @@
 
 #include <SmartPeak/ui/Widget.h>
 #include <SmartPeak/core/ApplicationHandler.h>
+#include <SmartPeak/core/WorkflowManager.h>
 #include <SmartPeak/ui/FilePicker.h>
 #include <misc/cpp/imgui_stdlib.h>
 #include <string>

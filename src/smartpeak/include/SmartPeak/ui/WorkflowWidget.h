@@ -27,7 +27,6 @@
 #include <SmartPeak/ui/WorkflowStepWidget.h>
 #include <SmartPeak/core/ApplicationHandler.h>
 #include <SmartPeak/core/WorkflowManager.h>
-#include <SmartPeak/core/ApplicationProcessor.h>
 #include <SmartPeak/core/ApplicationProcessors/BuildCommandsFromNames.h>
 #include <string>
 #include <vector>

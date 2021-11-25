@@ -22,7 +22,6 @@
 // --------------------------------------------------------------------------
 
 #include <SmartPeak/ui/SetInputOutputWidget.h>
-#include <SmartPeak/core/ApplicationProcessor.h>
 #include <imgui.h>
 #include <misc/cpp/imgui_stdlib.h>
 #include <plog/Log.h>
