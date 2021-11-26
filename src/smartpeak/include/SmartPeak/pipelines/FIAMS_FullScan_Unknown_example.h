@@ -27,7 +27,7 @@
 #include <SmartPeak/core/RawDataProcessors/LoadRawData.h>
 #include <SmartPeak/core/RawDataProcessors/ExtractSpectraWindows.h>
 #include <SmartPeak/core/RawDataProcessors/MergeSpectra.h>
-#include <SmartPeak/core/RawDataProcessors/PickMS1Features.h>
+#include <SmartPeak/core/RawDataProcessors/Pick2DFeatures.h>
 #include <SmartPeak/core/RawDataProcessors/SearchAccurateMass.h>
 #include <SmartPeak/core/RawDataProcessors/StoreAnnotations.h>
 #include <SmartPeak/core/RawDataProcessors/StoreFeatures.h>
@@ -53,7 +53,7 @@ void example_FIAMS_FullScan_Unknowns(
     std::make_shared<LoadRawData>(),
     std::make_shared<ExtractSpectraWindows>(),
     std::make_shared<MergeSpectra>(),
-    std::make_shared<PickMS1Features>(),
+    std::make_shared<Pick2DFeatures>(),
     std::make_shared<SearchAccurateMass>(),
     std::make_shared<StoreAnnotations>(),
     std::make_shared<StoreFeatures>()

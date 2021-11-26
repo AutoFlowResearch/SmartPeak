@@ -33,16 +33,14 @@
 namespace SmartPeak
 {
 
-  struct PickMS2Features : RawDataProcessor
+  struct Pick3DFeatures : RawDataProcessor
   {
     /* IProcessorDescription */
-    virtual std::string getName() const override { return "PICK_MS2_FEATURES"; }
-    virtual std::string getDescription() const override { return "Pick MS2 Features"; }
+    virtual std::string getName() const override { return "PICK_3D_FEATURES"; }
+    virtual std::string getDescription() const override { return "Pick 3D Features"; }
     virtual ParameterSet getParameterSchema() const override;
     virtual std::vector<std::string> getRequirements() const override;
 
-    /** PickMS2Features
-     */
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,

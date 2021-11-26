@@ -29,9 +29,9 @@ set(sources_list_h
 	MapChromatograms.h
 	MergeFeatures.h
 	MergeSpectra.h
+	Pick2DFeatures.h
+	Pick3DFeatures.h
 	PickMRMFeatures.h
-	PickMS1Features.h
-	PickMS2Features.h
 	PlotFeatures.h
 	QuantifyFeatures.h
 	SearchAccurateMass.h
