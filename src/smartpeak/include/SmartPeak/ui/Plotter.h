@@ -111,6 +111,12 @@ namespace SmartPeak {
       CURVE,
       HEATMAP
     };
+    
+    enum class ExportedFormat {
+      PNG,
+      PDF,
+      SVG
+    };
   
     PlotExporter(std::string output_path, SessionHandler::GraphVizData& graphvis_data, int format, PlotType plot_type);
     
@@ -165,11 +171,6 @@ namespace SmartPeak {
     void generatePDF_();
     
     /*
-    @brief generates HTML plots
-    */
-    void generateHTML_();
-    
-    /*
     @brief generates SVG plots
     */
     void generateSVG_();
@@ -192,27 +193,27 @@ namespace SmartPeak {
     @param[in] fout filestream to append to
     @param[in] path to generated gnuplot script
     */
-    void generatePlot_(std::ofstream &fout, const std::string &filename);
+    void generatePlot_(std::ofstream &fout, const std::string &filename, const ExportedFormat exported_format);
     
-    uint        nr_plots_;
-    bool        with_grid_;
-    std::string output_path_;
-    std::string filename = "smartpeak-exported-plot";
-    std::string x_title_;
-    std::string y_title_;
-    std::string plot_title_;
-    std::string gnuplot_path_;
-    uint        file_width_;
-    uint        file_height_;
-    PlotType    plot_type_;
+    uint            nr_plots_;
+    bool            with_grid_;
+    std::string     output_path_;
+    std::string     filename = "smartpeak-exported-plot";
+    std::string     x_title_;
+    std::string     y_title_;
+    std::string     plot_title_;
+    std::string     gnuplot_path_;
+    uint            file_width_;
+    uint            file_height_;
+    PlotType        plot_type_;
+    ExportedFormat  exported_format_;
     
     std::vector<PlotLineProperties> plotlines_properties_;
-    SessionHandler::GraphVizData graphvis_data_;
-    SessionHandler::HeatMapData heatmap_data_;
+    SessionHandler::GraphVizData    graphvis_data_;
+    SessionHandler::HeatMapData     heatmap_data_;
     
     bool plot_PNG_  = false;
     bool plot_PDF_  = false;
-    bool plot_HTML_ = false;
     bool plot_SVG_  = false;
   };
 }

@@ -173,11 +173,10 @@ namespace SmartPeak {
       file_height_(800),
       gnuplot_path_("gnuplot")
   {
-    //PNG=0, PDF=1, HTML=2, SVG=3
+    //PNG=0, PDF=1, SVG=2
     if (format == 0) plot_PNG_ = true;
     if (format == 1) plot_PDF_ = true;
-    if (format == 2) plot_HTML_ = true;
-    if (format == 3) plot_SVG_ = true;
+    if (format == 2) plot_SVG_ = true;
   }
 
   PlotExporter::PlotExporter(std::string output_path, SessionHandler::HeatMapData& heatmap_data, int format, PlotType plot_type)
@@ -192,11 +191,10 @@ namespace SmartPeak {
       file_height_(800),
       gnuplot_path_("gnuplot")
   {
-    //PNG=0, PDF=1, HTML=2, SVG=3
+    //PNG=0, PDF=1, SVG=2
     if (format == 0) plot_PNG_ = true;
     if (format == 1) plot_PDF_ = true;
-    if (format == 2) plot_HTML_ = true;
-    if (format == 3) plot_SVG_ = true;
+    if (format == 2) plot_SVG_ = true;
   }
 
   bool PlotExporter::plot()
@@ -260,9 +258,6 @@ namespace SmartPeak {
      }
      if (plot_PDF_) {
        generatePDF_();
-     }
-     if (plot_HTML_) {
-       generateHTML_();
      }
      if (plot_SVG_) {
        generateSVG_();
@@ -362,7 +357,7 @@ namespace SmartPeak {
           fout << plotlines_properties_[i].plotStyler() << std::endl;
         }
       }
-      generatePlot_(fout, filename);
+      generatePlot_(fout, filename, ExportedFormat::PNG);
       fout.close();
       plot_PNG_ = false;
     } else {
@@ -388,35 +383,9 @@ namespace SmartPeak {
           fout << plotlines_properties_[i].plotStyler() << std::endl;
         }
       }
-      generatePlot_(fout, filename);
+      generatePlot_(fout, filename, ExportedFormat::PDF);
       fout.close();
       plot_PDF_ = false;
-    } else {
-      LOGE << "Failed to save plot to disk.";
-    }
-  }
-
-  void PlotExporter::generateHTML_()
-  {
-    std::string filename = output_path_+this->filename+"-html.gpi";
-    std::string exported_plot = output_path_+this->filename+".html";
-    std::ofstream fout(filename.c_str());
-    
-    if (fout.is_open()) {
-      appendFileHeader_(fout);
-      if (isTermAvailable_("cairo")) {
-        fout << "set terminal canvas dashed enhanced" << std::endl;
-        fout << "set output '" << exported_plot << "'" << std::endl;
-        if (with_grid_) {
-          setGrid_(fout);
-        }
-        for (uint i = 0; i < plotlines_properties_.size(); ++i) {
-          fout << plotlines_properties_[i].plotStyler() << std::endl;
-        }
-      }
-      generatePlot_(fout, filename);
-      fout.close();
-      plot_HTML_ = false;
     } else {
       LOGE << "Failed to save plot to disk.";
     }
@@ -440,7 +409,7 @@ namespace SmartPeak {
           fout << plotlines_properties_[i].plotStyler() << std::endl;
         }
       }
-      generatePlot_(fout, filename);
+      generatePlot_(fout, filename, ExportedFormat::SVG);
       fout.close();
       plot_SVG_ = false;
     } else {
@@ -481,7 +450,7 @@ namespace SmartPeak {
     }
   }
 
-  void PlotExporter::generatePlot_(std::ofstream &fout, const std::string &filename)
+  void PlotExporter::generatePlot_(std::ofstream &fout, const std::string &filename, const ExportedFormat exported_format)
   {
     if (plot_type_ == PlotType::CURVE) {
     auto legends = getLegend_();
@@ -517,6 +486,7 @@ namespace SmartPeak {
     }
     
     if (plot_type_ == PlotType::HEATMAP) {
+      fout << "unset key" << std::endl;
       fout << "set style increment userstyle" << std::endl;
       fout << "set autoscale fix" << std::endl;
       fout << "unset log" << std::endl;
@@ -527,6 +497,30 @@ namespace SmartPeak {
       fout << "set view map scale 1" << std::endl;
       fout << "set xtic auto" << std::endl;
       fout << "set ytic auto" << std::endl;
+      
+      if (exported_format == ExportedFormat::SVG) {
+        fout << "set cbtics border in scale 0.2,1 mirror norotate ";
+        fout << "offset character -3.3, 0.0, 0 autojustify" << std::endl;
+        
+        fout << "set cbtics norangelimit ";
+        fout << heatmap_data_.feat_value_min_ << "," <<  heatmap_data_.feat_value_max_ / 5.0 << ",";
+        fout << heatmap_data_.feat_value_max_ << std::endl;
+        
+        fout << "set rtics axis in scale 0,0 nomirror norotate autojustify" << std::endl;
+        
+        fout << "set xrange [ -0.500000 : ";
+        fout << -0.500000 + heatmap_data_.feat_heatmap_col_labels.size();
+        fout << " ] noreverse nowriteback" << std::endl;
+        
+        fout << "set yrange [ -0.500000 : ";
+        fout << -0.500000 + heatmap_data_.feat_heatmap_row_labels.size();
+        fout << " ] noreverse nowriteback" << std::endl;
+        
+        fout << "set cbrange [ ";
+        fout << heatmap_data_.feat_value_min_ << ":" <<  heatmap_data_.feat_value_max_ << " ] ";
+        fout << "noreverse nowriteback" << std::endl;
+      }
+      
       fout << "set title \"" << plot_title_ << "\"" << std::endl;
       fout << "set xlabel \"" << x_title_ << "\"" << std::endl;
       fout << "set ylabel \"" << y_title_ << "\"" << std::endl;
