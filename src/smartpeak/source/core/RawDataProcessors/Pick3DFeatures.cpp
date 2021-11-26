@@ -20,7 +20,7 @@
 // $Maintainer: Douglas McCloskey $
 // $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
 // --------------------------------------------------------------------------
-#include <SmartPeak/core/RawDataProcessors/PickMS2Features.h>
+#include <SmartPeak/core/RawDataProcessors/Pick3DFeatures.h>
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/Utilities.h>
 #include <SmartPeak/core/FeatureFiltersUtils.h>
@@ -38,19 +38,19 @@
 namespace SmartPeak
 {
 
-  std::vector<std::string> PickMS2Features::getRequirements() const
+  std::vector<std::string> Pick3DFeatures::getRequirements() const
   {
     return { "sequence", "traML" };
   }
 
-  ParameterSet PickMS2Features::getParameterSchema() const
+  ParameterSet Pick3DFeatures::getParameterSchema() const
   {
     OpenMS::MassTraceDetection mass_trace_detection;
     OpenMS::ElutionPeakDetection elution_peak_detection;
     OpenMS::FeatureFindingMetabo feature_finding_metabo;
     ParameterSet parameters({ mass_trace_detection, elution_peak_detection, feature_finding_metabo });
     std::map<std::string, std::vector<std::map<std::string, std::string>>> param_struct({
-    {"PickMS2Features", {
+    {"Pick3DFeatures", {
     {
       {"name", "enable_elution"},
       {"type", "bool"},
@@ -75,13 +75,13 @@ namespace SmartPeak
     return parameters;
   }
 
-  void PickMS2Features::process(
+  void Pick3DFeatures::process(
     RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START PickMS2Features";
+    LOGD << "START Pick3DFeatures";
     getFilenames(filenames_I);
 
     // Complete user parameters with schema
@@ -91,7 +91,7 @@ namespace SmartPeak
     //-------------------------------------------------------------
     // set parameters
     //-------------------------------------------------------------
-    FunctionParameters pick_ms2_feature_params = params.at("PickMS2Features");
+    FunctionParameters pick_ms2_feature_params = params.at("Pick3DFeatures");
 
     OpenMS::MassTraceDetection mtdet;
     Utilities::setUserParameters(mtdet, params_I);
@@ -284,7 +284,7 @@ namespace SmartPeak
     rawDataHandler_IO.updateFeatureMapHistory();
     rawDataHandler_IO.getExperiment().setChromatograms(merged_chromatograms);
 
-    LOGD << "END PickMS2Features";
+    LOGD << "END Pick3DFeatures";
   }
 
 }

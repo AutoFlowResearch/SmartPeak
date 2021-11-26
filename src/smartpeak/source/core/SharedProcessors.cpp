@@ -45,8 +45,8 @@
 #include <SmartPeak/core/RawDataProcessors/CheckFeaturesBackgroundInterferences.h>
 #include <SmartPeak/core/RawDataProcessors/ExtractSpectraWindows.h>
 #include <SmartPeak/core/RawDataProcessors/MergeSpectra.h>
-#include <SmartPeak/core/RawDataProcessors/PickMS1Features.h>
-#include <SmartPeak/core/RawDataProcessors/PickMS2Features.h>
+#include <SmartPeak/core/RawDataProcessors/Pick2DFeatures.h>
+#include <SmartPeak/core/RawDataProcessors/Pick3DFeatures.h>
 #include <SmartPeak/core/RawDataProcessors/SearchAccurateMass.h>
 #include <SmartPeak/core/RawDataProcessors/MergeFeatures.h>
 #include <SmartPeak/core/RawDataProcessors/LoadAnnotations.h>
@@ -118,8 +118,8 @@ namespace SmartPeak {
     {"CHECK_FEATURES_BACKGROUND_INTERFERENCES",   std::make_shared<CheckFeaturesBackgroundInterferences>()},
     {"EXTRACT_SPECTRA_WINDOWS",                   std::make_shared<ExtractSpectraWindows>()},
     {"MERGE_SPECTRA",                             std::make_shared<MergeSpectra>()},
-    {"PICK_MS1_FEATURES",                         std::make_shared<PickMS1Features>()},
-    {"PICK_MS2_FEATURES",                         std::make_shared<PickMS2Features>()},
+    {"PICK_2D_FEATURES",                          std::make_shared<Pick2DFeatures>()},
+    {"PICK_3D_FEATURES",                          std::make_shared<Pick3DFeatures>()},
     {"SEARCH_ACCURATE_MASS",                      std::make_shared<SearchAccurateMass>()},
     {"MERGE_FEATURES",                            std::make_shared<MergeFeatures>()},
     {"LOAD_ANNOTATIONS",                          std::make_shared<LoadAnnotations>()},

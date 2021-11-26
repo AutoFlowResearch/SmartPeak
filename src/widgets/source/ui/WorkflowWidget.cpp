@@ -56,7 +56,7 @@ namespace SmartPeak
           const std::string s_string { s };
           if (s_string == "DDA")
             ids = { "LOAD_RAW_DATA",
-                    "PICK_MS2_FEATURES",
+                    "PICK_3D_FEATURES",
                     "SEARCH_SPECTRUM",
                     "DDA",
                     "STORE_FEATURES"};
@@ -142,7 +142,7 @@ namespace SmartPeak
             ids = { "LOAD_RAW_DATA",
                     "EXTRACT_SPECTRA_WINDOWS",
                     "MERGE_SPECTRA",
-                    "PICK_MS1_FEATURES",
+                    "PICK_2D_FEATURES",
                     "SEARCH_ACCURATE_MASS",
                     "STORE_ANNOTATIONS",
                     "STORE_FEATURES",

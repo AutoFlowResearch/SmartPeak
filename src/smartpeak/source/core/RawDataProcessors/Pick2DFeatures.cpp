@@ -20,7 +20,7 @@
 // $Maintainer: Douglas McCloskey $
 // $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
 // --------------------------------------------------------------------------
-#include <SmartPeak/core/RawDataProcessors/PickMS1Features.h>
+#include <SmartPeak/core/RawDataProcessors/Pick2DFeatures.h>
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/Utilities.h>
 #include <SmartPeak/core/FeatureFiltersUtils.h>
@@ -39,12 +39,12 @@
 namespace SmartPeak
 {
 
-  std::vector<std::string> PickMS1Features::getRequirements() const
+  std::vector<std::string> Pick2DFeatures::getRequirements() const
   {
     return { "sequence", "traML" };
   }
 
-  ParameterSet PickMS1Features::getParameterSchema() const
+  ParameterSet Pick2DFeatures::getParameterSchema() const
   {
     OpenMS::SavitzkyGolayFilter sgfilter;
     OpenMS::PeakPickerHiRes picker;
@@ -52,7 +52,7 @@ namespace SmartPeak
     ParameterSet parameters({ sgfilter, picker, pi });
 
     std::map<std::string, std::vector<std::map<std::string, std::string>>> param_struct({
-    {"PickMS1Features", {
+    {"Pick2DFeatures", {
     {
       {"name", "frame_length"},
       {"type", "int"},
@@ -95,12 +95,12 @@ namespace SmartPeak
     return parameters;
   }
 
-  void PickMS1Features::process(RawDataHandler& rawDataHandler_IO,
+  void Pick2DFeatures::process(RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START PickMS1Features";
+    LOGD << "START Pick2DFeatures";
     getFilenames(filenames_I);
 
     // Complete user parameters with schema
@@ -111,7 +111,7 @@ namespace SmartPeak
     bool compute_peak_shape_metrics = false;
     float min_intensity = 0;
     bool write_convex_hull = false;
-    for (const auto& pms1f_params : params.at("PickMS1Features")) {
+    for (const auto& pms1f_params : params.at("Pick2DFeatures")) {
       if (pms1f_params.getName() == "sne:window") {
         try {
           sn_window = std::stof(pms1f_params.getValueAsString());
@@ -150,17 +150,17 @@ namespace SmartPeak
       }
     }
     if (sn_window == 0) {
-      throw std::invalid_argument("Missing sne : window parameter for PickMS1Features. Not picking.");
+      throw std::invalid_argument("Missing sne : window parameter for Pick2DFeatures. Not picking.");
     }
     
     OpenMS::SavitzkyGolayFilter sgfilter;
-    Utilities::setUserParameters(sgfilter, params_I, "PickMS1Features");
+    Utilities::setUserParameters(sgfilter, params_I, "Pick2DFeatures");
 
     OpenMS::PeakPickerHiRes picker;
-    Utilities::setUserParameters(picker, params_I, "PickMS1Features");
+    Utilities::setUserParameters(picker, params_I, "Pick2DFeatures");
 
     OpenMS::PeakIntegrator pi;
-    Utilities::setUserParameters(pi, params_I, "PickMS1Features");
+    Utilities::setUserParameters(pi, params_I, "Pick2DFeatures");
 
     OpenMS::FeatureMap featureMap;
     for (const OpenMS::MSSpectrum& spec : rawDataHandler_IO.getExperiment().getSpectra()) {
@@ -255,7 +255,7 @@ namespace SmartPeak
     rawDataHandler_IO.updateFeatureMapHistory();
 
     LOGI << "Feature Picker output size: " << featureMap.size();
-    LOGD << "END PickMS1Features";
+    LOGD << "END Pick2DFeatures";
   }
 
 }

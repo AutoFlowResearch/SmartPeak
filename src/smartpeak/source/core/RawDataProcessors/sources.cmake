@@ -30,8 +30,8 @@ set(sources_list
 	MergeFeatures.cpp
 	MergeSpectra.cpp
 	PickMRMFeatures.cpp
-	PickMS1Features.cpp
-	PickMS2Features.cpp
+	Pick2DFeatures.cpp
+	Pick3DFeatures.cpp
 	PlotFeatures.cpp
 	QuantifyFeatures.cpp
 	SearchAccurateMass.cpp

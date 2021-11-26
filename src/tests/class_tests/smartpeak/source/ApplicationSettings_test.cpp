@@ -50,7 +50,7 @@ struct ApplicationSettingsFixture : public ::testing::Test
                 "--load-session", "C:/SmartPeak/src/examples/data/GCMS_SIM_Unknowns/sequence.csv",
                 "--verbose",
                 "--allow-inconsistent",
-                "--workflow", "load_raw_data", "EXTRACT_SPECTRA_WINDOWS", "pick_ms1_features" 
+                "--workflow", "load_raw_data", "EXTRACT_SPECTRA_WINDOWS", "pick_2d_features" 
                               "SEARCH_ACCURATE_MASS", "LOAD_FeATURE_BACKGROUND_FILTERS",
                 "--log-dir", ".",
                 "--integrity", "SAMPLE", "is",
@@ -126,7 +126,7 @@ TEST_F(ApplicationSettingsFixture, ApplicationSettings_load_options)
     EXPECT_TRUE(application_settings.disable_colors);
     EXPECT_TRUE(application_settings.allow_inconsistent);
     auto workflow = std::vector<std::string>{
-        "load_raw_data", "EXTRACT_SPECTRA_WINDOWS", "pick_ms1_features" 
+        "load_raw_data", "EXTRACT_SPECTRA_WINDOWS", "pick_2d_features" 
         "SEARCH_ACCURATE_MASS", "LOAD_FeATURE_BACKGROUND_FILTERS" };
     EXPECT_EQ(application_settings.workflow, workflow);
     EXPECT_EQ(application_settings.log_dir, ".");
@@ -150,7 +150,7 @@ TEST_F(ApplicationSettingsFixture, ApplicationSettings_process_options)
     auto samples = std::vector<std::string>{"STANDARD", "UNKNOWN", "DOUBLE BLANK"};
     EXPECT_EQ(application_settings.report_sample_types, samples);
     auto workflow = std::vector<std::string>{
-        "LOAD_RAW_DATA", "EXTRACT_SPECTRA_WINDOWS", "PICK_MS1_FEATURES"
+        "LOAD_RAW_DATA", "EXTRACT_SPECTRA_WINDOWS", "PICK_2D_FEATURES"
         "SEARCH_ACCURATE_MASS", "LOAD_FEATURE_BACKGROUND_FILTERS" };
     EXPECT_EQ(application_settings.workflow, workflow);
     auto integrity = std::vector<std::string>{"SAMPLE", "IS"};

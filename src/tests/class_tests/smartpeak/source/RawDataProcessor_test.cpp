@@ -47,8 +47,8 @@
 #include <SmartPeak/core/RawDataProcessors/CheckFeaturesBackgroundInterferences.h>
 #include <SmartPeak/core/RawDataProcessors/ExtractSpectraWindows.h>
 #include <SmartPeak/core/RawDataProcessors/MergeSpectra.h>
-#include <SmartPeak/core/RawDataProcessors/PickMS1Features.h>
-#include <SmartPeak/core/RawDataProcessors/PickMS2Features.h>
+#include <SmartPeak/core/RawDataProcessors/Pick2DFeatures.h>
+#include <SmartPeak/core/RawDataProcessors/Pick3DFeatures.h>
 #include <SmartPeak/core/RawDataProcessors/SearchAccurateMass.h>
 #include <SmartPeak/core/RawDataProcessors/MergeFeatures.h>
 #include <SmartPeak/core/RawDataProcessors/LoadAnnotations.h>
@@ -1209,8 +1209,8 @@ TEST(RawDataProcessor, sanitizeRawDataProcessorParameters)
   EXPECT_EQ(params.count("MRMFeatureFilter.filter_MRMFeatures.qc"), 1);
   EXPECT_EQ(params.count("SequenceProcessor"), 1);
   EXPECT_EQ(params.count("FIAMS"), 1);
-  EXPECT_EQ(params.count("PickMS1Features"), 1);
-  EXPECT_EQ(params.count("PickMS2Features"), 1);
+  EXPECT_EQ(params.count("Pick2DFeatures"), 1);
+  EXPECT_EQ(params.count("Pick3DFeatures"), 1);
   EXPECT_EQ(params.count("AccurateMassSearchEngine"), 1);
   EXPECT_EQ(params.count("MergeInjections"), 1);
   EXPECT_EQ(params.at("SequenceSegmentPlotter").size(), 3);
@@ -1221,8 +1221,8 @@ TEST(RawDataProcessor, sanitizeRawDataProcessorParameters)
   EXPECT_EQ(params.at("MRMFeatureFilter.filter_MRMFeaturesRSDs.qc").size(), 0);
   EXPECT_EQ(params.at("SequenceProcessor").size(), 0);
   EXPECT_EQ(params.at("FIAMS").size(), 0);
-  EXPECT_EQ(params.at("PickMS1Features").size(), 0);
-  EXPECT_EQ(params.at("PickMS2Features").size(), 0);
+  EXPECT_EQ(params.at("Pick2DFeatures").size(), 0);
+  EXPECT_EQ(params.at("Pick3DFeatures").size(), 0);
   EXPECT_EQ(params.at("AccurateMassSearchEngine").size(), 0);
   EXPECT_EQ(params.at("MergeInjections").size(), 0);
 }
@@ -1305,29 +1305,29 @@ TEST(RawDataProcessor, pickFeaturesMRM)
 }
 
 /**
-  PickMS1Features Tests
+  Pick2DFeatures Tests
 */
-TEST(RawDataProcessor, constructorPickMS1Features)
+TEST(RawDataProcessor, constructorPick2DFeatures)
 {
-  PickMS1Features* ptrPickFeatures = nullptr;
-  PickMS1Features* nullPointerPickFeatures = nullptr;
+  Pick2DFeatures* ptrPickFeatures = nullptr;
+  Pick2DFeatures* nullPointerPickFeatures = nullptr;
   EXPECT_EQ(ptrPickFeatures, nullPointerPickFeatures);
 }
 
-TEST(RawDataProcessor, destructorPickMS1Features)
+TEST(RawDataProcessor, destructorPick2DFeatures)
 {
-  PickMS1Features* ptrPickFeatures = nullptr;
-  ptrPickFeatures = new PickMS1Features();
+  Pick2DFeatures* ptrPickFeatures = nullptr;
+  ptrPickFeatures = new Pick2DFeatures();
   delete ptrPickFeatures;
 }
 
-TEST(RawDataProcessor, gettersPickMS1Features)
+TEST(RawDataProcessor, gettersPick2DFeatures)
 {
-  PickMS1Features processor;
-  EXPECT_EQ(processor.getName(), "PICK_MS1_FEATURES");
+  Pick2DFeatures processor;
+  EXPECT_EQ(processor.getName(), "PICK_2D_FEATURES");
 }
 
-TEST(RawDataProcessor, pickMS1Features)
+TEST(RawDataProcessor, pick2DFeatures)
 {
   // Pre-requisites: load the parameters and associated raw data
   ParameterSet params_1;
@@ -1343,7 +1343,7 @@ TEST(RawDataProcessor, pickMS1Features)
   rawDataHandler.getMetaData().scan_polarity = "positive";
 
   // Test pick features
-  PickMS1Features pickFeatures;
+  Pick2DFeatures pickFeatures;
   pickFeatures.process(rawDataHandler, params_1, filenames);
 
   EXPECT_EQ(rawDataHandler.getFeatureMap().size(), 10);
@@ -1406,29 +1406,29 @@ TEST(RawDataProcessor, pickMS1Features)
 }
 
 /**
-  PickMS2Features Tests
+  Pick3DFeatures Tests
 */
-TEST(RawDataProcessor, constructorPickMS2Features)
+TEST(RawDataProcessor, constructorPick3DFeatures)
 {
-  PickMS2Features* ptrPickFeatures = nullptr;
-  PickMS2Features* nullPointerPickFeatures = nullptr;
+  Pick3DFeatures* ptrPickFeatures = nullptr;
+  Pick3DFeatures* nullPointerPickFeatures = nullptr;
   EXPECT_EQ(ptrPickFeatures, nullPointerPickFeatures);
 }
 
-TEST(RawDataProcessor, destructorPickMS2Features)
+TEST(RawDataProcessor, destructorPick3DFeatures)
 {
-  PickMS2Features* ptrPickFeatures = nullptr;
-  ptrPickFeatures = new PickMS2Features();
+  Pick3DFeatures* ptrPickFeatures = nullptr;
+  ptrPickFeatures = new Pick3DFeatures();
   delete ptrPickFeatures;
 }
 
-TEST(RawDataProcessor, gettersPickMS2Features)
+TEST(RawDataProcessor, gettersPick3DFeatures)
 {
-  PickMS2Features processor;
-  EXPECT_EQ(processor.getName(), "PICK_MS2_FEATURES");
+  Pick3DFeatures processor;
+  EXPECT_EQ(processor.getName(), "PICK_3D_FEATURES");
 }
 
-TEST(RawDataProcessor, pickMS2Features)
+TEST(RawDataProcessor, pick3DFeatures)
 {
   // Pre-requisites: load the parameters and associated raw data
   ParameterSet params_1;
@@ -1443,7 +1443,7 @@ TEST(RawDataProcessor, pickMS2Features)
   loadRawData.extractMetaData(rawDataHandler);
 
   // Test pick features
-  PickMS2Features pickFeatures;
+  Pick3DFeatures pickFeatures;
   map<std::string, vector<map<string, string>>> feat_params_struct({
   {"FeatureFindingMetabo", {
     { {"name", "report_chromatograms"}, {"type", "bool"}, {"value", "true"} },
