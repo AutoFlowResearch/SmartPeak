@@ -149,8 +149,8 @@ namespace SmartPeak
       "MRMFeatureFilter.filter_MRMFeaturesRSDs.qc",
       "SequenceProcessor",
       "FIAMS",
-      "PickMS1Features",
-      "PickMS2Features",
+      "Pick2DFeatures",
+      "Pick3DFeatures",
       "AccurateMassSearchEngine",
       "MergeInjections"
     };
