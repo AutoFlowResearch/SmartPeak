@@ -15,12 +15,12 @@ SmartPeak is optimised to process data set folders with the following structure 
 	.. table:: featureFilterComponentGroups.csv Headers
 		:widths: auto
 
-		==================== ========= ========= ========= ========= ============= ============= =============== =============== =============== =============== =============== =============== ===================== ===================== =========== =========== ================ ================ =========== =========== ================= ================= ================= =================
-		component_group_name n_heavy_l n_heavy_u n_light_l n_light_u n_detecting_l n_detecting_u n_quantifying_l n_quantifying_u n_identifying_l n_identifying_u n_transitions_l n_transitions_u ion_ratio_pair_name_1 ion_ratio_pair_name_2 ion_ratio_l ion_ratio_u retention_time_l retention_time_u intensity_l intensity_u overall_quality_l overall_quality_u retention_time_l_ retention_time_u_
-		==================== ========= ========= ========= ========= ============= ============= =============== =============== =============== =============== =============== =============== ===================== ===================== =========== =========== ================ ================ =========== =========== ================= ================= ================= =================
-		Serotonin            0         10        0         10        0             10            0               10              0               10              0               10                                                                                  1.37             2.37             -1.00E+12   1.00E+15    -1.00E+12         1.00E+12          82.2              142.2
-		\-                   \-        \-        \-        \-        \-            \-            \-              \-              \-              \-              \-              \-              \-                    \-                    \-          \-          \-               \-               \-          \-          \-                \-                \-                \-
-		==================== ========= ========= ========= ========= ============= ============= =============== =============== =============== =============== =============== =============== ===================== ===================== =========== =========== ================ ================ =========== =========== ================= ================= ================= =================
+		==================== ========= ========= ========= ========= ============= ============= =============== =============== =============== =============== =============== =============== ===================== ===================== =========== =========== ================ ================ =========== =========== ================= =================
+		component_group_name n_heavy_l n_heavy_u n_light_l n_light_u n_detecting_l n_detecting_u n_quantifying_l n_quantifying_u n_identifying_l n_identifying_u n_transitions_l n_transitions_u ion_ratio_pair_name_1 ion_ratio_pair_name_2 ion_ratio_l ion_ratio_u retention_time_l retention_time_u intensity_l intensity_u overall_quality_l overall_quality_u
+		==================== ========= ========= ========= ========= ============= ============= =============== =============== =============== =============== =============== =============== ===================== ===================== =========== =========== ================ ================ =========== =========== ================= =================
+		Serotonin            0         10        0         10        0             10            0               10              0               10              0               10                                                                                  1.37             2.37             -1.00E+12   1.00E+15    -1.00E+12         1.00E+12         
+		\-                   \-        \-        \-        \-        \-            \-            \-              \-              \-              \-              \-              \-              \-                    \-                    \-          \-          \-               \-               \-          \-          \-                \-               
+		==================== ========= ========= ========= ========= ============= ============= =============== =============== =============== =============== =============== =============== ===================== ===================== =========== =========== ================ ================ =========== =========== ================= =================
 
 |
 
@@ -113,12 +113,12 @@ SmartPeak is optimised to process data set folders with the following structure 
 	.. table:: parameters.csv Headers
 		:widths: auto
 
-		========== =================== ===== ====== ======= ============ ======================================== ===== ========= ==========
-		function   name                type  value  default restrictions description used_                              comment_  comparator
-		========== =================== ===== ====== ======= ============ ======================================== ===== ========= ==========
+		========== =================== ===== ====== ======= ============ ======================================== ===== =========
+		function   name                type  value  default restrictions description                              used_ comment_ 
+		========== =================== ===== ====== ======= ============ ======================================== ===== =========
 		MRMMapping precursor_tolerance float 0.0009 0.1     0.1          Precursor tolerance when mapping (in Th) TRUE
-		\-         \-                  \-    \-     \-      \-           \-                                       \-    \-        \-
-		========== =================== ===== ====== ======= ============ ======================================== ===== ========= ==========
+		\-         \-                  \-    \-     \-      \-           \-                                       \-    \-       
+		========== =================== ===== ====== ======= ============ ======================================== ===== =========
 
 |
 
@@ -142,6 +142,7 @@ SmartPeak is optimised to process data set folders with the following structure 
 #. sequence.csv
 	This file contains information about all the injections in the data set and their values,
 	fields such as `sample_name` and `original_filename` refer to the files names stored in the `mzML` folder.
+	Please note that information in the sequence that are not required for some workflows are left empty.
 	The header including a sample entry is shown below:
 
 	.. table:: parameters.csv Headers
