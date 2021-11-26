@@ -33,18 +33,18 @@
 namespace SmartPeak
 {
 
-  struct PickMS2Features : RawDataProcessor
+  struct Pick2DFeatures : RawDataProcessor
   {
     /* IProcessorDescription */
-    virtual std::string getName() const override { return "PICK_MS2_FEATURES"; }
-    virtual std::string getDescription() const override { return "Pick MS2 Features"; }
+    virtual std::string getName() const override { return "PICK_2D_FEATURES"; }
+    virtual std::string getDescription() const override { return "Run the peak picking algorithm for MS1 spectra."; }
     virtual ParameterSet getParameterSchema() const override;
     virtual std::vector<std::string> getRequirements() const override;
     virtual std::set<std::string> getOutputs() const override;
     virtual std::set<std::string> getInputs() const override;
 
-    /** PickMS2Features
-     */
+    /** Run the MS1 peak picking and scoring algorithm.
+    */
     void doProcess(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,

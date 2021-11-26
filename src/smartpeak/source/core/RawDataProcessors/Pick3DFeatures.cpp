@@ -20,7 +20,7 @@
 // $Maintainer: Douglas McCloskey $
 // $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
 // --------------------------------------------------------------------------
-#include <SmartPeak/core/RawDataProcessors/PickMS2Features.h>
+#include <SmartPeak/core/RawDataProcessors/Pick3DFeatures.h>
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/Utilities.h>
 #include <SmartPeak/core/FeatureFiltersUtils.h>
@@ -38,29 +38,29 @@
 namespace SmartPeak
 {
 
-  std::set<std::string> PickMS2Features::getInputs() const
+  std::set<std::string> Pick3DFeatures::getInputs() const
   {
     return { "Spectra" };
   }
 
-  std::set<std::string> PickMS2Features::getOutputs() const
+  std::set<std::string> Pick3DFeatures::getOutputs() const
   {
     return { "Features" };
   }
 
-  std::vector<std::string> PickMS2Features::getRequirements() const
+  std::vector<std::string> Pick3DFeatures::getRequirements() const
   {
     return { "sequence", "traML" };
   }
 
-  ParameterSet PickMS2Features::getParameterSchema() const
+  ParameterSet Pick3DFeatures::getParameterSchema() const
   {
     OpenMS::MassTraceDetection mass_trace_detection;
     OpenMS::ElutionPeakDetection elution_peak_detection;
     OpenMS::FeatureFindingMetabo feature_finding_metabo;
     ParameterSet parameters({ mass_trace_detection, elution_peak_detection, feature_finding_metabo });
     std::map<std::string, std::vector<std::map<std::string, std::string>>> param_struct({
-    {"PickMS2Features", {
+    {"Pick3DFeatures", {
     {
       {"name", "enable_elution"},
       {"type", "bool"},
@@ -85,7 +85,7 @@ namespace SmartPeak
     return parameters;
   }
 
-  void PickMS2Features::doProcess(
+  void Pick3DFeatures::doProcess(
     RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
     Filenames& filenames_I
@@ -100,7 +100,7 @@ namespace SmartPeak
     //-------------------------------------------------------------
     // set parameters
     //-------------------------------------------------------------
-    FunctionParameters pick_ms2_feature_params = params.at("PickMS2Features");
+    FunctionParameters pick_ms2_feature_params = params.at("Pick3DFeatures");
 
     OpenMS::MassTraceDetection mtdet;
     Utilities::setUserParameters(mtdet, params_I);

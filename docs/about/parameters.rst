@@ -153,10 +153,10 @@ Raw Data Methods
       - Extract out specified spectra windows based on the user parameters.
     * - MERGE_SPECTRA
       - Merge all spectra along the time axis.
-    * - PICK_MS1_FEATURES
+    * - PICK_2D_FEATURES
       - Run the peak picking algorithm for MS1 spectra.
-    * - PICK_MS2_FEATURES
-      - Pick MS2 Features.
+    * - PICK_3D_FEATURES
+      - Pick 3D Features.
     * - SEARCH_ACCURATE_MASS
       - Run the accurate mass search algorithm.
     * - MERGE_FEATURES
