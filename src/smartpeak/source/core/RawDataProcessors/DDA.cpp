@@ -100,7 +100,7 @@ namespace SmartPeak
 
     // searchSpectra (will be on MS2 spectra)
     OpenMS::FeatureMap ms2_accurate_mass_found_feature_map;
-    targeted_spectra_extractor.searchSpectrum(selected_features, ms2_accurate_mass_found_feature_map);
+    targeted_spectra_extractor.searchSpectrum(selected_features, ms2_accurate_mass_found_feature_map, true);
 
     // merge features again (on MS2 spectra features)
     OpenMS::FeatureMap ms2_merged_features;
