@@ -26,6 +26,8 @@
 #include <SmartPeak/core/FeatureFiltersUtils.h>
 
 #include <OpenMS/ANALYSIS/OPENSWATH/TargetedSpectraExtractor.h>
+#include <OpenMS/ANALYSIS/OPENSWATH/TransitionTSVFile.h>
+#include <OpenMS/FORMAT/TraMLFile.h>
 
 #include <plog/Log.h>
 
@@ -52,12 +54,26 @@ namespace SmartPeak
   ParameterSet DDA::getParameterSchema() const
   {
     OpenMS::TargetedSpectraExtractor oms_params;
-    return ParameterSet({ oms_params });
+    ParameterSet parameters({ oms_params });
+    std::map<std::string, std::vector<std::map<std::string, std::string>>> param_struct({
+    {"DDA", {
+    {
+      {"name", "transitions_file_format"},
+      {"type", "string"},
+      {"value", "csv"},
+      {"description", "Transition file format."},
+      {"valid_strings", "['traML','csv']"}
+    }
+    }} });
+    ParameterSet dda_params(param_struct);
+    parameters.merge(dda_params);
+    return parameters;
   }
 
   void DDA::getFilenames(Filenames& filenames) const
   {
-    filenames.addFileName("output_traML", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}.traML");
+    filenames.addFileName("output_transitions_traML", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}.traML");
+    filenames.addFileName("output_transitions_csv", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}.csv");
   };
 
   void DDA::doProcess(RawDataHandler& rawDataHandler_IO,
@@ -120,7 +136,29 @@ namespace SmartPeak
     oms_params.setValue("deisotoping:use_deisotoper", "true");
     targeted_spectra_extractor.setParameters(oms_params);
     LOGI << "Storing: " << filenames_I.getFullPath("output_traML").generic_string();
-    targeted_spectra_extractor.storeSpectraTraML(filenames_I.getFullPath("output_traML").generic_string(), ms1_merged_features, ms2_merged_features);
+    OpenMS::TargetedExperiment t_exp;
+    targeted_spectra_extractor.constructTransitionsList(ms1_merged_features, ms2_merged_features, t_exp);
+
+
+    // write transitions
+    auto transition_file_format = params.findParameter("DDA", "transitions_file_format");
+    if (!transition_file_format)
+    {
+      throw std::invalid_argument("DDA:transitions_file_format Parameter not found");
+    }
+
+    if (transition_file_format->getValueAsString() == "traML")
+    {
+      auto transitions_filename = filenames_I.getFullPath("output_transitions_traML").generic_string();
+      OpenMS::TraMLFile traml_file;
+      traml_file.store(transitions_filename, t_exp);
+    }
+    else if (transition_file_format->getValueAsString() == "csv")
+    {
+      auto transitions_filename = filenames_I.getFullPath("output_transitions_csv").generic_string();
+      OpenMS::TransitionTSVFile transition_tsv_file;
+      transition_tsv_file.convertTargetedExperimentToTSV(transitions_filename.c_str(), t_exp);
+    }
 
     // build MS1/MS2 features
     OpenMS::FeatureMap ms1_ms2_features;
