@@ -224,7 +224,7 @@ The tutorial includes the following steps :
 
 #. Setting up the input files
 
-The data set used can be found in 
+The data set used can be found here 
 `HPLC_UV_Standards <https://github.com/AutoFlowResearch/SmartPeak/tree/develop/src/examples/data/HPLC_UV_Standards>`_ and
 `HPLC_UV_Unknowns <https://github.com/AutoFlowResearch/SmartPeak/tree/develop/src/examples/data/HPLC_UV_Unknowns>`_ 
 for the HPLC UV Standards and HPLC UV Unknowns respectively.
@@ -354,6 +354,62 @@ Targeted flux analysis with GC-MS SIM Agilent
 
 Non-targeted FIA-MS analysis with Thermo Orbitrap
 -------------------------------------------------
+
+This tutorial walks you through the workflow for analyzing targeted HPLC data
+starting from input file generation, to processing the data in SmartPeak, 
+to reviewing the data in SmartPeak, to reporting the results for later use.
+
+Objectives
+~~~~~~~~~~
+
+#. Obtaining the SOP for the workflow.
+#. Choosing a data set for demonstrating the workflow.
+#. Creating an optimized SmartPeak input templates for running the workflow.
+
+The Workflows include
+~~~~~~~~~~~~~~~~~~~~~
+
+#. Calculating the calibration curves using Standards
+#. Processing Unknowns
+
+Steps
+~~~~~
+
+The tutorial includes the following steps :
+
+#. Setting up the input files
+
+The data set used can be found here 
+`FIAMS FullScan Unknowns <https://github.com/AutoFlowResearch/SmartPeak/tree/develop/src/examples/data/FIAMS_FullScan_Unknowns>`_.
+
+#. Defining the workflow in SmartPeak
+
+For FIAMS FullScan Unknowns analysis, the following steps are saved 
+into the ``workflow.csv`` file. Alternatively, steps can be replaced, 
+added or deleted direclty from SmartPeakGUI within the "workflow" tap in the right pane. 
+A detailed explanation of each command step
+can be found in :ref:`Workflow Commands`.
+
+	* LOAD_RAW_DATA
+	* EXTRACT_SPECTRA_WINDOWS
+	* MERGE_SPECTRA
+	* PICK_MS1_FEATURES
+	* SEARCH_ACCURATE_MASS
+	* STORE_ANNOTATIONS
+	* STORE_FEATURES
+	* ESTIMATE_FEATURE_BACKGROUND_INTERFERENCES
+	* STORE_FEATURE_BACKGROUND_ESTIMATIONS
+	* FILTER_FEATURES_BACKGROUND_INTERFERENCES
+	* MERGE_FEATURES
+	* MERGE_INJECTIONS
+	* STORE_FEATURES_SAMPLE_GROUP
+
+	The Spectra for the two injection samples can be inspected after all workflow steps had been run, to do so please
+	click on view and then "Spectra". From the Injections tab check "Plot/Unplot All" select all injection samples and 
+	plot the mass to charge ratio relative to their respective intensities as shown below:
+
+	.. image:: ../images/fiams_fullscan_unknowns_spectra.png
+
 
 
 
