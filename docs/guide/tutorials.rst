@@ -224,7 +224,6 @@ The tutorial includes the following steps :
 
 #. Setting up the input files
 
-
 The data set used can be found in 
 `HPLC_UV_Standards <https://github.com/AutoFlowResearch/SmartPeak/tree/develop/src/examples/data/HPLC_UV_Standards>`_ and
 `HPLC_UV_Unknowns <https://github.com/AutoFlowResearch/SmartPeak/tree/develop/src/examples/data/HPLC_UV_Unknowns>`_ 
@@ -338,8 +337,10 @@ Targeted quantitation with LC-MS/MS 5500 QTRAP RapidRIP
 
 
 
-Targeted flux analysis with LC-MS/MS 5500 QTRAP
------------------------------------------------
+Targeted flux analysis with LC-MS/MS Agilent Lipidomics
+-------------------------------------------------------
+
+
 
 
 
