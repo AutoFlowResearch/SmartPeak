@@ -410,6 +410,18 @@ can be found in :ref:`Workflow Commands`.
 
 	.. image:: ../images/fiams_fullscan_unknowns_spectra.png
 
+	#. Reporting the results
+
+	To export the results, select "Report" from the "Actions" which will show the 
+	"Create Report" window:
+
+	.. image:: ../images/fiams_fullscan_unknowns_exports.png
+
+	Based in the data you wish to export, select the desired "Sample types" from the left pane
+	and select the "Metadata" from the right pane then click on of the buttons below to create
+	the report with the selected items in the csv format. More details on exporting the results can be found 
+	in :ref:`Export report`.
+
 
 
 
