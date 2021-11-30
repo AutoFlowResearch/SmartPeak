@@ -60,7 +60,8 @@ namespace SmartPeak
                      const std::string& name_pattern, 
                      const std::string& description = "", 
                      bool embeddable = false,
-                     bool default_embedded = false);
+                     bool default_embedded = false,
+                     bool overwrite = false);
 
     /**
       @brief Returns the full path, with root path and variant applied (or the overridden full path).
