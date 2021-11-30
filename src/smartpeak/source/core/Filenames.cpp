@@ -51,9 +51,10 @@ namespace SmartPeak
                               const std::string& name_pattern, 
                               const std::string& description, 
                               bool embeddable,
-                              bool default_embedded)
+                              bool default_embedded,
+                              bool overwrite)
   {
-    if (file_names_.find(id) == file_names_.end())
+    if (overwrite || (file_names_.find(id) == file_names_.end()))
     {
       FileName f{ name_pattern, description, embeddable, default_embedded };
       file_names_.insert_or_assign(id, f);

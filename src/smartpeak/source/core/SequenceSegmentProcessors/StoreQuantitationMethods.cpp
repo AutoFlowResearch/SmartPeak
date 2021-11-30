@@ -50,7 +50,7 @@ namespace SmartPeak
 
   void StoreQuantitationMethods::getFilenames(Filenames& filenames) const
   {
-    filenames.addFileName("quantitationMethods", constructFilename("quantitationMethods.csv", static_filenames_), "Quantitation Methods");
+    filenames.addFileName("quantitationMethods", constructFilename("quantitationMethods.csv", static_filenames_), "Quantitation Methods", false, false, true);
   };
 
   void StoreQuantitationMethods::process(
