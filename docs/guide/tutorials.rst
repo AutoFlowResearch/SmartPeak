@@ -224,7 +224,8 @@ The tutorial includes the following steps :
 
 #. Setting up the input files
 
-The data set used can be found here 
+
+The data set used can be found in 
 `HPLC_UV_Standards <https://github.com/AutoFlowResearch/SmartPeak/tree/develop/src/examples/data/HPLC_UV_Standards>`_ and
 `HPLC_UV_Unknowns <https://github.com/AutoFlowResearch/SmartPeak/tree/develop/src/examples/data/HPLC_UV_Unknowns>`_ 
 for the HPLC UV Standards and HPLC UV Unknowns respectively.

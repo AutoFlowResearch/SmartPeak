@@ -23,7 +23,10 @@
 #pragma once
 
 #include <SmartPeak/iface/IFilePickerHandler.h>
+#include <SmartPeak/core/ApplicationHandler.h>
+#include <SmartPeak/core/ApplicationProcessorObservable.h>
 #include <SmartPeak/ui/SessionFilesWidget.h>
+#include <SmartPeak/ui/SetInputOutputWidget.h>
 #include <string>
 #include <memory>
 
@@ -33,20 +36,57 @@
 */
 namespace SmartPeak
 {
-  struct LoadSessionWizard : IFilePickerHandler
+  struct LoadSessionWizard : 
+    IFilePickerHandler, 
+    ISetInputOutputWidgetObserver,
+    ApplicationProcessorObservable
   {
     LoadSessionWizard(std::shared_ptr<SessionFilesWidget>& session_files_widget_manage,
-                      IApplicationProcessorObserver* application_observer) :
-      application_observer_(application_observer),
-      session_files_widget_manage_(session_files_widget_manage)
-    {};
+                      WorkflowManager& workflow_manager,
+                      ApplicationHandler& application_handler,
+                      IApplicationProcessorObserver* application_processor_observer = nullptr,
+                      ISequenceProcessorObserver* sequence_processor_observer = nullptr,
+                      ISequenceSegmentProcessorObserver* sequence_segment_processor_observer = nullptr,
+                      ISampleGroupProcessorObserver* sample_group_processor_observer = nullptr) :
+      application_handler_(application_handler),
+      session_files_widget_manage_(session_files_widget_manage),
+      workflow_manager_(workflow_manager),
+      application_processor_observer_(application_processor_observer),
+      sequence_processor_observer_(sequence_processor_observer),
+      sequence_segment_processor_observer_(sequence_segment_processor_observer),
+      sample_group_processor_observer_(sample_group_processor_observer)
+    {
+      set_input_output_widget = std::make_shared<SetInputOutputWidget>(application_handler);
+      addApplicationProcessorObserver(application_processor_observer_);
+    };
+
+    /**
+    ISetInputOutputWidgetObserver
+    */
+    virtual void onInputOutputSet();
+    virtual void onInputOutputCancel();
 
     /**
     IFilePickerHandler
     */
     bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
+
+    std::shared_ptr<SetInputOutputWidget> set_input_output_widget;
+
   protected:
-    IApplicationProcessorObserver* application_observer_ = nullptr;
+    bool missingInputFileNames();
+    bool missingInputOutputDirectories();
+
+  protected:
+    ApplicationHandler& application_handler_;
     std::shared_ptr<SessionFilesWidget> session_files_widget_manage_;
+    WorkflowManager& workflow_manager_;
+    IApplicationProcessorObserver* application_processor_observer_ = nullptr;
+    ISequenceProcessorObserver* sequence_processor_observer_;
+    ISequenceSegmentProcessorObserver* sequence_segment_processor_observer_;
+    ISampleGroupProcessorObserver* sample_group_processor_observer_;
+    bool missing_input_file_ = false;
+    bool missing_input_output_directories_ = false;
+    std::optional<Filenames> loaded_filenames_;
   };
 }

@@ -22,9 +22,16 @@
 // --------------------------------------------------------------------------
 
 #include <SmartPeak/core/ApplicationHandler.h>
-#include <SmartPeak/core/ApplicationProcessor.h>
 #include <SmartPeak/core/SequenceHandler.h>
 #include <SmartPeak/core/SequenceProcessor.h>
+#include <SmartPeak/core/RawDataProcessors/LoadRawData.h>
+#include <SmartPeak/core/RawDataProcessors/ExtractSpectraWindows.h>
+#include <SmartPeak/core/RawDataProcessors/MergeSpectra.h>
+#include <SmartPeak/core/RawDataProcessors/PickMS1Features.h>
+#include <SmartPeak/core/RawDataProcessors/SearchAccurateMass.h>
+#include <SmartPeak/core/RawDataProcessors/StoreAnnotations.h>
+#include <SmartPeak/core/RawDataProcessors/StoreFeatures.h>
+#include <SmartPeak/core/ApplicationProcessors/LoadSession.h>
 
 using namespace SmartPeak;
 
@@ -35,7 +42,8 @@ void example_FIAMS_FullScan_Unknowns(
 )
 {
   ApplicationHandler application_handler;
-  LoadSession cs(application_handler);
+  WorkflowManager workflow_manager;
+  LoadSession cs(application_handler, workflow_manager);
   cs.filenames_        = filenames_I;
   cs.delimiter        = delimiter_I;
   cs.checkConsistency = true;
@@ -52,20 +60,20 @@ void example_FIAMS_FullScan_Unknowns(
   };
 
   Filenames methods_filenames;
-  methods_filenames.setTag(Filenames::Tag::MAIN_DIR, dir_I);
-  methods_filenames.setTag(Filenames::Tag::MZML_INPUT_PATH, dir_I + "/mzML/");
-  methods_filenames.setTag(Filenames::Tag::FEATURES_INPUT_PATH, dir_I + "/features/");
-  methods_filenames.setTag(Filenames::Tag::FEATURES_OUTPUT_PATH, dir_I + "/features/");
+  methods_filenames.setTagValue(Filenames::Tag::MAIN_DIR, dir_I);
+  methods_filenames.setTagValue(Filenames::Tag::MZML_INPUT_PATH, dir_I + "/mzML/");
+  methods_filenames.setTagValue(Filenames::Tag::FEATURES_INPUT_PATH, dir_I + "/features/");
+  methods_filenames.setTagValue(Filenames::Tag::FEATURES_OUTPUT_PATH, dir_I + "/features/");
 
   std::map<std::string, Filenames> dynamic_filenames;
   for (const InjectionHandler& injection : application_handler.sequenceHandler_.getSequence()) {
     const std::string& key = injection.getMetaData().getInjectionName();
     dynamic_filenames[key] = methods_filenames;
-    dynamic_filenames[key].setTag(Filenames::Tag::INPUT_MZML_FILENAME, injection.getMetaData().getFilename());
-    dynamic_filenames[key].setTag(Filenames::Tag::INPUT_INJECTION_NAME, key);
-    dynamic_filenames[key].setTag(Filenames::Tag::OUTPUT_INJECTION_NAME, key);
-    dynamic_filenames[key].setTag(Filenames::Tag::INPUT_GROUP_NAME, injection.getMetaData().getSampleGroupName());
-    dynamic_filenames[key].setTag(Filenames::Tag::OUTPUT_GROUP_NAME, injection.getMetaData().getSampleGroupName());
+    dynamic_filenames[key].setTagValue(Filenames::Tag::INPUT_MZML_FILENAME, injection.getMetaData().getFilename());
+    dynamic_filenames[key].setTagValue(Filenames::Tag::INPUT_INJECTION_NAME, key);
+    dynamic_filenames[key].setTagValue(Filenames::Tag::OUTPUT_INJECTION_NAME, key);
+    dynamic_filenames[key].setTagValue(Filenames::Tag::INPUT_GROUP_NAME, injection.getMetaData().getSampleGroupName());
+    dynamic_filenames[key].setTagValue(Filenames::Tag::OUTPUT_GROUP_NAME, injection.getMetaData().getSampleGroupName());
   }
 
   ProcessSequence ps(application_handler.sequenceHandler_);

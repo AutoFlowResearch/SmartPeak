@@ -107,6 +107,11 @@ namespace SmartPeak
       current_range_ = slider_min_max_ = std::make_pair(graph_viz_data_.x_min_, graph_viz_data_.x_max_);
     }
     input_range_ = std::make_pair(graph_viz_data_.x_min_, graph_viz_data_.x_max_);
+    if (serialized_range_)
+    {
+      current_range_ = *serialized_range_;
+      serialized_range_ = std::nullopt;
+    }
   }
 
   void GraphicDataVizWidget::drawGraph()
@@ -315,6 +320,103 @@ namespace SmartPeak
         ImGui::CloseCurrentPopup();
       }
       ImGui::EndPopup();
+    }
+  }
+
+  std::map<std::string, CastValue::Type> GraphicDataVizWidget::getPropertiesSchema() const
+  {
+    auto properties = Widget::getPropertiesSchema();
+    // sliders ranges
+    properties.emplace("current_range_.first", CastValue::Type::FLOAT);
+    properties.emplace("current_range_.second", CastValue::Type::FLOAT);
+    properties.emplace("compact_view_", CastValue::Type::BOOL);
+    properties.emplace("show_legend_", CastValue::Type::BOOL);
+    properties.emplace("marker_position_", CastValue::Type::FLOAT);
+    return properties;
+  }
+
+  std::optional<CastValue> GraphicDataVizWidget::getProperty(const std::string& property, const size_t row) const
+  {
+    auto widget_field = Widget::getProperty(property, row);
+    if (widget_field)
+    {
+      return widget_field;
+    }
+    if (property == "current_range_.first")
+    {
+      if (serialized_range_)
+      {
+        return serialized_range_->first;
+      }
+      else
+      {
+        return current_range_.first;
+      }
+    }
+    if (property == "current_range_.second")
+    {
+      if (serialized_range_)
+      {
+        return serialized_range_->second;
+      }
+      else
+      {
+        return current_range_.second;
+      }
+    }
+    if (property == "compact_view_")
+    {
+      return compact_view_;
+    }
+    if (property == "show_legend_")
+    {
+      return show_legend_;
+    }
+    if (property == "marker_position_")
+    {
+      return marker_position_ ? *marker_position_ : 0;
+    }
+    return std::nullopt;
+  }
+
+  void GraphicDataVizWidget::setProperty(const std::string& property, const CastValue& value, const size_t row)
+  {
+    Widget::setProperty(property, value, row);
+    if (property == "compact_view_")
+    {
+      compact_view_ = value.b_;
+    }
+    if (property == "show_legend_")
+    {
+      show_legend_ = value.b_;
+    }
+    // we need to keep range in a temporary variable to set it when the
+    // plot will be displayed.
+    if (property == "current_range_.first")
+    {
+      if (!serialized_range_)
+      {
+        serialized_range_ = { value.f_ , 0 };
+      }
+      else
+      {
+        serialized_range_->first = value.f_;
+      }
+    }
+    if (property == "current_range_.second")
+    {
+      if (!serialized_range_)
+      {
+        serialized_range_ = { 0, value.f_ };
+      }
+      else
+      {
+        serialized_range_->second = value.f_;
+      }
+    }
+    if (property == "marker_position_")
+    {
+      marker_position_ = value.f_;
     }
   }
 }

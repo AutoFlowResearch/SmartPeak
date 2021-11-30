@@ -40,7 +40,8 @@ namespace SmartPeak
 
     enum class Tag
     {
-      MAIN_DIR,
+      TAG_FIRST,
+      MAIN_DIR = TAG_FIRST,
       MZML_INPUT_PATH,
       FEATURES_INPUT_PATH,
       FEATURES_OUTPUT_PATH,
@@ -48,7 +49,8 @@ namespace SmartPeak
       INPUT_INJECTION_NAME,
       OUTPUT_INJECTION_NAME,
       INPUT_GROUP_NAME,
-      OUTPUT_GROUP_NAME
+      OUTPUT_GROUP_NAME,
+      TAG_LAST
     };
 
     /**
@@ -93,12 +95,17 @@ namespace SmartPeak
     /**
       @brief set tags and update paths.
     */
-    void setTag(Tag tag, const std::string& value);
+    void setTagValue(Tag tag, const std::string& value);
 
     /**
       @brief get tag value.
     */
-    std::string getTag(Tag tag) const;
+    std::string getTagValue(Tag tag) const;
+
+    /**
+      @return list of tag names and there corresponding enum
+    */
+    std::map<std::string, Filenames::Tag> getTagNames() const;
 
     /**
       @brief get description of the file.

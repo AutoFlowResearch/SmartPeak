@@ -55,6 +55,13 @@ namespace SmartPeak
       plot_title_(id) {};
 
     void draw() override;
+
+    /**
+      IPropertiesHandler
+    */
+    virtual std::map<std::string, CastValue::Type> getPropertiesSchema() const override;
+    virtual std::optional<CastValue> getProperty(const std::string& property, const size_t row) const override;
+    virtual void setProperty(const std::string& property, const CastValue& value, const size_t row) override;
     
   protected:
     virtual void setMarkerPosition(const std::optional<float>& marker_position);
@@ -86,6 +93,7 @@ namespace SmartPeak
     std::pair<float, float> slider_min_max_ = { 0.0f, 0.0f };
     std::pair<float, float> current_range_ = { 0.0f, 0.0f };
     std::pair<float, float> input_range_ = { 0.0f, 0.0f };
+    std::optional<std::pair<float, float>> serialized_range_;
     int current_z_ = 0;
     float sliders_height_ = 0.0f;
     std::optional<float> marker_position_;

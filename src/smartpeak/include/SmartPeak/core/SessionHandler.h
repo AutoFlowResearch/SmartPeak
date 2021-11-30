@@ -25,7 +25,6 @@
 
 #include <SmartPeak/core/SequenceHandler.h>
 #include <SmartPeak/core/ApplicationHandler.h>
-#include <SmartPeak/core/EventDispatcher.h>
 #include <unsupported/Eigen/CXX11/Tensor>
 
 namespace SmartPeak

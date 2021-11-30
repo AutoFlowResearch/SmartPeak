@@ -79,7 +79,7 @@ namespace SmartPeak
     }
 
     /**
-      ISequenceSegmentProcessorObserver
+      ISequenceProcessorObserver
     */
     void EventDispatcher::onSequenceProcessorStart(const size_t nb_injections)
     {
@@ -105,6 +105,10 @@ namespace SmartPeak
         [this] { this->notifySequenceProcessorEnd(); }
       )));
     }
+
+    /**
+      ISequenceSegmentProcessorObserver
+    */
     void EventDispatcher::onSequenceProcessorError(const std::string& sample_name, const std::string& processor_name, const std::string& error)
     {
       queueEvent(std::make_shared<std::future<void>>(std::async(std::launch::deferred,

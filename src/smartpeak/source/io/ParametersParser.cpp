@@ -27,7 +27,6 @@
 #endif
 #include <SmartPeak/io/csv.h>
 #include <SmartPeak/io/InputDataValidation.h>
-#include <SmartPeak/core/RawDataProcessor.h>
 #include <SmartPeak/core/Parameters.h>
 #include <SmartPeak/io/CSVWriter.h>
 

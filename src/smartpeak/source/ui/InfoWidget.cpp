@@ -22,7 +22,6 @@
 // --------------------------------------------------------------------------
 
 #include <SmartPeak/ui/InfoWidget.h>
-#include <SmartPeak/core/ApplicationProcessor.h>
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <plog/Log.h>

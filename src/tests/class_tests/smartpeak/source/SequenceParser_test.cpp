@@ -26,9 +26,9 @@
 #include <SmartPeak/test_config.h>
 #include <SmartPeak/io/SequenceParser.h>
 #include <SmartPeak/core/MetaDataHandler.h>
-#include <SmartPeak/core/RawDataProcessor.h>
 #include <SmartPeak/core/SampleType.h>
 #include <SmartPeak/core/ApplicationHandler.h>
+#include <SmartPeak/core/RawDataProcessors/LoadFeatures.h>
 
 using namespace SmartPeak;
 using namespace std;

@@ -31,7 +31,7 @@
 #include <unsupported/Eigen/CXX11/Tensor>
 #include <SmartPeak/iface/ISequenceSegmentObserver.h>
 #include <SmartPeak/iface/IFeaturesObserver.h>
-#include <SmartPeak/core/EventDispatcher.h>
+#include <SmartPeak/iface/IPropertiesHandler.h>
 
 #include <string>
 #include <utility>
@@ -48,7 +48,7 @@ namespace SmartPeak
   /**
     @brief Abstract base class for all panes, windows, and widgets
   */
-  class Widget
+  class Widget: public IPropertiesHandler
   {
   public:
     explicit Widget(std::string title = ""):
@@ -56,6 +56,14 @@ namespace SmartPeak
     {};
     virtual ~Widget() = default;
     Widget(const Widget &&) = delete;
+
+    /**
+      IPropertiesHandler
+    */
+    virtual std::string getPropertiesHandlerName() const override;
+    virtual std::map<std::string, CastValue::Type> getPropertiesSchema() const override;
+    virtual std::optional<CastValue> getProperty(const std::string& property, const size_t row) const override;
+    virtual void setProperty(const std::string& property, const CastValue& value, const size_t row) override;
 
     /**
       Interface to show the widget
@@ -310,51 +318,6 @@ namespace SmartPeak
       table_data_.clear();
       data_changed_ = true;
     };
-  };
-
-  /**
-    @brief Base class for all tables
-
-    TODO: features
-    - row highlighting on focus
-    - searching
-    - color coding of rows by status
-  */
-  class ExplorerWidget :
-      public GenericTableWidget,
-      public ISequenceObserver,
-      public IFeaturesObserver
-    {
-    public:
-      ExplorerWidget(const std::string& table_id, const std::string title ="", SequenceObservable* sequence_observable = nullptr)
-        :GenericTableWidget(table_id, title)
-      {
-        if (sequence_observable)
-        {
-          sequence_observable->addSequenceObserver(this);
-        }
-      };
-    /*
-    @brief Show the explorer
-
-    @param[in] headers Column header names
-    @param[in,out] columns Table body or matrix
-    @param[in,out] checked_rows What rows are checked/filtered
-    */
-    void draw() override;
-
-    /**
-    ISequenceObserver
-    */
-    virtual void onSequenceUpdated() override;
-    
-    /**
-    IFeaturesObserver
-    */
-    virtual void onFeaturesUpdated() override;
-
-    Eigen::Tensor<std::string, 1> checkbox_headers_;
-    Eigen::Tensor<bool, 2> *checkbox_columns_ = nullptr;
   };
 
   /**

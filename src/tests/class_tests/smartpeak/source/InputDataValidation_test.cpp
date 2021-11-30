@@ -26,8 +26,10 @@
 #include <SmartPeak/io/InputDataValidation.h>
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/SequenceProcessor.h>
-#include <SmartPeak/core/ApplicationProcessor.h>
 #include <SmartPeak/core/Utilities.h>
+#include <SmartPeak/core/RawDataProcessors/LoadTransitions.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/LoadQuantitationMethods.h>
+#include <SmartPeak/core/ApplicationProcessors/LoadSession.h>
 
 using namespace SmartPeak;
 using namespace std;
@@ -119,7 +121,8 @@ TEST(InputDataValidation, sampleNamesAreConsistent)
 {
   ApplicationHandler application_handler;
   application_handler.filenames_ = Utilities::buildFilenamesFromDirectory(application_handler, main_dir);
-  LoadSession cs(application_handler);
+  WorkflowManager workflow_manager;
+  LoadSession cs(application_handler, workflow_manager);
   auto& sequenceHandler = application_handler.sequenceHandler_;
   cs.filenames_          = application_handler.filenames_;
   cs.delimiter          = ",";
@@ -145,7 +148,8 @@ TEST(InputDataValidation, componentNamesAreConsistent)
 {
   ApplicationHandler application_handler;
   application_handler.filenames_ = Utilities::buildFilenamesFromDirectory(application_handler, main_dir);
-  LoadSession cs(application_handler);
+  WorkflowManager workflow_manager;
+  LoadSession cs(application_handler, workflow_manager);
   auto& sequenceHandler = application_handler.sequenceHandler_;
   cs.filenames_          = application_handler.filenames_;
   cs.delimiter          = ",";
@@ -171,7 +175,8 @@ TEST(InputDataValidation, componentNameGroupsAreConsistent)
 {
   ApplicationHandler application_handler;
   application_handler.filenames_ = Utilities::buildFilenamesFromDirectory(application_handler, main_dir);
-  LoadSession cs(application_handler);
+  WorkflowManager workflow_manager;
+  LoadSession cs(application_handler, workflow_manager);
   auto& sequenceHandler = application_handler.sequenceHandler_;
   cs.filenames_          = application_handler.filenames_;
   cs.delimiter          = ",";
@@ -196,8 +201,9 @@ TEST(InputDataValidation, componentNameGroupsAreConsistent)
 TEST(InputDataValidation, heavyComponentsAreConsistent)
 {
   ApplicationHandler application_handler;
+  WorkflowManager workflow_manager;
   application_handler.filenames_ = Utilities::buildFilenamesFromDirectory(application_handler, main_dir);
-  LoadSession cs(application_handler);
+  LoadSession cs(application_handler, workflow_manager);
   auto& sequenceHandler = application_handler.sequenceHandler_;
   cs.filenames_          = application_handler.filenames_;
   cs.delimiter          = ",";
