@@ -55,6 +55,7 @@
 #include <SmartPeak/core/RawDataProcessors/ConstructTransitionsList.h>
 #include <SmartPeak/core/RawDataProcessors/StoreAnnotations.h>
 #include <SmartPeak/core/RawDataProcessors/ClearData.h>
+#include <SmartPeak/core/RawDataProcessors/StoreMSP.h>
 #include <SmartPeak/core/RawDataProcessors/StoreRawData.h>
 #include <SmartPeak/core/RawDataProcessors/CalculateMDVs.h>
 #include <SmartPeak/core/RawDataProcessors/IsotopicCorrections.h>
@@ -130,6 +131,7 @@ namespace SmartPeak {
     {"CONSTRUCT_TRANSITIONS_LIST",                std::make_shared<ConstructTransitionsList>()},
     {"STORE_ANNOTATIONS",                         std::make_shared<StoreAnnotations>()},
     {"CLEAR_DATA",                                std::make_shared<ClearData>()},
+    {"STORE_MSP",                                 std::make_shared<StoreMSP>()},
     {"STORE_RAW_DATA",                            std::make_shared<StoreRawData>()},
     {"CALCULATE_MDVS",                            std::make_shared<CalculateMDVs>()},
     {"ISOTOPIC_CORRECTIONS",                      std::make_shared<IsotopicCorrections>()},
