@@ -10,6 +10,7 @@ set(sources_list_h
 	CheckFeaturesBackgroundInterferences.h
 	CheckFeaturesRSDs.h
 	ClearData.h
+	ConstructTransitionsList.h
 	DDA.h
 	ExtractChromatogramWindows.h
 	ExtractSpectraWindows.h

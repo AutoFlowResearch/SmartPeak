@@ -52,6 +52,7 @@
 #include <SmartPeak/core/RawDataProcessors/LoadAnnotations.h>
 #include <SmartPeak/core/RawDataProcessors/SearchSpectrum.h>
 #include <SmartPeak/core/RawDataProcessors/DDA.h>
+#include <SmartPeak/core/RawDataProcessors/ConstructTransitionsList.h>
 #include <SmartPeak/core/RawDataProcessors/StoreAnnotations.h>
 #include <SmartPeak/core/RawDataProcessors/ClearData.h>
 #include <SmartPeak/core/RawDataProcessors/StoreRawData.h>
@@ -126,6 +127,7 @@ namespace SmartPeak {
     {"LOAD_ANNOTATIONS",                          std::make_shared<LoadAnnotations>()},
     {"SEARCH_SPECTRUM",                           std::make_shared<SearchSpectrum>()},
     {"DDA",                                       std::make_shared<DDA>()},
+    {"CONSTRUCT_TRANSITIONS_LIST",                std::make_shared<ConstructTransitionsList>()},
     {"STORE_ANNOTATIONS",                         std::make_shared<StoreAnnotations>()},
     {"CLEAR_DATA",                                std::make_shared<ClearData>()},
     {"STORE_RAW_DATA",                            std::make_shared<StoreRawData>()},

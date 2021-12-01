@@ -891,7 +891,8 @@ namespace SmartPeak
                     "PICK_3D_FEATURES",
                     "SEARCH_SPECTRUM",
                     "DDA",
-                    "STORE_FEATURES" };
+                    "CONSTRUCT_TRANSITIONS_LIST",
+                    "STORE_FEATURES"};
           else if (s_string == "LCMS MRM Unknowns")
             ids = { "LOAD_RAW_DATA",
                     "MAP_CHROMATOGRAMS",
