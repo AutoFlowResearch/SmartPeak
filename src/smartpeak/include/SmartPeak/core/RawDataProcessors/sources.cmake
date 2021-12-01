@@ -28,6 +28,7 @@ set(sources_list_h
 	LoadTransitions.h
 	LoadValidationData.h
 	MapChromatograms.h
+	MatchSpectra.h
 	MergeFeatures.h
 	MergeSpectra.h
 	Pick2DFeatures.h
