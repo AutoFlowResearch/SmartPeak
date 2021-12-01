@@ -50,6 +50,10 @@ public:
     OpenMS::FeatureMap& getFeatureMap();
     const OpenMS::FeatureMap& getFeatureMap() const;
 
+    void setFeatureMap(const std::string& name, const OpenMS::FeatureMap& feature_map);
+    OpenMS::FeatureMap& getFeatureMap(const std::string& name);
+    const OpenMS::FeatureMap& getFeatureMap(const std::string& name) const;
+
     void setMetaData(const MetaDataHandler& meta_data);
     void setMetaData(std::shared_ptr<MetaDataHandler>& meta_data);
     MetaDataHandler& getMetaData();
@@ -189,6 +193,7 @@ private:
     std::shared_ptr<MetaDataHandler> meta_data_;  ///< sample meta data; shared between the injection handler and the raw data handler
     std::map<std::string, float> validation_metrics_;
     OpenMS::MzTab mz_tab_;
+    std::map<std::string, OpenMS::FeatureMap> named_feature_maps_;
 
     // input (reused between RawDataHandlers)
     std::shared_ptr<ParameterSet> parameters_ = nullptr;  ///< algorithm parameters; shared between all raw data handlers in the sequence
