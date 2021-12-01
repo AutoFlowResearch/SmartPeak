@@ -42,6 +42,7 @@ set(sources_list
 	StoreFeatureFiltersRDP.cpp
 	StoreFeatureQCsRDP.cpp
 	StoreFeatures.cpp
+	StoreMSP.cpp
 	StoreParameters.cpp
 	StoreRawData.cpp
 	StoreValidationData.cpp
