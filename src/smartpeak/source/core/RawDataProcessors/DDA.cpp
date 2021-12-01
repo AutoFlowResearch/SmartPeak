@@ -92,27 +92,10 @@ namespace SmartPeak
     OpenMS::FeatureMap ms1_merged_features;
     targeted_spectra_extractor.mergeFeatures(ms1_accurate_mass_found_feature_map, ms1_merged_features);
 
-    // annotateSpectra :  I would like to annotate my MS2 spectra with the likely MS1 feature that it was derived from
+    // extractSpectra
     std::vector<OpenMS::MSSpectrum> annotated_spectra;
-    OpenMS::FeatureMap ms2_features; // will be the input of annoteSpectra
-    targeted_spectra_extractor.annotateSpectra(rawDataHandler_IO.getExperiment().getSpectra(), ms1_merged_features, ms2_features, annotated_spectra);
-
-    // pickSpectra
-    std::vector<OpenMS::MSSpectrum> picked_spectra;
-    for (const auto& spectrum : annotated_spectra)
-    {
-      OpenMS::MSSpectrum picked_spectrum;
-      targeted_spectra_extractor.pickSpectrum(spectrum, picked_spectrum);
-      picked_spectra.push_back(picked_spectrum);
-    }
-
-    // score and select
-    std::vector<OpenMS::MSSpectrum> scored_spectra;
-    targeted_spectra_extractor.scoreSpectra(annotated_spectra, picked_spectra, scored_spectra);
-
-    std::vector<OpenMS::MSSpectrum> selected_spectra;
     OpenMS::FeatureMap selected_features;
-    targeted_spectra_extractor.selectSpectra(scored_spectra, ms2_features, selected_spectra, selected_features, true);
+    targeted_spectra_extractor.extractSpectra(rawDataHandler_IO.getExperiment(), ms1_merged_features, annotated_spectra, selected_features, true);
 
     // searchSpectra (will be on MS2 spectra)
     OpenMS::FeatureMap ms2_accurate_mass_found_feature_map;
