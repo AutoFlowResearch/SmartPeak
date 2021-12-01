@@ -28,6 +28,7 @@ set(sources_list
 	LoadTransitions.cpp
 	LoadValidationData.cpp
 	MapChromatograms.cpp
+	MatchSpectra.cpp
 	MergeFeatures.cpp
 	MergeSpectra.cpp
 	PickMRMFeatures.cpp
