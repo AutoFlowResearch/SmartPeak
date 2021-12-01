@@ -42,6 +42,7 @@ set(sources_list_h
 	StoreFeatureFiltersRDP.h
 	StoreFeatureQCsRDP.h
 	StoreFeatures.h
+	StoreMSP.h
 	StoreParameters.h
 	StoreRawData.h
 	StoreValidationData.h
