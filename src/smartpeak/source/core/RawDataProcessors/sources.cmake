@@ -10,6 +10,7 @@ set(sources_list
 	CheckFeaturesBackgroundInterferences.cpp
 	CheckFeaturesRSDs.cpp
 	ClearData.cpp
+	ConstructTransitionsList.cpp
 	DDA.cpp
 	ExtractChromatogramWindows.cpp
 	ExtractSpectraWindows.cpp
