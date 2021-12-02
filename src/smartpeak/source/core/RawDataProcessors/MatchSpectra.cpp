@@ -25,6 +25,7 @@
 #include <SmartPeak/core/Utilities.h>
 #include <SmartPeak/core/FeatureFiltersUtils.h>
 
+#include <OpenMS/FORMAT/MSPGenericFile.h>
 #include <OpenMS/ANALYSIS/OPENSWATH/TargetedSpectraExtractor.h>
 
 #include <plog/Log.h>
@@ -49,6 +50,7 @@ namespace SmartPeak
 
   void MatchSpectra::getFilenames(Filenames& filenames) const
   {
+    filenames.addFileName("cmp_spectra", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}.msp");
   };
 
   void MatchSpectra::process(RawDataHandler& rawDataHandler_IO,
@@ -66,13 +68,21 @@ namespace SmartPeak
     OpenMS::TargetedSpectraExtractor targeted_spectra_extractor;
     Utilities::setUserParameters(targeted_spectra_extractor, params);
 
+    // Load spectra for comparison
+    auto cmp_spectra_file_name = filenames_I.getFullPath("cmp_spectra").generic_string();
+    OpenMS::MSPGenericFile msp_file;
+    OpenMS::MSExperiment library;
+    msp_file.load(cmp_spectra_file_name, library);
+
+    // Compare
     OpenMS::TargetedSpectraExtractor::BinnedSpectrumComparator cmp;
     OpenMS::FeatureMap feature_map;
+    std::map<OpenMS::String, OpenMS::DataValue> options;
+    cmp.init(library.getSpectra(), options);
     targeted_spectra_extractor.targetedMatching(rawDataHandler_IO.getExperiment().getSpectra(), cmp, feature_map);
 
     rawDataHandler_IO.setFeatureMap(feature_map);
     rawDataHandler_IO.updateFeatureMapHistory();
-
     LOGD << "END MatchSpectra";
   }
 
