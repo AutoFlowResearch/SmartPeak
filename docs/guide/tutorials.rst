@@ -438,6 +438,22 @@ can be found in :ref:`Workflow Commands`.
 	* MERGE_INJECTIONS
 	* STORE_FEATURES_SAMPLE_GROUP
 
+	The workflow pipeline is initialized by loading the raw data followed 
+	by extracting the spectra windows based on the given parameters by the user
+	then merging spectras over the time axis. Once done, the peak picking routine
+	will be executed on the MS1 spectras followed by executing the mass search routine.
+	As an intermediate workflow step, the mzTab annotations and feature lists are saved 
+	to disk as ``mzTab`` and ``featureXML`` file formats respectively. A major processing
+	step in this workflow is to estimate the Background Interferences for component and 
+	component group feature filter as well as ion intensity attributes from blank samples
+	followed by storing component and component group percent Background Interference 
+	estimations to disk. Then, filter transitions and transitions groups based on criteria
+	provided by the user followed by creating merged features from the accurate mass search
+	results as well as merging multiple injections of the same sample. An as the final step
+	in the workflow pipeline, the features for the sample group is saved to disk as a 
+	``featureXML`` file.
+
+
 	The Spectra for the two injection samples can be inspected after all workflow steps had been run, to do so please
 	click on view and then "Spectra". From the Injections tab check "Plot/Unplot All" select all injection samples and 
 	plot the mass to charge ratio relative to their respective intensities as shown below:
