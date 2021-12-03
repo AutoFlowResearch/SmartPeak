@@ -26,6 +26,7 @@ set(core_executables_list
 	SessionHandler_test
 	SessionLoaderGenerator_test
 	Task_test
+	UIUtilities_test
 	Utilities_test
 	WorkflowObservable_test
 	WorkflowManager_test

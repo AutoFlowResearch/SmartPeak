@@ -612,23 +612,6 @@ TEST(utilities, getLogFilepath)
   }
 }
 
-TEST(utilities, makeHumanReadable)
-{
-  SmartPeak::ImEntry dir_entry_1;
-  dir_entry_1.ID = 0;
-  dir_entry_1.entry_contents.resize(4, "");
-  dir_entry_1.entry_contents[0] = "testfile.csv";
-  dir_entry_1.entry_contents[1] = "1325000000";
-  dir_entry_1.entry_contents[2] = ".csv";
-  dir_entry_1.entry_contents[3] = "2021-03-22 06:59:29";
-
-  Utilities::makeHumanReadable(dir_entry_1);
-  EXPECT_STREQ(dir_entry_1.entry_contents[0].c_str(), "testfile.csv");
-  EXPECT_STREQ(dir_entry_1.entry_contents[1].c_str(), "1.32 GB");
-  EXPECT_STREQ(dir_entry_1.entry_contents[2].c_str(), "csv");
-  EXPECT_STREQ(dir_entry_1.entry_contents[3].c_str(), "Mon Mar 22 06:59:29 2021");
-}
-
 TEST(utilities, removeTrailing)
 {
   std::string str1 = "234.0000";

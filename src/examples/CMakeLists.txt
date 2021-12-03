@@ -19,7 +19,7 @@ include(executables.cmake)
 # Include directories for examples
 set(SMARTPEAK_EXAMPLES_INTERNAL_INCLUDE_DIRECTORIES "${PROJECT_BINARY_DIR}/include/")
 # add SmartPeak directories
-set(SMARTPEAK_EXAMPLES_EXTERNAL_INCLUDE_DIRECTORIES "${SmartPeak_INCLUDE_DIRECTORIES}")
+set(SMARTPEAK_EXAMPLES_EXTERNAL_INCLUDE_DIRECTORIES "${SmartPeak_INCLUDE_DIRECTORIES}" "${SmartPeakWidgets_INCLUDE_DIRECTORIES}")
 include_directories(${SMARTPEAK_EXAMPLES_INTERNAL_INCLUDE_DIRECTORIES})
 include_directories(SYSTEM ${SMARTPEAK_EXAMPLES_EXTERNAL_INCLUDE_DIRECTORIES})
 
@@ -123,7 +123,7 @@ foreach(_examples ${EXAMPLE_executables})
       set_source_files_properties(${ASSETS} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
       source_group("Resources" FILES ${ASSETS})
       add_executable(${_examples} MACOSX_BUNDLE source/${_examples} ${ASSETS})
-      target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} 
+      target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} ${SmartPeakWidgets_LIBRARIES}
             OpenMS ${SDL2_LIBRARY} ${OPENGL_LIBRARIES} ImPlot::ImPlot ImGui::ImGui 
             ${COREFOUNDATION_LIBRARY} ${APPLICATIONSERVICES_LIBRARY}
             PRIVATE ImPlot::Sources ImGui::Sources ImGui::Examples ImGui::SourcesMiscCpp)
@@ -138,7 +138,7 @@ foreach(_examples ${EXAMPLE_executables})
 
     if (${_examples} STREQUAL "SmartPeakGUI")
       add_executable(${_examples} source/${_examples})
-      target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} 
+      target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} ${SmartPeakWidgets_LIBRARIES}
           OpenMS ${SDL2_LIBRARIES} ${OPENGL_LIBRARIES} ImPlot::ImPlot ImGui::ImGui 
           PRIVATE ImPlot::Sources ImGui::Sources ImGui::Examples ImGui::SourcesMiscCpp)
       install_tool(${_examples}) 
@@ -163,15 +163,15 @@ foreach(_examples ${EXAMPLE_executables})
 
   else() # Win
 
-    if(NOT ${_examples} STREQUAL "SmartPeakGUI")
+    if(${_examples} STREQUAL "SmartPeakGUI")
+      add_executable(${_examples} source/${_examples} ${CMAKE_SOURCE_DIR}/cmake/Windows/SmartPeakGUI.rc)
+      target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} ${SmartPeakWidgets_LIBRARIES}
+        OpenMS ${SDL2_LIBRARIES} ${OPENGL_LIBRARIES} ImPlot::ImPlot ImGui::ImGui 
+        PRIVATE ImPlot::Sources ImGui::Sources ImGui::Examples ImGui::SourcesMiscCpp)
+      install_tool(${_examples})
+    else()
       add_executable(${_examples} source/${_examples})
       target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} OpenMS)
-    else()
-      add_executable(${_examples} source/${_examples} ${CMAKE_SOURCE_DIR}/cmake/Windows/SmartPeakGUI.rc)
-      target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} 
-          OpenMS ${SDL2_LIBRARIES} ${OPENGL_LIBRARIES} ImPlot::ImPlot ImGui::ImGui 
-          PRIVATE ImPlot::Sources ImGui::Sources ImGui::Examples ImGui::SourcesMiscCpp)
-      install_tool(${_examples})
     endif()
 
   endif()
