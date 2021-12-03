@@ -25,7 +25,14 @@
 #include <SmartPeak/core/CastValue.h>
 #include <SmartPeak/core/Parameters.h>
 #include <SmartPeak/smartpeak_package_version.h>
+
 #include <OpenMS/DATASTRUCTURES/Param.h>
+
+#ifndef CSV_IO_NO_THREAD
+#define CSV_IO_NO_THREAD
+#endif
+#include <SmartPeak/io/csv.h>
+
 #include <algorithm>
 #include <iostream>
 #include <numeric>
