@@ -52,9 +52,6 @@ endif()
 if (TBB_FOUND)
  list(APPEND SMARTPEAK_DEP_LIBRARIES ${TBB_LIBRARIES})
 endif()
-if (MSVC)
-	list(APPEND SMARTPEAK_DEP_LIBRARIES opengl32.lib)
-endif()
 
 smartpeak_add_library(TARGET_NAME  SmartPeak
                    SOURCE_FILES  ${SmartPeak_sources}
@@ -63,8 +60,6 @@ smartpeak_add_library(TARGET_NAME  SmartPeak
                    INTERNAL_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/include
                                      ${CMAKE_CURRENT_BINARY_DIR}/include
                    EXTERNAL_INCLUDES ${OpenMS_INCLUDE_DIRECTORIES}
-                                     ${ImGui_INCLUDE_DIR}
-                                     ${IMPLOT_INCLUDE_DIR}
                                      ${EIGEN3_INCLUDE_DIR}
                                      ${PLOG_INCLUDE_DIR}
                                      ${SQLITE_INCLUDE_DIR}

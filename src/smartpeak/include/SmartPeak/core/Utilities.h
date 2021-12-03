@@ -27,8 +27,6 @@
 #include <SmartPeak/core/Parameters.h>
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/ApplicationHandler.h>
-#include <imgui.h>
-#include <imgui_internal.h>
 #include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureSelector.h>
 #include <OpenMS/DATASTRUCTURES/Param.h>
 #include <OpenMS/FORMAT/MRMFeatureQCFile.h>
