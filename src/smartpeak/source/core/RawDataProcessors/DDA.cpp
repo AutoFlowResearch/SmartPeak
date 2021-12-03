@@ -81,6 +81,11 @@ namespace SmartPeak
     targeted_spectra_extractor.mergeFeatures(ms1_accurate_mass_found_feature_map, ms1_merged_features);
     rawDataHandler_IO.setFeatureMap("ms1_merged_features", ms1_merged_features);
 
+    rawDataHandler_IO.setFeatureMap(ms1_merged_features);
+    rawDataHandler_IO.updateFeatureMapHistory();
+
+    // --- To split here
+
     // extractSpectra
     std::vector<OpenMS::MSSpectrum> annotated_spectra;
     OpenMS::FeatureMap selected_features;
