@@ -59,28 +59,28 @@ namespace SmartPeak
       {
         size_human_readable_stream << std::fixed << std::setprecision(2) << (entry_size / 1e3);
         auto size_human_readable_str = size_human_readable_stream.str();
-        Utilities::removeTrailing(size_human_readable_str, ".00");
+        // Utilities::removeTrailing(size_human_readable_str, ".00");
         size_human_readable = size_human_readable_str + " KB";
       }
       else if (entry_size >= 1e6 && entry_size < 1e9)
       {
         size_human_readable_stream << std::fixed << std::setprecision(2) << (entry_size / 1e6);
         auto size_human_readable_str = size_human_readable_stream.str();
-        Utilities::removeTrailing(size_human_readable_str, ".00");
+        // Utilities::removeTrailing(size_human_readable_str, ".00");
         size_human_readable = size_human_readable_str + " MB";
       }
       else if (entry_size >= 1e9 && entry_size < 1e12)
       {
         size_human_readable_stream << std::fixed << std::setprecision(2) << (entry_size / 1e9);
         auto size_human_readable_str = size_human_readable_stream.str();
-        Utilities::removeTrailing(size_human_readable_str, ".00");
+        // Utilities::removeTrailing(size_human_readable_str, ".00");
         size_human_readable = size_human_readable_str + " GB";
       }
       else if (entry_size >= 1e12 && entry_size < 1e18)
       {
         size_human_readable_stream << std::fixed << std::setprecision(2) << (entry_size / 1e12);
         auto size_human_readable_str = size_human_readable_stream.str();
-        Utilities::removeTrailing(size_human_readable_str, ".00");
+        // Utilities::removeTrailing(size_human_readable_str, ".00");
         size_human_readable = size_human_readable_str + " TB";
       }
     
