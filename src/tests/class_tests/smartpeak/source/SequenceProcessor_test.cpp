@@ -61,29 +61,6 @@ Filenames generateTestFilenames()
 }
 
 /*
-TEST(SequenceHandler, createSequence_onFilePicked)
-{
-  ApplicationHandler application_handler;
-  LoadSession cs(application_handler);
-  auto& sequenceHandler = application_handler.sequenceHandler_;
-  std::string datapath_ = SMARTPEAK_GET_TEST_DATA_PATH("");
-  auto workflow = std::filesystem::path{ datapath_ } / std::filesystem::path{ "workflow_csv_files" };
-  Filenames filenames_;
-  filenames_.setFullPath("sequence", workflow / "sequence.csv");
-  cs.onFilePicked(filenames_.getFullPath("sequence"), &application_handler);
-
-  ASSERT_EQ(sequenceHandler.getSequence().size(), 2);
-  InjectionHandler& injection0 = sequenceHandler.getSequence()[0];
-  EXPECT_STREQ(injection0.getMetaData().getSampleName().c_str(), "150516_CM1_Level1");
-  EXPECT_STREQ(injection0.getMetaData().getSampleGroupName().c_str(), "CM");
-  EXPECT_STREQ(injection0.getRawData().getMetaData().getSampleName().c_str(), "150516_CM1_Level1");
-  EXPECT_EQ(injection0.getRawData().getParameters().size(), 27);
-  EXPECT_STREQ(injection0.getRawData().getParameters().at("MRMFeatureFinderScoring")[0].getName().c_str(), "stop_report_after_feature");
-  EXPECT_EQ(injection0.getRawData().getQuantitationMethods().size(), 10);
-  EXPECT_STREQ(injection0.getRawData().getQuantitationMethods()[0].getComponentName().c_str(), "arg-L.arg-L_1.Light");
-}
-*/
-/*
 #if (WIN32)
 TEST(SequenceHandler, createSequence_onFilePicked_windows_separators)
 {

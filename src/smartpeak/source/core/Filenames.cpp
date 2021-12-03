@@ -112,6 +112,7 @@ namespace SmartPeak
     }
     file_names_.at(id).full_path_override_ = true;
     file_names_.at(id).full_path_ = full_path;
+    file_names_.at(id).name_pattern_ = "";
   }
 
   void Filenames::updateFullPaths()

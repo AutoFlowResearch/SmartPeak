@@ -28,7 +28,12 @@
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/ApplicationProcessors/BuildCommandsFromNames.h>
 #include <SmartPeak/core/ApplicationProcessors/CreateCommand.h>
+#include <SmartPeak/core/ApplicationProcessors/LoadSession.h>
+#include <SmartPeak/core/ApplicationProcessors/SaveSession.h>
+#include <SmartPeak/core/Utilities.h>
 #include <filesystem>
+
+#include <plog/Appenders/ColorConsoleAppender.h>
 
 using namespace SmartPeak;
 using namespace std;
@@ -153,4 +158,52 @@ TEST_F(ApplicationProcessorFixture, BuildCommandsFromNames_GetName)
 {
   BuildCommandsFromNames cmd{ ah_ };
   EXPECT_STREQ(cmd.getName().c_str(), "BuildCommandsFromNames");
+}
+
+
+TEST(LoadSession, SaveSession_LoadSession_onFilePicked)
+{
+  plog::ColorConsoleAppender<plog::TxtFormatter> consoleAppender;
+
+  // Init logger with all the appenders
+  plog::init(plog::debug, &consoleAppender);
+
+  // Copy test data to antoher place to avoid poluting the data folder with the test.
+  auto data_path = std::filesystem::path(std::tmpnam(nullptr));
+  std::filesystem::copy(SMARTPEAK_GET_TEST_DATA_PATH("workflow_csv_files"), data_path);
+
+  // Load session from a directory
+  ApplicationHandler application_handler;
+  application_handler.filenames_ = Utilities::buildFilenamesFromDirectory(application_handler, data_path);
+  WorkflowManager workflow_manager;
+  LoadSession load_session(application_handler, workflow_manager);
+  load_session.filenames_ = application_handler.filenames_;
+  load_session.delimiter = ",";
+  load_session.checkConsistency = false;
+  load_session.process();
+
+  application_handler.filenames_.log();
+
+  // Save Session using onFilePicked
+  auto path_db = data_path / "session.db";
+  SaveSession save_session_on_file_picked(application_handler);
+  save_session_on_file_picked.onFilePicked(path_db, &application_handler);
+
+  // close session
+  application_handler.closeSession();
+
+  // Load Session using onFilePicked
+  LoadSession load_session_on_file_picked(application_handler, workflow_manager);
+  load_session_on_file_picked.onFilePicked(path_db, &application_handler);
+
+  auto& sequenceHandler = application_handler.sequenceHandler_;
+  ASSERT_EQ(sequenceHandler.getSequence().size(), 2);
+  InjectionHandler& injection0 = sequenceHandler.getSequence()[0];
+  EXPECT_STREQ(injection0.getMetaData().getSampleName().c_str(), "150516_CM1_Level1");
+  EXPECT_STREQ(injection0.getMetaData().getSampleGroupName().c_str(), "CM");
+  EXPECT_STREQ(injection0.getRawData().getMetaData().getSampleName().c_str(), "150516_CM1_Level1");
+  EXPECT_EQ(injection0.getRawData().getParameters().size(), 27);
+  EXPECT_STREQ(injection0.getRawData().getParameters().at("MRMFeatureFinderScoring")[0].getName().c_str(), "stop_report_after_feature");
+  EXPECT_EQ(injection0.getRawData().getQuantitationMethods().size(), 10);
+  EXPECT_STREQ(injection0.getRawData().getQuantitationMethods()[0].getComponentName().c_str(), "arg-L.arg-L_1.Light");
 }
