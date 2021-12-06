@@ -139,12 +139,7 @@ foreach(_class_test ${TEST_executables})
       OR ${_class_test} STREQUAL "PlotExporter_test"
       OR ${_class_test} STREQUAL "WindowSizesAndPositions_test"
       OR ${_class_test} STREQUAL "UIUtilities_test" ))
-      message(STATUS "---------------------------------")
-      message(STATUS "${_class_test}")
-      message(STATUS "SmartPeak_LIBRARIES: ${SmartPeak_LIBRARIES}")
-      message(STATUS "SmartPeakWidgets_LIBRARIES: ${SmartPeakWidgets_LIBRARIES}")
-      message(STATUS "---------------------------------")
-      target_link_libraries(${_class_test} PUBLIC ${SmartPeak_LIBRARIES} ${SmartPeakWidgets_LIBRARIES} OpenMS  ${OPENGL_LIBRARIES} ImGui::ImGui ImPlot::ImPlot 
+      target_link_libraries(${_class_test} PUBLIC ${SmartPeakWidgets_LIBRARIES} ${SmartPeak_LIBRARIES} OpenMS  ${OPENGL_LIBRARIES} ImGui::ImGui ImPlot::ImPlot 
       PRIVATE gtest_main gmock_main ImGui::Sources ImPlot::Sources ImGui::SourcesMiscCpp)
   else()
     target_link_libraries(${_class_test} PUBLIC ${SmartPeak_LIBRARIES} OpenMS PRIVATE gtest_main gmock_main)
