@@ -178,8 +178,8 @@ int main(int argc, char** argv)
   auto spectrum_explorer_window_ = std::make_shared<ExplorerWidget>("SpectrumExplorerWindow", "Scans", &event_dispatcher);
   auto sequence_main_window_ = std::make_shared<SequenceTableWidget>("SequenceMainWindow", "Sequence",
                                                                       &session_handler_, &application_handler_.sequenceHandler_);
-  auto transitions_main_window_ = std::make_shared<GenericTableWidget>("TransitionsMainWindow", "Transitions");
-  auto spectrum_main_window_ = std::make_shared<GenericTableWidget>("SpectrumMainWindow", "Scans");
+  auto transitions_main_window_ = std::make_shared<GenericTableWidget>("TransitionsMainWindow", "Transitions Table");
+  auto spectrum_main_window_ = std::make_shared<GenericTableWidget>("SpectrumMainWindow", "Scans Table");
   auto quant_method_main_window_ = std::make_shared<SequenceSegmentWidget>("QuantMethodMainWindow", "Quantitation Method",
                                    &session_handler_, &application_handler_.sequenceHandler_,
                                    &SessionHandler::setQuantMethodTable, &SessionHandler::getFiltersTable, &application_handler_.sequenceHandler_);
@@ -244,7 +244,7 @@ int main(int argc, char** argv)
   transitions_explorer_window_->visible_ = true;
 
   // windows organization
-  split_window.top_windows = {
+  split_window.top_windows_ = {
     statistics_,
     sequence_main_window_,
     transitions_main_window_,
@@ -281,14 +281,14 @@ int main(int argc, char** argv)
     calibrators_line_plot_
   };
 
-  split_window.bottom_windows = {
+  split_window.bottom_windows_ = {
     quickInfoText_,
     log_widget_,
     spectra_msms_plot_widget_,
     spectra_ms2_plot_widget_,
   };
 
-  split_window.left_windows = {
+  split_window.left_windows_ = {
     injections_explorer_window_,
     transitions_explorer_window_,
     features_explorer_window_,
@@ -309,9 +309,9 @@ int main(int argc, char** argv)
   split_window.setupLayoutLoader(layout_loader);
 
   // We need titles for all sub windows
-  checkTitles(split_window.top_windows);
-  checkTitles(split_window.bottom_windows);
-  checkTitles(split_window.left_windows);
+  checkTitles(split_window.top_windows_);
+  checkTitles(split_window.bottom_windows_);
+  checkTitles(split_window.left_windows_);
 
   // Create log path
   const std::time_t t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
@@ -386,6 +386,7 @@ int main(int argc, char** argv)
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
   ImGuiIO& io = ImGui::GetIO(); (void)io;
+  ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
   //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
 
   // Setup Dear ImGui style
@@ -414,28 +415,27 @@ int main(int argc, char** argv)
     // Start the Dear ImGui frame
     ImGui_ImplOpenGL2_NewFrame();
     ImGui_ImplSDL2_NewFrame(window);
+
+    split_window.win_size_and_pos_.applyLayout();
     ImGui::NewFrame();
 
-    { // keeping this block to easily collapse/expand the bulk of the loop
+    event_dispatcher.dispatchEvents();
 
-      event_dispatcher.dispatchEvents();
+    session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
 
-      session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
+    if ((!workflow_is_done_) && workflow_manager_.isWorkflowDone()) // workflow just finished
+    {
+      workflow_manager_.updateApplicationHandler(application_handler_);
+    }
+    workflow_is_done_ = workflow_manager_.isWorkflowDone();
+    file_loading_is_done_ = file_picker_->fileLoadingIsDone();
 
-      split_window.win_size_and_pos.setXAndYSizes(io.DisplaySize.x, io.DisplaySize.y);
-      if ((!workflow_is_done_) && workflow_manager_.isWorkflowDone()) // workflow just finished
-      {
-        workflow_manager_.updateApplicationHandler(application_handler_);
-      }
-      workflow_is_done_ = workflow_manager_.isWorkflowDone();
-      file_loading_is_done_ = file_picker_->fileLoadingIsDone();
-
-      // Make the quick info text
-      quickInfoText_->clearErrorMessages();
-      if (exceeding_plot_points_) quickInfoText_->addErrorMessage("Plot rendering limit reached.  Not plotting all selected data.");
-      if (exceeding_table_size_) quickInfoText_->addErrorMessage("Table rendering limit reached.  Not showing all selected data.");
-      if (ran_integrity_check_ && integrity_check_failed_) quickInfoText_->addErrorMessage("Integrity check failed.  Check the `Information` log.");
-      if (ran_integrity_check_ && !integrity_check_failed_) quickInfoText_->addErrorMessage("Integrity check passed.");
+    // Make the quick info text
+    quickInfoText_->clearErrorMessages();
+    if (exceeding_plot_points_) quickInfoText_->addErrorMessage("Plot rendering limit reached.  Not plotting all selected data.");
+    if (exceeding_table_size_) quickInfoText_->addErrorMessage("Table rendering limit reached.  Not showing all selected data.");
+    if (ran_integrity_check_ && integrity_check_failed_) quickInfoText_->addErrorMessage("Integrity check failed.  Check the `Information` log.");
+    if (ran_integrity_check_ && !integrity_check_failed_) quickInfoText_->addErrorMessage("Integrity check passed.");
       
     // ======================================
     // Popups
@@ -672,6 +672,15 @@ int main(int argc, char** argv)
       }
       showQuickHelpToolTip("actions");
       
+      if (ImGui::BeginMenu("Window"))
+      {
+        if (ImGui::MenuItem("Reset Window Layout"))
+        {
+          split_window.reset_layout_ = true;
+        }
+        ImGui::EndMenu();
+      }
+
       if (ImGui::BeginMenu("Help"))
       {
         ImGui::MenuItem("About", NULL, &about_widget_->visible_);
@@ -816,9 +825,9 @@ int main(int argc, char** argv)
     // =====================================================
     layout_loader.process();
 
-    }
-
+    // =====================================================
     // Rendering
+    // =====================================================
     ImGui::Render();
     glViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
     glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);

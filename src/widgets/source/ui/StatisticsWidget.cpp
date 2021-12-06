@@ -33,6 +33,13 @@ namespace SmartPeak
   void StatisticsWidget::draw()
   {
 
+    if (!transitions_)
+    {
+      return;
+    }
+
+    auto window_size = ImGui::GetWindowSize();
+
     // number of items from which the basic graph 
     // will be replaced by simplified graph to support large number of data
     static const int max_samples = 50;
@@ -170,7 +177,9 @@ namespace SmartPeak
     {
       ImPlot::SetNextPlotLimits(-0.5, +0.5, 0, 1, ImGuiCond_Always);
     }
-    if (ImPlot::BeginPlot(title, x_label, y_label, ImVec2((width_/2.0f) - 10, height_ - 40), ImPlotFlags_Default & ~ImPlotFlags_Legend & ~ImPlotFlags_MousePos, ImPlotAxisFlags_GridLines | ImPlotAxisFlags_TickMarks)) {
+
+    auto window_size = ImGui::GetWindowSize();
+    if (ImPlot::BeginPlot(title, x_label, y_label, ImVec2((window_size .x/2.0f) - 10, window_size.y - 40), ImPlotFlags_Default & ~ImPlotFlags_Legend & ~ImPlotFlags_MousePos, ImPlotAxisFlags_GridLines | ImPlotAxisFlags_TickMarks)) {
       if (chart_data.values_.size() > 0)
       {
         ImPlot::PlotBars("Unselected", &chart_data.unselected_values_.front(), chart_data.unselected_values_.size());
