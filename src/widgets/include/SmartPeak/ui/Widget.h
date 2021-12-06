@@ -72,12 +72,8 @@ namespace SmartPeak
     */
     virtual void draw() = 0;
 
-    void setWindowSize(float width, float height) { width_ = width; height_ = height; };
-
     bool visible_ = false;
     std::string title_;
-    float width_ = 0.0;
-    float height_ = 0.0;
   };
 
   class GenericTextWidget : public Widget
@@ -403,6 +399,7 @@ namespace SmartPeak
   */
   static void showQuickHelpToolTip(const std::string& ui_element_name)
   {
+    return;
     if (ImGui::IsItemHovered() && enable_quick_help && tooltip_info.find(ui_element_name) != tooltip_info.end()) {
       ImGui::SetTooltip("%s", tooltip_info.find(ui_element_name)->second.c_str());
     }

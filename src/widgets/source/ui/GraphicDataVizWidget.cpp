@@ -127,12 +127,13 @@ namespace SmartPeak
     }
     else
     {
+      auto window_size = ImGui::GetWindowSize();
       auto [plot_min_x, plot_max_x, plot_min_y, plot_max_y] = plotLimits();
       ImPlot::SetNextPlotLimits(plot_min_x, plot_max_x, plot_min_y, plot_max_y, ImGuiCond_Always);
       ImPlotFlags plotFlags = show_legend_ ? ImPlotFlags_Default | ImPlotFlags_Legend : ImPlotFlags_Default & ~ImPlotFlags_Legend;
       plotFlags |= ImPlotFlags_Crosshairs;
-      float graphic_height = height_ - sliders_height_;
-      if (ImPlot::BeginPlot(plot_title_.c_str(), graph_viz_data_.x_axis_title_.c_str(), graph_viz_data_.y_axis_title_.c_str(), ImVec2(width_ - 25, graphic_height - 85), plotFlags)) {
+      float graphic_height = window_size.y - sliders_height_;
+      if (ImPlot::BeginPlot(plot_title_.c_str(), graph_viz_data_.x_axis_title_.c_str(), graph_viz_data_.y_axis_title_.c_str(), ImVec2(window_size.x - 25, graphic_height - 85), plotFlags)) {
         int i = 0;
         for (const auto& serie_name_scatter : graph_viz_data_.series_names_area_)
         {

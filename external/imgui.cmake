@@ -9,7 +9,7 @@ message (STATUS "Adding imgui ${IMGUI_VERSION} as an external project.")
 
 ExternalProject_Add(imgui
   GIT_REPOSITORY https://github.com/ocornut/imgui.git
-  GIT_TAG ${IMGUI_VERSION}
+  GIT_TAG 848d21b6b56d369fb7976bd88b5f4094ab9ea50a
   UPDATE_COMMAND ""
   CONFIGURE_COMMAND ""
   BUILD_COMMAND ""

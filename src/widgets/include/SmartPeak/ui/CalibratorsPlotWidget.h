@@ -60,11 +60,11 @@ namespace SmartPeak
     }
     void draw() override;
   protected:
-    const std::vector<std::vector<float>>* x_fit_data_;
-    const std::vector<std::vector<float>>* y_fit_data_;
-    const std::vector<std::vector<float>>* x_raw_data_;
-    const std::vector<std::vector<float>>* y_raw_data_;
-    const std::vector<std::string>* series_names_;
+    const std::vector<std::vector<float>>* x_fit_data_ = nullptr;
+    const std::vector<std::vector<float>>* y_fit_data_ = nullptr;
+    const std::vector<std::vector<float>>* x_raw_data_ = nullptr;
+    const std::vector<std::vector<float>>* y_raw_data_ = nullptr;
+    const std::vector<std::string>* series_names_ = nullptr;
     std::string x_axis_title_;
     std::string y_axis_title_;
     float x_min_;
