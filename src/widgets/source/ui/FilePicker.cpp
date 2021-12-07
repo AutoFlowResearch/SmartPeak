@@ -23,6 +23,7 @@
 
 #include <SmartPeak/ui/FilePicker.h>
 #include <SmartPeak/core/Utilities.h>
+#include <SmartPeak/ui/UIUtilities.h>
 #include <future>
 #include <imgui.h>
 #include <imgui_internal.h>
@@ -169,7 +170,7 @@ namespace SmartPeak
         for (int column = 0; column < column_count; column++)
         {
           ImEntry item = Im_directory_entries[row];
-          Utilities::makeHumanReadable(item);
+          UIUtilities::makeHumanReadable(item);
           char text_buffer[256];
           std::snprintf(text_buffer, sizeof text_buffer, "%s", item.entry_contents[column].c_str());
 

@@ -27,9 +27,6 @@
 #include <SmartPeak/core/Parameters.h>
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/ApplicationHandler.h>
-#include <SmartPeak/ui/ImEntry.h>
-#include <imgui.h>
-#include <imgui_internal.h>
 #include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureSelector.h>
 #include <OpenMS/DATASTRUCTURES/Param.h>
 #include <OpenMS/FORMAT/MRMFeatureQCFile.h>
@@ -41,10 +38,6 @@
 #include <chrono>
 #include <tuple>
 
-#ifndef CSV_IO_NO_THREAD
-#define CSV_IO_NO_THREAD
-#endif
-#include <SmartPeak/io/csv.h>
 #include <plog/Log.h>
 
 #define maxFunc(a,b) (((a) > (b)) ? (a) : (b))
@@ -358,13 +351,6 @@ public:
     * @brief Returns the build version of SmartPeak package if available.
     */
     static std::string getSmartPeakVersion();
-    
-    /**
-     @brief Modify ImEntry to a human readable format.
-     
-     @param[in,out] directory_entry directory entry on which the modification is done.
-    */
-    static void makeHumanReadable(ImEntry& directory_entry);
 
     /**
      * Converts an input string to upper case string.
