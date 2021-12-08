@@ -399,7 +399,6 @@ namespace SmartPeak
   */
   static void showQuickHelpToolTip(const std::string& ui_element_name)
   {
-    return;
     if (ImGui::IsItemHovered() && enable_quick_help && tooltip_info.find(ui_element_name) != tooltip_info.end()) {
       ImGui::SetTooltip("%s", tooltip_info.find(ui_element_name)->second.c_str());
     }
