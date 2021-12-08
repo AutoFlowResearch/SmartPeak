@@ -13,6 +13,7 @@ set(sources_list
 	ConstructTransitionsList.cpp
 	DDA.cpp
 	ExtractChromatogramWindows.cpp
+	ExtractSpectraNonTargeted.cpp
 	ExtractSpectraWindows.cpp
 	FilterFeatures.cpp
 	FilterFeaturesBackgroundInterferences.cpp
