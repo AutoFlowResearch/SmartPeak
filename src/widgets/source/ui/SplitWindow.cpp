@@ -17,127 +17,98 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Douglas McCloskey $
+// $Maintainer: Douglas McCloskey, Bertrand Boudaud $
 // $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
 // --------------------------------------------------------------------------
 
 #include <SmartPeak/ui/SplitWindow.h>
+#include <SmartPeak/core/Utilities.h>
+#include <imgui_internal.h>
 
 namespace SmartPeak
 {
 
   void SplitWindow::setupLayoutLoader(LayoutLoader& layout_loader)
   {
-    for (auto& window : top_windows)
+    for (auto& window : top_windows_)
     {
       layout_loader.properties_handlers_.push_back(window.get());
     }
-    for (auto& window : bottom_windows)
+    for (auto& window : bottom_windows_)
     {
       layout_loader.properties_handlers_.push_back(window.get());
     }
-    for (auto& window : left_windows)
+    for (auto& window : left_windows_)
     {
       layout_loader.properties_handlers_.push_back(window.get());
     }
-    layout_loader.properties_handlers_.push_back(&win_size_and_pos);
+    layout_loader.properties_handlers_.push_back(&win_size_and_pos_);
+  }
+
+  void SplitWindow::showWindows(std::vector<std::shared_ptr<Widget>>& windows)
+  {
+    for (auto& widget : windows)
+    {
+      if (widget->visible_)
+      {
+        if (ImGui::Begin(widget->title_.c_str(), &widget->visible_))
+        {
+          showQuickHelpToolTip(widget->title_);
+          widget->draw();
+        }
+        ImGui::End();
+      }
+    }
   }
 
   void SplitWindow::draw()
   {
-    // ======================================
-    // Window size computation
-    // ======================================
-    bool show_top_window_ = std::find_if(top_windows.begin(), top_windows.end(), [](const auto& w) { return w->visible_; }) != top_windows.end();
-    bool show_bottom_window_ = std::find_if(bottom_windows.begin(), bottom_windows.end(), [](const auto& w) { return w->visible_; }) != bottom_windows.end();
-    bool show_left_window_ = std::find_if(left_windows.begin(), left_windows.end(), [](const auto& w) { return w->visible_; }) != left_windows.end();
-    bool show_right_window_ = false;
-    win_size_and_pos.setWindowsVisible(show_top_window_, show_bottom_window_, show_left_window_, show_right_window_);
-
-
-    // windfow flags common to top, left and bottom windows
-    const ImGuiWindowFlags window_flags =
-      ImGuiWindowFlags_NoTitleBar |
-      ImGuiWindowFlags_NoMove |
-      ImGuiWindowFlags_NoCollapse |
-      ImGuiWindowFlags_NoFocusOnAppearing;
-
-    // Left window
-    if (show_left_window_) {
-      ImGui::SetNextWindowPos(ImVec2(win_size_and_pos.left_window_x_pos_, win_size_and_pos.left_and_right_window_y_pos_));
-      ImGui::SetNextWindowSize(ImVec2(win_size_and_pos.left_window_x_size_, win_size_and_pos.left_and_right_window_y_size_));
-      ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0);
-      ImGui::Begin("Left window", NULL, window_flags);
-      if (ImGui::BeginTabBar("Left window tab bar", ImGuiTabBarFlags_Reorderable | ImGuiTabBarFlags_AutoSelectNewTabs))
-      {
-        for (auto& widget : left_windows)
-        {
-          if (ImGui::BeginTabItem(widget->title_.c_str(), &widget->visible_))
-          {
-            widget->setWindowSize(win_size_and_pos.left_window_x_size_, win_size_and_pos.left_and_right_window_y_size_);
-            showQuickHelpToolTip(widget->title_);
-            widget->draw();
-            ImGui::EndTabItem();
-          }
-        }
-        ImGui::EndTabBar();
-      }
-      win_size_and_pos.setLeftWindowXSize(ImGui::GetWindowWidth());
-      win_size_and_pos.setWindowsVisible(show_top_window_, show_bottom_window_, show_left_window_, show_right_window_);
-      ImGui::End();
-      ImGui::PopStyleVar();
-    }
-
-    // Top window
-    if (show_top_window_)
+    ImGuiIO& io = ImGui::GetIO();
+    static const int menu_height = 18;
+    static const int padding_height = 50;
+    ImGui::SetNextWindowSize(ImVec2(io.DisplaySize.x, io.DisplaySize.y - menu_height));
+    ImGui::SetNextWindowPos(ImVec2(0, menu_height));
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0);
+    static bool visible = true;
+    if (ImGui::Begin("Splitter", &visible, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus))
     {
-      ImGui::SetNextWindowPos(ImVec2(win_size_and_pos.bottom_and_top_window_x_pos_, win_size_and_pos.top_window_y_pos_));
-      ImGui::SetNextWindowSize(ImVec2(win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.top_window_y_size_));
-      ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0);
-      ImGui::Begin("Top window", NULL, window_flags);
-      if (ImGui::BeginTabBar("Top window tab bar", ImGuiTabBarFlags_Reorderable | ImGuiTabBarFlags_AutoSelectNewTabs))
+      // Build default docking
+      ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
+      if (reset_layout_)
       {
-        for (auto& widget : top_windows)
+        ImGuiID left_node;
+        ImGuiID center_node;
+        ImGuiID bottom_node;
+        ImGui::DockBuilderAddNode(dockspace_id, ImGuiDockNodeFlags_DockSpace);
+        ImGui::DockBuilderSetNodeSize(dockspace_id, ImVec2(io.DisplaySize.x, io.DisplaySize.y - menu_height));
+        ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Left, 0.3, &left_node, &center_node); // The second parameter defines the direction of the split
+        ImGui::DockBuilderSplitNode(center_node, ImGuiDir_Down, 0.5, &bottom_node, &center_node); // The second parameter defines the direction of the split
+        for (auto& widget : left_windows_)
         {
-          if (ImGui::BeginTabItem(widget->title_.c_str(), &widget->visible_))
-          {
-            widget->setWindowSize(win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.top_window_y_size_);
-            showQuickHelpToolTip(widget->title_);
-            widget->draw();
-            ImGui::EndTabItem();
-          }
+          ImGui::DockBuilderDockWindow(widget->title_.c_str() , left_node);
         }
-        ImGui::EndTabBar();
+        for (auto& widget : top_windows_)
+        {
+          ImGui::DockBuilderDockWindow(widget->title_.c_str(), center_node);
+        }
+        for (auto& widget : bottom_windows_)
+        {
+          ImGui::DockBuilderDockWindow(widget->title_.c_str(), bottom_node);
+        }
+        ImGui::DockBuilderFinish(dockspace_id);
+        reset_layout_ = false;
       }
-      win_size_and_pos.setTopWindowYSize(ImGui::GetWindowHeight());
-      win_size_and_pos.setLeftWindowXSize(ImGui::GetWindowPos().x);
-      win_size_and_pos.setWindowsVisible(show_top_window_, show_bottom_window_, show_left_window_, show_right_window_);
-      ImGui::End();
-      ImGui::PopStyleVar();
-    }
 
-    // Bottom window
-    if (show_bottom_window_)
-    {
-      ImGui::SetNextWindowPos(ImVec2(win_size_and_pos.bottom_and_top_window_x_pos_, win_size_and_pos.bottom_window_y_pos_));
-      ImGui::SetNextWindowSize(ImVec2(win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.bottom_window_y_size_));
-      ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0);
-      ImGui::Begin("Bottom window", NULL, window_flags);
-      if (ImGui::BeginTabBar("Bottom window tab bar", ImGuiTabBarFlags_Reorderable | ImGuiTabBarFlags_AutoSelectNewTabs))
-      {
-        for (auto& widget : bottom_windows)
-        {
-          if (ImGui::BeginTabItem(widget->title_.c_str(), &widget->visible_))
-          {
-            widget->setWindowSize(win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.bottom_window_y_size_);
-            widget->draw();
-            ImGui::EndTabItem();
-          }
-        }
-        ImGui::EndTabBar();
-      }
+      ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_None);
+
+      // Instanciate windows
+      showWindows(left_windows_);
+      showWindows(top_windows_);
+      showWindows(bottom_windows_);
+
       ImGui::End();
-      ImGui::PopStyleVar();
     }
+    ImGui::PopStyleVar();
+    return;
   }
 }

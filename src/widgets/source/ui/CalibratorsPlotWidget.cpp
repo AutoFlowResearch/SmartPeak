@@ -28,10 +28,15 @@ namespace SmartPeak
 {
   void CalibratorsPlotWidget::draw()
   {
+    if (!x_raw_data_)
+    {
+      return;
+    }
     showQuickHelpToolTip("CalibratorsPlotWidget");
     // Main graphic
     ImPlot::SetNextPlotLimits(x_min_, x_max_, y_min_, y_max_, ImGuiCond_Always);
-    if (ImPlot::BeginPlot(plot_title_.c_str(), x_axis_title_.c_str(), y_axis_title_.c_str(), ImVec2(width_ - 25, height_ - 40))) {
+    auto window_size = ImGui::GetWindowSize();
+    if (ImPlot::BeginPlot(plot_title_.c_str(), x_axis_title_.c_str(), y_axis_title_.c_str(), ImVec2(window_size.x - 25, window_size.y - 40))) {
       for (int i = 0; i < x_raw_data_->size(); ++i) {
         assert(x_raw_data_->at(i).size() == y_raw_data_->at(i).size());
         ImPlot::PushStyleVar(ImPlotStyleVar_Marker, ImPlotMarker_Circle);
