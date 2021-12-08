@@ -20,7 +20,7 @@
 // $Maintainer: Douglas McCloskey $
 // $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
 // --------------------------------------------------------------------------
-#include <SmartPeak/core/RawDataProcessors/DDA.h>
+#include <SmartPeak/core/RawDataProcessors/ExtractSpectraNonTargeted.h>
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/Utilities.h>
 #include <SmartPeak/core/FeatureFiltersUtils.h>
@@ -35,54 +35,41 @@
 namespace SmartPeak
 {
 
-  std::vector<std::string> DDA::getRequirements() const
+  std::vector<std::string> ExtractSpectraNonTargeted::getRequirements() const
   {
     return { "sequence", "traML" };
   }
 
-  ParameterSet DDA::getParameterSchema() const
+  ParameterSet ExtractSpectraNonTargeted::getParameterSchema() const
   {
     OpenMS::TargetedSpectraExtractor oms_params;
     ParameterSet parameters({ oms_params });
     return parameters;
   }
 
-  void DDA::getFilenames(Filenames& filenames) const
-  {
-    filenames.addFileName("output_transitions_traML", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}.traML");
-    filenames.addFileName("output_transitions_csv", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}.csv");
-  };
-
-  void DDA::process(RawDataHandler& rawDataHandler_IO,
+  void ExtractSpectraNonTargeted::process(
+    RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START DDA";
+    LOGD << "START ExtractSpectraNonTargeted";
     getFilenames(filenames_I);
-
     // Complete user parameters with schema
     ParameterSet params(params_I);
     params.merge(getParameterSchema());
-    std::filesystem::path main_path(filenames_I.getTagValue(Filenames::Tag::MAIN_DIR));
-    Utilities::prepareFileParameterList(params, "TargetedSpectraExtractor", "AccurateMassSearchEngine:db:mapping", main_path);
-    Utilities::prepareFileParameterList(params, "TargetedSpectraExtractor", "AccurateMassSearchEngine:db:struct", main_path);
-    Utilities::prepareFileParameter(params, "TargetedSpectraExtractor", "AccurateMassSearchEngine:positive_adducts", main_path);
-    Utilities::prepareFileParameter(params, "TargetedSpectraExtractor", "AccurateMassSearchEngine:negative_adducts", main_path);
 
     OpenMS::TargetedSpectraExtractor targeted_spectra_extractor;
     Utilities::setUserParameters(targeted_spectra_extractor, params);
 
-    // merge features (will be on MS1 spectra)
-    OpenMS::FeatureMap& ms1_accurate_mass_found_feature_map = rawDataHandler_IO.getFeatureMap();
-    OpenMS::FeatureMap ms1_merged_features;
-    targeted_spectra_extractor.mergeFeatures(ms1_accurate_mass_found_feature_map, ms1_merged_features);
-    rawDataHandler_IO.setFeatureMap("ms1_merged_features", ms1_merged_features);
+    std::vector<OpenMS::MSSpectrum> annotated_spectra;
+    OpenMS::FeatureMap selected_features;
+    targeted_spectra_extractor.extractSpectra(rawDataHandler_IO.getExperiment(), rawDataHandler_IO.getFeatureMap(), annotated_spectra, selected_features, true);
 
-    rawDataHandler_IO.setFeatureMap(ms1_merged_features);
+    rawDataHandler_IO.setFeatureMap(selected_features);
     rawDataHandler_IO.updateFeatureMapHistory();
 
-    LOGD << "END DDA";
+    LOGD << "END ExtractSpectraNonTargeted";
   }
 
 }
