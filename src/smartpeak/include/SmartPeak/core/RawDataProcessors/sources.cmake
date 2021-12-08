@@ -13,6 +13,7 @@ set(sources_list_h
 	ConstructTransitionsList.h
 	DDA.h
 	ExtractChromatogramWindows.h
+	ExtractSpectraNonTargeted.h
 	ExtractSpectraWindows.h
 	FilterFeatures.h
 	FilterFeaturesBackgroundInterferences.h

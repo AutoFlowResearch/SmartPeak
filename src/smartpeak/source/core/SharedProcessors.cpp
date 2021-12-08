@@ -44,6 +44,7 @@
 #include <SmartPeak/core/RawDataProcessors/FilterFeaturesBackgroundInterferences.h>
 #include <SmartPeak/core/RawDataProcessors/CheckFeaturesBackgroundInterferences.h>
 #include <SmartPeak/core/RawDataProcessors/ExtractSpectraWindows.h>
+#include <SmartPeak/core/RawDataProcessors/ExtractSpectraNonTargeted.h>
 #include <SmartPeak/core/RawDataProcessors/MergeSpectra.h>
 #include <SmartPeak/core/RawDataProcessors/Pick2DFeatures.h>
 #include <SmartPeak/core/RawDataProcessors/Pick3DFeatures.h>
@@ -120,6 +121,7 @@ namespace SmartPeak {
     {"FILTER_FEATURES_BACKGROUND_INTERFERENCES",  std::make_shared<FilterFeaturesBackgroundInterferences>()},
     {"CHECK_FEATURES_BACKGROUND_INTERFERENCES",   std::make_shared<CheckFeaturesBackgroundInterferences>()},
     {"EXTRACT_SPECTRA_WINDOWS",                   std::make_shared<ExtractSpectraWindows>()},
+    {"EXTRACT_SPECTRA_NON_TARGETED",              std::make_shared<ExtractSpectraNonTargeted>()},
     {"MERGE_SPECTRA",                             std::make_shared<MergeSpectra>()},
     {"PICK_2D_FEATURES",                          std::make_shared<Pick2DFeatures>()},
     {"PICK_3D_FEATURES",                          std::make_shared<Pick3DFeatures>()},
