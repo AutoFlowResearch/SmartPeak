@@ -26,6 +26,8 @@
 #include <SmartPeak/core/FeatureFiltersUtils.h>
 #include <SmartPeak/io/InputDataValidation.h>
 
+#include <OpenMS/ANALYSIS/OPENSWATH/TargetedSpectraExtractor.h>
+
 #include <plog/Log.h>
 
 #include <algorithm>
@@ -49,82 +51,33 @@ namespace SmartPeak
     return { "sequence", "traML" };
   }
 
+  ParameterSet MergeFeatures::getParameterSchema() const
+  {
+    OpenMS::TargetedSpectraExtractor oms_params;
+    ParameterSet parameters({ oms_params });
+    return parameters;
+  }
+
   void MergeFeatures::doProcess(RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
     getFilenames(filenames_I);
-    LOGI << "MergeFeatures input size: " << rawDataHandler_IO.getFeatureMap().size();
 
-    // Pass 1: organize into a map by combining features and subordinates with the same `identifier`
-    OpenMS::FeatureMap fmap;
-    std::map<std::string, std::vector<OpenMS::Feature>> fmapmap;
-    for (const OpenMS::Feature& f : rawDataHandler_IO.getFeatureMap()) {
-      if (f.metaValueExists("identifier")) {
-        auto found_f = fmapmap.emplace(f.getMetaValue("identifier").toStringList().at(0), std::vector<OpenMS::Feature>({ f }));
-        if (!found_f.second) {
-          fmapmap.at(f.getMetaValue("identifier").toStringList().at(0)).push_back(f);
-        }
-      }
-      for (const OpenMS::Feature& s : f.getSubordinates()) {
-        if (s.metaValueExists("identifier")) {
-          auto found_s = fmapmap.emplace(s.getMetaValue("identifier").toStringList().at(0), std::vector<OpenMS::Feature>({ s }));
-          if (!found_s.second) {
-            fmapmap.at(s.getMetaValue("identifier").toStringList().at(0)).push_back(s);
-          }
-        }
-      }
-    }
+    // Complete user parameters with schema
+    ParameterSet params(params_I);
+    params.merge(getParameterSchema());
 
-    // Pass 2: compute the consensus manually
-    for (const auto& f_map : fmapmap) {
+    OpenMS::TargetedSpectraExtractor targeted_spectra_extractor;
+    Utilities::setUserParameters(targeted_spectra_extractor, params);
 
-      // compute the total intensity for weighting
-      double total_intensity = 0;
-      for (const auto& f : f_map.second) {
-        if (f.metaValueExists("peak_apex_int")) 
-          total_intensity += (double)f.getMetaValue("peak_apex_int");
-        else 
-          total_intensity += f.getIntensity();
-      }
-
-      // compute the weighted averages
-      double rt = 0.0, m = 0.0, intensity = 0.0, peak_apex_int = 0.0;
-      double weighting_factor = 1.0 / f_map.second.size(); // will be updated
-      for (const auto& f : f_map.second) {
-        // compute the weighting factor
-        if (f.metaValueExists("peak_apex_int")) 
-          weighting_factor = (double)f.getMetaValue("peak_apex_int") / total_intensity;
-        else 
-          weighting_factor = f.getIntensity() / total_intensity;
-
-        // compute the weighted averages
-        rt += f.getRT() * weighting_factor;
-        if (f.getCharge() == 0)
-          LOGW << "ConsensusFeature::computeDechargeConsensus() WARNING: Feature's charge is 0! This will lead to M=0!";
-        //m += (f.getMZ() * std::abs(f.getCharge()) + (double)f.getMetaValue("dc_charge_adduct_mass")) * weighting_factor; // weighted mz
-        m += f.getMZ() * weighting_factor;
-        //intensity += f.getIntensity() * weighting_factor; // weighted intensity
-        intensity += f.getIntensity();
-        if (f.metaValueExists("peak_apex_int")) 
-          //peak_apex_int += (double)f.getMetaValue("peak_apex_int") * weighting_factor; // weighted peak_apex_int
-        peak_apex_int += (double)f.getMetaValue("peak_apex_int");
-      }
-
-      // make the feature map and assign subordinates
-      OpenMS::Feature f;
-      f.setUniqueId();
-      f.setMetaValue("PeptideRef", f_map.first);
-      f.setMZ(m);
-      f.setRT(rt);
-      f.setMetaValue("scan_polarity", f_map.second.front().getMetaValue("scan_polarity"));
-      f.setIntensity(intensity);
-      f.setMetaValue("peak_apex_int", peak_apex_int);
-      f.setSubordinates(f_map.second);
-      fmap.push_back(f);
-    }
-    rawDataHandler_IO.setFeatureMap(fmap);
+    // merge features
+    OpenMS::FeatureMap& ms1_accurate_mass_found_feature_map = rawDataHandler_IO.getFeatureMap();
+    OpenMS::FeatureMap ms1_merged_features;
+    targeted_spectra_extractor.mergeFeatures(ms1_accurate_mass_found_feature_map, ms1_merged_features);
+    rawDataHandler_IO.setFeatureMap("ms1_merged_features", ms1_merged_features);
+    rawDataHandler_IO.setFeatureMap(ms1_merged_features);
     rawDataHandler_IO.updateFeatureMapHistory();
 
     LOGI << "MergeFeatures output size: " << rawDataHandler_IO.getFeatureMap().size();
