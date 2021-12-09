@@ -38,6 +38,7 @@ namespace SmartPeak
     /* IProcessorDescription */
     virtual std::string getName() const override { return "MERGE_FEATURES"; }
     virtual std::string getDescription() const override { return "Create merged features from accurate mass search results."; }
+    virtual ParameterSet getParameterSchema() const override;
     virtual std::vector<std::string> getRequirements() const override;
 
     /** Create merged features from accurate mass search results.
