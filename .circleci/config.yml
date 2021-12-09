@@ -289,6 +289,7 @@ jobs:
             msbuild src/smartpeak/SmartPeak.sln /verbosity:normal /maxcpucount /p:Configuration=Release
             msbuild src/examples/SmartPeak_class_examples_smartpeak.sln /maxcpucount /property:Configuration=Release
             refreshenv
+            @("set(CMAKE_ERROR_ON_ABSOLUTE_INSTALL_DESTINATION FALSE)") +  (Get-Content ".\_deps\grpc-build\third_party\abseil-cpp\absl\base\cmake_install.cmake") | Set-Content ".\_deps\grpc-build\third_party\abseil-cpp\absl\base\cmake_install.cmake"
             & 'C:\Program Files\cmake\bin\ctest.exe' -VV -F -E "(example|example|absl|dfa|exhaustive|random|re2|charclass|compile|mimics|parse|regexp|required_prefix|search|set|simplify|string_generator|possible)"
             ThrowOnFailure "CTest failed!"
             & 'C:\Program Files\cmake\bin\cpack.exe' -G NSIS64
