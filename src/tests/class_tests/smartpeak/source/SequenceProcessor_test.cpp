@@ -31,6 +31,8 @@
 #include <SmartPeak/core/SequenceSegmentProcessors/CalculateCalibration.h>
 #include <SmartPeak/core/SampleGroupProcessors/MergeInjections.h>
 #include <SmartPeak/core/ApplicationProcessors/LoadSession.h>
+#include <SmartPeak/core/ApplicationProcessors/SaveSession.h>
+#include <SmartPeak/core/Utilities.h>
 #include <filesystem>
 
 using namespace SmartPeak;
@@ -60,23 +62,82 @@ Filenames generateTestFilenames()
   return filenames;
 }
 
-/*
+TEST(SequenceHandler, SaveSession_LoadSession_onFilePicked)
+{
+  // Copy test data to antoher place to avoid poluting the data folder with the test.
+  auto data_path = std::filesystem::path(std::tmpnam(nullptr));
+  std::filesystem::copy(SMARTPEAK_GET_TEST_DATA_PATH("workflow_csv_files"), data_path);
+
+  // Load session from a directory
+  ApplicationHandler application_handler;
+  application_handler.filenames_ = Utilities::buildFilenamesFromDirectory(application_handler, data_path);
+  WorkflowManager workflow_manager;
+  LoadSession load_session(application_handler, workflow_manager);
+  load_session.filenames_ = application_handler.filenames_;
+  load_session.delimiter = ",";
+  load_session.checkConsistency = false;
+  load_session.process();
+
+  // Save Session using onFilePicked
+  auto path_db = data_path / "session.db";
+  SaveSession save_session_on_file_picked(application_handler);
+  save_session_on_file_picked.onFilePicked(path_db, &application_handler);
+
+  // close session
+  application_handler.closeSession();
+
+  // Load Session using onFilePicked
+  LoadSession load_session_on_file_picked(application_handler, workflow_manager);
+  load_session_on_file_picked.onFilePicked(path_db, &application_handler);
+
+  auto& sequenceHandler = application_handler.sequenceHandler_;
+  ASSERT_EQ(sequenceHandler.getSequence().size(), 2);
+  InjectionHandler& injection0 = sequenceHandler.getSequence()[0];
+  EXPECT_STREQ(injection0.getMetaData().getSampleName().c_str(), "150516_CM1_Level1");
+  EXPECT_STREQ(injection0.getMetaData().getSampleGroupName().c_str(), "CM");
+  EXPECT_STREQ(injection0.getRawData().getMetaData().getSampleName().c_str(), "150516_CM1_Level1");
+  EXPECT_EQ(injection0.getRawData().getParameters().size(), 27);
+  EXPECT_STREQ(injection0.getRawData().getParameters().at("MRMFeatureFinderScoring")[0].getName().c_str(), "stop_report_after_feature");
+  EXPECT_EQ(injection0.getRawData().getQuantitationMethods().size(), 10);
+  EXPECT_STREQ(injection0.getRawData().getQuantitationMethods()[0].getComponentName().c_str(), "arg-L.arg-L_1.Light");
+}
+
 #if (WIN32)
 TEST(SequenceHandler, createSequence_onFilePicked_windows_separators)
 {
-  ApplicationHandler application_handler;
-  LoadSession cs(application_handler);
-  auto& sequenceHandler = application_handler.sequenceHandler_;
-  std::string datapath_ = SMARTPEAK_GET_TEST_DATA_PATH("");
-  auto workflow = std::filesystem::path{ datapath_ } / std::filesystem::path{ "workflow_csv_files" };
-  Filenames filenames_;
-  filenames_.setFullPath("sequence", workflow / "sequence.csv");
-  std::string full_name = filenames_.getFullPath("sequence").generic_string();
-  // replace separators (this way of specifying filename can happen with command line interface actually)
-  std::replace(full_name.begin(), full_name.end(), '/', '\\');
-  filenames_.setFullPath("sequence", full_name);
-  cs.onFilePicked(filenames_.getFullPath("sequence"), &application_handler);
+  // Copy test data to antoher place to avoid poluting the data folder with the test.
+  auto data_path = std::filesystem::path(std::tmpnam(nullptr));
+  std::filesystem::copy(SMARTPEAK_GET_TEST_DATA_PATH("workflow_csv_files"), data_path);
 
+  // Load session from a directory
+  ApplicationHandler application_handler;
+  application_handler.filenames_ = Utilities::buildFilenamesFromDirectory(application_handler, data_path);
+  WorkflowManager workflow_manager;
+  LoadSession load_session(application_handler, workflow_manager);
+  load_session.filenames_ = application_handler.filenames_;
+  load_session.delimiter = ",";
+  load_session.checkConsistency = false;
+  load_session.process();
+
+  application_handler.filenames_.log();
+
+  // Save Session using onFilePicked
+  auto path_db = data_path / "session.db";
+  SaveSession save_session_on_file_picked(application_handler);
+  save_session_on_file_picked.onFilePicked(path_db, &application_handler);
+
+  // close session
+  application_handler.closeSession();
+
+  // replace separators (this way of specifying filename can happen with command line interface actually)
+  std::string full_name = path_db.generic_string();
+  std::replace(full_name.begin(), full_name.end(), '/', '\\');
+
+  // Load Session using onFilePicked
+  LoadSession load_session_on_file_picked(application_handler, workflow_manager);
+  load_session_on_file_picked.onFilePicked(full_name, &application_handler);
+
+  auto& sequenceHandler = application_handler.sequenceHandler_;
   ASSERT_EQ(sequenceHandler.getSequence().size(), 2);
   InjectionHandler& injection0 = sequenceHandler.getSequence()[0];
   EXPECT_STREQ(injection0.getMetaData().getSampleName().c_str(), "150516_CM1_Level1");
@@ -89,13 +150,14 @@ TEST(SequenceHandler, createSequence_onFilePicked_windows_separators)
 }
 #endif(WIN32)
 
-TEST(SequenceHandler, createSequence)
+TEST(SequenceHandler, createSession)
 {
   ApplicationHandler application_handler;
-  LoadSession cs(application_handler);
+  WorkflowManager workflow_manager;
+  LoadSession cs(application_handler, workflow_manager);
   auto& sequenceHandler = application_handler.sequenceHandler_;
-  cs.filenames_        = generateTestFilenames();
-  cs.delimiter        = ",";
+  cs.filenames_ = generateTestFilenames();
+  cs.delimiter = ",";
   cs.checkConsistency = false;
   cs.process();
 
@@ -207,7 +269,7 @@ TEST(SequenceHandler, createSequence)
   EXPECT_STREQ(sequenceHandler.getSequenceSegments()[0].getFeatureBackgroundQC().component_qcs[0].component_name.c_str(), "ala-L.ala-L_1.Heavy-modified");
 
   sequenceHandler.clear();
-  Filenames filenames { generateTestFilenames() };
+  Filenames filenames{ generateTestFilenames() };
   filenames.setFullPath("sequence", SMARTPEAK_GET_TEST_DATA_PATH("SequenceProcessor_empty_sequence.csv"));
 
   cs.filenames_ = filenames;
@@ -215,7 +277,7 @@ TEST(SequenceHandler, createSequence)
 
   EXPECT_EQ(sequenceHandler.getSequence().size(), 0);
 }
-*/
+
 TEST(SequenceHandler, gettersCreateSequence)
 {
   ApplicationHandler application_handler;
