@@ -87,15 +87,6 @@ namespace SmartPeak
     OpenMS::TargetedSpectraExtractor targeted_spectra_extractor;
     Utilities::setUserParameters(targeted_spectra_extractor, params);
 
-    // searchSpectra (will be on MS2 spectra)
-    OpenMS::FeatureMap ms2_accurate_mass_found_feature_map;
-    auto selected_features = rawDataHandler_IO.getFeatureMap();
-    targeted_spectra_extractor.searchSpectrum(selected_features, ms2_accurate_mass_found_feature_map, true);
-
-    // merge features again (on MS2 spectra features)
-    OpenMS::FeatureMap ms2_merged_features;
-    targeted_spectra_extractor.mergeFeatures(ms2_accurate_mass_found_feature_map, ms2_merged_features);
-
     // Store - we want to store MS1 and the associated MS2 features 
     OpenMS::Param oms_params = targeted_spectra_extractor.getParameters();
     oms_params.setValue("output_format", "traML");
@@ -103,7 +94,8 @@ namespace SmartPeak
     targeted_spectra_extractor.setParameters(oms_params);
     LOGI << "Storing: " << filenames_I.getFullPath("output_traML").generic_string();
     OpenMS::TargetedExperiment t_exp;
-    auto ms1_merged_features = rawDataHandler_IO.getFeatureMap("ms1_merged_features");
+    const auto& ms1_merged_features = rawDataHandler_IO.getFeatureMap("ms1_merged_features");
+    const auto& ms2_merged_features = rawDataHandler_IO.getFeatureMap();
     targeted_spectra_extractor.constructTransitionsList(ms1_merged_features, ms2_merged_features, t_exp);
 
     // write transitions
