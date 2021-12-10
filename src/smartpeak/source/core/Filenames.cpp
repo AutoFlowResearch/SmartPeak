@@ -51,9 +51,10 @@ namespace SmartPeak
                               const std::string& name_pattern, 
                               const std::string& description, 
                               bool embeddable,
-                              bool default_embedded)
+                              bool default_embedded,
+                              bool overwrite)
   {
-    if (file_names_.find(id) == file_names_.end())
+    if (overwrite || (file_names_.find(id) == file_names_.end()))
     {
       FileName f{ name_pattern, description, embeddable, default_embedded };
       file_names_.insert_or_assign(id, f);
@@ -111,6 +112,7 @@ namespace SmartPeak
     }
     file_names_.at(id).full_path_override_ = true;
     file_names_.at(id).full_path_ = full_path;
+    file_names_.at(id).name_pattern_ = "";
   }
 
   void Filenames::updateFullPaths()
@@ -161,13 +163,13 @@ namespace SmartPeak
     return file_ids;
   }
 
-  void Filenames::setTag(Tag tag, const std::string& value)
+  void Filenames::setTagValue(Tag tag, const std::string& value)
   {
     tags_[tag] = value;
     updateFullPaths();
   }
 
-  std::string Filenames::getTag(Tag tag) const
+  std::string Filenames::getTagValue(Tag tag) const
   {
     if (tags_.count(tag))
     {
@@ -177,6 +179,11 @@ namespace SmartPeak
     {
       return "";
     }
+  }
+
+  std::map<std::string, Filenames::Tag> Filenames::getTagNames() const
+  {
+    return string_to_tag_;
   }
 
   std::string Filenames::getDescription(const std::string& file_id) const

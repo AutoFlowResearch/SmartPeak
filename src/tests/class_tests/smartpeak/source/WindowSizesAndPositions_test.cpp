@@ -24,6 +24,10 @@
 #include <gtest/gtest.h>
 #include <SmartPeak/test_config.h>
 #include <SmartPeak/ui/WindowSizesAndPositions.h>
+#include <SmartPeak/io/SessionDB.h>
+
+#include <imgui.h>
+
 #include <thread>
 
 using namespace SmartPeak;
@@ -38,123 +42,42 @@ TEST(WindowSizesAndPositions, constructor)
   delete p1;
 }
 
-TEST(WindowSizesAndPositions, defaults)
+class WindowSizesAndPositions_Test : public WindowSizesAndPositions
 {
-  WindowSizesAndPositions win_size_and_pos;
-  EXPECT_NEAR(win_size_and_pos.main_menu_bar_y_size_, 18.0f, 1e-3);
-  EXPECT_NEAR(win_size_and_pos.y_size_, 0, 1e-3);
-  EXPECT_NEAR(win_size_and_pos.x_size_, 0, 1e-3);
-  EXPECT_NEAR(win_size_and_pos.bottom_window_y_size_, 0, 1e-3);
-  EXPECT_NEAR(win_size_and_pos.bottom_and_top_window_x_size_, 0, 1e-3);
-  EXPECT_NEAR(win_size_and_pos.top_window_y_size_, 0, 1e-3);
-  EXPECT_NEAR(win_size_and_pos.left_and_right_window_y_size_, 0, 1e-3);
-  EXPECT_NEAR(win_size_and_pos.left_window_x_size_, 0, 1e-3);
-  EXPECT_NEAR(win_size_and_pos.right_window_x_size_, 0, 1e-3);
-  EXPECT_NEAR(win_size_and_pos.bottom_window_y_pos_, 0, 1e-3);
-  EXPECT_NEAR(win_size_and_pos.bottom_and_top_window_x_pos_, 0, 1e-3);
-  EXPECT_NEAR(win_size_and_pos.top_window_y_pos_, 0, 1e-3);
-  EXPECT_NEAR(win_size_and_pos.left_and_right_window_y_pos_, 0, 1e-3);
-  EXPECT_NEAR(win_size_and_pos.left_window_x_pos_, 0, 1e-3);
-  EXPECT_NEAR(win_size_and_pos.right_window_x_pos_, 0, 1e-3);
-  EXPECT_NEAR(win_size_and_pos.bottom_window_y_perc_, 0.25, 1e-3);
-  EXPECT_NEAR(win_size_and_pos.left_window_x_perc_, 0.25, 1e-3);
-  EXPECT_NEAR(win_size_and_pos.right_window_x_perc_, 0, 1e-3);
-}
+public:
+  // wrappers to protected methods
+  std::string wrapper_get_imgui_ini_() const
+  {
+    return imgui_ini_;
+  }
 
-TEST(WindowSizesAndPositions, setXAndYSizes)
-{
-  WindowSizesAndPositions win_size_and_pos;
-  win_size_and_pos.setXAndYSizes(10, 10);
-  EXPECT_NEAR(win_size_and_pos.y_size_, -8, 1e-3);
-  EXPECT_NEAR(win_size_and_pos.x_size_, 10, 1e-3);
-}
+  bool wrapper_get_imgui_ini_updated_() const
+  {
+    return imgui_ini_updated_;
+  }
+};
 
-TEST(WindowSizesAndPositions, setLeftWindowXSize)
+TEST(WindowSizesAndPositions, widget_WriteAndReadWindowSizesAndPositions)
 {
-  WindowSizesAndPositions win_size_and_pos;
-  win_size_and_pos.setXAndYSizes(100, 100);
-  win_size_and_pos.setLeftWindowXSize(10);
-  win_size_and_pos.setWindowSizesAndPositions(true, true, true, false);
-  EXPECT_NEAR(win_size_and_pos.bottom_window_y_size_, 20.5 , 1e-3);
-  EXPECT_NEAR(win_size_and_pos.top_window_y_size_, 61.5, 1e-3);
-  EXPECT_NEAR(win_size_and_pos.bottom_and_top_window_x_size_, 90, 1e-3);
-  EXPECT_NEAR(win_size_and_pos.left_and_right_window_y_size_, 82, 1e-3); //
-  EXPECT_NEAR(win_size_and_pos.left_window_x_size_, 10, 1e-3);
-  EXPECT_NEAR(win_size_and_pos.right_window_x_size_, 0, 1e-3);
-  EXPECT_NEAR(win_size_and_pos.bottom_window_y_pos_, 79.5, 1e-3);
-  EXPECT_NEAR(win_size_and_pos.top_window_y_pos_, 18, 1e-3);
-  EXPECT_NEAR(win_size_and_pos.bottom_and_top_window_x_pos_, 10, 1e-3);
-  EXPECT_NEAR(win_size_and_pos.left_and_right_window_y_pos_, 18, 1e-3);
-  EXPECT_NEAR(win_size_and_pos.left_window_x_pos_, 0, 1e-3);
-  EXPECT_NEAR(win_size_and_pos.right_window_x_pos_, 100, 1e-3);
-}
+  ImGui::CreateContext();
+  WindowSizesAndPositions_Test win_size_and_pos_write;
+  EXPECT_EQ(win_size_and_pos_write.wrapper_get_imgui_ini_(), std::string(""));
+  EXPECT_EQ(win_size_and_pos_write.wrapper_get_imgui_ini_updated_(), false);
 
-TEST(WindowSizesAndPositions, setTopWindowYSize)
-{
-  WindowSizesAndPositions win_size_and_pos;
-  win_size_and_pos.setXAndYSizes(100, 100);
-  win_size_and_pos.setTopWindowYSize(10);
-  win_size_and_pos.setWindowSizesAndPositions(true, true, true, false);
-  EXPECT_NEAR(win_size_and_pos.bottom_window_y_size_, 72, 1e-3);
-  EXPECT_NEAR(win_size_and_pos.top_window_y_size_, 10, 1e-3);
-  EXPECT_NEAR(win_size_and_pos.bottom_and_top_window_x_size_, 75, 1e-3);
-  EXPECT_NEAR(win_size_and_pos.left_and_right_window_y_size_, 82, 1e-3); //
-  EXPECT_NEAR(win_size_and_pos.left_window_x_size_, 25, 1e-3);
-  EXPECT_NEAR(win_size_and_pos.right_window_x_size_, 0, 1e-3);
-  EXPECT_NEAR(win_size_and_pos.bottom_window_y_pos_, 28, 1e-3);
-  EXPECT_NEAR(win_size_and_pos.top_window_y_pos_, 18, 1e-3);
-  EXPECT_NEAR(win_size_and_pos.bottom_and_top_window_x_pos_, 25, 1e-3);
-  EXPECT_NEAR(win_size_and_pos.left_and_right_window_y_pos_, 18, 1e-3);
-  EXPECT_NEAR(win_size_and_pos.left_window_x_pos_, 0, 1e-3);
-  EXPECT_NEAR(win_size_and_pos.right_window_x_pos_, 100, 1e-3);
-}
+  SessionDB session_db;
+  auto path_db = std::tmpnam(nullptr);
+  session_db.setDBFilePath(path_db);
 
-TEST(WindowSizesAndPositions, showHide)
-{
-  WindowSizesAndPositions win_size_and_pos;
-  win_size_and_pos.setXAndYSizes(100, 100);
-  win_size_and_pos.setTopWindowYSize(10);
-  win_size_and_pos.setWindowSizesAndPositions(true, true, true, false);
-  EXPECT_NEAR(win_size_and_pos.bottom_window_y_size_, 72, 1e-3);
-  EXPECT_NEAR(win_size_and_pos.top_window_y_size_, 10, 1e-3);
-  win_size_and_pos.setWindowSizesAndPositions(true, false, true, false);
-  EXPECT_NEAR(win_size_and_pos.bottom_window_y_size_, 0, 1e-3);
-  EXPECT_NEAR(win_size_and_pos.top_window_y_size_, 82, 1e-3);
-  win_size_and_pos.setWindowSizesAndPositions(true, true, true, false);
-  EXPECT_NEAR(win_size_and_pos.bottom_window_y_size_, 20.5, 1e-3);
-  EXPECT_NEAR(win_size_and_pos.top_window_y_size_, 61.5, 1e-3);
-}
+  session_db.writePropertiesHandler(win_size_and_pos_write);
+  EXPECT_EQ(win_size_and_pos_write.wrapper_get_imgui_ini_(), std::string(""));
+  EXPECT_EQ(win_size_and_pos_write.wrapper_get_imgui_ini_updated_(), false);
 
-TEST(WindowSizesAndPositions, setWindowPercentages)
-{
-  WindowSizesAndPositions win_size_and_pos;
-  win_size_and_pos.setWindowPercentages(0.1, 0.2, 0.3);
-  EXPECT_NEAR(win_size_and_pos.bottom_window_y_perc_, 0.1, 1e-3);
-  EXPECT_NEAR(win_size_and_pos.left_window_x_perc_, 0.2, 1e-3);
-  EXPECT_NEAR(win_size_and_pos.right_window_x_perc_, 0.3, 1e-3);
-}
+  WindowSizesAndPositions_Test win_size_and_pos_read;
+  session_db.readPropertiesHandler(win_size_and_pos_read);
 
-TEST(WindowSizesAndPositions, setWindowSizesAndPositions_)
-{
-  WindowSizesAndPositions win_size_and_pos;
-  win_size_and_pos.setXAndYSizes(100, 100);
-  win_size_and_pos.setWindowSizesAndPositions_(0.2, 0.2, 0.2);
-  EXPECT_NEAR(win_size_and_pos.main_menu_bar_y_size_, 18.0f, 1e-3);
-  EXPECT_NEAR(win_size_and_pos.y_size_, 82, 1e-3);
-  EXPECT_NEAR(win_size_and_pos.x_size_, 100, 1e-3);
-  EXPECT_NEAR(win_size_and_pos.bottom_window_y_size_, 16.4, 1e-3);
-  EXPECT_NEAR(win_size_and_pos.bottom_and_top_window_x_size_, 60, 1e-3);
-  EXPECT_NEAR(win_size_and_pos.top_window_y_size_, 65.6, 1e-3);
-  EXPECT_NEAR(win_size_and_pos.left_and_right_window_y_size_, 82, 1e-3);
-  EXPECT_NEAR(win_size_and_pos.left_window_x_size_, 20, 1e-3);
-  EXPECT_NEAR(win_size_and_pos.right_window_x_size_, 20, 1e-3);
-  EXPECT_NEAR(win_size_and_pos.bottom_window_y_pos_, 83.6, 1e-3);
-  EXPECT_NEAR(win_size_and_pos.bottom_and_top_window_x_pos_, 20, 1e-3);
-  EXPECT_NEAR(win_size_and_pos.top_window_y_pos_, 18, 1e-3);
-  EXPECT_NEAR(win_size_and_pos.left_and_right_window_y_pos_, 18, 1e-3);
-  EXPECT_NEAR(win_size_and_pos.left_window_x_pos_, 0, 1e-3);
-  EXPECT_NEAR(win_size_and_pos.right_window_x_pos_, 80, 1e-3);
-  EXPECT_NEAR(win_size_and_pos.bottom_window_y_perc_, 0.25, 1e-3); // Defaults
-  EXPECT_NEAR(win_size_and_pos.left_window_x_perc_, 0.25, 1e-3); // Defaults
-  EXPECT_NEAR(win_size_and_pos.right_window_x_perc_, 0, 1e-3); // Defaults
+  // Unfortunately, we would need to create a full graphic context to create windows 
+  // in order to get a proper, populated ini file from imgui.
+  // so we just check that it's empty and it didn"t crashed.
+  EXPECT_EQ(win_size_and_pos_read.wrapper_get_imgui_ini_(), std::string(""));
+  EXPECT_EQ(win_size_and_pos_read.wrapper_get_imgui_ini_updated_(), true);
 }

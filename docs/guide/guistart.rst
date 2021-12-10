@@ -1,5 +1,7 @@
-Using SmartPeak
-===============
+.. begin_smartpeak_gui_usage
+
+Using SmartPeak GUI
+----------------------------------------------------------------------------------------------------------
 
 After successful installation of SmartPeak, on Windows open menu start and browse for relevant icon, you can also find the shortcut on desktop.
 
@@ -96,3 +98,5 @@ The report is saved in the same location as the ``sequence.csv`` file.
 
 .. todo::
     Explain the difference in options: ``Create FeatureDB.csv`` and ``Create PivotTable.csv``.
+
+.. end_smartpeak_gui_usage

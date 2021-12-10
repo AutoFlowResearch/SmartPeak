@@ -25,8 +25,14 @@
 #include <SmartPeak/test_config.h>
 #include <SmartPeak/core/SequenceProcessor.h>
 #include <SmartPeak/core/ApplicationHandler.h>
-#include <SmartPeak/core/ApplicationProcessor.h>
 #include <SmartPeak/core/Filenames.h>
+#include <SmartPeak/core/RawDataProcessors/LoadRawData.h>
+#include <SmartPeak/core/RawDataProcessors/LoadFeatures.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/CalculateCalibration.h>
+#include <SmartPeak/core/SampleGroupProcessors/MergeInjections.h>
+#include <SmartPeak/core/ApplicationProcessors/LoadSession.h>
+#include <SmartPeak/core/ApplicationProcessors/SaveSession.h>
+#include <SmartPeak/core/Utilities.h>
 #include <filesystem>
 
 using namespace SmartPeak;
@@ -56,18 +62,35 @@ Filenames generateTestFilenames()
   return filenames;
 }
 
-/*
-TEST(SequenceHandler, createSequence_onFilePicked)
+TEST(SequenceHandler, SaveSession_LoadSession_onFilePicked)
 {
-  ApplicationHandler application_handler;
-  LoadSession cs(application_handler);
-  auto& sequenceHandler = application_handler.sequenceHandler_;
-  std::string datapath_ = SMARTPEAK_GET_TEST_DATA_PATH("");
-  auto workflow = std::filesystem::path{ datapath_ } / std::filesystem::path{ "workflow_csv_files" };
-  Filenames filenames_;
-  filenames_.setFullPath("sequence", workflow / "sequence.csv");
-  cs.onFilePicked(filenames_.getFullPath("sequence"), &application_handler);
+  // Copy test data to antoher place to avoid poluting the data folder with the test.
+  auto data_path = std::filesystem::path(std::tmpnam(nullptr));
+  std::filesystem::copy(SMARTPEAK_GET_TEST_DATA_PATH("workflow_csv_files"), data_path);
 
+  // Load session from a directory
+  ApplicationHandler application_handler;
+  application_handler.filenames_ = Utilities::buildFilenamesFromDirectory(application_handler, data_path);
+  WorkflowManager workflow_manager;
+  LoadSession load_session(application_handler, workflow_manager);
+  load_session.filenames_ = application_handler.filenames_;
+  load_session.delimiter = ",";
+  load_session.checkConsistency = false;
+  load_session.process();
+
+  // Save Session using onFilePicked
+  auto path_db = data_path / "session.db";
+  SaveSession save_session_on_file_picked(application_handler);
+  save_session_on_file_picked.onFilePicked(path_db, &application_handler);
+
+  // close session
+  application_handler.closeSession();
+
+  // Load Session using onFilePicked
+  LoadSession load_session_on_file_picked(application_handler, workflow_manager);
+  load_session_on_file_picked.onFilePicked(path_db, &application_handler);
+
+  auto& sequenceHandler = application_handler.sequenceHandler_;
   ASSERT_EQ(sequenceHandler.getSequence().size(), 2);
   InjectionHandler& injection0 = sequenceHandler.getSequence()[0];
   EXPECT_STREQ(injection0.getMetaData().getSampleName().c_str(), "150516_CM1_Level1");
@@ -78,24 +101,43 @@ TEST(SequenceHandler, createSequence_onFilePicked)
   EXPECT_EQ(injection0.getRawData().getQuantitationMethods().size(), 10);
   EXPECT_STREQ(injection0.getRawData().getQuantitationMethods()[0].getComponentName().c_str(), "arg-L.arg-L_1.Light");
 }
-*/
-/*
+
 #if (WIN32)
 TEST(SequenceHandler, createSequence_onFilePicked_windows_separators)
 {
-  ApplicationHandler application_handler;
-  LoadSession cs(application_handler);
-  auto& sequenceHandler = application_handler.sequenceHandler_;
-  std::string datapath_ = SMARTPEAK_GET_TEST_DATA_PATH("");
-  auto workflow = std::filesystem::path{ datapath_ } / std::filesystem::path{ "workflow_csv_files" };
-  Filenames filenames_;
-  filenames_.setFullPath("sequence", workflow / "sequence.csv");
-  std::string full_name = filenames_.getFullPath("sequence").generic_string();
-  // replace separators (this way of specifying filename can happen with command line interface actually)
-  std::replace(full_name.begin(), full_name.end(), '/', '\\');
-  filenames_.setFullPath("sequence", full_name);
-  cs.onFilePicked(filenames_.getFullPath("sequence"), &application_handler);
+  // Copy test data to antoher place to avoid poluting the data folder with the test.
+  auto data_path = std::filesystem::path(std::tmpnam(nullptr));
+  std::filesystem::copy(SMARTPEAK_GET_TEST_DATA_PATH("workflow_csv_files"), data_path);
 
+  // Load session from a directory
+  ApplicationHandler application_handler;
+  application_handler.filenames_ = Utilities::buildFilenamesFromDirectory(application_handler, data_path);
+  WorkflowManager workflow_manager;
+  LoadSession load_session(application_handler, workflow_manager);
+  load_session.filenames_ = application_handler.filenames_;
+  load_session.delimiter = ",";
+  load_session.checkConsistency = false;
+  load_session.process();
+
+  application_handler.filenames_.log();
+
+  // Save Session using onFilePicked
+  auto path_db = data_path / "session.db";
+  SaveSession save_session_on_file_picked(application_handler);
+  save_session_on_file_picked.onFilePicked(path_db, &application_handler);
+
+  // close session
+  application_handler.closeSession();
+
+  // replace separators (this way of specifying filename can happen with command line interface actually)
+  std::string full_name = path_db.generic_string();
+  std::replace(full_name.begin(), full_name.end(), '/', '\\');
+
+  // Load Session using onFilePicked
+  LoadSession load_session_on_file_picked(application_handler, workflow_manager);
+  load_session_on_file_picked.onFilePicked(full_name, &application_handler);
+
+  auto& sequenceHandler = application_handler.sequenceHandler_;
   ASSERT_EQ(sequenceHandler.getSequence().size(), 2);
   InjectionHandler& injection0 = sequenceHandler.getSequence()[0];
   EXPECT_STREQ(injection0.getMetaData().getSampleName().c_str(), "150516_CM1_Level1");
@@ -108,13 +150,14 @@ TEST(SequenceHandler, createSequence_onFilePicked_windows_separators)
 }
 #endif(WIN32)
 
-TEST(SequenceHandler, createSequence)
+TEST(SequenceHandler, createSession)
 {
   ApplicationHandler application_handler;
-  LoadSession cs(application_handler);
+  WorkflowManager workflow_manager;
+  LoadSession cs(application_handler, workflow_manager);
   auto& sequenceHandler = application_handler.sequenceHandler_;
-  cs.filenames_        = generateTestFilenames();
-  cs.delimiter        = ",";
+  cs.filenames_ = generateTestFilenames();
+  cs.delimiter = ",";
   cs.checkConsistency = false;
   cs.process();
 
@@ -226,7 +269,7 @@ TEST(SequenceHandler, createSequence)
   EXPECT_STREQ(sequenceHandler.getSequenceSegments()[0].getFeatureBackgroundQC().component_qcs[0].component_name.c_str(), "ala-L.ala-L_1.Heavy-modified");
 
   sequenceHandler.clear();
-  Filenames filenames { generateTestFilenames() };
+  Filenames filenames{ generateTestFilenames() };
   filenames.setFullPath("sequence", SMARTPEAK_GET_TEST_DATA_PATH("SequenceProcessor_empty_sequence.csv"));
 
   cs.filenames_ = filenames;
@@ -234,11 +277,12 @@ TEST(SequenceHandler, createSequence)
 
   EXPECT_EQ(sequenceHandler.getSequence().size(), 0);
 }
-*/
+
 TEST(SequenceHandler, gettersCreateSequence)
 {
   ApplicationHandler application_handler;
-  LoadSession cs(application_handler);
+  WorkflowManager workflow_manager;
+  LoadSession cs(application_handler, workflow_manager);
   auto& sequenceHandler = application_handler.sequenceHandler_;
   EXPECT_STREQ(cs.getName().c_str(), "LOAD_SESSION");
 }
@@ -246,7 +290,8 @@ TEST(SequenceHandler, gettersCreateSequence)
 TEST(SequenceHandler, processSequence)
 {
   ApplicationHandler application_handler;
-  LoadSession cs(application_handler);
+  WorkflowManager workflow_manager;
+  LoadSession cs(application_handler, workflow_manager);
   auto& sequenceHandler = application_handler.sequenceHandler_;
   cs.filenames_        = generateTestFilenames();
   cs.delimiter        = ",";
@@ -260,18 +305,18 @@ TEST(SequenceHandler, processSequence)
   std::map<std::string, Filenames> dynamic_filenames;
   Filenames methods_filenames;
   const std::string path = SMARTPEAK_GET_TEST_DATA_PATH("");
-  methods_filenames.setTag(Filenames::Tag::MAIN_DIR, path);
-  methods_filenames.setTag(Filenames::Tag::MZML_INPUT_PATH, path + "/mzML");
-  methods_filenames.setTag(Filenames::Tag::FEATURES_INPUT_PATH, path + "/features");
-  methods_filenames.setTag(Filenames::Tag::FEATURES_OUTPUT_PATH, path + "/features");
+  methods_filenames.setTagValue(Filenames::Tag::MAIN_DIR, path);
+  methods_filenames.setTagValue(Filenames::Tag::MZML_INPUT_PATH, path + "/mzML");
+  methods_filenames.setTagValue(Filenames::Tag::FEATURES_INPUT_PATH, path + "/features");
+  methods_filenames.setTagValue(Filenames::Tag::FEATURES_OUTPUT_PATH, path + "/features");
   for (const InjectionHandler& injection : sequenceHandler.getSequence()) {
     const std::string key = injection.getMetaData().getInjectionName();
     dynamic_filenames[key] = methods_filenames;
-    dynamic_filenames[key].setTag(Filenames::Tag::INPUT_MZML_FILENAME, injection.getMetaData().getFilename());
-    dynamic_filenames[key].setTag(Filenames::Tag::INPUT_INJECTION_NAME, key);
-    dynamic_filenames[key].setTag(Filenames::Tag::OUTPUT_INJECTION_NAME, key);
-    dynamic_filenames[key].setTag(Filenames::Tag::INPUT_GROUP_NAME, injection.getMetaData().getSampleGroupName());
-    dynamic_filenames[key].setTag(Filenames::Tag::OUTPUT_GROUP_NAME, injection.getMetaData().getSampleGroupName());
+    dynamic_filenames[key].setTagValue(Filenames::Tag::INPUT_MZML_FILENAME, injection.getMetaData().getFilename());
+    dynamic_filenames[key].setTagValue(Filenames::Tag::INPUT_INJECTION_NAME, key);
+    dynamic_filenames[key].setTagValue(Filenames::Tag::OUTPUT_INJECTION_NAME, key);
+    dynamic_filenames[key].setTagValue(Filenames::Tag::INPUT_GROUP_NAME, injection.getMetaData().getSampleGroupName());
+    dynamic_filenames[key].setTagValue(Filenames::Tag::OUTPUT_GROUP_NAME, injection.getMetaData().getSampleGroupName());
   }
 
   EXPECT_EQ(sequenceHandler.getSequence().size(), dynamic_filenames.size());
@@ -333,7 +378,8 @@ TEST(SequenceHandler, gettersProcessSequence)
 TEST(SequenceHandler, processSequenceSegments)
 {
   ApplicationHandler application_handler;
-  LoadSession cs(application_handler);
+  WorkflowManager workflow_manager;
+  LoadSession cs(application_handler, workflow_manager);
   auto& sequenceHandler = application_handler.sequenceHandler_;
   cs.filenames_        = generateTestFilenames();
   cs.delimiter        = ",";
@@ -345,19 +391,19 @@ TEST(SequenceHandler, processSequenceSegments)
 
   Filenames methods_filenames;
   const std::string path = SMARTPEAK_GET_TEST_DATA_PATH("");
-  methods_filenames.setTag(Filenames::Tag::MAIN_DIR, path);
-  methods_filenames.setTag(Filenames::Tag::MZML_INPUT_PATH, path + "mzML");
-  methods_filenames.setTag(Filenames::Tag::FEATURES_INPUT_PATH, path + "features");
-  methods_filenames.setTag(Filenames::Tag::FEATURES_OUTPUT_PATH, path + "features");
+  methods_filenames.setTagValue(Filenames::Tag::MAIN_DIR, path);
+  methods_filenames.setTagValue(Filenames::Tag::MZML_INPUT_PATH, path + "mzML");
+  methods_filenames.setTagValue(Filenames::Tag::FEATURES_INPUT_PATH, path + "features");
+  methods_filenames.setTagValue(Filenames::Tag::FEATURES_OUTPUT_PATH, path + "features");
   std::map<std::string, Filenames> dynamic_filenames;
   for (const SequenceSegmentHandler& sequence_segment : sequenceHandler.getSequenceSegments()) {
     const std::string key = sequence_segment.getSequenceSegmentName();
     dynamic_filenames[key] = methods_filenames;
-    dynamic_filenames[key].setTag(Filenames::Tag::INPUT_MZML_FILENAME, "");
-    dynamic_filenames[key].setTag(Filenames::Tag::INPUT_INJECTION_NAME, key);
-    dynamic_filenames[key].setTag(Filenames::Tag::OUTPUT_INJECTION_NAME, key);
-    dynamic_filenames[key].setTag(Filenames::Tag::INPUT_GROUP_NAME, key);
-    dynamic_filenames[key].setTag(Filenames::Tag::OUTPUT_GROUP_NAME, key);
+    dynamic_filenames[key].setTagValue(Filenames::Tag::INPUT_MZML_FILENAME, "");
+    dynamic_filenames[key].setTagValue(Filenames::Tag::INPUT_INJECTION_NAME, key);
+    dynamic_filenames[key].setTagValue(Filenames::Tag::OUTPUT_INJECTION_NAME, key);
+    dynamic_filenames[key].setTagValue(Filenames::Tag::INPUT_GROUP_NAME, key);
+    dynamic_filenames[key].setTagValue(Filenames::Tag::OUTPUT_GROUP_NAME, key);
   }
 
   // Default sequence segment names (i.e., all)
@@ -416,7 +462,8 @@ TEST(SequenceHandler, processSampleGroups)
 {
   // Create the sequence
   ApplicationHandler application_handler;
-  LoadSession cs(application_handler);
+  WorkflowManager workflow_manager;
+  LoadSession cs(application_handler, workflow_manager);
   auto& sequenceHandler = application_handler.sequenceHandler_;
   cs.filenames_ = generateTestFilenames();
   cs.delimiter = ",";
@@ -431,15 +478,15 @@ TEST(SequenceHandler, processSampleGroups)
   for (const InjectionHandler& injection : sequenceHandler.getSequence()) {
     const std::string key = injection.getMetaData().getInjectionName();
     dynamic_filenames[key] = methods_filenames;
-    dynamic_filenames[key].setTag(Filenames::Tag::MAIN_DIR, path);
-    dynamic_filenames[key].setTag(Filenames::Tag::MZML_INPUT_PATH, path);
-    dynamic_filenames[key].setTag(Filenames::Tag::FEATURES_INPUT_PATH, path);
-    dynamic_filenames[key].setTag(Filenames::Tag::FEATURES_OUTPUT_PATH, path);
-    dynamic_filenames[key].setTag(Filenames::Tag::INPUT_MZML_FILENAME, injection.getMetaData().getFilename());
-    dynamic_filenames[key].setTag(Filenames::Tag::INPUT_INJECTION_NAME, key);
-    dynamic_filenames[key].setTag(Filenames::Tag::OUTPUT_INJECTION_NAME, key);
-    dynamic_filenames[key].setTag(Filenames::Tag::INPUT_GROUP_NAME, injection.getMetaData().getSampleGroupName());
-    dynamic_filenames[key].setTag(Filenames::Tag::OUTPUT_GROUP_NAME, injection.getMetaData().getSampleGroupName());
+    dynamic_filenames[key].setTagValue(Filenames::Tag::MAIN_DIR, path);
+    dynamic_filenames[key].setTagValue(Filenames::Tag::MZML_INPUT_PATH, path);
+    dynamic_filenames[key].setTagValue(Filenames::Tag::FEATURES_INPUT_PATH, path);
+    dynamic_filenames[key].setTagValue(Filenames::Tag::FEATURES_OUTPUT_PATH, path);
+    dynamic_filenames[key].setTagValue(Filenames::Tag::INPUT_MZML_FILENAME, injection.getMetaData().getFilename());
+    dynamic_filenames[key].setTagValue(Filenames::Tag::INPUT_INJECTION_NAME, key);
+    dynamic_filenames[key].setTagValue(Filenames::Tag::OUTPUT_INJECTION_NAME, key);
+    dynamic_filenames[key].setTagValue(Filenames::Tag::INPUT_GROUP_NAME, injection.getMetaData().getSampleGroupName());
+    dynamic_filenames[key].setTagValue(Filenames::Tag::OUTPUT_GROUP_NAME, injection.getMetaData().getSampleGroupName());
   }
 
   ProcessSequence ps(sequenceHandler);
@@ -451,17 +498,17 @@ TEST(SequenceHandler, processSampleGroups)
   { std::make_shared<MergeInjections>() };
   dynamic_filenames.clear();
   Filenames methods_filenames2;
-  methods_filenames2.setTag(Filenames::Tag::MAIN_DIR, path);
-  methods_filenames2.setTag(Filenames::Tag::MZML_INPUT_PATH, path + "mzML");
-  methods_filenames2.setTag(Filenames::Tag::FEATURES_INPUT_PATH, path + "features");
-  methods_filenames2.setTag(Filenames::Tag::FEATURES_OUTPUT_PATH, path + "features");
+  methods_filenames2.setTagValue(Filenames::Tag::MAIN_DIR, path);
+  methods_filenames2.setTagValue(Filenames::Tag::MZML_INPUT_PATH, path + "mzML");
+  methods_filenames2.setTagValue(Filenames::Tag::FEATURES_INPUT_PATH, path + "features");
+  methods_filenames2.setTagValue(Filenames::Tag::FEATURES_OUTPUT_PATH, path + "features");
   for (const SampleGroupHandler& sampleGroupHandler : sequenceHandler.getSampleGroups()) {
     dynamic_filenames[sampleGroupHandler.getSampleGroupName()] = methods_filenames2;
-    dynamic_filenames[sampleGroupHandler.getSampleGroupName()].setTag(Filenames::Tag::INPUT_MZML_FILENAME, "");
-    dynamic_filenames[sampleGroupHandler.getSampleGroupName()].setTag(Filenames::Tag::INPUT_INJECTION_NAME, sampleGroupHandler.getSampleGroupName());
-    dynamic_filenames[sampleGroupHandler.getSampleGroupName()].setTag(Filenames::Tag::OUTPUT_INJECTION_NAME, sampleGroupHandler.getSampleGroupName());
-    dynamic_filenames[sampleGroupHandler.getSampleGroupName()].setTag(Filenames::Tag::INPUT_GROUP_NAME, sampleGroupHandler.getSampleGroupName());
-    dynamic_filenames[sampleGroupHandler.getSampleGroupName()].setTag(Filenames::Tag::OUTPUT_GROUP_NAME, sampleGroupHandler.getSampleGroupName());
+    dynamic_filenames[sampleGroupHandler.getSampleGroupName()].setTagValue(Filenames::Tag::INPUT_MZML_FILENAME, "");
+    dynamic_filenames[sampleGroupHandler.getSampleGroupName()].setTagValue(Filenames::Tag::INPUT_INJECTION_NAME, sampleGroupHandler.getSampleGroupName());
+    dynamic_filenames[sampleGroupHandler.getSampleGroupName()].setTagValue(Filenames::Tag::OUTPUT_INJECTION_NAME, sampleGroupHandler.getSampleGroupName());
+    dynamic_filenames[sampleGroupHandler.getSampleGroupName()].setTagValue(Filenames::Tag::INPUT_GROUP_NAME, sampleGroupHandler.getSampleGroupName());
+    dynamic_filenames[sampleGroupHandler.getSampleGroupName()].setTagValue(Filenames::Tag::OUTPUT_GROUP_NAME, sampleGroupHandler.getSampleGroupName());
   }
 
   // Default sample group names (i.e., all)
@@ -488,7 +535,8 @@ TEST(SequenceHandler, processSampleGroups_no_injections)
 {
   // Try to launch ProcessSequence while no injections is set.
   ApplicationHandler application_handler;
-  LoadSession cs(application_handler);
+  WorkflowManager workflow_manager;
+  LoadSession cs(application_handler, workflow_manager);
   auto& sequenceHandler = application_handler.sequenceHandler_;
   ProcessSequence ps(sequenceHandler);
   const vector<std::shared_ptr<RawDataProcessor>> raw_data_processing_methods = { std::make_shared<LoadFeatures>() };

@@ -26,7 +26,6 @@
 #include <string>
 #include <vector>
 #include <SmartPeak/core/ApplicationHandler.h>
-#include <SmartPeak/core/ApplicationProcessor.h>
 #include <SmartPeak/core/SequenceProcessor.h>
 #include <SmartPeak/core/WorkflowManager.h>
 #include <SmartPeak/core/SessionHandler.h>
@@ -48,14 +47,29 @@
 #include <SmartPeak/ui/WorkflowWidget.h>
 #include <SmartPeak/ui/StatisticsWidget.h>
 #include <SmartPeak/ui/Widget.h>
+#include <SmartPeak/ui/ExplorerWidget.h>
 #include <SmartPeak/ui/InfoWidget.h>
 #include <SmartPeak/ui/RunWorkflowWidget.h>
 #include <SmartPeak/ui/AboutWidget.h>
 #include <SmartPeak/ui/LogWidget.h>
 #include <SmartPeak/ui/SequenceTableWidget.h>
-#include <SmartPeak/ui/WindowSizesAndPositions.h>
 #include <SmartPeak/ui/LoadSessionWizard.h>
+#include <SmartPeak/ui/LayoutLoader.h>
+#include <SmartPeak/ui/SplitWindow.h>
 #include <SmartPeak/core/EventDispatcher.h>
+#include <SmartPeak/core/RawDataProcessors/StoreParameters.h>
+#include <SmartPeak/core/RawDataProcessors/StoreValidationData.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/StoreFeatureBackgroundEstimations.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/StoreFeatureBackgroundFilters.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/StoreFeatureBackgroundQCs.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/StoreFeatureFilters.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/StoreFeatureQCs.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/StoreFeatureRSDEstimations.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/StoreFeatureRSDFilters.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/StoreFeatureRSDQCs.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/StoreQuantitationMethods.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/StoreStandardsConcentrations.h>
+#include <SmartPeak/core/ApplicationProcessors/SaveSession.h>
 #include <plog/Log.h>
 #include <plog/Appenders/ConsoleAppender.h>
 #include <plog/Appenders/ColorConsoleAppender.h>
@@ -76,9 +90,9 @@ bool SmartPeak::run_on_server = false;
 void initializeDataDirs(ApplicationHandler& state);
 
 void initializeDataDir(
-  ApplicationHandler& state,
+  ApplicationHandler& application_handler,
   const std::string& label,
-  std::filesystem::path& data_dir_member,
+  Filenames::Tag tag,
   const std::filesystem::path& default_dir
 );
 
@@ -100,6 +114,8 @@ int main(int argc, char** argv)
   SessionHandler session_handler_;
   WorkflowManager workflow_manager_;
   GuiAppender appender_;
+  SplitWindow split_window;
+  LayoutLoader layout_loader(application_handler_);
 
   // EventDispatcher will dispatch events triggered by the observers in the main GUI thread
   EventDispatcher event_dispatcher;
@@ -109,11 +125,13 @@ int main(int argc, char** argv)
   event_dispatcher.addTransitionsObserver(&session_handler_);
   event_dispatcher.addSequenceObserver(&session_handler_);
   event_dispatcher.addFeaturesObserver(&session_handler_);
+  event_dispatcher.addApplicationProcessorObserver(&layout_loader);
+  event_dispatcher.addApplicationProcessorObserver(&application_handler_.session_loader_generator);
 
   // widgets: pop ups
   auto file_picker_ = std::make_shared<FilePicker>();
-  auto session_files_widget_create_ = std::make_shared<SessionFilesWidget>(application_handler_, SessionFilesWidget::Mode::ECreation);
-  auto session_files_widget_modify_ = std::make_shared<SessionFilesWidget>(application_handler_, SessionFilesWidget::Mode::EModification);
+  auto session_files_widget_create_ = std::make_shared<SessionFilesWidget>(application_handler_, SessionFilesWidget::Mode::ECreation, workflow_manager_, &event_dispatcher);
+  auto session_files_widget_modify_ = std::make_shared<SessionFilesWidget>(application_handler_, SessionFilesWidget::Mode::EModification, workflow_manager_, &event_dispatcher);
   auto create_session_widget_ = std::make_shared<CreateSessionWidget>(application_handler_, session_files_widget_create_);
   auto run_workflow_widget_ = std::make_shared<RunWorkflowWidget>(application_handler_,
     session_handler_,
@@ -125,7 +143,15 @@ int main(int argc, char** argv)
   auto about_widget_ = std::make_shared<AboutWidget>();
   auto report_ = std::make_shared<Report>(application_handler_);
 
-  auto load_session_wizard_ = std::make_shared<LoadSessionWizard>(session_files_widget_modify_);
+  auto load_session_wizard_ = std::make_shared<LoadSessionWizard>(
+    session_files_widget_modify_,
+    workflow_manager_,
+    application_handler_,
+    &event_dispatcher,
+    &event_dispatcher,
+    &event_dispatcher,
+    &event_dispatcher
+    );
 
   // widgets: windows
   auto quickInfoText_= std::make_shared<InfoWidget>("Info", application_handler_,
@@ -154,8 +180,8 @@ int main(int argc, char** argv)
   auto spectrum_explorer_window_ = std::make_shared<ExplorerWidget>("SpectrumExplorerWindow", "Scans", &event_dispatcher);
   auto sequence_main_window_ = std::make_shared<SequenceTableWidget>("SequenceMainWindow", "Sequence",
                                                                       &session_handler_, &application_handler_.sequenceHandler_);
-  auto transitions_main_window_ = std::make_shared<GenericTableWidget>("TransitionsMainWindow", "Transitions");
-  auto spectrum_main_window_ = std::make_shared<GenericTableWidget>("SpectrumMainWindow", "Scans");
+  auto transitions_main_window_ = std::make_shared<GenericTableWidget>("TransitionsMainWindow", "Transitions Table");
+  auto spectrum_main_window_ = std::make_shared<GenericTableWidget>("SpectrumMainWindow", "Scans Table");
   auto quant_method_main_window_ = std::make_shared<SequenceSegmentWidget>("QuantMethodMainWindow", "Quantitation Method",
                                    &session_handler_, &application_handler_.sequenceHandler_,
                                    &SessionHandler::setQuantMethodTable, &SessionHandler::getFiltersTable, &application_handler_.sequenceHandler_);
@@ -220,7 +246,7 @@ int main(int argc, char** argv)
   transitions_explorer_window_->visible_ = true;
 
   // windows organization
-  std::vector<std::shared_ptr<Widget>> top_windows = {
+  split_window.top_windows_ = {
     statistics_,
     sequence_main_window_,
     transitions_main_window_,
@@ -257,14 +283,14 @@ int main(int argc, char** argv)
     calibrators_line_plot_
   };
 
-  std::vector<std::shared_ptr<Widget>> bottom_windows = {
+  split_window.bottom_windows_ = {
     quickInfoText_,
     log_widget_,
     spectra_msms_plot_widget_,
     spectra_ms2_plot_widget_,
   };
 
-  std::vector<std::shared_ptr<Widget>> left_windows = {
+  split_window.left_windows_ = {
     injections_explorer_window_,
     transitions_explorer_window_,
     features_explorer_window_,
@@ -278,13 +304,16 @@ int main(int argc, char** argv)
       create_session_widget_,
       run_workflow_widget_,
       about_widget_,
-      report_
+      report_,
+      load_session_wizard_->set_input_output_widget
   };
 
+  split_window.setupLayoutLoader(layout_loader);
+
   // We need titles for all sub windows
-  checkTitles(top_windows);
-  checkTitles(bottom_windows);
-  checkTitles(left_windows);
+  checkTitles(split_window.top_windows_);
+  checkTitles(split_window.bottom_windows_);
+  checkTitles(split_window.left_windows_);
 
   // Create log path
   const std::time_t t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
@@ -359,6 +388,7 @@ int main(int argc, char** argv)
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
   ImGuiIO& io = ImGui::GetIO(); (void)io;
+  ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
   //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
 
   // Setup Dear ImGui style
@@ -370,7 +400,6 @@ int main(int argc, char** argv)
   ImGui_ImplOpenGL2_Init();
 
   ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-  WindowSizesAndPositions win_size_and_pos;
 
   // Main loop
   bool done = false;
@@ -388,29 +417,27 @@ int main(int argc, char** argv)
     // Start the Dear ImGui frame
     ImGui_ImplOpenGL2_NewFrame();
     ImGui_ImplSDL2_NewFrame(window);
+
+    split_window.win_size_and_pos_.applyLayout();
     ImGui::NewFrame();
 
-    { // keeping this block to easily collapse/expand the bulk of the loop
+    event_dispatcher.dispatchEvents();
 
-      event_dispatcher.dispatchEvents();
+    session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
 
-      session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
+    if ((!workflow_is_done_) && workflow_manager_.isWorkflowDone()) // workflow just finished
+    {
+      workflow_manager_.updateApplicationHandler(application_handler_);
+    }
+    workflow_is_done_ = workflow_manager_.isWorkflowDone();
+    file_loading_is_done_ = file_picker_->fileLoadingIsDone();
 
-      win_size_and_pos.setXAndYSizes(io.DisplaySize.x, io.DisplaySize.y);
-      if ((!workflow_is_done_) && workflow_manager_.isWorkflowDone()) // workflow just finished
-      {
-        workflow_manager_.updateApplicationHandler(application_handler_);
-      }
-      workflow_is_done_ = workflow_manager_.isWorkflowDone();
-      file_loading_is_done_ = file_picker_->fileLoadingIsDone();
-
-      // Make the quick info text
-      quickInfoText_->setFileLoadingDone(file_loading_is_done_, file_picker_->errorLoadingFile());
-      quickInfoText_->clearErrorMessages();
-      if (exceeding_plot_points_) quickInfoText_->addErrorMessage("Plot rendering limit reached.  Not plotting all selected data.");
-      if (exceeding_table_size_) quickInfoText_->addErrorMessage("Table rendering limit reached.  Not showing all selected data.");
-      if (ran_integrity_check_ && integrity_check_failed_) quickInfoText_->addErrorMessage("Integrity check failed.  Check the `Information` log.");
-      if (ran_integrity_check_ && !integrity_check_failed_) quickInfoText_->addErrorMessage("Integrity check passed.");
+    // Make the quick info text
+    quickInfoText_->clearErrorMessages();
+    if (exceeding_plot_points_) quickInfoText_->addErrorMessage("Plot rendering limit reached.  Not plotting all selected data.");
+    if (exceeding_table_size_) quickInfoText_->addErrorMessage("Table rendering limit reached.  Not showing all selected data.");
+    if (ran_integrity_check_ && integrity_check_failed_) quickInfoText_->addErrorMessage("Integrity check failed.  Check the `Information` log.");
+    if (ran_integrity_check_ && !integrity_check_failed_) quickInfoText_->addErrorMessage("Integrity check passed.");
       
     // ======================================
     // Popups
@@ -447,12 +474,15 @@ int main(int argc, char** argv)
           workflow_is_done_ && file_loading_is_done_
           && application_handler_.filenames_.getSessionDB().getDBFilePath() != "")) {
           SaveSession save_session(application_handler_);
+          save_session.addApplicationProcessorObserver(&event_dispatcher);
           save_session.process();
         }
         if (ImGui::MenuItem("Save Session As ...", NULL, false, 
                              workflow_is_done_ && file_loading_is_done_ && application_handler_.sessionIsOpened())) {
+          auto save_session = std::make_shared<SaveSession>(application_handler_);
+          save_session->addApplicationProcessorObserver(&event_dispatcher);
           file_picker_->open("Select session file",
-            std::make_shared<SaveSession>(application_handler_),
+            save_session,
             FilePicker::Mode::EFileCreate,
             application_handler_,
             "session.db");
@@ -644,6 +674,15 @@ int main(int argc, char** argv)
       }
       showQuickHelpToolTip("actions");
       
+      if (ImGui::BeginMenu("Window"))
+      {
+        if (ImGui::MenuItem("Reset Window Layout"))
+        {
+          split_window.reset_layout_ = true;
+        }
+        ImGui::EndMenu();
+      }
+
       if (ImGui::BeginMenu("Help"))
       {
         ImGui::MenuItem("About", NULL, &about_widget_->visible_);
@@ -800,98 +839,19 @@ int main(int argc, char** argv)
         "CalibratorsMainWindow");
     }
 
-
     // ======================================
     // Windows display
     // ======================================
-    
-    // windfow flags common to top, left and bottom windows
-    const ImGuiWindowFlags window_flags =
-      ImGuiWindowFlags_NoTitleBar |
-      ImGuiWindowFlags_NoMove |
-      ImGuiWindowFlags_NoCollapse |
-      ImGuiWindowFlags_NoFocusOnAppearing;
+    split_window.draw();
 
-    // Left window
-    if (show_left_window_) {
-      ImGui::SetNextWindowPos(ImVec2(win_size_and_pos.left_window_x_pos_, win_size_and_pos.left_and_right_window_y_pos_));
-      ImGui::SetNextWindowSize(ImVec2(win_size_and_pos.left_window_x_size_, win_size_and_pos.left_and_right_window_y_size_));
-      ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0);
-      ImGui::Begin("Left window", NULL, window_flags);
-      if (ImGui::BeginTabBar("Left window tab bar", ImGuiTabBarFlags_Reorderable | ImGuiTabBarFlags_AutoSelectNewTabs))
-      {
-        for (auto& widget : left_windows)
-        {
-          if (ImGui::BeginTabItem(widget->title_.c_str(), &widget->visible_))
-          {
-            widget->setWindowSize(win_size_and_pos.left_window_x_size_, win_size_and_pos.left_and_right_window_y_size_);
-            showQuickHelpToolTip(widget->title_);
-            widget->draw();
-            ImGui::EndTabItem();
-          }
-        }
-        ImGui::EndTabBar();
-      }
-      win_size_and_pos.setLeftWindowXSize(ImGui::GetWindowWidth());
-      win_size_and_pos.setWindowSizesAndPositions(show_top_window_, show_bottom_window_, show_left_window_, show_right_window_);
-      ImGui::End();
-      ImGui::PopStyleVar();
-    }
+    // =====================================================
+    // Load/Save Layout (must be call after ui has been set)
+    // =====================================================
+    layout_loader.process();
 
-    // Top window
-    if (show_top_window_)
-    {
-      ImGui::SetNextWindowPos(ImVec2(win_size_and_pos.bottom_and_top_window_x_pos_, win_size_and_pos.top_window_y_pos_));
-      ImGui::SetNextWindowSize(ImVec2(win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.top_window_y_size_));
-      ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0);
-      ImGui::Begin("Top window", NULL, window_flags);
-      if (ImGui::BeginTabBar("Top window tab bar", ImGuiTabBarFlags_Reorderable | ImGuiTabBarFlags_AutoSelectNewTabs))
-      {
-        for (auto& widget : top_windows)
-        {
-          if (ImGui::BeginTabItem(widget->title_.c_str(), &widget->visible_))
-          {
-            widget->setWindowSize(win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.top_window_y_size_);
-            showQuickHelpToolTip(widget->title_);
-            widget->draw();
-            ImGui::EndTabItem();
-          }
-        }
-        ImGui::EndTabBar();
-      }
-      win_size_and_pos.setTopWindowYSize(ImGui::GetWindowHeight());
-      win_size_and_pos.setLeftWindowXSize(ImGui::GetWindowPos().x);
-      win_size_and_pos.setWindowSizesAndPositions(show_top_window_, show_bottom_window_, show_left_window_, show_right_window_);
-      ImGui::End();
-      ImGui::PopStyleVar();
-    }
-
-    // Bottom window
-    if (show_bottom_window_)
-    {
-      ImGui::SetNextWindowPos(ImVec2(win_size_and_pos.bottom_and_top_window_x_pos_, win_size_and_pos.bottom_window_y_pos_));
-      ImGui::SetNextWindowSize(ImVec2(win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.bottom_window_y_size_));
-      ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0);
-      ImGui::Begin("Bottom window", NULL, window_flags);
-      if (ImGui::BeginTabBar("Bottom window tab bar", ImGuiTabBarFlags_Reorderable | ImGuiTabBarFlags_AutoSelectNewTabs))
-      {
-        for (auto& widget : bottom_windows)
-        {
-          if (ImGui::BeginTabItem(widget->title_.c_str(), &widget->visible_))
-          {
-            widget->setWindowSize(win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.bottom_window_y_size_);
-            widget->draw();
-            ImGui::EndTabItem();
-          }
-        }
-        ImGui::EndTabBar();
-      }
-      ImGui::End();
-      ImGui::PopStyleVar();
-    }
-    }
-
+    // =====================================================
     // Rendering
+    // =====================================================
     ImGui::Render();
     glViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
     glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
@@ -915,23 +875,23 @@ int main(int argc, char** argv)
 
 void initializeDataDirs(ApplicationHandler& application_handler)
 {
-  initializeDataDir(application_handler, "mzML", application_handler.mzML_dir_, "mzML");
-  initializeDataDir(application_handler, "INPUT features", application_handler.features_in_dir_, "features");
-  initializeDataDir(application_handler, "OUTPUT features", application_handler.features_out_dir_, "features");
+  initializeDataDir(application_handler, "mzML", Filenames::Tag::MZML_INPUT_PATH, "mzML");
+  initializeDataDir(application_handler, "INPUT features", Filenames::Tag::FEATURES_INPUT_PATH, "features");
+  initializeDataDir(application_handler, "OUTPUT features", Filenames::Tag::FEATURES_OUTPUT_PATH, "features");
 }
 
 void initializeDataDir(
   ApplicationHandler& application_handler,
   const std::string& label,
-  std::filesystem::path& data_dir_member,
+  Filenames::Tag tag,
   const std::filesystem::path& default_dir
 )
 {
-  if (!data_dir_member.empty()) {
+  auto tag_value = application_handler.filenames_.getTagValue(tag);
+  if (!tag_value.empty()) {
     return;
   }
-  data_dir_member = application_handler.main_dir_ / default_dir;
-  LOGN << "\n\nGenerated path for '" << label << "':\t" << data_dir_member.generic_string();
+  application_handler.filenames_.setTagValue(tag, (application_handler.main_dir_ / default_dir).generic_string());
 }
 
 void checkTitles(const std::vector<std::shared_ptr<Widget>> windows)

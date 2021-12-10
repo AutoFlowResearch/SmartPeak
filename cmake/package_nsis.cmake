@@ -90,7 +90,7 @@ macro(prepare_nsis_link linkName appName params)
 	LIST(APPEND CPACK_NSIS_DELETE_ICONS_EXTRA  "  Delete '$DESKTOP\\\\${linkName}.lnk'")
 endmacro()
 
-prepare_nsis_link(${CPACK_PACKAGE_NAME} "SmartPeakGUI" " ")
+prepare_nsis_link(${CPACK_PACKAGE_FILE_NAME} "SmartPeakGUI" " ")
 
 # Replace semicolons with new lines:
 string (REPLACE ";" "\n" CPACK_NSIS_CREATE_ICONS_EXTRA "${CPACK_NSIS_CREATE_ICONS_EXTRA}")

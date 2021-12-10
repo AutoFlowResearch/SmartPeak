@@ -22,9 +22,36 @@
 // --------------------------------------------------------------------------
 
 #include <SmartPeak/core/ApplicationHandler.h>
-#include <SmartPeak/core/ApplicationProcessor.h>
 #include <SmartPeak/core/SharedProcessors.h>
 #include <SmartPeak/core/SequenceProcessor.h>
+#include <SmartPeak/core/RawDataProcessors/LoadTransitions.h>
+#include <SmartPeak/core/RawDataProcessors/LoadParameters.h>
+#include <SmartPeak/core/RawDataProcessors/LoadValidationData.h>
+#include <SmartPeak/core/RawDataProcessors/StoreParameters.h>
+#include <SmartPeak/core/RawDataProcessors/StoreValidationData.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/LoadFeatureFilters.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/LoadFeatureQCs.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/LoadQuantitationMethods.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/LoadStandardsConcentrations.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/StoreQuantitationMethods.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/LoadFeatureRSDFilters.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/LoadFeatureRSDQCs.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/LoadFeatureBackgroundEstimations.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/LoadFeatureBackgroundFilters.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/LoadFeatureBackgroundQCs.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/LoadFeatureRSDEstimations.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/StoreFeatureBackgroundEstimations.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/StoreFeatureBackgroundFilters.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/StoreFeatureBackgroundQCs.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/StoreFeatureFilters.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/StoreFeatureQCs.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/StoreFeatureRSDEstimations.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/StoreFeatureRSDFilters.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/StoreFeatureRSDQCs.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/StoreQuantitationMethods.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/StoreStandardsConcentrations.h>
+#include <SmartPeak/core/ApplicationProcessors/BuildCommandsFromNames.h>
+
 
 namespace SmartPeak
 {
@@ -101,11 +128,9 @@ namespace SmartPeak
     LOGI << "Pathnames for 'mzML', 'INPUT features' and 'OUTPUT features' reset.";
     sequence_pathname_.clear();
     std::filesystem::path main_dir_ = ".";
-    mzML_dir_.clear();
-    features_in_dir_.clear();
-    features_out_dir_.clear();
     sequenceHandler_.clear();
     filenames_ = Filenames();
+    session_loader_generator.clear();
   }
   
   bool ApplicationHandler::sessionIsOpened() const

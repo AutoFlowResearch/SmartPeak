@@ -17,7 +17,7 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Bertrand Boudaud $
+// $Maintainer: Bertrand Boudaud, Douglas McCloskey $
 // $Authors: Douglas McCloskey, Bertrand Boudaud $
 // --------------------------------------------------------------------------
 
@@ -73,6 +73,13 @@ namespace SmartPeak
       for (auto& observer : observers_)
       {
         observer->onSampleGroupProcessorEnd();
+      }
+    }
+    void notifySampleGroupProcessorError(const std::string& group_name, const std::string& processor_name, const std::string& error)
+    {
+      for (auto& observer : observers_)
+      {
+        observer->onSampleGroupProcessorError(group_name, processor_name, error);
       }
     }
   protected:

@@ -25,10 +25,9 @@
 
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/RawDataProcessor.h>
-#include <SmartPeak/core/SampleType.h>
 #include <SmartPeak/core/SequenceSegmentProcessor.h>
 #include <SmartPeak/core/SampleGroupProcessor.h>
-#include <SmartPeak/io/InputDataValidation.h>
+#include <SmartPeak/core/SessionLoaderGenerator.h>
 #include <map>
 #include <string>
 #include <vector>
@@ -115,13 +114,12 @@ namespace SmartPeak
 
     std::filesystem::path sequence_pathname_;
     std::filesystem::path main_dir_                = ".";
-    std::filesystem::path mzML_dir_;
-    std::filesystem::path features_in_dir_;
-    std::filesystem::path features_out_dir_;
     SequenceHandler       sequenceHandler_;
     Filenames             filenames_;
     std::vector<std::shared_ptr<IFilenamesHandler>> loading_processors_;
     std::vector<std::shared_ptr<IFilenamesHandler>> storing_processors_;
+    SessionLoaderGenerator session_loader_generator;
+
   protected:
     std::map<std::string, bool> saved_files_;
   };
@@ -129,36 +127,53 @@ namespace SmartPeak
 
   struct SetRawDataPathname : IFilePickerHandler
   {
+    SetRawDataPathname(Filenames* filenames)
+    {
+      filenames_ = filenames;
+    }
     /**
     IFilePickerHandler
     */
     bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override
     {
-      application_handler->mzML_dir_ = filename;
+      filenames_->setTagValue(Filenames::Tag::MZML_INPUT_PATH, filename.generic_string());
       return true;
     };
+
+    Filenames *filenames_;
   };
 
-  struct SetInputFeaturesPathname : IFilePickerHandler {
+  struct SetInputFeaturesPathname : IFilePickerHandler
+  {
+    SetInputFeaturesPathname(Filenames* filenames)
+    {
+      filenames_ = filenames;
+    }
     /**
     IFilePickerHandler
     */
     bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override
     {
-      application_handler->features_in_dir_ = filename;
+      filenames_->setTagValue(Filenames::Tag::FEATURES_INPUT_PATH, filename.generic_string());
       return true;
     };
+    Filenames *filenames_;
   };
 
   struct SetOutputFeaturesPathname : IFilePickerHandler
   {
+    SetOutputFeaturesPathname(Filenames* filenames)
+    {
+      filenames_ = filenames;
+    }
     /**
     IFilePickerHandler
     */
     bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override
     {
-      application_handler->features_out_dir_ = filename;
+      filenames_->setTagValue(Filenames::Tag::FEATURES_OUTPUT_PATH, filename.generic_string());
       return true;
     }
+    Filenames *filenames_;
   };
 }

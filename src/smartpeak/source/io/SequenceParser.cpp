@@ -764,6 +764,98 @@ namespace SmartPeak
     }
   }
 
+  void SequenceParser::makeGroupDataTableFromMetaValue(
+    const SequenceHandler& sequenceHandler,
+    std::vector<std::vector<std::string>>& rows_out,
+    std::vector<std::string>& headers_out,
+    const std::vector<std::string>& meta_data,
+    const std::set<SampleType>& sample_types,
+    const std::set<std::string>& sample_names,
+    const std::set<std::string>& component_group_names,
+    const std::set<std::string>& component_names) {
+    std::vector<std::string> headers = {
+      "sample_group_name", "component_group_name", "component_name", "used_"
+    };
+    headers.insert(headers.end(), meta_data.cbegin(), meta_data.cend());
+    headers_out = headers;
+
+    const std::string delimiter{ "_____" };
+
+    rows_out.clear();
+    for (const SampleGroupHandler& sample_handler : sequenceHandler.getSampleGroups())
+    {
+      auto feature_map = sample_handler.getFeatureMap();
+      
+      if (sample_names.size() > 0 && sample_names.count(sample_handler.getSampleGroupName()) == 0)
+        continue;
+
+      for (const OpenMS::Feature& feature : feature_map)
+      {
+        if (!feature.metaValueExists(s_PeptideRef) || feature.getMetaValue(s_PeptideRef).isEmpty()) {
+          LOGV << "component_group_name is absent or empty. Skipping this feature";
+          continue;
+        }
+        const std::string component_group_name = feature.getMetaValue(s_PeptideRef);
+        if (component_group_names.size() > 0 && component_group_names.count(component_group_name) == 0)
+          continue;
+
+        // Case #1: Features only
+        if (feature.getSubordinates().size() <= 0) {
+          std::vector<std::string> row;
+          row.push_back(sample_handler.getSampleGroupName());
+          row.push_back(component_group_name);
+          row.push_back("");
+          row.push_back(feature.metaValueExists("used_") ? feature.getMetaValue("used_").toString() : "");
+          for (const std::string& meta_value_name : meta_data)
+          {
+            CastValue datum = SequenceHandler::getMetaValue(feature, feature, meta_value_name);
+            if (datum.getTag() == CastValue::Type::FLOAT && datum.f_ != 0.0) {
+              // NOTE: to_string() rounds at 1e-6. Therefore, some precision might be lost.
+              row.push_back(std::to_string(datum.f_));
+            }
+            else
+            {
+              row.push_back("");
+            }
+          }
+          rows_out.push_back(row);
+        }
+
+        // Case #2: Features and subordinates
+        for (const OpenMS::Feature& subordinate : feature.getSubordinates())
+        {
+          std::vector<std::string> row;
+          row.push_back(sample_handler.getSampleGroupName());
+          row.push_back(component_group_name);
+          if (!subordinate.metaValueExists(s_native_id) ||
+            subordinate.getMetaValue(s_native_id).isEmpty() ||
+            subordinate.getMetaValue(s_native_id).toString().empty()) {
+            LOGV << "component_name is absent or empty. Skipping this subordinate";
+            continue;
+          }
+          const std::string component_name = subordinate.getMetaValue(s_native_id);
+          if (component_names.size() > 0 && component_names.count(component_name) == 0)
+            continue;
+          row.push_back(component_name);
+          row.push_back(subordinate.metaValueExists("used_") ? subordinate.getMetaValue("used_").toString() : "");
+          for (const std::string& meta_value_name : meta_data)
+          {
+            CastValue datum = SequenceHandler::getMetaValue(feature, subordinate, meta_value_name);
+            if (datum.getTag() == CastValue::Type::FLOAT && datum.f_ != 0.0) {
+              // NOTE: to_string() rounds at 1e-6. Therefore, some precision might be lost.
+              row.push_back(std::to_string(datum.f_));
+            }
+            else
+            {
+              row.push_back("");
+            }
+          }
+          rows_out.push_back(row);
+        }
+      }
+    }
+  }
+
   bool SequenceParser::writeDataTableFromMetaValue(
     const SequenceHandler& sequenceHandler,
     const std::filesystem::path& filename,
@@ -781,6 +873,40 @@ namespace SmartPeak
       meta_data_strings.push_back(metadataToString.at(m));
     }
     makeDataTableFromMetaValue(sequenceHandler, rows, headers, meta_data_strings, sample_types, std::set<std::string>(), std::set<std::string>(), std::set<std::string>());
+
+    CSVWriter writer(filename.generic_string(), ",");
+    const size_t cnt = writer.writeDataInRow(headers.cbegin(), headers.cend());
+
+    if (cnt < headers.size()) {
+      LOGD << "END writeDataTableFromMetaValue";
+      return false;
+    }
+
+    for (const std::vector<std::string>& line : rows) {
+      writer.writeDataInRow(line.cbegin(), line.cend());
+    }
+
+    LOGD << "END writeDataTableFromMetaValue";
+    return true;
+  }
+
+  bool SequenceParser::writeGroupDataTableFromMetaValue(
+    const SequenceHandler& sequenceHandler,
+    const std::filesystem::path& filename,
+    const std::vector<FeatureMetadata>& meta_data,
+    const std::set<SampleType>& sample_types
+  )
+  {
+    LOGD << "START writeDataTableFromMetaValue";
+    LOGI << "Storing: " << filename.generic_string();
+
+    std::vector<std::vector<std::string>> rows;
+    std::vector<std::string> headers;
+    std::vector<std::string> meta_data_strings;
+    for (const FeatureMetadata& m : meta_data) {
+      meta_data_strings.push_back(metadataToString.at(m));
+    }
+    makeGroupDataTableFromMetaValue(sequenceHandler, rows, headers, meta_data_strings, sample_types, std::set<std::string>(), std::set<std::string>(), std::set<std::string>());
 
     CSVWriter writer(filename.generic_string(), ",");
     const size_t cnt = writer.writeDataInRow(headers.cbegin(), headers.cend());
@@ -994,6 +1120,169 @@ namespace SmartPeak
       for (size_t j = 0; j < data.dimension(1); ++j) {
         // NOTE: to_string() rounds at 1e-6. Therefore, some precision might be lost.
         line.emplace_back(std::to_string(data(i,j)));
+      }
+      writer.writeDataInRow(line.cbegin(), line.cend());
+    }
+
+    LOGD << "END writeDataMatrixFromMetaValue";
+    return true;
+  }
+
+  void SequenceParser::makeGroupDataMatrixFromMetaValue(
+    const SequenceHandler& sequenceHandler,
+    Eigen::Tensor<float, 2>& data_out,
+    Eigen::Tensor<std::string, 1>& columns_out,
+    Eigen::Tensor<std::string, 2>& rows_out,
+    const std::vector<std::string>& meta_data,
+    const std::set<SampleType>& sample_types,
+    const std::set<std::string>& sample_names,
+    const std::set<std::string>& component_group_names,
+    const std::set<std::string>& component_names
+  )
+  {
+    std::set<std::string> columns;
+    std::set<Row, Row_less> rows;
+    std::map<std::string, std::map<Row, float, Row_less>> data_dict;
+
+    for (const SampleGroupHandler& sample_handler : sequenceHandler.getSampleGroups()) {
+
+      const std::string& sample_name = sample_handler.getSampleGroupName();
+
+      if (sample_names.size() && sample_names.count(sample_name) == 0)
+        continue;
+
+      data_dict.insert({ sample_name, std::map<Row,float,Row_less>() });
+      for (const std::string& meta_value_name : meta_data) {
+        // feature_map_history is not needed here as we are only interested in the current/"used" features
+        for (const OpenMS::Feature& feature : sample_handler.getFeatureMap()) {
+          if (component_group_names.size() && component_group_names.count(feature.getMetaValue(s_PeptideRef).toString()) == 0)
+            continue;
+          if (feature.metaValueExists("used_")) {
+            const std::string used = feature.getMetaValue("used_").toString();
+            if (used.empty() || used[0] == 'f' || used[0] == 'F')
+              continue;
+          }
+
+          // Case #1 Features only
+          if (feature.getSubordinates().size() <= 0) {
+            const Row row_tuple_name(
+              feature.getMetaValue(s_PeptideRef).toString(),
+              "",
+              meta_value_name
+            );
+            CastValue datum;
+            datum = SequenceHandler::getMetaValue(feature, feature, meta_value_name);
+            if (datum.getTag() == CastValue::Type::FLOAT && !std::isnan(datum.f_)) { // Skip NAN (replaced by 0 later)
+              data_dict[sample_name].emplace(row_tuple_name, datum.f_);
+              columns.insert(sample_name);
+              rows.insert(row_tuple_name);
+            }
+          }
+
+          // Case #2 Features and subordinates
+          for (const OpenMS::Feature& subordinate : feature.getSubordinates()) {
+            if (component_names.size() && component_names.count(subordinate.getMetaValue(s_native_id).toString()) == 0)
+              continue;
+            if (subordinate.metaValueExists("used_")) {
+              const std::string used = subordinate.getMetaValue("used_").toString();
+              if (used.empty() || used[0] == 'f' || used[0] == 'F')
+                continue;
+            }
+            const Row row_tuple_name(
+              feature.getMetaValue(s_PeptideRef).toString(),
+              subordinate.getMetaValue(s_native_id).toString(),
+              meta_value_name
+            );
+            CastValue datum;
+            datum = SequenceHandler::getMetaValue(feature, subordinate, meta_value_name);
+            if (meta_value_name == "validation") {
+              if (datum.s_ == "TP") datum = static_cast<float>(1.0);
+              else if (datum.s_ == "FP") datum = static_cast<float>(-1.0);
+              else datum = static_cast<float>(-2.0);
+            }
+            if (datum.getTag() == CastValue::Type::FLOAT && !std::isnan(datum.f_)) { // Skip NAN (replaced by 0 later)
+              data_dict[sample_name].emplace(row_tuple_name, datum.f_);
+              columns.insert(sample_name);
+              rows.insert(row_tuple_name);
+            }
+          }
+        }
+      }
+    }
+
+    // Copy over the rows
+    rows_out.resize((int)rows.size(), 3);
+    int row = 0;
+    for (const auto& r : rows) {
+      rows_out(row, 0) = r.component_name;
+      rows_out(row, 1) = r.component_group_name;
+      rows_out(row, 2) = r.meta_value_name;
+      ++row;
+    }
+
+    // Copy over the columns
+    columns_out.resize((int)columns.size());
+    int col = 0;
+    for (const auto& c : columns) {
+      columns_out(col) = c;
+      ++col;
+    }
+
+    // Copy over the data
+    data_out.resize((int)rows.size(), (int)columns.size());
+    data_out.setConstant(0.0); // for now, initialize to 0 instead of NAN even though there are clear benefits to using NAN in packages that support NAN
+    col = 0;
+    for (const auto& c : columns) {
+      row = 0;
+      for (const auto& r : rows) {
+        if (data_dict.count(c) && data_dict[c].count(r)) {
+          data_out(row, col) = data_dict[c][r];
+        }
+        ++row;
+      }
+      ++col;
+    }
+  }
+
+  bool SequenceParser::writeGroupDataMatrixFromMetaValue(
+    const SequenceHandler& sequenceHandler,
+    const std::filesystem::path& filename,
+    const std::vector<FeatureMetadata>& meta_data,
+    const std::set<SampleType>& sample_types
+  )
+  {
+    LOGD << "START writeDataMatrixFromMetaValue";
+
+    LOGI << "Storing: " << filename.generic_string();
+
+    Eigen::Tensor<float, 2> data;
+    Eigen::Tensor<std::string, 1> columns;
+    Eigen::Tensor<std::string, 2> rows;
+    std::vector<std::string> meta_data_strings;
+    for (const FeatureMetadata& m : meta_data) {
+      meta_data_strings.push_back(metadataToString.at(m));
+    }
+    makeGroupDataMatrixFromMetaValue(sequenceHandler, data, columns, rows, meta_data_strings, sample_types, std::set<std::string>(), std::set<std::string>(), std::set<std::string>());
+
+    std::vector<std::string> headers = { "component_name", "component_group_name", "meta_value" };
+    for (int i = 0; i < columns.size(); ++i) headers.push_back(columns(i));
+
+    CSVWriter writer(filename.generic_string(), ",");
+    const size_t cnt = writer.writeDataInRow(headers.cbegin(), headers.cend());
+
+    if (cnt < headers.size()) {
+      LOGD << "END writeDataMatrixFromMetaValue";
+      return false;
+    }
+
+    for (size_t i = 0; i < rows.dimension(0); ++i) {
+      std::vector<std::string> line;
+      for (size_t j = 0; j < rows.dimension(1); ++j) {
+        line.push_back(rows(i, j));
+      }
+      for (size_t j = 0; j < data.dimension(1); ++j) {
+        // NOTE: to_string() rounds at 1e-6. Therefore, some precision might be lost.
+        line.emplace_back(std::to_string(data(i, j)));
       }
       writer.writeDataInRow(line.cbegin(), line.cend());
     }

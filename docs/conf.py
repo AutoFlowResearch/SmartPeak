@@ -14,16 +14,18 @@ import os, subprocess
 from distutils.dir_util import copy_tree
 
 project     = 'SmartPeak'
-copyright   = '2020, SmartPeak Team'
+copyright   = '2021, SmartPeak Team'
 author      = 'SmartPeak Team'
 
-extensions              = [ "breathe", 
+extensions              = [ 
+                            "breathe",
                             "exhale",
                             "sphinx.ext.todo",
                             "sphinx.ext.autodoc",
                             "sphinx.ext.intersphinx",
                             "sphinx.ext.viewcode",
-                            "sphinx_tabs.tabs"]
+                            "sphinx.ext.autosectionlabel"
+                            ]
 
 todo_include_todos      = True
 todo_link_only          = True
@@ -32,7 +34,7 @@ breathe_default_project = "SmartPeak"
 
 exclude_patterns        = ['_build', 'Thumbs.db', '.DS_Store', '*.csv']
 master_doc              = 'index'
-html_theme              = 'sphinx_rtd_theme'
+# html_theme              = 'sphinx_rtd_theme'
 
 def configureDoxyfile(input_dir, output_dir):
     with open('Doxyfile.in', 'r') as file :

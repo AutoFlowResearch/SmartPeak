@@ -25,6 +25,72 @@
 #include <SmartPeak/core/RawDataProcessor.h>
 #include <SmartPeak/core/SequenceSegmentProcessor.h>
 #include <SmartPeak/core/SampleGroupProcessor.h>
+#include <SmartPeak/core/RawDataProcessors/LoadRawData.h>
+#include <SmartPeak/core/RawDataProcessors/LoadFeatures.h>
+#include <SmartPeak/core/RawDataProcessors/LoadTransitions.h>
+#include <SmartPeak/core/RawDataProcessors/PickMRMFeatures.h>
+#include <SmartPeak/core/RawDataProcessors/FilterFeatures.h>
+#include <SmartPeak/core/RawDataProcessors/SelectFeatures.h>
+#include <SmartPeak/core/RawDataProcessors/ValidateFeatures.h>
+#include <SmartPeak/core/RawDataProcessors/QuantifyFeatures.h>
+#include <SmartPeak/core/RawDataProcessors/CheckFeatures.h>
+#include <SmartPeak/core/RawDataProcessors/StoreFeatures.h>
+#include <SmartPeak/core/RawDataProcessors/MapChromatograms.h>
+#include <SmartPeak/core/RawDataProcessors/ZeroChromatogramBaseline.h>
+#include <SmartPeak/core/RawDataProcessors/ExtractChromatogramWindows.h>
+#include <SmartPeak/core/RawDataProcessors/FitFeaturesEMG.h>
+#include <SmartPeak/core/RawDataProcessors/FilterFeaturesRSDs.h>
+#include <SmartPeak/core/RawDataProcessors/CheckFeaturesRSDs.h>
+#include <SmartPeak/core/RawDataProcessors/FilterFeaturesBackgroundInterferences.h>
+#include <SmartPeak/core/RawDataProcessors/CheckFeaturesBackgroundInterferences.h>
+#include <SmartPeak/core/RawDataProcessors/ExtractSpectraWindows.h>
+#include <SmartPeak/core/RawDataProcessors/MergeSpectra.h>
+#include <SmartPeak/core/RawDataProcessors/PickMS1Features.h>
+#include <SmartPeak/core/RawDataProcessors/PickMS2Features.h>
+#include <SmartPeak/core/RawDataProcessors/SearchAccurateMass.h>
+#include <SmartPeak/core/RawDataProcessors/MergeFeatures.h>
+#include <SmartPeak/core/RawDataProcessors/LoadAnnotations.h>
+#include <SmartPeak/core/RawDataProcessors/SearchSpectrum.h>
+#include <SmartPeak/core/RawDataProcessors/DDA.h>
+#include <SmartPeak/core/RawDataProcessors/StoreAnnotations.h>
+#include <SmartPeak/core/RawDataProcessors/ClearData.h>
+#include <SmartPeak/core/RawDataProcessors/StoreRawData.h>
+#include <SmartPeak/core/RawDataProcessors/CalculateMDVs.h>
+#include <SmartPeak/core/RawDataProcessors/IsotopicCorrections.h>
+#include <SmartPeak/core/RawDataProcessors/CalculateIsotopicPurities.h>
+#include <SmartPeak/core/RawDataProcessors/CalculateMDVAccuracies.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/CalculateCalibration.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/EstimateFeatureBackgroundInterferences.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/EstimateFeatureFilterValues.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/EstimateFeatureQCValues.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/EstimateFeatureRSDs.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/LoadFeatureBackgroundEstimations.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/LoadFeatureBackgroundFilters.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/LoadFeatureBackgroundQCs.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/LoadFeatureFilters.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/LoadFeatureQCs.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/LoadFeatureRSDEstimations.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/LoadFeatureRSDFilters.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/LoadFeatureRSDQCs.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/LoadQuantitationMethods.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/LoadStandardsConcentrations.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/StoreFeatureBackgroundEstimations.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/StoreFeatureBackgroundFilters.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/StoreFeatureBackgroundQCs.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/StoreFeatureFilters.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/StoreFeatureQCs.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/StoreFeatureRSDEstimations.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/StoreFeatureRSDFilters.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/StoreFeatureRSDQCs.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/StoreQuantitationMethods.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/StoreStandardsConcentrations.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/TransferLOQToFeatureFilters.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/TransferLOQToFeatureQCs.h>
+#include <SmartPeak/core/SampleGroupProcessors/MergeInjections.h>
+#include <SmartPeak/core/SampleGroupProcessors/LoadFeaturesSampleGroup.h>
+#include <SmartPeak/core/SampleGroupProcessors/StoreFeaturesSampleGroup.h>
+
+
 #include <map>
 #include <memory>
 
@@ -97,7 +163,6 @@ namespace SmartPeak {
   const std::map<std::string, std::shared_ptr<SampleGroupProcessor>> n_to_sample_group_method_ {
     {"MERGE_INJECTIONS",                          std::make_shared<MergeInjections>()},
     {"LOAD_FEATURES_SAMPLE_GROUP",                std::make_shared<LoadFeaturesSampleGroup>()},
-    {"STORE_FEATURES_SAMPLE_GROUP",               std::make_shared<StoreFeaturesSampleGroup>()},
-    {"SELECT_DILUTIONS",                          std::make_shared<SelectDilutions>()}
+    {"STORE_FEATURES_SAMPLE_GROUP",               std::make_shared<StoreFeaturesSampleGroup>()}
   };
 }

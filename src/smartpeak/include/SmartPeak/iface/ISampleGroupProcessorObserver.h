@@ -31,5 +31,6 @@ namespace SmartPeak
     virtual void onSampleGroupProcessorSampleStart(const std::string& segment_name) = 0;
     virtual void onSampleGroupProcessorSampleEnd(const std::string& segment_name) = 0;
     virtual void onSampleGroupProcessorEnd() = 0;
+    virtual void onSampleGroupProcessorError(const std::string& group_name, const std::string& processor_name, const std::string& error) = 0;
   };
 }

@@ -253,7 +253,15 @@ namespace SmartPeak
     */
     void setAsSchema(bool is_schema);
 
+    /**
+      @brief return a parameter by name (both const and non const versions)
+    */
     Parameter* findParameter(const std::string& parameter);
+    const Parameter* findParameter(const std::string& parameter) const;
+
+    /**
+      @brief get Function's name
+    */
     const std::string& getFunctionName() const { return function_name_; };
     
     /**
