@@ -11,7 +11,6 @@ set(sources_list_h
 	CheckFeaturesRSDs.h
 	ClearData.h
 	ConstructTransitionsList.h
-	DDA.h
 	ExtractChromatogramWindows.h
 	ExtractSpectraNonTargeted.h
 	ExtractSpectraWindows.h
