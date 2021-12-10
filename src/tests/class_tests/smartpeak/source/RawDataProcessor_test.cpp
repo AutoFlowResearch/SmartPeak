@@ -53,7 +53,6 @@
 #include <SmartPeak/core/RawDataProcessors/MergeFeatures.h>
 #include <SmartPeak/core/RawDataProcessors/LoadAnnotations.h>
 #include <SmartPeak/core/RawDataProcessors/SearchSpectrum.h>
-#include <SmartPeak/core/RawDataProcessors/DDA.h>
 #include <SmartPeak/core/RawDataProcessors/StoreAnnotations.h>
 #include <SmartPeak/core/RawDataProcessors/ClearData.h>
 #include <SmartPeak/core/RawDataProcessors/StoreRawData.h>
@@ -2897,13 +2896,4 @@ TEST(RawDataProcessor, SearchSpectrum)
   EXPECT_EQ(s.getMetaValue("chemical_formula").toString(), "C4H10N2O2");
   EXPECT_NEAR(s.getMetaValue("mz_error_ppm"), 0.180061646746413, 1e-6);
   EXPECT_NEAR(s.getMetaValue("mz_error_Da"), 1.4228891060952265e-05, 1e-6);
-}
-
-/**
-  DDA Tests
-*/
-TEST(RawDataProcessor, gettersDDA)
-{
-  DDA processor;
-  EXPECT_EQ(processor.getName(), "DDA");
 }
