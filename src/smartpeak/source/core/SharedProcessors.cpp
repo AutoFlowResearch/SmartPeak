@@ -52,7 +52,6 @@
 #include <SmartPeak/core/RawDataProcessors/MergeFeatures.h>
 #include <SmartPeak/core/RawDataProcessors/LoadAnnotations.h>
 #include <SmartPeak/core/RawDataProcessors/SearchSpectrum.h>
-#include <SmartPeak/core/RawDataProcessors/DDA.h>
 #include <SmartPeak/core/RawDataProcessors/ConstructTransitionsList.h>
 #include <SmartPeak/core/RawDataProcessors/StoreAnnotations.h>
 #include <SmartPeak/core/RawDataProcessors/ClearData.h>
@@ -128,7 +127,6 @@ namespace SmartPeak {
     {"MERGE_FEATURES",                            std::make_shared<MergeFeatures>()},
     {"LOAD_ANNOTATIONS",                          std::make_shared<LoadAnnotations>()},
     {"SEARCH_SPECTRUM",                           std::make_shared<SearchSpectrum>()},
-    {"DDA",                                       std::make_shared<DDA>()},
     {"CONSTRUCT_TRANSITIONS_LIST",                std::make_shared<ConstructTransitionsList>()},
     {"STORE_ANNOTATIONS",                         std::make_shared<StoreAnnotations>()},
     {"CLEAR_DATA",                                std::make_shared<ClearData>()},
