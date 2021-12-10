@@ -11,7 +11,6 @@ set(sources_list
 	CheckFeaturesRSDs.cpp
 	ClearData.cpp
 	ConstructTransitionsList.cpp
-	DDA.cpp
 	ExtractChromatogramWindows.cpp
 	ExtractSpectraNonTargeted.cpp
 	ExtractSpectraWindows.cpp
