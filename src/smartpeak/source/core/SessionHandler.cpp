@@ -25,7 +25,6 @@
 #include <SmartPeak/core/FeatureMetadata.h>
 #include <OpenMS/ANALYSIS/QUANTITATION/AbsoluteQuantitation.h>
 #include <SmartPeak/io/SequenceParser.h>
-#include <SmartPeak/core/ApplicationProcessor.h>
 #include <plog/Log.h>
 #include <SmartPeak/core/RawDataProcessor.h>
 #include <SmartPeak/core/Parameters.h>
@@ -109,13 +108,13 @@ namespace SmartPeak
       feature_explorer_data.checkbox_headers.setValues({ "plot", "table" });
     }
     const int n_cols = feature_table.headers_.size();
-    const int n_rows = metadatafloatToString.size();
+    const int n_rows = metadataFloatToString.size();
     // Make the feature explorer body
     if (feature_table.body_.dimension(0) != n_rows) {
       LOGD << "Making feature_table.body_";
       feature_table.body_.resize(n_rows, n_cols);
       int col = 0, row = 0;
-      for (const auto& metadata : metadatafloatToString) {
+      for (const auto& metadata : metadataFloatToString) {
         feature_table.body_(row, col) = metadata.second;
         col = 0;
         ++row;
@@ -1149,7 +1148,7 @@ namespace SmartPeak
 
   void SessionHandler::setComponentGroupBackgroundQCsTable(const SequenceHandler& sequence_handler, GenericTableData& table_data)
   {
-    if (sequence_handler.getSequenceSegments().size() > 0 && sequence_handler.getSequenceSegments().at(0).getFeatureBackgroundQC().component_qcs.size() > 0) {
+    if (sequence_handler.getSequenceSegments().size() > 0 && sequence_handler.getSequenceSegments().at(0).getFeatureBackgroundQC().component_group_qcs.size() > 0) {
       // Make the comp_group_background_qcs table headers
       if (table_data.headers_.size() <= 0) {
         LOGD << "Making comp_group_background_qcs_table_headers";

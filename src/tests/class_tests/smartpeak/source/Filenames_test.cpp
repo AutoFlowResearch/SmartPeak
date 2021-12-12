@@ -42,6 +42,17 @@ TEST(Filenames, addFileName)
   ASSERT_EQ(file_ids.size(), 1);
 }
 
+TEST(Filenames, addFileNameOverwrite)
+{
+  Filenames filenames;
+  filenames.addFileName("my_file", "file.txt");
+  EXPECT_STREQ(filenames.getFullPath("my_file").generic_string().c_str(), "file.txt");
+  filenames.addFileName("my_file", "file_non_overwrite.txt");
+  EXPECT_STREQ(filenames.getFullPath("my_file").generic_string().c_str(), "file.txt");
+  filenames.addFileName("my_file", "file_overwrite.txt", "description", false, false, true);
+  EXPECT_STREQ(filenames.getFullPath("my_file").generic_string().c_str(), "file_overwrite.txt");
+}
+
 TEST(Filenames, getFullPath)
 {
   Filenames filenames;
@@ -52,15 +63,7 @@ TEST(Filenames, getFullPath)
 TEST(Filenames, getFullPath_non_existing)
 {
   Filenames filenames;
-  try {
-    filenames.getFullPath("test");
-    FAIL() << "Expected std::out_of_range";
-  }
-  catch (std::out_of_range const& err) {
-  }
-  catch (...) {
-    FAIL() << "Expected std::out_of_range";
-  }
+  EXPECT_STREQ(filenames.getFullPath("test").generic_string().c_str(), "");
 }
 
 TEST(Filenames, setFullPath)
@@ -70,15 +73,15 @@ TEST(Filenames, setFullPath)
   filenames.setFullPath("my_file_main", "/file/to/file_main.txt");
   EXPECT_STREQ(filenames.getFullPath("my_file_main").generic_string().c_str(), "/file/to/file_main.txt");
   // setting variant or root has no effect
-  filenames.setTag(Filenames::Tag::MAIN_DIR, "/main");
-  filenames.setTag(Filenames::Tag::MZML_INPUT_PATH, "/mzml");
-  filenames.setTag(Filenames::Tag::FEATURES_INPUT_PATH, "/feat_input");
-  filenames.setTag(Filenames::Tag::FEATURES_OUTPUT_PATH, "/feat_output");
-  filenames.setTag(Filenames::Tag::INPUT_MZML_FILENAME, "variant_mzml_");
-  filenames.setTag(Filenames::Tag::INPUT_INJECTION_NAME, "variant_input_injection_");
-  filenames.setTag(Filenames::Tag::OUTPUT_INJECTION_NAME, "variant_output_injection_");
-  filenames.setTag(Filenames::Tag::INPUT_GROUP_NAME, "variant_input_sample_");
-  filenames.setTag(Filenames::Tag::OUTPUT_GROUP_NAME, "variant_output_sample_");
+  filenames.setTagValue(Filenames::Tag::MAIN_DIR, "/main");
+  filenames.setTagValue(Filenames::Tag::MZML_INPUT_PATH, "/mzml");
+  filenames.setTagValue(Filenames::Tag::FEATURES_INPUT_PATH, "/feat_input");
+  filenames.setTagValue(Filenames::Tag::FEATURES_OUTPUT_PATH, "/feat_output");
+  filenames.setTagValue(Filenames::Tag::INPUT_MZML_FILENAME, "variant_mzml_");
+  filenames.setTagValue(Filenames::Tag::INPUT_INJECTION_NAME, "variant_input_injection_");
+  filenames.setTagValue(Filenames::Tag::OUTPUT_INJECTION_NAME, "variant_output_injection_");
+  filenames.setTagValue(Filenames::Tag::INPUT_GROUP_NAME, "variant_input_sample_");
+  filenames.setTagValue(Filenames::Tag::OUTPUT_GROUP_NAME, "variant_output_sample_");
   EXPECT_STREQ(filenames.getFullPath("my_file_main").generic_string().c_str(), "/file/to/file_main.txt");
 }
 
@@ -90,15 +93,15 @@ TEST(Filenames, setRootPath_setVariant_after)
   filenames.addFileName("my_file_injection_output", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}file_injection_output.txt");
   filenames.addFileName("my_file_group_input", "${FEATURES_INPUT_PATH}/${INPUT_GROUP_NAME}file_group_input.txt");
   filenames.addFileName("my_file_group_output", "${FEATURES_OUTPUT_PATH}/${OUTPUT_GROUP_NAME}file_group_output.txt");
-  filenames.setTag(Filenames::Tag::MAIN_DIR, "/main");
-  filenames.setTag(Filenames::Tag::MZML_INPUT_PATH, "/mzml");
-  filenames.setTag(Filenames::Tag::FEATURES_INPUT_PATH, "/feat_input");
-  filenames.setTag(Filenames::Tag::FEATURES_OUTPUT_PATH, "/feat_output");
-  filenames.setTag(Filenames::Tag::INPUT_MZML_FILENAME, "variant_mzml_");
-  filenames.setTag(Filenames::Tag::INPUT_INJECTION_NAME, "variant_input_injection_");
-  filenames.setTag(Filenames::Tag::OUTPUT_INJECTION_NAME, "variant_output_injection_");
-  filenames.setTag(Filenames::Tag::INPUT_GROUP_NAME, "variant_input_sample_");
-  filenames.setTag(Filenames::Tag::OUTPUT_GROUP_NAME, "variant_output_sample_");
+  filenames.setTagValue(Filenames::Tag::MAIN_DIR, "/main");
+  filenames.setTagValue(Filenames::Tag::MZML_INPUT_PATH, "/mzml");
+  filenames.setTagValue(Filenames::Tag::FEATURES_INPUT_PATH, "/feat_input");
+  filenames.setTagValue(Filenames::Tag::FEATURES_OUTPUT_PATH, "/feat_output");
+  filenames.setTagValue(Filenames::Tag::INPUT_MZML_FILENAME, "variant_mzml_");
+  filenames.setTagValue(Filenames::Tag::INPUT_INJECTION_NAME, "variant_input_injection_");
+  filenames.setTagValue(Filenames::Tag::OUTPUT_INJECTION_NAME, "variant_output_injection_");
+  filenames.setTagValue(Filenames::Tag::INPUT_GROUP_NAME, "variant_input_sample_");
+  filenames.setTagValue(Filenames::Tag::OUTPUT_GROUP_NAME, "variant_output_sample_");
   EXPECT_STREQ(filenames.getFullPath("my_file_main").generic_string().c_str(), "/main/file_main.txt");
   EXPECT_STREQ(filenames.getFullPath("my_file_injection_input").generic_string().c_str(), "/feat_input/variant_input_injection_file_injection_input.txt");
   EXPECT_STREQ(filenames.getFullPath("my_file_injection_output").generic_string().c_str(), "/feat_output/variant_output_injection_file_injection_output.txt");
@@ -109,15 +112,15 @@ TEST(Filenames, setRootPath_setVariant_after)
 TEST(Filenames, setRootPath_setVariant_before)
 {
   Filenames filenames;
-  filenames.setTag(Filenames::Tag::MAIN_DIR, "/main");
-  filenames.setTag(Filenames::Tag::MZML_INPUT_PATH, "/mzml");
-  filenames.setTag(Filenames::Tag::FEATURES_INPUT_PATH, "/feat_input");
-  filenames.setTag(Filenames::Tag::FEATURES_OUTPUT_PATH, "/feat_output");
-  filenames.setTag(Filenames::Tag::INPUT_MZML_FILENAME, "variant_mzml_");
-  filenames.setTag(Filenames::Tag::INPUT_INJECTION_NAME, "variant_input_injection_");
-  filenames.setTag(Filenames::Tag::OUTPUT_INJECTION_NAME, "variant_output_injection_");
-  filenames.setTag(Filenames::Tag::INPUT_GROUP_NAME, "variant_input_sample_");
-  filenames.setTag(Filenames::Tag::OUTPUT_GROUP_NAME, "variant_output_sample_");
+  filenames.setTagValue(Filenames::Tag::MAIN_DIR, "/main");
+  filenames.setTagValue(Filenames::Tag::MZML_INPUT_PATH, "/mzml");
+  filenames.setTagValue(Filenames::Tag::FEATURES_INPUT_PATH, "/feat_input");
+  filenames.setTagValue(Filenames::Tag::FEATURES_OUTPUT_PATH, "/feat_output");
+  filenames.setTagValue(Filenames::Tag::INPUT_MZML_FILENAME, "variant_mzml_");
+  filenames.setTagValue(Filenames::Tag::INPUT_INJECTION_NAME, "variant_input_injection_");
+  filenames.setTagValue(Filenames::Tag::OUTPUT_INJECTION_NAME, "variant_output_injection_");
+  filenames.setTagValue(Filenames::Tag::INPUT_GROUP_NAME, "variant_input_sample_");
+  filenames.setTagValue(Filenames::Tag::OUTPUT_GROUP_NAME, "variant_output_sample_");
   filenames.addFileName("my_file_main", "${MAIN_DIR}/file_main.txt");
   filenames.addFileName("my_file_injection_input", "${FEATURES_INPUT_PATH}/${INPUT_INJECTION_NAME}file_injection_input.txt");
   filenames.addFileName("my_file_injection_output", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}file_injection_output.txt");
@@ -133,15 +136,15 @@ TEST(Filenames, setRootPath_setVariant_before)
 TEST(Filenames, merge)
 {
   Filenames filenames1;
-  filenames1.setTag(Filenames::Tag::MAIN_DIR, "/main");
-  filenames1.setTag(Filenames::Tag::MZML_INPUT_PATH, "/mzml");
-  filenames1.setTag(Filenames::Tag::FEATURES_INPUT_PATH, "/feat_input");
-  filenames1.setTag(Filenames::Tag::FEATURES_OUTPUT_PATH, "/feat_output");
-  filenames1.setTag(Filenames::Tag::INPUT_MZML_FILENAME, "variant_mzml_");
-  filenames1.setTag(Filenames::Tag::INPUT_INJECTION_NAME, "variant_input_injection_");
-  filenames1.setTag(Filenames::Tag::OUTPUT_INJECTION_NAME, "variant_output_injection_");
-  filenames1.setTag(Filenames::Tag::INPUT_GROUP_NAME, "variant_input_sample_");
-  filenames1.setTag(Filenames::Tag::OUTPUT_GROUP_NAME, "variant_output_sample_");
+  filenames1.setTagValue(Filenames::Tag::MAIN_DIR, "/main");
+  filenames1.setTagValue(Filenames::Tag::MZML_INPUT_PATH, "/mzml");
+  filenames1.setTagValue(Filenames::Tag::FEATURES_INPUT_PATH, "/feat_input");
+  filenames1.setTagValue(Filenames::Tag::FEATURES_OUTPUT_PATH, "/feat_output");
+  filenames1.setTagValue(Filenames::Tag::INPUT_MZML_FILENAME, "variant_mzml_");
+  filenames1.setTagValue(Filenames::Tag::INPUT_INJECTION_NAME, "variant_input_injection_");
+  filenames1.setTagValue(Filenames::Tag::OUTPUT_INJECTION_NAME, "variant_output_injection_");
+  filenames1.setTagValue(Filenames::Tag::INPUT_GROUP_NAME, "variant_input_sample_");
+  filenames1.setTagValue(Filenames::Tag::OUTPUT_GROUP_NAME, "variant_output_sample_");
   filenames1.addFileName("my_file_main", "${MAIN_DIR}/file_main.txt");
   filenames1.addFileName("my_file_injection_input", "${FEATURES_INPUT_PATH}/${INPUT_INJECTION_NAME}file_injection_input.txt");
 
@@ -157,4 +160,61 @@ TEST(Filenames, merge)
   EXPECT_STREQ(filenames1.getFullPath("my_file_injection_output").generic_string().c_str(), "/feat_output/variant_output_injection_file_injection_output.txt");
   EXPECT_STREQ(filenames1.getFullPath("my_file_group_input").generic_string().c_str(), "/feat_input/variant_input_sample_file_group_input.txt");
   EXPECT_STREQ(filenames1.getFullPath("my_file_group_output").generic_string().c_str(), "/feat_output/variant_output_sample_file_group_output.txt");
+}
+
+TEST(Filenames, getNamePattern)
+{
+  Filenames filenames1;
+  filenames1.addFileName("my_file_main", "${MAIN_DIR}/file_main.txt");
+  EXPECT_EQ(filenames1.getNamePattern("my_file_main"), "${MAIN_DIR}/file_main.txt");
+  EXPECT_EQ(filenames1.getNamePattern("non_existing_id"), "");
+}
+
+TEST(Filenames, isEmbeddable)
+{
+  Filenames filenames1;
+  filenames1.addFileName("my_file_main", "${MAIN_DIR}/file_main.txt");
+  filenames1.addFileName("my_file_main_2", "${MAIN_DIR}/file_main_2.txt", "description", true);
+  EXPECT_FALSE(filenames1.isEmbeddable("my_file_main"));
+  EXPECT_TRUE(filenames1.isEmbeddable("my_file_main_2"));
+}
+
+TEST(Filenames, isEmbedded)
+{
+  Filenames filenames1;
+  filenames1.addFileName("my_file_main", "${MAIN_DIR}/file_main.txt");
+  filenames1.addFileName("my_file_main_2", "${MAIN_DIR}/file_main_2.txt", "description", true, true);
+  EXPECT_FALSE(filenames1.isEmbedded("my_file_main"));
+  EXPECT_TRUE(filenames1.isEmbedded("my_file_main_2"));
+}
+
+TEST(Filenames, setEmbedded)
+{
+  Filenames filenames1;
+  filenames1.addFileName("my_file_main", "${MAIN_DIR}/file_main.txt");
+  EXPECT_FALSE(filenames1.isEmbedded("my_file_main"));
+  filenames1.setEmbedded("my_file_main", true);
+  EXPECT_TRUE(filenames1.isEmbedded("my_file_main"));
+  filenames1.setEmbedded("my_file_main", false);
+  EXPECT_FALSE(filenames1.isEmbedded("my_file_main"));
+}
+
+TEST(Filenames, getDescription)
+{
+  Filenames filenames1;
+  filenames1.addFileName("my_file_main", "${MAIN_DIR}/file_main.txt");
+  filenames1.addFileName("my_file_main_2", "${MAIN_DIR}/file_main_2.txt", "description");
+  EXPECT_EQ(filenames1.getDescription("my_file_main"), "");
+  EXPECT_EQ(filenames1.getDescription("my_file_main_2"), "description");
+}
+
+TEST(Filenames, getTag)
+{
+  Filenames filenames1;
+  EXPECT_EQ(filenames1.getTagValue(Filenames::Tag::MAIN_DIR), "");
+  EXPECT_EQ(filenames1.getTagValue(Filenames::Tag::MZML_INPUT_PATH), "");
+  filenames1.setTagValue(Filenames::Tag::MAIN_DIR, "/main");
+  filenames1.setTagValue(Filenames::Tag::MZML_INPUT_PATH, "/mzml");
+  EXPECT_EQ(filenames1.getTagValue(Filenames::Tag::MAIN_DIR), "/main");
+  EXPECT_EQ(filenames1.getTagValue(Filenames::Tag::MZML_INPUT_PATH), "/mzml");
 }

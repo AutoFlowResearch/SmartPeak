@@ -24,9 +24,10 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include <SmartPeak/test_config.h>
-#include <SmartPeak/core/ApplicationProcessor.h>
 #include <SmartPeak/core/SequenceProcessor.h>
 #include <SmartPeak/core/Filenames.h>
+#include <SmartPeak/core/ApplicationProcessors/BuildCommandsFromNames.h>
+#include <SmartPeak/core/ApplicationProcessors/CreateCommand.h>
 #include <filesystem>
 
 using namespace SmartPeak;
@@ -40,7 +41,7 @@ struct ApplicationProcessorFixture : public ::testing::Test
     datapath_ = SMARTPEAK_GET_TEST_DATA_PATH("");
     auto workflow = std::filesystem::path{ datapath_ } / std::filesystem::path{ "workflow_csv_files" };
 
-    filenames_.setFullPath("referenceData_csv_i", (std::filesystem::path{datapath_} / std::filesystem::path{"MRMFeatureValidator_referenceData_1.csv"}).string());
+    filenames_.setFullPath("referenceData", (std::filesystem::path{datapath_} / std::filesystem::path{"MRMFeatureValidator_referenceData_1.csv"}).string());
 
     // Injections sequence:
     std::vector<InjectionHandler> seq;

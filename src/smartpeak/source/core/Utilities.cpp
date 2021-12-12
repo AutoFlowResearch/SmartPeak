@@ -25,7 +25,14 @@
 #include <SmartPeak/core/CastValue.h>
 #include <SmartPeak/core/Parameters.h>
 #include <SmartPeak/smartpeak_package_version.h>
+
 #include <OpenMS/DATASTRUCTURES/Param.h>
+
+#ifndef CSV_IO_NO_THREAD
+#define CSV_IO_NO_THREAD
+#endif
+#include <SmartPeak/io/csv.h>
+
 #include <algorithm>
 #include <iostream>
 #include <numeric>
@@ -532,7 +539,7 @@ namespace SmartPeak
     return false;
   }
 
-  std::array<std::vector<std::string>, 4> Utilities::getFolderContents(const std::filesystem::path& folder_path)
+  std::array<std::vector<std::string>, 4> Utilities::getFolderContents(const std::filesystem::path& folder_path, bool only_directories)
   {
     // name, ext, size, date
     std::array<std::vector<std::string>, 4> directory_entries;
@@ -540,24 +547,30 @@ namespace SmartPeak
     
     try {
       for (auto & p : std::filesystem::directory_iterator(folder_path, std::filesystem::directory_options::skip_permission_denied)) {
-        if (!isHiddenEntry(p)) {
+        if (!isHiddenEntry(p))
+        {
           auto last_write_time = std::filesystem::last_write_time(p.path());
           auto sctp = std::chrono::time_point_cast<std::chrono::system_clock::duration>(last_write_time
-                                                                                        - std::filesystem::file_time_type::clock::now()
-                                                                                        + std::chrono::system_clock::now());
+            - std::filesystem::file_time_type::clock::now()
+            + std::chrono::system_clock::now());
           std::time_t cftime = std::chrono::system_clock::to_time_t(sctp);
-          if (p.is_regular_file()) {
+          if (p.is_regular_file() && (!only_directories))
+          {
             entries_temp.push_back(std::make_tuple(p.path().filename().string(), p.file_size(), p.path().extension().string(), cftime));
-          } else if (p.is_directory()) {
+          }
+          else if (p.is_directory())
+          {
             std::tuple<float, uintmax_t> directory_info;
             getDirectoryInfo(p, directory_info);
             entries_temp.push_back(std::make_tuple(p.path().filename().string(), std::get<1>(directory_info), "Directory", cftime));
           }
         }
       }
-    } catch (const std::exception& e) {
+    }
+    catch (const std::exception& e) {
       LOGE << "Utilities::getFolderContents : " << typeid(e).name() << " : " << e.what();
     }
+
     
     if (entries_temp.size() > 1)
     {
@@ -732,96 +745,6 @@ namespace SmartPeak
 #endif
   }
 
-  void Utilities::makeHumanReadable(ImEntry& directory_entry)
-  {
-    // prettify size [1]
-    std::string entry_size_string = directory_entry.entry_contents[1];
-    if (directory_entry.entry_contents[2] != "Directory" && !directory_entry.entry_contents[1].empty()
-        && entry_size_string.find("Bytes") == std::string::npos
-        && entry_size_string.find("KB") == std::string::npos
-        && entry_size_string.find("MB") == std::string::npos
-        && entry_size_string.find("GB") == std::string::npos
-        && entry_size_string.find("TB") == std::string::npos
-        )
-    {
-      double entry_size = std::stod(entry_size_string);
-      std::string size_human_readable = "";
-      std::stringstream size_human_readable_stream;
-      
-      if (entry_size >= 0 && entry_size < 1e3)
-      {
-        size_human_readable_stream << entry_size;
-        size_human_readable = size_human_readable_stream.str() + " Bytes";
-      }
-      if (entry_size >= 1e3 && entry_size < 1e6)
-      {
-        size_human_readable_stream << std::fixed << std::setprecision(2) << (entry_size / 1e3);
-        auto size_human_readable_str = size_human_readable_stream.str();
-        removeTrailing(size_human_readable_str, ".00");
-        size_human_readable = size_human_readable_str + " KB";
-      }
-      else if (entry_size >= 1e6 && entry_size < 1e9)
-      {
-        size_human_readable_stream << std::fixed << std::setprecision(2) << (entry_size / 1e6);
-        auto size_human_readable_str = size_human_readable_stream.str();
-        removeTrailing(size_human_readable_str, ".00");
-        size_human_readable = size_human_readable_str + " MB";
-      }
-      else if (entry_size >= 1e9 && entry_size < 1e12)
-      {
-        size_human_readable_stream << std::fixed << std::setprecision(2) << (entry_size / 1e9);
-        auto size_human_readable_str = size_human_readable_stream.str();
-        removeTrailing(size_human_readable_str, ".00");
-        size_human_readable = size_human_readable_str + " GB";
-      }
-      else if (entry_size >= 1e12 && entry_size < 1e18)
-      {
-        size_human_readable_stream << std::fixed << std::setprecision(2) << (entry_size / 1e12);
-        auto size_human_readable_str = size_human_readable_stream.str();
-        removeTrailing(size_human_readable_str, ".00");
-        size_human_readable = size_human_readable_str + " TB";
-      }
-    
-      directory_entry.entry_contents[1] = size_human_readable;
-    }
-    else if (directory_entry.entry_contents[2] == "Directory")
-    {
-      directory_entry.entry_contents[1] = entry_size_string + " Item(s)";
-    }
-    
-    // prettify extension [2]
-    std::string* extension = &directory_entry.entry_contents[2];
-    extension->erase(std::remove_if(extension->begin(), extension->end(),
-                                   [](unsigned char c){ return std::ispunct(c); }), extension->end());
-    
-    // prettify date [3]
-    std::tm * current_time_tm, entry_date_tm;
-    char date_time_buffer[80];
-    std::string date_time_buf;
-    
-    std::time_t current_time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-    current_time_tm = std::localtime(&current_time);
-    
-    std::istringstream entry_date_ss(directory_entry.entry_contents[3]);
-    entry_date_ss >> std::get_time(&entry_date_tm, "%Y-%m-%d %T");
-    
-    entry_date_tm.tm_isdst = current_time_tm->tm_isdst;    
-    time_t entry_date_time = std::mktime(&entry_date_tm);
-        
-    if (entry_date_tm.tm_mday == current_time_tm->tm_mday
-        && entry_date_tm.tm_mon == current_time_tm->tm_mon
-        && entry_date_tm.tm_year == current_time_tm->tm_year)
-    {
-      std::strftime(date_time_buffer, sizeof date_time_buffer, "%R", std::localtime(&entry_date_time));
-      directory_entry.entry_contents[3] = "Today at " + std::string(date_time_buffer);
-    }
-    else
-    {
-      std::strftime(date_time_buffer, sizeof date_time_buffer, "%c", std::localtime(&entry_date_time));
-      directory_entry.entry_contents[3] = date_time_buffer;
-    }
-  }
-
   std::string Utilities::str2upper(const std::string& str)
   {
     auto str_ = str;
@@ -834,4 +757,128 @@ namespace SmartPeak
     auto it = str.find(to_remove);
     if (it != std::string::npos) str.erase(it, str.length());
   }
+
+  Filenames Utilities::buildFilenamesFromDirectory(ApplicationHandler& application_handler, const std::filesystem::path& path)
+  {
+    Filenames filenames;
+    filenames.setTagValue(Filenames::Tag::MAIN_DIR, path.generic_string());
+    for (const auto& filename_handler : application_handler.loading_processors_)
+    {
+      filename_handler->getFilenames(filenames);
+    }
+    for (auto& file_id : filenames.getFileIds())
+    {
+      filenames.setEmbedded(file_id, false);
+      const auto& full_path = filenames.getFullPath(file_id);
+      if (!std::filesystem::exists(full_path))
+      {
+        LOGI << "Non existing file, will not be used: " << full_path.generic_string();
+        filenames.setFullPath(file_id, "");
+      }
+    }
+    return filenames;
+  }
+
+  std::string Utilities::makeUniqueStringFromTime()
+  {
+    const std::time_t time_now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+    auto time_in_epochs = std::chrono::system_clock::now().time_since_epoch();
+    char time_str[32];
+    strftime(time_str, 32, "%Y-%m-%d_%H-%M-%S_", std::localtime(&time_now));
+    return std::string(time_str + std::to_string(time_in_epochs.count()));
+  }
+
+  std::filesystem::path Utilities::createEmptyTempDirectory()
+  {
+    std::filesystem::path tmp_dir_path;
+    auto path_to_tmp_dir = std::filesystem::path(std::string("tmp_").append(makeUniqueStringFromTime()));
+    tmp_dir_path = std::filesystem::temp_directory_path();
+    std::filesystem::current_path(tmp_dir_path);
+    if (std::filesystem::create_directory(path_to_tmp_dir))
+    {
+      tmp_dir_path /= path_to_tmp_dir;
+    }
+    else
+    {
+      throw std::runtime_error("could not find non-existing directory");
+    }
+    return tmp_dir_path;
+  }
+
+  void Utilities::prepareFileParameter(
+    ParameterSet& parameter_set,
+    const std::string& function_parameter,
+    const std::string& parameter_name,
+    const std::filesystem::path main_path)
+  {
+    auto parameter = parameter_set.at(function_parameter).findParameter(parameter_name);
+    if (!parameter)
+    {
+      LOGE << "Cannot find parameter " << function_parameter << ":" << parameter_name;
+      return;
+    }
+    const auto file_path_as_string = parameter->getValueAsString();
+    std::filesystem::path file_path(file_path_as_string);
+    if (file_path.is_relative())
+    {
+      std::filesystem::path full_path = main_path / file_path;
+      if (std::filesystem::exists(full_path))
+      {
+        parameter->setValueFromString(full_path.lexically_normal().generic_string());
+      }
+      else
+      {
+        LOGW << file_path.generic_string() << " not found in session directory, OpenMS will look for it in other directories.";
+      }
+    }
+  }
+
+  void Utilities::prepareFileParameterList(
+    ParameterSet& parameter_set,
+    const std::string& function_parameter,
+    const std::string& parameter_name,
+    const std::filesystem::path main_path)
+  {
+    auto parameter = parameter_set.at(function_parameter).findParameter(parameter_name);
+    if (!parameter)
+    {
+      LOGE << "Cannot find parameter " << function_parameter << ":" << parameter_name;
+      return;
+    }
+    CastValue file_list;
+    std::vector<std::filesystem::path> fixed_file_list;
+    Utilities::parseString(parameter->getValueAsString(), file_list);
+    for (const auto& file_path_as_string : file_list.sl_)
+    {
+      std::filesystem::path file_path(file_path_as_string);
+      if (file_path.is_relative())
+      {
+        std::filesystem::path full_path = main_path / file_path;
+        if (std::filesystem::exists(full_path))
+        {
+          file_path = full_path;
+        }
+        else
+        {
+          LOGW << file_path.generic_string() << " not found in session directory, OpenMS will look for it in other directories.";
+        }
+      }
+      fixed_file_list.push_back(file_path);
+    }
+    std::ostringstream os;
+    os << "[";
+    std::string list_separator;
+    for (const auto& file_path : fixed_file_list)
+    {
+      os << list_separator << "'" << file_path.lexically_normal().generic_string() << "'";
+      if (list_separator.empty())
+      {
+        list_separator = ",";
+      }
+    }
+    os << "]";
+    parameter->setValueFromString(os.str());
+  }
+
 }
+

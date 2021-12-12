@@ -1,6 +1,80 @@
 SmartPeak Changelog
 ===================
 
+v1.17.0 (2020-11-16)
+--------------------
+
+Features
+~~~~~~~~
+- Save layout in session `(#452) <https://github.com/AutoFlowResearch/SmartPeak/pull/452>`_
+
+Fix
+~~~
+- Read the Docs maintenance `(#447) <https://github.com/AutoFlowResearch/SmartPeak/pull/447>`_
+- Display error in info panel when user select incorrect file for session file. `(#456) <https://github.com/AutoFlowResearch/SmartPeak/pull/456>`_
+- Fix/fix sample group processing - processors can run into infinite loop. `(#450) <https://github.com/AutoFlowResearch/SmartPeak/pull/450>`_
+- Enabled OpenMP for MacOS builds (fix crash when running multithreaded workflows) `(#455) <https://github.com/AutoFlowResearch/SmartPeak/pull/455>`_
+
+Changes
+~~~~~~~
+- Modifying start menu title to include SmartPeakGUI version `(#451) <https://github.com/AutoFlowResearch/SmartPeak/pull/451>`_
+
+v1.16.0 (2020-10-25)
+--------------------
+
+Features
+~~~~~~~~
+- SmartPeak support for exporting heatmaps as PNGs `(#433) <https://github.com/AutoFlowResearch/SmartPeak/pull/433>`_
+- Display Errors in Info Panel `(#439) <https://github.com/AutoFlowResearch/SmartPeak/pull/439>`_
+
+Fix
+~~~
+- Fixed computation of merge injections `(#434) <https://github.com/AutoFlowResearch/SmartPeak/pull/434>`_
+- Fix DDA parameters `(#435) <https://github.com/AutoFlowResearch/SmartPeak/pull/435>`_
+- Statistics Widget: display message if no sample/transition is selected `(#438) <https://github.com/AutoFlowResearch/SmartPeak/pull/438>`_
+- Min/Max zooming sliders issues `(#440) <https://github.com/AutoFlowResearch/SmartPeak/pull/440>`_
+- Fixed export of PivotTable `(#444) <https://github.com/AutoFlowResearch/SmartPeak/pull/444>`_
+- Fix export of Pivot Table `(#445) <https://github.com/AutoFlowResearch/SmartPeak/pull/445>`_
+- Fix/select dilution `(#446) <https://github.com/AutoFlowResearch/SmartPeak/pull/446>`_
+
+v1.15.0 (2020-10-11)
+--------------------
+
+Features
+~~~~~~~~
+- "Select All" button when generating Report `(#427) <https://github.com/AutoFlowResearch/SmartPeak/pull/427>`_
+- Added options to SmartPeakCLI `(#429) <https://github.com/AutoFlowResearch/SmartPeak/pull/429>`_
+    - --input-file (-f): Override input file.
+    - --parameter (-p): Override parameter.
+    - --mzml (-z): Overrides the default location for the mzML directory.
+    - --reports-out-dir (-ro): Overrides the default location for reports.
+    - --output-features (-o): Overrides the default location for output features.
+    - --input-features (-i): Overrides the default location for input features.
+- Create Report: Pivotable and FeatureDB button to use FilePickerHandler `(#431) <https://github.com/AutoFlowResearch/SmartPeak/pull/431>`_
+
+Fix
+~~~
+- Fixed number of transitions does not appear after loading `(#430) <https://github.com/AutoFlowResearch/SmartPeak/pull/430>`_
+
+Changes
+~~~~~~~
+- Changed options to SmartPeakCLI `(#429) <https://github.com/AutoFlowResearch/SmartPeak/pull/429>`_
+    - --output (-o) is now replaced by either --output-features or --reports-out-dir
+    - --disable-progressbar short form has been replaced from -p to -pg
+    - --integrity short form has been replaced from -i to -t
+
+v1.14.0 (2020-09-30)
+--------------------
+
+Features
+~~~~~~~~
+- Implementation of user sessions `(#423) <https://github.com/AutoFlowResearch/SmartPeak/pull/423>`_
+
+Fix
+~~~
+- Fixed some metadata not appearing in PivotTable `(#424) <https://github.com/AutoFlowResearch/SmartPeak/pull/424>`_
+- Fixed failure to load featureQCComponents.csv when featureQCComponentGroups.csv is not provided `(#423) <https://github.com/AutoFlowResearch/SmartPeak/pull/423>`_
+
 v1.13.0 (2020-09-13)
 --------------------
 

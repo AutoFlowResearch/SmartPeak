@@ -124,6 +124,24 @@ public:
       const std::set<SampleType>& sample_types
     );
 
+    static void makeGroupDataTableFromMetaValue(
+      const SequenceHandler& sequenceHandler,
+      std::vector<std::vector<std::string>>& rows_out,
+      std::vector<std::string>& headers_out,
+      const std::vector<std::string>& meta_data,
+      const std::set<SampleType>& sample_types,
+      const std::set<std::string>& sample_names,
+      const std::set<std::string>& component_group_names,
+      const std::set<std::string>& component_names
+    );
+
+    static bool writeGroupDataTableFromMetaValue(
+      const SequenceHandler& sequenceHandler,
+      const std::filesystem::path& filename,
+      const std::vector<FeatureMetadata>& meta_data,
+      const std::set<SampleType>& sample_types
+    );
+
     static void makeDataMatrixFromMetaValue(
       const SequenceHandler& sequenceHandler,
       Eigen::Tensor<float,2>& data_out,
@@ -144,40 +162,54 @@ public:
       const std::set<SampleType>& sample_types
     );
 
+    static void makeGroupDataMatrixFromMetaValue(
+      const SequenceHandler& sequenceHandler,
+      Eigen::Tensor<float, 2>& data_out,
+      Eigen::Tensor<std::string, 1>& columns_out,
+      Eigen::Tensor<std::string, 2>& rows_out,
+      const std::vector<std::string>& meta_data,
+      const std::set<SampleType>& sample_types,
+      const std::set<std::string>& sample_names,
+      const std::set<std::string>& component_group_names,
+      const std::set<std::string>& component_names
+    );
+
+    static bool writeGroupDataMatrixFromMetaValue(
+      const SequenceHandler& sequenceHandler,
+      const std::filesystem::path& filename,
+      const std::vector<FeatureMetadata>& meta_data,
+      const std::set<SampleType>& sample_types
+    );
+
     private:
       template<typename delimiter>
       static void readSequenceFile(SequenceHandler& sequenceHandler, const std::filesystem::path& pathname);
   };
 
-  struct StoreSequenceFileSmartPeak : IFilePickerHandler
-  {
-    /**
-    IFilePickerHandler
-    */
+  struct StoreSequenceFileAnalyst : IFilePickerHandler, IFilenamesHandler {
+
+    /* IFilePickerHandler */
     bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
+
+    /* IFilenamesHandler */
+    virtual void getFilenames(Filenames& filenames) const override;
   };
 
-  struct StoreSequenceFileAnalyst : IFilePickerHandler {
+  struct StoreSequenceFileMasshunter : IFilePickerHandler, IFilenamesHandler {
 
-    /**
-    IFilePickerHandler
-    */
+    /* IFilePickerHandler */
     bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
+
+    /* IFilenamesHandler */
+    virtual void getFilenames(Filenames& filenames) const override;
   };
 
-  struct StoreSequenceFileMasshunter : IFilePickerHandler {
+  struct StoreSequenceFileXcalibur : IFilePickerHandler, IFilenamesHandler {
 
-    /**
-    IFilePickerHandler
-    */
+    /* IFilePickerHandler */
     bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
-  };
 
-  struct StoreSequenceFileXcalibur : IFilePickerHandler {
-
-    /**
-    IFilePickerHandler
-    */
-    bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
+    /* IFilenamesHandler */
+    virtual void getFilenames(Filenames& filenames) const override;
   };
 }

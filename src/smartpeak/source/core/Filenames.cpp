@@ -22,6 +22,8 @@
 // --------------------------------------------------------------------------
 
 #include <SmartPeak/core/Filenames.h>
+#include <plog/Log.h>
+
 #include <string>
 #include <map>
 #include <iostream>
@@ -45,19 +47,61 @@ namespace SmartPeak
     { "OUTPUT_GROUP_NAME", Filenames::Tag::OUTPUT_GROUP_NAME }
   };
 
-  void Filenames::addFileName(const std::string& id, const std::string& name_pattern)
+  void Filenames::addFileName(const std::string& id, 
+                              const std::string& name_pattern, 
+                              const std::string& description, 
+                              bool embeddable,
+                              bool default_embedded,
+                              bool overwrite)
   {
-    if (file_names_.find(id) == file_names_.end())
+    if (overwrite || (file_names_.find(id) == file_names_.end()))
     {
-      FileName f{ name_pattern };
+      FileName f{ name_pattern, description, embeddable, default_embedded };
       file_names_.insert_or_assign(id, f);
       updateFullPaths();
     }
+    else
+    {
+      // if exits, override description and embeddable flag
+      file_names_.at(id).description_ = description;
+      file_names_.at(id).embeddable_ = embeddable;
+    }
   }
 
-  std::filesystem::path Filenames::getFullPath(const std::string& id) const
+  std::filesystem::path Filenames::getFullPath(const std::string& file_id) const
   {
-    return file_names_.at(id).full_path_.generic_string();
+    if (file_names_.count(file_id))
+    {
+      return file_names_.at(file_id).full_path_.lexically_normal().generic_string();
+    }
+    else
+    {
+      return "";
+    }
+  }
+
+  std::filesystem::path Filenames::getNamePattern(const std::string& file_id) const
+  {
+    if (file_names_.count(file_id))
+    {
+      return file_names_.at(file_id).name_pattern_;
+    }
+    else
+    {
+      return "";
+    }
+  }
+
+  bool Filenames::isEmbeddable(const std::string& file_id) const
+  {
+    if (file_names_.count(file_id))
+    {
+      return file_names_.at(file_id).embeddable_;
+    }
+    else
+    {
+      return false;
+    }
   }
 
   void Filenames::setFullPath(const std::string& id, const std::filesystem::path& full_path)
@@ -68,6 +112,7 @@ namespace SmartPeak
     }
     file_names_.at(id).full_path_override_ = true;
     file_names_.at(id).full_path_ = full_path;
+    file_names_.at(id).name_pattern_ = "";
   }
 
   void Filenames::updateFullPaths()
@@ -118,10 +163,65 @@ namespace SmartPeak
     return file_ids;
   }
 
-  void Filenames::setTag(Tag tag, const std::string& value)
+  void Filenames::setTagValue(Tag tag, const std::string& value)
   {
     tags_[tag] = value;
     updateFullPaths();
   }
 
+  std::string Filenames::getTagValue(Tag tag) const
+  {
+    if (tags_.count(tag))
+    {
+      return tags_.at(tag);
+    }
+    else
+    {
+      return "";
+    }
+  }
+
+  std::map<std::string, Filenames::Tag> Filenames::getTagNames() const
+  {
+    return string_to_tag_;
+  }
+
+  std::string Filenames::getDescription(const std::string& file_id) const
+  {
+    return file_names_.at(file_id).description_;
+  }
+
+  void Filenames::setEmbedded(const std::string& file_id, bool embedded)
+  {
+    file_names_.at(file_id).embedded_ = embedded;
+  }
+
+  bool Filenames::isEmbedded(const std::string& file_id) const
+  {
+    if (file_names_.count(file_id))
+    {
+      return file_names_.at(file_id).embedded_;
+    }
+    else
+    {
+      return false;
+    }
+  }
+
+  void Filenames::log() const
+  {
+    LOGI << "Input Files Setup:";
+    for (const auto& file_id : getFileIds())
+    {
+      const auto full_path = getFullPath(file_id);
+      if (full_path.empty())
+      {
+        LOGI << file_id << ": Not used";
+      }
+      else
+      {
+        LOGI << file_id << ": " << "\"" << full_path.generic_string() << "\"";
+      }
+    }
+  }
 }

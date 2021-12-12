@@ -19,6 +19,7 @@ if (USE_SUPERBUILD)
   include(external/plog.cmake)
   include(external/imgui.cmake)
   include(external/implot.cmake)
+  include(external/sqlite.cmake)
   if (MSVC)
     include(external/eigen.cmake)
     include(external/openms.cmake)
@@ -78,7 +79,7 @@ list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/Windows")
 # SmartPeak Version Information
 #------------------------------------------------------------------------------
 set(SMARTPEAK_PACKAGE_VERSION_MAJOR 1)
-set(SMARTPEAK_PACKAGE_VERSION_MINOR 13)
+set(SMARTPEAK_PACKAGE_VERSION_MINOR 17)
 set(SMARTPEAK_PACKAGE_VERSION_PATCH 0)
 
 #------------------------------------------------------------------------------

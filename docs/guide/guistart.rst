@@ -1,5 +1,7 @@
-Using SmartPeak
-===============
+.. begin_smartpeak_gui_usage
+
+Using SmartPeak GUI
+----------------------------------------------------------------------------------------------------------
 
 After successful installation of SmartPeak, on Windows open menu start and browse for relevant icon, you can also find the shortcut on desktop.
 
@@ -17,12 +19,9 @@ If directory specified by the path doesn't exist, SmartPeak will create it.
 
 Load session and run workflow
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#. Start the session with ``File | Load session from sequence``.
-#. Choose the corresponding directory with ``Change dir``. The path to example folder can be shortened to f.e. ``/data/GCMS_SIM_Unknowns``.
-#. Select the sequence file.
+#. Start the session with ``File | New Session``.
+#. Choose your working directory with ``Change dir``.
 #. When workflow successfully opens, run workflow with ``Actions | Run workflow``.
-
-.. image:: ../images/load_sequence.gif
 
 Integrity checks
 ~~~~~~~~~~~~~~~~
@@ -99,3 +98,5 @@ The report is saved in the same location as the ``sequence.csv`` file.
 
 .. todo::
     Explain the difference in options: ``Create FeatureDB.csv`` and ``Create PivotTable.csv``.
+
+.. end_smartpeak_gui_usage

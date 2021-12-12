@@ -15,13 +15,12 @@ SmartPeak
    
 .. toctree::
    :caption: Step-by-step guides
-   :maxdepth: 1
+   :maxdepth: 3
 
    guide/install
    guide/build
-   guide/logs
-   guide/guistart
-   guide/cli
+   guide/usage
+   guide/tutorials
 
 .. toctree::
    :caption: About Smartpeak

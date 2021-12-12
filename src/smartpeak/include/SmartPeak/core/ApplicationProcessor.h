@@ -30,7 +30,9 @@
 #include <SmartPeak/iface/ISequenceSegmentProcessorObserver.h>
 #include <SmartPeak/iface/ISampleGroupProcessorObserver.h>
 #include <SmartPeak/core/ApplicationProcessorObservable.h>
-#include <SmartPeak/io/InputDataValidation.h>
+#include <SmartPeak/core/WorkflowManager.h>
+#include <SmartPeak/core/Parameters.h>
+#include <SmartPeak/iface/IPropertiesHandler.h>
 #include <string>
 #include <vector>
 
@@ -41,14 +43,14 @@ namespace SmartPeak
     ApplicationProcessor& operator=(const ApplicationProcessor& other) = delete;
     virtual ~ApplicationProcessor() = default;
 
-    // Each of the derived classes implement the following virtual methods
     virtual bool process() = 0;
 
     /* IProcessorDescription */
-    int getID() const override { return -1; }
-    std::string getDescription() const override { return ""; }
-    ParameterSet getParameterSchema() const override { return ParameterSet(); };
+    virtual std::string getDescription() const override { return ""; }
+    virtual ParameterSet getParameterSchema() const override { return ParameterSet(); };
+    virtual std::vector<std::string> getRequirements() const override { return {}; };
 
+  protected:
     ApplicationHandler& application_handler_;
 
   protected:
@@ -68,21 +70,5 @@ namespace SmartPeak
       ISequenceSegmentProcessorObserver* sequence_segment_processor_observer = nullptr,
       ISampleGroupProcessorObserver* sample_group_processor_observer = nullptr);
   }
-
-  struct CreateCommand : ApplicationProcessor {
-    CreateCommand(ApplicationHandler& application_handler) : ApplicationProcessor(application_handler) {}
-    bool process() override;
-    std::string name_;
-    ApplicationHandler::Command cmd_; 
-    std::string getName() const override { return "CreateCommand"; };
-  };
-
-  struct BuildCommandsFromNames : ApplicationProcessor {
-    BuildCommandsFromNames(ApplicationHandler& application_handler) : ApplicationProcessor(application_handler) {}
-    bool process() override;
-    std::vector<std::string> names_;
-    std::vector<ApplicationHandler::Command> commands_;
-    std::string getName() const override { return "BuildCommandsFromNames"; };
-  };
 
 }

@@ -61,7 +61,7 @@ namespace SmartPeak {
     { FeatureMetadata::n_features,                  "n_features"                  },
     { FeatureMetadata::validation,                  "validation"                  }*/
   };
-  const std::map<FeatureMetadata, std::string> metadatafloatToString{
+  const std::map<FeatureMetadata, std::string> metadataFloatToString{
     { FeatureMetadata::asymmetry_factor,            "asymmetry_factor"            },
     { FeatureMetadata::baseline_delta_to_height,    "baseline_delta_2_height"     },
     { FeatureMetadata::calculated_concentration,    "calculated_concentration"    },

@@ -22,8 +22,8 @@
 // --------------------------------------------------------------------------
 
 #include <SmartPeak/core/WorkflowManager.h>
-#include <SmartPeak/core/ApplicationHandler.h>
 #include <SmartPeak/core/ApplicationProcessor.h>
+#include <SmartPeak/core/ApplicationHandler.h>
 #include <thread>
 #include <future>
 
@@ -127,6 +127,62 @@ namespace SmartPeak {
   void WorkflowManager::updateApplicationHandler(ApplicationHandler& source_app_handler)
   {
     // update the status for this workflow, to be used from the main thread (gui, client)
+    application_handler_.session_loader_generator = source_app_handler.session_loader_generator;
     source_app_handler = std::move(application_handler_);
+  }
+
+  std::set<std::string> WorkflowManager::getRequirements(
+    const std::vector<ApplicationHandler::Command>& commands) const
+  {
+    std::set<std::string> requirements;
+    for (const auto& command : commands)
+    {
+      const IProcessorDescription* processor_description = nullptr;
+      switch (command.type)
+      {
+      case ApplicationHandler::Command::RawDataMethod:
+        processor_description = command.raw_data_method.get();
+        break;
+      case ApplicationHandler::Command::SampleGroupMethod:
+        processor_description = command.sample_group_method.get();
+        break;
+      case ApplicationHandler::Command::SequenceSegmentMethod:
+        processor_description = command.seq_seg_method.get();
+        break;
+      default:
+        break;
+      }
+      if (processor_description)
+      {
+        const auto processor_required = processor_description->getRequirements();
+        for (const auto& req_file_id : processor_required)
+        {
+          requirements.insert(req_file_id);
+        }
+      }
+    }
+    return requirements;
+  }
+
+  bool WorkflowManager::isMissingRequirements(const Filenames& filenames, const std::set<std::string>& requirements) const
+  {
+    const auto file_ids = filenames.getFileIds();
+    bool missing_requirement = false;
+    for (const auto& req_file_id : requirements)
+    {
+      bool found = false;
+      if (std::find(std::begin(file_ids), std::end(file_ids), req_file_id) != std::end(file_ids))
+      {
+        const auto full_path = filenames.getFullPath(req_file_id);
+        found = (filenames.isEmbedded(req_file_id) ||
+          (!full_path.empty() && std::filesystem::exists(full_path)));
+      }
+      if (!found)
+      {
+        missing_requirement = true;
+        break;
+      }
+    }
+    return missing_requirement;
   }
 }

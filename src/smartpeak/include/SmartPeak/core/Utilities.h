@@ -25,12 +25,11 @@
 
 #include <SmartPeak/core/CastValue.h>
 #include <SmartPeak/core/Parameters.h>
-#include <SmartPeak/ui/ImEntry.h>
-//#include <SmartPeak/ui/Help.h>
-#include <imgui.h>
-#include <imgui_internal.h>
+#include <SmartPeak/core/Filenames.h>
+#include <SmartPeak/core/ApplicationHandler.h>
 #include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureSelector.h>
 #include <OpenMS/DATASTRUCTURES/Param.h>
+#include <OpenMS/FORMAT/MRMFeatureQCFile.h>
 
 #include <regex>
 #include <string>
@@ -39,10 +38,6 @@
 #include <chrono>
 #include <tuple>
 
-#ifndef CSV_IO_NO_THREAD
-#define CSV_IO_NO_THREAD
-#endif
-#include <SmartPeak/io/csv.h>
 #include <plog/Log.h>
 
 #define maxFunc(a,b) (((a) > (b)) ? (a) : (b))
@@ -262,7 +257,7 @@ public:
       where the first element is "name", "extension", "size" and "last_write_time", the second element can either be "ascending" or "descending".
       @return List of files found where each string of vectors is a representation of a file's name, size, type and date.
     */
-    static std::array<std::vector<std::string>, 4> getFolderContents(const std::filesystem::path& folder_path);
+    static std::array<std::vector<std::string>, 4> getFolderContents(const std::filesystem::path& folder_path, bool only_directories);
     
     /**
       @brief Get the parent path from a given path, the given path is returned when the parent path isn't existent
@@ -356,13 +351,6 @@ public:
     * @brief Returns the build version of SmartPeak package if available.
     */
     static std::string getSmartPeakVersion();
-    
-    /**
-     @brief Modify ImEntry to a human readable format.
-     
-     @param[in,out] directory_entry directory entry on which the modification is done.
-    */
-    static void makeHumanReadable(ImEntry& directory_entry);
 
     /**
      * Converts an input string to upper case string.
@@ -379,5 +367,43 @@ public:
      @param[in,out] str string on which the modification is done.
     */
     static void removeTrailing(std::string& str, std::string to_remove);
+
+    /**
+     @brief Construct filename using the default files organisation.
+     
+     Can be used to create an empty session from a directory.
+    */
+    static Filenames buildFilenamesFromDirectory(ApplicationHandler& application_handler, const std::filesystem::path& path);
+    
+    /**
+     @brief Returns a unique string based on the current time.
+     
+     @param[out] a unique string in the format : %Y-%m-%d_%H-%M-%S_TIME_SINCE_EPOCHS
+    */
+    static std::string makeUniqueStringFromTime();
+
+    /**
+     @brief return an empty, temporary directory.
+    */
+    static std::filesystem::path createEmptyTempDirectory();
+
+    /**
+      @brief for parameter that is supposed to be file path, make it full path if it exists.
+    */
+    static void prepareFileParameter(
+      ParameterSet& parameter_set,
+      const std::string& function_parameter,
+      const std::string& parameter_name,
+      const std::filesystem::path main_path);
+
+    /**
+     @brief for parameter that is supposed to be file path, make it full path if it exists (list version).
+     */
+    static void prepareFileParameterList(
+      ParameterSet& parameter_set,
+      const std::string& function_parameter,
+      const std::string& parameter_name,
+      const std::filesystem::path main_path);
+
   };
 }

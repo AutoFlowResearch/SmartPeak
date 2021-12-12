@@ -17,7 +17,7 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Krzysztof Abram $
+// $Maintainer: Krzysztof Abram, Douglas McCloskey $
 // $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
 // --------------------------------------------------------------------------
 #include <SmartPeak/cli/ApplicationSettings.h>
@@ -35,7 +35,7 @@ namespace cli {
 
 void ApplicationSettings::define_options()
 {
-    m_parser.set_required<std::string>("l", "load-session", "The path to sequence.csv file");
+    m_parser.set_required<std::string>("l", "load-session", "The path to session file, or a directory with structured file organization (prefer session file)");
     m_parser.set_optional<std::vector<std::string>>("r", "report", std::vector<std::string>{ "FeatureDB", "PivotTable" }, 
         "Specify a report type to export.");
     m_parser.set_optional<std::vector<std::string>>("rt", "report-sample-types", std::vector<std::string>{ "ALL" }, 
@@ -44,10 +44,13 @@ void ApplicationSettings::define_options()
     m_parser.set_optional<std::vector<std::string>>("rm", "report-metadata", std::vector<std::string>{ "ALL" }, 
         "A list of metadata to include in the report. "
         "The full list can be found in documentation https://smartpeak.readthedocs.io");
-    m_parser.set_optional<std::vector<std::string>>("w", "workflow", std::vector<std::string>{}, 
+    m_parser.set_optional<std::string>("ro", "reports-out-dir", ".",
+      "An absolute or relative path to an output directory for reports. Overrides the default location which is the current working directory. "
+      "SmartPeak will create given directory if one does not exist.");
+    m_parser.set_optional<std::vector<std::string>>("w", "workflow", std::vector<std::string>{},
         "The workflow sequence as a list of commands, e.g. LOAD_DATA MAP_CHROMATOGRAMS ... "
         "Overrides the workflow settings loaded from the sequence file (with option --load-session)");
-    m_parser.set_optional<std::vector<std::string>>("i", "integrity", std::vector<std::string>{ "NONE" }, 
+    m_parser.set_optional<std::vector<std::string>>("t", "integrity", std::vector<std::string>{ "NONE" }, 
         "Specify which integrity checks to run, available are: SAMPLE, COMP, COMP_GROUP, IS and ALL (runs all listed).");
     m_parser.set_optional<bool>("a", "allow-inconsistent", false, 
         "Given that any integrity checks were specified with '--integrity', "
@@ -56,14 +59,23 @@ void ApplicationSettings::define_options()
         "Run SmartPeak in verbose mode, display more detailed information");
     m_parser.set_optional<bool>("d", "disable-colors", false, 
         "By default the console output is colored, this flag disables colors.");
-    m_parser.set_optional<bool>("p", "disable-progressbar", false, 
+    m_parser.set_optional<bool>("no-pg", "disable-progressbar", false, 
         "Progress bar allows to track the progress of the entire workflow. This option disables the progress bar.");
     m_parser.set_optional<std::string>("ld", "log-dir", "", 
         "The path to the log directory. Given directory has to exist. Overrides the default location for the log file: "
         "https://smartpeak.readthedocs.io/en/latest/guide/guistart.html#logs");
-    m_parser.set_optional<std::string>("o", "output", ".", 
+    m_parser.set_optional<std::string>("o", "output-features", "./features", 
         "An absolute or relative path to an output directory. Overrides the default location which is the current working directory. " 
         "SmartPeak will create given directory if one does not exist.");
+    m_parser.set_optional<std::string>("i", "input-features", "./features",
+        "An absolute or relative path to the input features directory. Overrides the default location which is the current working directory. ");
+    m_parser.set_optional<std::string>("z", "mzml", "./mzML",
+        "An absolute or relative path to the mzML directory. Overrides the default location which is the mzML folder under the current working directory. "
+        "SmartPeak will create given directory if one does not exist.");
+    m_parser.set_optional<std::vector<std::string>>("f", "input-file", {},
+        "Override input file. Ex: -f featureQCComponents=\"./featureQCComponents_new.csv\".");
+    m_parser.set_optional<std::vector<std::string>>("p", "parameter", {},
+        "Override parameter. Ex: '-p MRMFeatureFinderScoring:TransitionGroupPicker:peak_integration=smoothed'.");
     m_parser.run_and_exit_if_error();
 }
 
@@ -74,13 +86,18 @@ void ApplicationSettings::load_options()
     report_sample_types     = m_parser.get<std::vector<std::string>>("rt");
     report_metadata         = m_parser.get<std::vector<std::string>>("rm");
     workflow                = m_parser.get<std::vector<std::string>>("w");
-    integrity               = m_parser.get<std::vector<std::string>>("i");
+    integrity               = m_parser.get<std::vector<std::string>>("t");
     allow_inconsistent      = m_parser.get<bool>("a");
     verbose                 = m_parser.get<bool>("v");
     disable_colors          = m_parser.get<bool>("d");
-    disable_progressbar     = m_parser.get<bool>("p");
+    disable_progressbar     = m_parser.get<bool>("no-pg");
     log_dir                 = m_parser.get<std::string>("ld");
-    out_dir                 = m_parser.get<std::string>("o");
+    features_out_dir        = m_parser.get<std::string>("o");
+    features_in_dir         = m_parser.get<std::string>("i");
+    input_files             = m_parser.get<std::vector<std::string>>("f");
+    parameters              = m_parser.get<std::vector<std::string>>("p");
+    mzml_dir                = m_parser.get<std::string>("z");
+    reports_out_dir         = m_parser.get<std::string>("ro");
 }
 
 void ApplicationSettings::process_options()
@@ -119,12 +136,33 @@ bool ApplicationSettings::contains_option(
     return flag;
 }
 
+std::pair<std::string, std::string> ApplicationSettings::get_key_value_from_option(
+  const std::string& option)
+{
+  std::pair<std::string, std::string> key_value;
+  auto separator_pos = option.find("=");
+  if (separator_pos != option.npos)
+  {
+    std::string key = option.substr(0, separator_pos);
+    std::string value = option.substr((separator_pos + 1), option.size() - (separator_pos + 1));
+    if (!key.empty())
+    {
+      if ((value.size() > 1) && (value.front() == '\"') && (value.back() == '\"'))
+      {
+        value = value.substr(1, value.size() - 2);
+      }
+      key_value.first = key;
+      key_value.second = value;
+    }
+  };
+  return key_value;
+}
+
 void ApplicationSettings::validate_report() const
 {
     auto options = std::vector<std::string>{"FEATUREDB", "PIVOTTABLE", "ALL"};
     std::for_each(report.cbegin(), report.cend(), [&options](const auto& option) {
-        auto it = std::find(options.cbegin(), options.cend(), option);
-        if (it == std::cend(options))
+        if (std::find(options.cbegin(), options.cend(), option) == std::cend(options))
         {
             auto options_str = Utilities::join(options.cbegin(), options.cend(), ", ");
             throw std::invalid_argument(static_cast<std::ostringstream&&>(

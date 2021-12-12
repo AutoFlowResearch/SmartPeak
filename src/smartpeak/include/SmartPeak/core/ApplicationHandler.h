@@ -25,17 +25,33 @@
 
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/RawDataProcessor.h>
-#include <SmartPeak/core/SampleType.h>
 #include <SmartPeak/core/SequenceSegmentProcessor.h>
 #include <SmartPeak/core/SampleGroupProcessor.h>
-#include <SmartPeak/io/InputDataValidation.h>
+#include <SmartPeak/core/SessionLoaderGenerator.h>
 #include <map>
 #include <string>
 #include <vector>
 
 namespace SmartPeak
 {
-  struct ApplicationHandler final {
+  struct ApplicationHandler final : 
+    public IParametersObserver,
+    public IWorkflowObserver
+  {
+
+  public:
+
+    ApplicationHandler();
+
+    /**
+     IParametersObserver
+    */
+    virtual void onParametersUpdated() override;
+    /**
+     IWorkflowObserver
+    */
+    virtual void onWorkflowUpdated() override;
+
     class Command {
     public:
       enum CommandType {
@@ -44,112 +60,120 @@ namespace SmartPeak
         SampleGroupMethod,
       } type;
 
-      void setMethod(const std::shared_ptr<RawDataProcessor> method)
-      {
-        type = RawDataMethod;
-        raw_data_method = method;
-      }
+      void setMethod(const std::shared_ptr<RawDataProcessor> method);
 
-      void setMethod(const std::shared_ptr<SequenceSegmentProcessor> method)
-      {
-        type = SequenceSegmentMethod;
-        seq_seg_method = method;
-      }
+      void setMethod(const std::shared_ptr<SequenceSegmentProcessor> method);
 
-      void setMethod(const std::shared_ptr<SampleGroupProcessor> method)
-      {
-        type = SampleGroupMethod;
-        sample_group_method = method;
-      }
+      void setMethod(const std::shared_ptr<SampleGroupProcessor> method);
 
-      int getID() const
-      {
-        const auto description = getIProcessorDescription();
-        return (description ? description->getID() : 0);
-      }
+      std::string getName() const;
 
-      std::string getName() const
-      {
-        const auto description = getIProcessorDescription();
-        return (description ? description->getName() : "");
-      }
+      ParameterSet getParameterSchema() const;
 
-      ParameterSet getParameterSchema() const
-      {
-        const auto description = getIProcessorDescription();
-        return (description ? description->getParameterSchema() : ParameterSet());
-      }
+      std::string getDescription() const;
 
-      std::string getDescription() const
-      {
-        const auto description = getIProcessorDescription();
-        return (description ? description->getDescription() : "");
-      }
-
+    public:
       std::shared_ptr<RawDataProcessor> raw_data_method;
       std::shared_ptr<SequenceSegmentProcessor> seq_seg_method;
       std::shared_ptr<SampleGroupProcessor> sample_group_method;
-
       std::map<std::string, Filenames> dynamic_filenames;
 
     private:
-      const IProcessorDescription* getIProcessorDescription() const
-      {
-        switch (type)
-        {
-        case RawDataMethod:
-          return raw_data_method.get();
-        case SequenceSegmentMethod:
-          return seq_seg_method.get();
-        case SampleGroupMethod:
-          return sample_group_method.get();
-        default:
-          throw "Unsupported CommandType in ApplicationHandler::Command::getIProcessorDescription()";
-        }
-      }
+      const IProcessorDescription* getIProcessorDescription() const;
     };
+
+    /**
+    * @brief clear all data in the aapplication handler.
+    */
+    void closeSession();
+
+    /**
+    * @brief check if one session is currently opened
+    */
+    bool sessionIsOpened() const;
+
+    /**
+    * @brief return the saved status of the session
+    */
+    bool sessionIsSaved() const;
+
+    /**
+    * @brief Set one file saved status
+    */
+    void setFileSavedState(const std::string& file_id, bool saved_state);
+
+    /**
+    * @brief returns weither a file is saved
+    */
+    bool isFileSaved(const std::string& file_id) const;
+
+    /**
+    * @brief returns Parameter Schema of the current Workflow
+    */
+    ParameterSet getWorkflowParameterSchema();
 
     std::filesystem::path sequence_pathname_;
     std::filesystem::path main_dir_                = ".";
-    std::filesystem::path mzML_dir_;
-    std::filesystem::path features_in_dir_;
-    std::filesystem::path features_out_dir_;
     SequenceHandler       sequenceHandler_;
+    Filenames             filenames_;
+    std::vector<std::shared_ptr<IFilenamesHandler>> loading_processors_;
+    std::vector<std::shared_ptr<IFilenamesHandler>> storing_processors_;
+    SessionLoaderGenerator session_loader_generator;
+
+  protected:
+    std::map<std::string, bool> saved_files_;
   };
 
 
   struct SetRawDataPathname : IFilePickerHandler
   {
+    SetRawDataPathname(Filenames* filenames)
+    {
+      filenames_ = filenames;
+    }
     /**
     IFilePickerHandler
     */
     bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override
     {
-      application_handler->mzML_dir_ = filename;
+      filenames_->setTagValue(Filenames::Tag::MZML_INPUT_PATH, filename.generic_string());
       return true;
     };
+
+    Filenames *filenames_;
   };
 
-  struct SetInputFeaturesPathname : IFilePickerHandler {
+  struct SetInputFeaturesPathname : IFilePickerHandler
+  {
+    SetInputFeaturesPathname(Filenames* filenames)
+    {
+      filenames_ = filenames;
+    }
     /**
     IFilePickerHandler
     */
     bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override
     {
-      application_handler->features_in_dir_ = filename;
+      filenames_->setTagValue(Filenames::Tag::FEATURES_INPUT_PATH, filename.generic_string());
       return true;
     };
+    Filenames *filenames_;
   };
 
   struct SetOutputFeaturesPathname : IFilePickerHandler
   {
+    SetOutputFeaturesPathname(Filenames* filenames)
+    {
+      filenames_ = filenames;
+    }
     /**
     IFilePickerHandler
     */
     bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override
     {
-      application_handler->features_out_dir_ = filename;
+      filenames_->setTagValue(Filenames::Tag::FEATURES_OUTPUT_PATH, filename.generic_string());
       return true;
     }
+    Filenames *filenames_;
   };
 }

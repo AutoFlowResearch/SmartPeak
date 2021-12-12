@@ -17,7 +17,7 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Bertrand Boudaud $
+// $Maintainer: Bertrand Boudaud, Douglas McCloskey $
 // $Authors: Douglas McCloskey, Bertrand Boudaud $
 // --------------------------------------------------------------------------
 
@@ -75,6 +75,7 @@ namespace SmartPeak
     virtual void onApplicationProcessorCommandStart(size_t command_index, const std::string& command_name) override;
     virtual void onApplicationProcessorCommandEnd(size_t command_index, const std::string& command_name) override;
     virtual void onApplicationProcessorEnd() override;
+    virtual void onApplicationProcessorError(const std::string& error) override;
     
     /**
       IFeaturesObserver
@@ -82,16 +83,22 @@ namespace SmartPeak
     virtual void onFeaturesUpdated() override;
 
     /**
-      ISequenceSegmentProcessorObserver
+      ISequenceProcessorObserver
     */
     virtual void onSequenceProcessorStart(const size_t nb_injections) override;
     virtual void onSequenceProcessorSampleStart(const std::string& sample_name) override;
     virtual void onSequenceProcessorSampleEnd(const std::string& sample_name) override;
     virtual void onSequenceProcessorEnd() override;
+    virtual void onSequenceProcessorError(const std::string& sample_name, const std::string& processor_name, const std::string& error) override;
+
+    /**
+      ISequenceSegmentProcessorObserver
+    */
     virtual void onSequenceSegmentProcessorStart(const size_t nb_segments) override;
     virtual void onSequenceSegmentProcessorSampleStart(const std::string& segment_name) override;
     virtual void onSequenceSegmentProcessorSampleEnd(const std::string& segment_name) override;
     virtual void onSequenceSegmentProcessorEnd() override;
+    virtual void onSequenceSegmentProcessorError(const std::string& segment_name, const std::string& processor_name, const std::string& error) override;
 
     /**
       ISampleGroupProcessorObserver
@@ -100,6 +107,7 @@ namespace SmartPeak
     virtual void onSampleGroupProcessorSampleStart(const std::string& group_name) override;
     virtual void onSampleGroupProcessorSampleEnd(const std::string& group_name) override;
     virtual void onSampleGroupProcessorEnd() override;
+    virtual void onSampleGroupProcessorError(const std::string& group_name, const std::string& processor_name, const std::string& error) override;
 
     /**
       ISequenceObserver

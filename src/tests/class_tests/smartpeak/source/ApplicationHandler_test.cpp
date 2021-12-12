@@ -44,26 +44,57 @@ public:
 /* SetRawDataPathname */
 TEST_F(ApplicationHandlerFixture, SetRawDataPathname_ProcessSetsPath)
 {
-  SetRawDataPathname cmd;
-  EXPECT_STREQ(ah_.mzML_dir_.generic_string().c_str(), "");
+  SetRawDataPathname cmd(&ah_.filenames_);
+  EXPECT_STREQ(ah_.filenames_.getTagValue(Filenames::Tag::MZML_INPUT_PATH).c_str(), "");
   EXPECT_TRUE(cmd.onFilePicked("test", &ah_));
-  EXPECT_STREQ(ah_.mzML_dir_.generic_string().c_str(), "test");
+  EXPECT_STREQ(ah_.filenames_.getTagValue(Filenames::Tag::MZML_INPUT_PATH).c_str(), "test");
 }
 
 /* SetInputFeaturesPathname */
 TEST_F(ApplicationHandlerFixture, SetInputFeaturesPathname_ProcessSetsPath)
 {
-  SetInputFeaturesPathname cmd;
-  EXPECT_STREQ(ah_.features_in_dir_.generic_string().c_str(), "");
+  SetInputFeaturesPathname cmd(&ah_.filenames_);
+  EXPECT_STREQ(ah_.filenames_.getTagValue(Filenames::Tag::FEATURES_INPUT_PATH).c_str(), "");
   EXPECT_TRUE(cmd.onFilePicked("test", &ah_));
-  EXPECT_STREQ(ah_.features_in_dir_.generic_string().c_str(), "test");
+  EXPECT_STREQ(ah_.filenames_.getTagValue(Filenames::Tag::FEATURES_INPUT_PATH).c_str(), "test");
 }
 
 /* SetOutputFeaturesPathname */
 TEST_F(ApplicationHandlerFixture, SetOutputFeaturesPathname_ProcessSetsPath)
 {
-  SetOutputFeaturesPathname cmd;
-  EXPECT_STREQ(ah_.features_out_dir_.generic_string().c_str(), "");
+  SetOutputFeaturesPathname cmd(&ah_.filenames_);
+  EXPECT_STREQ(ah_.filenames_.getTagValue(Filenames::Tag::FEATURES_OUTPUT_PATH).c_str(), "");
   EXPECT_TRUE(cmd.onFilePicked("test", &ah_));
-  EXPECT_STREQ(ah_.features_out_dir_.generic_string().c_str(), "test");
+  EXPECT_STREQ(ah_.filenames_.getTagValue(Filenames::Tag::FEATURES_OUTPUT_PATH).c_str(), "test");
+}
+
+TEST_F(ApplicationHandlerFixture, sessionIsOpen)
+{
+  EXPECT_FALSE(ah_.sessionIsOpened());
+  ah_.filenames_.setFullPath("test", "test");
+  EXPECT_TRUE(ah_.sessionIsOpened());
+}
+
+TEST_F(ApplicationHandlerFixture, sessionIsSaved)
+{
+  EXPECT_TRUE(ah_.sessionIsSaved());
+  ah_.setFileSavedState("test", false);
+  EXPECT_FALSE(ah_.sessionIsSaved());
+  ah_.setFileSavedState("test", true);
+  EXPECT_TRUE(ah_.sessionIsSaved());
+}
+
+TEST_F(ApplicationHandlerFixture, setFileSavedState)
+{
+  EXPECT_TRUE(ah_.isFileSaved("test"));
+  ah_.setFileSavedState("test", false);
+  EXPECT_FALSE(ah_.isFileSaved("test"));
+  ah_.setFileSavedState("test", true);
+  EXPECT_TRUE(ah_.isFileSaved("test"));
+}
+
+TEST_F(ApplicationHandlerFixture, getWorkflowParameterSchema)
+{
+  auto schema_params = ah_.getWorkflowParameterSchema();
+  EXPECT_EQ(schema_params.size(), 1);
 }

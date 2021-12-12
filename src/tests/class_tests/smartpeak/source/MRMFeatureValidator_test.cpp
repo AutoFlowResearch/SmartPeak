@@ -28,7 +28,7 @@
 #include <OpenMS/FORMAT/FeatureXMLFile.h>
 #include <SmartPeak/io/ParametersParser.h>
 #include <SmartPeak/core/RawDataHandler.h>
-#include <SmartPeak/core/RawDataProcessor.h>
+#include <SmartPeak/core/RawDataProcessors/LoadValidationData.h>
 
 using namespace SmartPeak;
 using namespace std;
@@ -36,7 +36,7 @@ using namespace std;
 TEST(MRMFeaturevalidator, validate_MRMFeatures)
 {
   Filenames filenames;
-  filenames.setFullPath("referenceData_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("MRMFeatureValidator_referenceData_1.csv"));
+  filenames.setFullPath("referenceData", SMARTPEAK_GET_TEST_DATA_PATH("MRMFeatureValidator_referenceData_1.csv"));
   const string featureXML_i = SMARTPEAK_GET_TEST_DATA_PATH("MRMFeatureValidator_test_1_algorithm_MRMFeatureValidator.featureXML");
   const string filename_params = SMARTPEAK_GET_TEST_DATA_PATH("MRMFeatureValidator_test_pyTOPP_MRMFeatureValidator_params.csv");
 

@@ -5,6 +5,7 @@
 #include <SmartPeak/pipelines/LCMS_MRM_Standards_example.h>
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/Utilities.h>
+#include <SmartPeak/core/RawDataProcessors/LoadFeatures.h>
 
 using namespace SmartPeak;
 using namespace std;
@@ -13,10 +14,10 @@ void test_main_LCMS_MRM_Standards()
 {
   const std::string main_dir = SMARTPEAK_GET_EXAMPLES_DATA_PATH("LCMS_MRM_Standards");
   Filenames filenames_main;
-  filenames_main.setTag(Filenames::Tag::MAIN_DIR, main_dir);
-  filenames_main.setTag(Filenames::Tag::MZML_INPUT_PATH, main_dir + "/mzML/");
-  filenames_main.setTag(Filenames::Tag::FEATURES_INPUT_PATH, main_dir + "/features/");
-  filenames_main.setTag(Filenames::Tag::FEATURES_OUTPUT_PATH, main_dir + "/features/");
+  filenames_main.setTagValue(Filenames::Tag::MAIN_DIR, main_dir);
+  filenames_main.setTagValue(Filenames::Tag::MZML_INPUT_PATH, main_dir + "/mzML/");
+  filenames_main.setTagValue(Filenames::Tag::FEATURES_INPUT_PATH, main_dir + "/features/");
+  filenames_main.setTagValue(Filenames::Tag::FEATURES_OUTPUT_PATH, main_dir + "/features/");
 
   example_LCMS_MRM_Standards(main_dir, filenames_main, ",");
 

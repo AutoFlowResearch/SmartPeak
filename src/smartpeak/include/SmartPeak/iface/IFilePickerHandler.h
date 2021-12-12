@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <filesystem>
+
 namespace SmartPeak 
 {
   struct ApplicationHandler;

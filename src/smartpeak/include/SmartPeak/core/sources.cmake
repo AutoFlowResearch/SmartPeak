@@ -10,7 +10,9 @@ set(sources_list_h
 	ConsoleHandler.h
 	EventDispatcher.h
 	Filenames.h
-  FeaturesObservable.h
+	FeaturesObservable.h
+	FeatureFiltersUtils.h
+	FeatureFiltersUtilsMode.h
 	FeatureMetadata.h
 	Helloworld.h
 	InjectionHandler.h
@@ -33,6 +35,7 @@ set(sources_list_h
 	SequenceSegmentProcessor.h
 	SequenceSegmentProcessorObservable.h
 	SessionHandler.h
+	SessionLoaderGenerator.h
 	SharedProcessors.h
 	TransitionsObservable.h
 	Utilities.h

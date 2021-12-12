@@ -3,10 +3,12 @@ set(directory source/core)
 
 ### list all filenames of the directory here
 set(sources_list
+	ApplicationHandler.cpp
 	ApplicationProcessor.cpp
 	CastValue.cpp
 	ConsoleHandler.cpp
 	EventDispatcher.cpp
+	FeatureFiltersUtils.cpp
 	FeatureMetadata.cpp
 	Filenames.cpp
 	Helloworld.cpp
@@ -15,15 +17,14 @@ set(sources_list
 	Parameters.cpp
 	ProgessInfo.cpp
 	RawDataHandler.cpp
-	RawDataProcessor.cpp
 	SampleGroupHandler.cpp
-	SampleGroupProcessor.cpp
 	SampleType.cpp
 	SequenceHandler.cpp
 	SequenceProcessor.cpp
 	SequenceSegmentHandler.cpp
 	SequenceSegmentProcessor.cpp
 	SessionHandler.cpp
+	SessionLoaderGenerator.cpp
 	SharedProcessors.cpp
 	Utilities.cpp
 	WorkflowManager.cpp

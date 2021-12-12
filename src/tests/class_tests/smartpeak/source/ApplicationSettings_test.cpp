@@ -17,7 +17,7 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Krzysztof Abram $
+// $Maintainer: Krzysztof Abram, Douglas McCloskey $
 // $Authors: Douglas McCloskey $
 // --------------------------------------------------------------------------
 
@@ -96,7 +96,11 @@ TEST_F(ApplicationSettingsFixture, ApplicationSettings_define_options)
     EXPECT_TRUE(option_exists<std::vector<std::string>>("rt"));
     EXPECT_TRUE(option_exists<std::vector<std::string>>("rm"));
     EXPECT_TRUE(option_exists<std::vector<std::string>>("w"));
-    EXPECT_TRUE(option_exists<std::vector<std::string>>("i"));
+    EXPECT_TRUE(option_exists<std::vector<std::string>>("t"));
+    EXPECT_TRUE(option_exists<std::string>("o"));
+    EXPECT_TRUE(option_exists<std::string>("i"));
+    EXPECT_TRUE(option_exists<std::vector<std::string>>("p"));
+    EXPECT_TRUE(option_exists<std::vector<std::string>>("f"));
     EXPECT_TRUE(option_exists<bool>("a"));
     EXPECT_TRUE(option_exists<bool>("v"));
     EXPECT_TRUE(option_exists<bool>("d"));
@@ -268,4 +272,24 @@ TEST_F(ApplicationSettingsFixture, ApplicationSettings_validate_integrity)
         });
     application_settings.integrity = std::vector<std::string>{"ASDFG", "COMP_GROUP"};
     EXPECT_THROW(application_settings.validate_integrity(), std::invalid_argument);
+}
+
+TEST_F(ApplicationSettingsFixture, ApplicationSettings_get_key_value_from_option)
+{
+  auto& application_settings = get_application_settings();
+
+  // one value
+  auto split_options_1 = application_settings.get_key_value_from_option("key1=value1");
+  std::pair<std::string, std::string> expected_split_options_1 = { std::string("key1"), std::string("value1") };
+  EXPECT_EQ(split_options_1, expected_split_options_1);
+
+  // empty
+  auto split_options_3 = application_settings.get_key_value_from_option("");
+  std::pair<std::string, std::string> expected_split_options_3 = { };
+  EXPECT_EQ(split_options_3, expected_split_options_3);
+
+  // surrounding quotes
+  auto split_options_4 = application_settings.get_key_value_from_option("key1=\"value1\"");
+  std::pair<std::string, std::string> expected_split_options_4 = { std::string("key1"), std::string("value1") };
+  EXPECT_EQ(split_options_4, expected_split_options_4);
 }

@@ -26,6 +26,10 @@
 #include <SmartPeak/io/InputDataValidation.h>
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/SequenceProcessor.h>
+#include <SmartPeak/core/Utilities.h>
+#include <SmartPeak/core/RawDataProcessors/LoadTransitions.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/LoadQuantitationMethods.h>
+#include <SmartPeak/core/ApplicationProcessors/LoadSession.h>
 
 using namespace SmartPeak;
 using namespace std;
@@ -115,11 +119,12 @@ TEST(InputDataValidation, findMissingNames)
 
 TEST(InputDataValidation, sampleNamesAreConsistent)
 {
-  SequenceHandler sequenceHandler;
-  Filenames filenames;
-  filenames.setTag(Filenames::Tag::MAIN_DIR, main_dir);
-  CreateSequence cs(sequenceHandler);
-  cs.filenames_          = filenames;
+  ApplicationHandler application_handler;
+  application_handler.filenames_ = Utilities::buildFilenamesFromDirectory(application_handler, main_dir);
+  WorkflowManager workflow_manager;
+  LoadSession cs(application_handler, workflow_manager);
+  auto& sequenceHandler = application_handler.sequenceHandler_;
+  cs.filenames_          = application_handler.filenames_;
   cs.delimiter          = ",";
   cs.checkConsistency   = false;
   cs.process();
@@ -129,10 +134,10 @@ TEST(InputDataValidation, sampleNamesAreConsistent)
   result = InputDataValidation::sampleNamesAreConsistent(sequenceHandler);
   EXPECT_TRUE(result);
 
-  filenames.setFullPath("sequence_csv_i", main_dir + "/sequence_missing.csv");
+  application_handler.filenames_.setFullPath("sequence", main_dir + "/sequence_missing.csv");
   sequenceHandler.clear();
 
-  cs.filenames_ = filenames;
+  cs.filenames_ = application_handler.filenames_;
   cs.process();
 
   result = InputDataValidation::sampleNamesAreConsistent(sequenceHandler);
@@ -141,12 +146,12 @@ TEST(InputDataValidation, sampleNamesAreConsistent)
 
 TEST(InputDataValidation, componentNamesAreConsistent)
 {
-  SequenceHandler sequenceHandler;
-  Filenames filenames;
-  filenames.setTag(Filenames::Tag::MAIN_DIR, main_dir);
-
-  CreateSequence cs(sequenceHandler);
-  cs.filenames_          = filenames;
+  ApplicationHandler application_handler;
+  application_handler.filenames_ = Utilities::buildFilenamesFromDirectory(application_handler, main_dir);
+  WorkflowManager workflow_manager;
+  LoadSession cs(application_handler, workflow_manager);
+  auto& sequenceHandler = application_handler.sequenceHandler_;
+  cs.filenames_          = application_handler.filenames_;
   cs.delimiter          = ",";
   cs.checkConsistency   = false;
   cs.process();
@@ -156,11 +161,11 @@ TEST(InputDataValidation, componentNamesAreConsistent)
   result = InputDataValidation::componentNamesAreConsistent(sequenceHandler);
   EXPECT_TRUE(result);
 
-  filenames.setFullPath("traML_csv_i", main_dir + "/traML_missing.csv");
+  application_handler.filenames_.setFullPath("traML", main_dir + "/traML_missing.csv");
   // SequenceProcessor::createSequence(sequenceHandler, filenames, ",", false);
   RawDataHandler& rawData0 = sequenceHandler.getSequence().front().getRawData();
   LoadTransitions loadTransitions;
-  loadTransitions.process(rawData0, {}, filenames);
+  loadTransitions.process(rawData0, {}, application_handler.filenames_);
 
   result = InputDataValidation::componentNamesAreConsistent(sequenceHandler);
   EXPECT_FALSE(result);
@@ -168,12 +173,12 @@ TEST(InputDataValidation, componentNamesAreConsistent)
 
 TEST(InputDataValidation, componentNameGroupsAreConsistent)
 {
-  SequenceHandler sequenceHandler;
-  Filenames filenames;
-  filenames.setTag(Filenames::Tag::MAIN_DIR, main_dir);
-
-  CreateSequence cs(sequenceHandler);
-  cs.filenames_          = filenames;
+  ApplicationHandler application_handler;
+  application_handler.filenames_ = Utilities::buildFilenamesFromDirectory(application_handler, main_dir);
+  WorkflowManager workflow_manager;
+  LoadSession cs(application_handler, workflow_manager);
+  auto& sequenceHandler = application_handler.sequenceHandler_;
+  cs.filenames_          = application_handler.filenames_;
   cs.delimiter          = ",";
   cs.checkConsistency   = false;
   cs.process();
@@ -183,11 +188,11 @@ TEST(InputDataValidation, componentNameGroupsAreConsistent)
   result = InputDataValidation::componentNameGroupsAreConsistent(sequenceHandler);
   EXPECT_TRUE(result);
 
-  filenames.setFullPath("traML_csv_i", main_dir + "/traML_missing.csv");
+  application_handler.filenames_.setFullPath("traML", main_dir + "/traML_missing.csv");
   //SequenceProcessor::createSequence(sequenceHandler, filenames, ",", false);
   RawDataHandler& rawData0 = sequenceHandler.getSequence().front().getRawData();
   LoadTransitions loadTransitions;
-  loadTransitions.process(rawData0, {}, filenames);
+  loadTransitions.process(rawData0, {}, application_handler.filenames_);
 
   result = InputDataValidation::componentNameGroupsAreConsistent(sequenceHandler);
   EXPECT_FALSE(result);
@@ -195,12 +200,12 @@ TEST(InputDataValidation, componentNameGroupsAreConsistent)
 
 TEST(InputDataValidation, heavyComponentsAreConsistent)
 {
-  SequenceHandler sequenceHandler;
-  Filenames filenames;
-  filenames.setTag(Filenames::Tag::MAIN_DIR, main_dir);
-
-  CreateSequence cs(sequenceHandler);
-  cs.filenames_          = filenames;
+  ApplicationHandler application_handler;
+  WorkflowManager workflow_manager;
+  application_handler.filenames_ = Utilities::buildFilenamesFromDirectory(application_handler, main_dir);
+  LoadSession cs(application_handler, workflow_manager);
+  auto& sequenceHandler = application_handler.sequenceHandler_;
+  cs.filenames_          = application_handler.filenames_;
   cs.delimiter          = ",";
   cs.checkConsistency   = false;
   cs.process();
@@ -210,11 +215,11 @@ TEST(InputDataValidation, heavyComponentsAreConsistent)
   result = InputDataValidation::heavyComponentsAreConsistent(sequenceHandler);
   EXPECT_TRUE(result);
 
-  filenames.setFullPath("quantitationMethods_csv_i", main_dir + "/quantitationMethods_missing.csv");
+  application_handler.filenames_.setFullPath("quantitationMethods", main_dir + "/quantitationMethods_missing.csv");
   //SequenceProcessor::createSequence(sequenceHandler, filenames, ",", false);
   SequenceSegmentHandler& seqSeg0 = sequenceHandler.getSequenceSegments().front();
   LoadQuantitationMethods loadQuantitationMethods;
-  loadQuantitationMethods.process(seqSeg0, SequenceHandler(), {}, filenames);
+  loadQuantitationMethods.process(seqSeg0, SequenceHandler(), {}, application_handler.filenames_);
 
   result = InputDataValidation::heavyComponentsAreConsistent(sequenceHandler);
   EXPECT_FALSE(result); // g6p.g6p_2.Heavy is missing
@@ -223,37 +228,41 @@ TEST(InputDataValidation, heavyComponentsAreConsistent)
 TEST(InputDataValidation, prepareToLoad)
 {
   Filenames filenames;
-  filenames.setFullPath("quantitationMethods_csv_i", main_dir + "/quantitationMethods_missing.csv");
+  filenames.setFullPath("quantitationMethods", main_dir + "/quantitationMethods_missing.csv");
   filenames.setFullPath("non_existing_file", main_dir + "/non_existing_file.csv");
-  EXPECT_TRUE(InputDataValidation::prepareToLoad(filenames, "quantitationMethods_csv_i"));
+  EXPECT_TRUE(InputDataValidation::prepareToLoad(filenames, "quantitationMethods"));
   EXPECT_FALSE(InputDataValidation::prepareToLoad(filenames, "non_existing_file"));
 }
 
 TEST(InputDataValidation, prepareToLoadOneOfTwo)
 {
   Filenames filenames;
-  filenames.setFullPath("quantitationMethods_csv_i", main_dir + "/quantitationMethods_missing.csv");
+  filenames.setFullPath("existing_file", main_dir + "/quantitationMethods_missing.csv");
+  filenames.setFullPath("non_existing_file", main_dir + "/non_existing_file.csv");
   filenames.setFullPath("empty_file", "");
   filenames.setFullPath("another_empty_file", "");
-  EXPECT_TRUE(InputDataValidation::prepareToLoadOneOfTwo(filenames, "quantitationMethods_csv_i", "empty_file"));
+  EXPECT_TRUE(InputDataValidation::prepareToLoadOneOfTwo(filenames, "existing_file", "empty_file"));
+  EXPECT_TRUE(InputDataValidation::prepareToLoadOneOfTwo(filenames, "empty_file", "existing_file"));
   EXPECT_FALSE(InputDataValidation::prepareToLoadOneOfTwo(filenames, "empty_file", "another_empty_file"));
+  EXPECT_TRUE(InputDataValidation::prepareToLoadOneOfTwo(filenames, "non_existing_file", "existing_file"));
+  EXPECT_TRUE(InputDataValidation::prepareToLoadOneOfTwo(filenames, "existing_file", "non_existing_file"));
 }
 
 TEST(InputDataValidation, prepareToStore)
 {
   Filenames filenames;
-  filenames.setFullPath("quantitationMethods_csv_i", main_dir + "/quantitationMethods_missing.csv");
+  filenames.setFullPath("quantitationMethods", main_dir + "/quantitationMethods_missing.csv");
+  EXPECT_TRUE(InputDataValidation::prepareToStore(filenames, "quantitationMethods"));
   filenames.setFullPath("empty_file", "");
-  EXPECT_TRUE(InputDataValidation::prepareToStore(filenames, "quantitationMethods_csv_i"));
   EXPECT_FALSE(InputDataValidation::prepareToStore(filenames, "empty_file"));
 }
 
 TEST(InputDataValidation, prepareToStoreOneOfTwo)
 {
   Filenames filenames;
-  filenames.setFullPath("quantitationMethods_csv_i", main_dir + "/quantitationMethods_missing.csv");
+  filenames.setFullPath("quantitationMethods", main_dir + "/quantitationMethods_missing.csv");
   filenames.setFullPath("empty_file", "");
   filenames.setFullPath("another_empty_file", "");
-  EXPECT_TRUE(InputDataValidation::prepareToStoreOneOfTwo(filenames, "quantitationMethods_csv_i", "empty_file"));
+  EXPECT_TRUE(InputDataValidation::prepareToStoreOneOfTwo(filenames, "quantitationMethods", "empty_file"));
   EXPECT_FALSE(InputDataValidation::prepareToStoreOneOfTwo(filenames, "empty_file", "another_empty_file"));
 }

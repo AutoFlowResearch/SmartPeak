@@ -7,6 +7,7 @@ set(sources_list
 	ParametersParser.cpp
 	SelectDilutionsParser.cpp
 	SequenceParser.cpp
+	SessionDB.cpp
 	InputDataValidation.cpp
 )
 

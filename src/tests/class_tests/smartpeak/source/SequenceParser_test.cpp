@@ -26,9 +26,14 @@
 #include <SmartPeak/test_config.h>
 #include <SmartPeak/io/SequenceParser.h>
 #include <SmartPeak/core/MetaDataHandler.h>
-#include <SmartPeak/core/RawDataProcessor.h>
 #include <SmartPeak/core/SampleType.h>
 #include <SmartPeak/core/ApplicationHandler.h>
+#include <SmartPeak/core/RawDataProcessors/LoadFeatures.h>
+
+#ifndef CSV_IO_NO_THREAD
+#define CSV_IO_NO_THREAD
+#endif
+#include <SmartPeak/io/csv.h>
 
 using namespace SmartPeak;
 using namespace std;

@@ -75,6 +75,13 @@ namespace SmartPeak
         observer->onApplicationProcessorEnd();
       }
     }
+    void notifyApplicationProcessorError(const std::string& error)
+    {
+      for (auto& observer : observers_)
+      {
+        observer->onApplicationProcessorError(error);
+      }
+    }
   protected:
     std::vector<IApplicationProcessorObserver*> observers_;
   };
