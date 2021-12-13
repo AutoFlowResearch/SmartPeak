@@ -375,10 +375,12 @@ int main(int argc, char** argv)
   SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
-  SDL_DisplayMode current;
-  SDL_GetCurrentDisplayMode(0, &current);
+  SDL_DisplayMode display_mode;
+  SDL_GetCurrentDisplayMode(0, &display_mode);
+  auto starting_window_width = display_mode.w * 0.75;
+  auto starting_window_height = display_mode.h * 0.75;
   SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
-  SDL_Window* window = SDL_CreateWindow(getMainWindowTitle(application_handler_).c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, window_flags);
+  SDL_Window* window = SDL_CreateWindow(getMainWindowTitle(application_handler_).c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, starting_window_width, starting_window_height, window_flags);
   SDL_GLContext gl_context = SDL_GL_CreateContext(window);
   SDL_GL_SetSwapInterval(1); // Enable vsync
 
@@ -541,6 +543,10 @@ int main(int argc, char** argv)
             }
           }
           ImGui::EndMenu();
+        }
+        ImGui::Separator();
+        if (ImGui::MenuItem("Exit")) {
+          done = true;
         }
         ImGui::EndMenu();
         showQuickHelpToolTip("export_file");
