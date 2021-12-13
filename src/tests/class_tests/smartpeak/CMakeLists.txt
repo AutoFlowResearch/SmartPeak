@@ -1,4 +1,25 @@
-
+# --------------------------------------------------------------------------
+#   SmartPeak -- Fast and Accurate CE-, GC- and LC-MS(/MS) Data Processing
+# --------------------------------------------------------------------------
+# Copyright The SmartPeak Team -- Novo Nordisk Foundation 
+# Center for Biosustainability, Technical University of Denmark 2018-2022.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL ANY OF THE AUTHORS OR THE CONTRIBUTING
+# INSTITUTIONS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+# EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+# PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+# OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+# OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+# ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+# --------------------------------------------------------------------------
+# $Maintainer: Ahmed Khalil, Bertrand Boudaud $
+# $Authors: Douglas McCloskey $
+# --------------------------------------------------------------------------
 
 cmake_minimum_required(VERSION 3.8.2 FATAL_ERROR)
 project("SmartPeak_class_tests_smartpeak")
@@ -55,6 +76,28 @@ endif()
 #------------------------------------------------------------------------------
 # get the test executables
 include(executables.cmake)
+
+#------------------------------------------------------------------------------
+# googletest
+include(FetchContent)
+FetchContent_Declare(
+  googletest
+  GIT_REPOSITORY https://github.com/google/googletest.git
+  GIT_TAG release-1.10.0
+)
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(googletest)
+
+include(FetchContent)
+if(NOT googletest_POPULATED)
+  FetchContent_Populate(googletest)
+  add_subdirectory(
+    ${googletest_SOURCE_DIR}
+    ${googletest_BINARY_DIR}
+  )
+endif()
+include(GoogleTest)
+
 #------------------------------------------------------------------------------
 # Include directories for tests
 set(SMARTPEAK_CLASS_TESTS_INTERNAL_INCLUDE_DIRECTORIES "${PROJECT_BINARY_DIR}/include/")
