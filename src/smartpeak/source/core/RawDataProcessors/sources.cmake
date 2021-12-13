@@ -38,6 +38,7 @@ set(sources_list
 	QuantifyFeatures.cpp
 	SearchAccurateMass.cpp
 	SearchSpectrum.cpp
+	SearchSpectrumAndKeepUnknown.cpp
 	SelectFeatures.cpp
 	StoreAnnotations.cpp
 	StoreFeatureFiltersRDP.cpp
