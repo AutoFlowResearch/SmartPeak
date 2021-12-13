@@ -30,7 +30,7 @@
 #include <plog/Appenders/ConsoleAppender.h>
 #include <plog/Appenders/ColorConsoleAppender.h>
 
-#include <SmartPeak/ui/GuiAppender.h>
+#include <SmartPeak/core/Server.h>
 
 
 namespace SmartPeak {
@@ -179,7 +179,7 @@ private:
     std::shared_ptr<plog::ConsoleAppender<plog::TxtFormatter>> m_console_appender;
   
 public:
-    GuiAppender gui_appender_;
+    serv::ServerAppender server_appender_;
 };
 
 } /* namespace SmartPeak */

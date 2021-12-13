@@ -696,15 +696,6 @@ int main(int argc, char** argv)
       
       ImGui::EndMainMenuBar();
     }
-
-    // ======================================
-    // Window size computation
-    // ======================================
-    bool show_top_window_ = std::find_if(top_windows.begin(), top_windows.end(), [](const auto& w) { return w->visible_; }) != top_windows.end();
-    bool show_bottom_window_ = std::find_if(bottom_windows.begin(), bottom_windows.end(), [](const auto& w) { return w->visible_; }) != bottom_windows.end();
-    bool show_left_window_ = std::find_if(left_windows.begin(), left_windows.end(), [](const auto& w) { return w->visible_; }) != left_windows.end();
-    bool show_right_window_ = false;
-    win_size_and_pos.setWindowSizesAndPositions(show_top_window_, show_bottom_window_, show_left_window_, show_right_window_);
       
     // ======================================
     // Server-Side Execution
@@ -712,7 +703,7 @@ int main(int argc, char** argv)
       if (run_workflow_widget_->server_fields_set)
       {
         WorkflowClient workflow_client(grpc::CreateChannel(run_workflow_widget_->server_url, grpc::InsecureChannelCredentials()));
-        std::string workflow_status = workflow_client.runWorkflow(application_handler_.filenames_.getTag(Filenames::Tag::MAIN_DIR));
+        std::string workflow_status = workflow_client.runWorkflow(application_handler_.filenames_.getTagValue(Filenames::Tag::MAIN_DIR));
         workflow_client.getLogstream();
         LOGI << "GUI workflow status : " << workflow_status << std::endl;
         ::serv::loadRawDataAndFeatures(application_handler_, session_handler_, workflow_manager_, event_dispatcher);

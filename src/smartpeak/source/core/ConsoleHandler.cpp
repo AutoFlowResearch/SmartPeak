@@ -131,11 +131,11 @@ namespace SmartPeak {
     }
     if (nullptr == m_file_appender)
     {
-      plog::init(plog::debug, m_console_appender.get()).addAppender(&gui_appender_);
+      plog::init(plog::debug, m_console_appender.get()).addAppender(&server_appender_);
     }
     else
     {
-      plog::init(plog::debug, m_file_appender.get()).addAppender(m_console_appender.get()).addAppender(&gui_appender_);
+      plog::init(plog::debug, m_file_appender.get()).addAppender(m_console_appender.get()).addAppender(&server_appender_);
     }
   }
 

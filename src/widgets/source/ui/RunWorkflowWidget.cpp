@@ -146,10 +146,9 @@ namespace SmartPeak
       }
       if (run_workflow_clicked && !server_url.empty() && run_on_server)
       {
-        application_handler_.mzML_dir_ = mzML_dir_edit_;
-        application_handler_.features_in_dir_ = features_in_dir_edit_;
-        application_handler_.features_out_dir_ = features_out_dir_edit_;
-
+        application_handler_.filenames_.setTagValue(Filenames::Tag::MZML_INPUT_PATH, mzML_dir_edit_);
+        application_handler_.filenames_.setTagValue(Filenames::Tag::FEATURES_INPUT_PATH, features_in_dir_edit_);
+        application_handler_.filenames_.setTagValue(Filenames::Tag::FEATURES_OUTPUT_PATH, features_out_dir_edit_);
         
         server_fields_set = true;
         visible_ = false;

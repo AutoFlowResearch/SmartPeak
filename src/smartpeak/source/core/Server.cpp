@@ -27,6 +27,30 @@
 namespace SmartPeak {
   namespace serv {
   
+    void ServerAppender::write(const plog::Record& record)
+    {
+      std::ostringstream ss;
+      ss << PLOG_NSTR("[") << record.getFunc() << PLOG_NSTR("@") << record.getLine() << PLOG_NSTR("] ");
+      ss << record.getMessage() << PLOG_NSTR("\n");
+      
+      plog::util::nstring str = ss.str();
+      std::lock_guard<std::mutex> g(messages_mutex);
+      messages.emplace_back(record.getSeverity(), str);
+    }
+
+    std::vector<ServerAppender::ServerAppenderRecord> ServerAppender::getAppenderRecordList(plog::Severity severity)
+    {
+      std::vector<ServerAppender::ServerAppenderRecord> filtered;
+      std::lock_guard<std::mutex> g(messages_mutex);
+      for (const ServerAppender::ServerAppenderRecord& p : messages) {
+        if (p.first <= severity) {
+          filtered.push_back(p);
+        }
+      }
+      messages.clear();
+      return filtered;
+    }
+  
     bool contains_option(
       const std::vector<std::string>& list,
       const std::string& option,
@@ -99,18 +123,24 @@ namespace SmartPeak {
 
     bool handleWorkflowRequest(ServerManager* application_manager, bool all_reports)
     {
-      bool job_done = false;
+      bool job_done = true;
+      if (!std::filesystem::exists(std::filesystem::path(application_manager->dataset_path))) {
+        LOGE << "No data set found at the given path : " << application_manager->dataset_path;
+        LOGE << "Aborting!";
+        return false;
+      }
       LOGI << ">> SmartPeak Server is processing : " << application_manager->dataset_path;
 
       try
       {
         auto& application_handler = application_manager->get_application_handler();
-        SmartPeak::LoadSession create_sequence(application_handler);
+        auto& workflow_manager = application_manager->get_workflow_manager();
+        SmartPeak::LoadSession create_sequence(application_handler, workflow_manager);
         if (std::filesystem::is_regular_file(application_manager->dataset_path)) {
           create_sequence.onFilePicked(application_manager->dataset_path, &application_handler);
         } else {
           Filenames filenames_main = Utilities::buildFilenamesFromDirectory(application_handler, application_manager->dataset_path);
-          application_handler.main_dir_ = filenames_main.getTag(Filenames::Tag::MAIN_DIR);
+          application_handler.main_dir_ = filenames_main.getTagValue(Filenames::Tag::MAIN_DIR);
           create_sequence.filenames_ = filenames_main;
           create_sequence.process();
         }
@@ -120,26 +150,27 @@ namespace SmartPeak {
         {
           mzml_dir = (application_handler.main_dir_ / mzml_dir).lexically_normal();
         }
-        application_handler.mzML_dir_ = mzml_dir;
+        application_handler.filenames_.setTagValue(Filenames::Tag::MZML_INPUT_PATH, mzml_dir.generic_string());
 
         std::filesystem::path features_out_dir = application_manager->features_out_dir;
         if (features_out_dir.is_relative())
         {
           features_out_dir = (application_handler.main_dir_ / features_out_dir).lexically_normal();
         }
-        application_handler.features_out_dir_ = features_out_dir;
+        application_handler.filenames_.setTagValue(Filenames::Tag::FEATURES_OUTPUT_PATH, features_out_dir.generic_string());
 
         std::filesystem::path features_in_dir = application_manager->features_in_dir;
         if (features_in_dir.is_relative())
         {
           features_in_dir = (application_handler.main_dir_ / features_in_dir).lexically_normal();
         }
-        application_handler.features_in_dir_ = features_in_dir;
+        application_handler.filenames_.setTagValue(Filenames::Tag::FEATURES_INPUT_PATH, features_in_dir.generic_string());
+
 
         auto paths = {
-            application_handler.mzML_dir_,
-            application_handler.features_in_dir_,
-            application_handler.features_out_dir_
+          application_handler.filenames_.getTagValue(Filenames::Tag::MZML_INPUT_PATH),
+          application_handler.filenames_.getTagValue(Filenames::Tag::FEATURES_INPUT_PATH),
+          application_handler.filenames_.getTagValue(Filenames::Tag::FEATURES_OUTPUT_PATH)
         };
         auto current_path = std::filesystem::path{};
         try
@@ -152,6 +183,7 @@ namespace SmartPeak {
         }
         catch (std::filesystem::filesystem_error& fe)
         {
+          job_done &= false;
           if (fe.code() == std::errc::permission_denied) {
             LOG_ERROR
               << static_cast<std::ostringstream&&>(std::ostringstream()
@@ -177,22 +209,21 @@ namespace SmartPeak {
         if (!buildCommandsFromNames.process())
         {
           LOG_ERROR << "Failed to create workflow commands, abort.";
-          job_done = false;
+          job_done &= false;
         }
         const auto workflow_commands = buildCommandsFromNames.commands_;
         for (auto& cmd : buildCommandsFromNames.commands_)
         {
           for (auto& p : cmd.dynamic_filenames)
           {
-            p.second.setTag(SmartPeak::Filenames::Tag::MAIN_DIR, application_handler.main_dir_.generic_string());
-            p.second.setTag(SmartPeak::Filenames::Tag::MZML_INPUT_PATH, application_handler.mzML_dir_.generic_string());
-            p.second.setTag(SmartPeak::Filenames::Tag::FEATURES_INPUT_PATH, application_handler.features_in_dir_.generic_string());
-            p.second.setTag(SmartPeak::Filenames::Tag::FEATURES_OUTPUT_PATH, application_handler.features_out_dir_.generic_string());
+            p.second.setTagValue(Filenames::Tag::MAIN_DIR, application_handler.main_dir_.generic_string());
+                      p.second.setTagValue(Filenames::Tag::MZML_INPUT_PATH, application_handler.filenames_.getTagValue(Filenames::Tag::MZML_INPUT_PATH));
+                      p.second.setTagValue(Filenames::Tag::FEATURES_INPUT_PATH, application_handler.filenames_.getTagValue(Filenames::Tag::FEATURES_INPUT_PATH));
+                      p.second.setTagValue(Filenames::Tag::FEATURES_OUTPUT_PATH, application_handler.filenames_.getTagValue(Filenames::Tag::FEATURES_OUTPUT_PATH));
           }
         }
         
         auto& session_handler = application_manager->get_session_handler();
-        auto& workflow_manager = application_manager->get_workflow_manager();
         auto& event_dispatcher = application_manager->get_event_dispatcher();
         try
         {
@@ -208,7 +239,7 @@ namespace SmartPeak {
         catch(const std::exception& e)
         {
           LOG_ERROR << e.what();
-          job_done = false;
+          job_done &= false;
         }
         
         try
@@ -229,6 +260,7 @@ namespace SmartPeak {
               !std::filesystem::create_directories(std::filesystem::path(reports_out_dir)))
           {
             LOGE << "Failed to create output report directory: " << reports_out_dir.generic_string();
+            job_done &= false;
           }
 
           if (feature_db)
@@ -249,24 +281,25 @@ namespace SmartPeak {
               report_metadata, report_sample_types);
           }
 
-          job_done = true;
+          job_done &= true;
         }
         catch(const std::exception& e)
         {
           LOG_ERROR << e.what();
-          job_done = false;
+          job_done &= false;
         }
       }
       catch(const std::exception& e)
       {
         LOG_ERROR << e.what();
+        job_done &= false;
       }
 
       LOGI << " Server : Workflow finished : " << (job_done ? "YES" : "NO") << std::endl;
       LOGI << " Server : Waiting for jobs .. " << std::endl;
       return job_done;
     }
-  
+
     void loadRawDataAndFeatures(ApplicationHandler& application_handler, SessionHandler& session_handler,
                                 WorkflowManager& workflow_manager, EventDispatcher& event_dispatcher)
     {
@@ -277,9 +310,10 @@ namespace SmartPeak {
       } else {
         for (auto& cmd : buildCommandsFromNames.commands_) {
           for (auto& p : cmd.dynamic_filenames) {
-            p.second.setTag(Filenames::Tag::MZML_INPUT_PATH, application_handler.mzML_dir_.generic_string());
-            p.second.setTag(Filenames::Tag::FEATURES_INPUT_PATH, application_handler.features_in_dir_.generic_string());
-            p.second.setTag(Filenames::Tag::FEATURES_OUTPUT_PATH, application_handler.features_out_dir_.generic_string());
+            p.second.setTagValue(Filenames::Tag::MAIN_DIR, application_handler.main_dir_.generic_string());
+            p.second.setTagValue(Filenames::Tag::MZML_INPUT_PATH, application_handler.filenames_.getTagValue(Filenames::Tag::MZML_INPUT_PATH));
+            p.second.setTagValue(Filenames::Tag::FEATURES_INPUT_PATH, application_handler.filenames_.getTagValue(Filenames::Tag::FEATURES_INPUT_PATH));
+            p.second.setTagValue(Filenames::Tag::FEATURES_OUTPUT_PATH, application_handler.filenames_.getTagValue(Filenames::Tag::FEATURES_OUTPUT_PATH));
           }
         }
         const std::set<std::string> injection_names = session_handler.getSelectInjectionNamesWorkflow(application_handler.sequenceHandler_);

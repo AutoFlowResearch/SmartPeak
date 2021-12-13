@@ -24,7 +24,6 @@
 #include <SmartPeak/io/SequenceParser.h>
 #include <SmartPeak/io/InputDataValidation.h>
 
-#include <SmartPeak/core/ConsoleHandler.h>
 #include <SmartPeak/core/ApplicationHandler.h>
 #include <SmartPeak/core/SessionHandler.h>
 #include <SmartPeak/core/WorkflowManager.h>
@@ -34,16 +33,18 @@
 #include <SmartPeak/core/SequenceProcessor.h>
 #include <SmartPeak/core/FeatureMetadata.h>
 #include <SmartPeak/core/SharedProcessors.h>
+#include <SmartPeak/core/ApplicationProcessors/LoadSession.h>
+#include <SmartPeak/core/ApplicationProcessors/BuildCommandsFromNames.h>
 
 #include <SmartPeak/iface/IApplicationProcessorObserver.h>
 #include <SmartPeak/iface/ISequenceProcessorObserver.h>
 #include <SmartPeak/iface/ISampleGroupProcessorObserver.h>
 #include <SmartPeak/iface/ISequenceSegmentProcessorObserver.h>
 
-#include <SmartPeak/ui/GuiAppender.h>
 #include <plog/Log.h>
 
 #include <iostream>
+#include <mutex>
 #include <algorithm>
 #include <vector>
 #include <memory>
@@ -54,6 +55,21 @@
 
 namespace SmartPeak {
   namespace serv {
+  
+    class ServerAppender : public plog::IAppender
+    {
+    public:
+      typedef std::pair<plog::Severity, plog::util::nstring> ServerAppenderRecord;
+      
+      void write(const plog::Record& record) override;
+      
+      std::vector<ServerAppenderRecord> getAppenderRecordList(plog::Severity severity);
+
+    private:
+      std::vector<ServerAppenderRecord> messages;
+      mutable std::mutex messages_mutex;
+    };
+  
     class ServerManager {
     public:
       /**
@@ -104,7 +120,7 @@ namespace SmartPeak {
       EventDispatcher event_dispatcher_;
       std::shared_ptr<ProgressInfo> progress_info_ptr_;
       std::vector<ApplicationHandler::Command> commands_;
-      std::shared_ptr<GuiAppender> gui_appender_;
+      std::shared_ptr<serv::ServerAppender> server_appender_;
     };
 
     void extract_report_sampletypes(

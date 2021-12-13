@@ -22,6 +22,7 @@
 // --------------------------------------------------------------------------
 
 #include <SmartPeak/core/Server.h>
+#include <SmartPeak/core/ConsoleHandler.h>
 
 #include "workflow_grpc.h"
 #include <grpcpp/grpcpp.h>
@@ -113,7 +114,7 @@ public:
                               const ::SmartPeakServer::InquireLogs* request,
                               ::grpc::ServerWriter<::SmartPeakServer::LogStream>* writer) override
   {
-    auto logstream = console_handler_->gui_appender_.getAppenderRecordList(plog::debug);
+    auto logstream = console_handler_->server_appender_.getAppenderRecordList(plog::debug);
     auto nr_lines = request->nr_lines();
     int message_list_start = (logstream.size() > nr_lines) ? logstream.size() - nr_lines : 0;
     for (int i = message_list_start; i < logstream.size(); ++i)
