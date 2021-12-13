@@ -86,10 +86,8 @@ namespace SmartPeak
 
     // Store - we want to store MS1 and the associated MS2 features 
     OpenMS::Param oms_params = targeted_spectra_extractor.getParameters();
-    oms_params.setValue("output_format", "traML");
     oms_params.setValue("deisotoping:use_deisotoper", "true");
     targeted_spectra_extractor.setParameters(oms_params);
-    LOGI << "Storing: " << filenames_I.getFullPath("output_traML").generic_string();
     OpenMS::TargetedExperiment t_exp;
     auto ms1_merged_features = rawDataHandler_IO.getFeatureMap("ms1_merged_features");
     targeted_spectra_extractor.constructTransitionsList(ms1_merged_features, ms2_merged_features, t_exp);
@@ -103,12 +101,14 @@ namespace SmartPeak
 
     if (transition_file_format->getValueAsString() == "traML")
     {
+      LOGI << "Storing: " << filenames_I.getFullPath("output_traML").generic_string();
       auto transitions_filename = filenames_I.getFullPath("output_transitions_traML").generic_string();
       OpenMS::TraMLFile traml_file;
       traml_file.store(transitions_filename, t_exp);
     }
     else if (transition_file_format->getValueAsString() == "csv")
     {
+      LOGI << "Storing: " << filenames_I.getFullPath("output_transitions_csv").generic_string();
       auto transitions_filename = filenames_I.getFullPath("output_transitions_csv").generic_string();
       OpenMS::TransitionTSVFile transition_tsv_file;
       transition_tsv_file.convertTargetedExperimentToTSV(transitions_filename.c_str(), t_exp);
