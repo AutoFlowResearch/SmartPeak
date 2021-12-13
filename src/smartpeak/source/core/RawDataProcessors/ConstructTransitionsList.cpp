@@ -78,23 +78,11 @@ namespace SmartPeak
     // Complete user parameters with schema
     ParameterSet params(params_I);
     params.merge(getParameterSchema());
-    std::filesystem::path main_path(filenames_I.getTagValue(Filenames::Tag::MAIN_DIR));
-    Utilities::prepareFileParameterList(params, "TargetedSpectraExtractor", "AccurateMassSearchEngine:db:mapping", main_path);
-    Utilities::prepareFileParameterList(params, "TargetedSpectraExtractor", "AccurateMassSearchEngine:db:struct", main_path);
-    Utilities::prepareFileParameter(params, "TargetedSpectraExtractor", "AccurateMassSearchEngine:positive_adducts", main_path);
-    Utilities::prepareFileParameter(params, "TargetedSpectraExtractor", "AccurateMassSearchEngine:negative_adducts", main_path);
 
     OpenMS::TargetedSpectraExtractor targeted_spectra_extractor;
     Utilities::setUserParameters(targeted_spectra_extractor, params);
 
-    // searchSpectra (will be on MS2 spectra)
-    OpenMS::FeatureMap ms2_accurate_mass_found_feature_map;
-    auto selected_features = rawDataHandler_IO.getFeatureMap();
-    targeted_spectra_extractor.searchSpectrum(selected_features, ms2_accurate_mass_found_feature_map, true);
-
-    // merge features again (on MS2 spectra features)
-    OpenMS::FeatureMap ms2_merged_features;
-    targeted_spectra_extractor.mergeFeatures(ms2_accurate_mass_found_feature_map, ms2_merged_features);
+    const auto& ms2_merged_features = rawDataHandler_IO.getFeatureMap();
 
     // Store - we want to store MS1 and the associated MS2 features 
     OpenMS::Param oms_params = targeted_spectra_extractor.getParameters();

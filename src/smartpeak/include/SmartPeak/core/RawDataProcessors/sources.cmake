@@ -38,6 +38,7 @@ set(sources_list_h
 	QuantifyFeatures.h
 	SearchAccurateMass.h
 	SearchSpectrum.h
+	SearchSpectrumAndKeepUnknown.h
 	SelectFeatures.h
 	StoreAnnotations.h
 	StoreFeatureFiltersRDP.h
