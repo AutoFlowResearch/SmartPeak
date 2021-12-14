@@ -33,7 +33,12 @@ namespace SmartPeak {
       ss << PLOG_NSTR("[") << record.getFunc() << PLOG_NSTR("@") << record.getLine() << PLOG_NSTR("] ");
       ss << record.getMessage() << PLOG_NSTR("\n");
       
+      #ifdef _WIN32
+      const std::string sss = ss.str();
+      plog::util::nstring str(sss.begin(), sss.end());
+      #else
       plog::util::nstring str = ss.str();
+      #endif
       std::lock_guard<std::mutex> g(messages_mutex);
       messages.emplace_back(record.getSeverity(), str);
     }
