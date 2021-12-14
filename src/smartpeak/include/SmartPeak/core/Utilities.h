@@ -39,6 +39,7 @@
 #include <tuple>
 
 #include <plog/Log.h>
+#include <openssl/sha.h>
 
 #define maxFunc(a,b) (((a) > (b)) ? (a) : (b))
 
@@ -404,6 +405,24 @@ public:
       const std::string& function_parameter,
       const std::string& parameter_name,
       const std::filesystem::path main_path);
+    
+    /**
+     @brief Returns current time
+     
+     @returns Current time in the format : %H-%M-%S_%d-%m-%Y
+    */
+    static std::string getCurrentTime();
+    
+    static std::string sha256(const std::string str);
+    
+    static void createServerSessionFile(std::filesystem::path file_path);
+    
+    static void writeToServerSessionFile(std::filesystem::path file_path,
+                                         std::string usr_id, std::string dataset_name, std::string workflow_status,
+                                         std::string started_at, std::string finished_at, std::string path_to_exports,
+                                         std::string log_file);
+    
+    static bool checkLastServerWorkflowRun(std::filesystem::path file_path, std::string& username);
 
   };
 }

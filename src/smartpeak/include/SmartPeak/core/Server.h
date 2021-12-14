@@ -70,6 +70,110 @@ namespace SmartPeak {
       mutable std::mutex messages_mutex;
     };
   
+    struct SeverEventDispatcherObserver :
+      IApplicationProcessorObserver,
+      ISequenceProcessorObserver,
+      ISequenceSegmentProcessorObserver,
+      ISampleGroupProcessorObserver,
+      ISequenceObserver,
+      ITransitionsObserver
+    {
+      /**
+        IApplicationProcessorObserver
+      */
+      virtual void onApplicationProcessorStart(const std::vector<std::string>& commands) override
+      {
+        events_.push_back(std::make_tuple("onApplicationProcessorStart", 0, "", commands));
+      }
+      virtual void onApplicationProcessorCommandStart(size_t command_index, const std::string& command_name) override
+      {
+        events_.push_back(std::make_tuple("onApplicationProcessorCommandStart", command_index, command_name, std::vector<std::string>()));
+      }
+      virtual void onApplicationProcessorCommandEnd(size_t command_index, const std::string& command_name) override
+      {
+        events_.push_back(std::make_tuple("onApplicationProcessorCommandEnd", command_index, command_name, std::vector<std::string>()));
+      }
+      virtual void onApplicationProcessorEnd() override
+      {
+        events_.push_back(std::make_tuple("onApplicationProcessorEnd", 0, "", std::vector<std::string>()));
+      }
+      /**
+        ISequenceProcessorObserver
+      */
+      virtual void onSequenceProcessorStart(const size_t nb_injections) override
+      {
+        events_.push_back(std::make_tuple("onSequenceProcessorStart", nb_injections, "", std::vector<std::string>()));
+      }
+      virtual void onSequenceProcessorSampleStart(const std::string& sample_name) override
+      {
+        events_.push_back(std::make_tuple("onSequenceProcessorSampleStart", 0, sample_name, std::vector<std::string>()));
+      }
+      virtual void onSequenceProcessorSampleEnd(const std::string& sample_name) override
+      {
+        events_.push_back(std::make_tuple("onSequenceProcessorSampleEnd", 0, sample_name, std::vector<std::string>()));
+      }
+      virtual void onSequenceProcessorEnd() override
+      {
+        events_.push_back(std::make_tuple("onSequenceProcessorEnd", 0, "", std::vector<std::string>()));
+      }
+      /**
+        ISequenceSegmentProcessorObserver
+      */
+      virtual void onSequenceSegmentProcessorStart(const size_t nb_segments) override
+      {
+        events_.push_back(std::make_tuple("onSequenceSegmentProcessorStart", nb_segments, "", std::vector<std::string>()));
+      }
+      virtual void onSequenceSegmentProcessorSampleStart(const std::string& segment_name) override
+      {
+        events_.push_back(std::make_tuple("onSequenceSegmentProcessorSampleStart", 0, segment_name, std::vector<std::string>()));
+      }
+      virtual void onSequenceSegmentProcessorSampleEnd(const std::string& segment_name) override
+      {
+        events_.push_back(std::make_tuple("onSequenceSegmentProcessorSampleEnd", 0, segment_name, std::vector<std::string>()));
+      }
+      virtual void onSequenceSegmentProcessorEnd() override
+      {
+        events_.push_back(std::make_tuple("onSequenceSegmentProcessorEnd", 0, "", std::vector<std::string>()));
+      }
+      /**
+        ISampleGroupProcessorObserver
+      */
+      virtual void onSampleGroupProcessorStart(const size_t nb_groups) override
+      {
+        events_.push_back(std::make_tuple("onSampleGroupProcessorStart", nb_groups, "", std::vector<std::string>()));
+      }
+      virtual void onSampleGroupProcessorSampleStart(const std::string& group_name) override
+      {
+        events_.push_back(std::make_tuple("onSampleGroupProcessorSampleStart", 0, group_name, std::vector<std::string>()));
+      }
+      virtual void onSampleGroupProcessorSampleEnd(const std::string& group_name) override
+      {
+        events_.push_back(std::make_tuple("onSampleGroupProcessorSampleEnd", 0, group_name, std::vector<std::string>()));
+      }
+      virtual void onSampleGroupProcessorEnd() override
+      {
+        events_.push_back(std::make_tuple("onSampleGroupProcessorEnd", 0, "", std::vector<std::string>()));
+      }
+
+      /**
+        ISequenceObserver
+      */
+      virtual void onSequenceUpdated() override
+      {
+        events_.push_back(std::make_tuple("onSequenceUpdated", 0, "", std::vector<std::string>()));
+      }
+
+      /**
+        ITransitionsObserver
+      */
+      virtual void onTransitionsUpdated() override
+      {
+        events_.push_back(std::make_tuple("onTransitionsUpdated", 0, "", std::vector<std::string>()));
+      }
+
+      std::vector<std::tuple<std::string, size_t, std::string, std::vector<std::string>>> events_;
+    };
+  
     class ServerManager {
     public:
       /**
@@ -99,6 +203,11 @@ namespace SmartPeak {
       inline EventDispatcher& get_event_dispatcher() { return event_dispatcher_; }
       inline const EventDispatcher& get_event_dispatcher() const { return event_dispatcher_; }
       
+      inline SeverEventDispatcherObserver& get_server_event_dispatcher_observer() { return server_event_dispatcher_observer_; }
+      inline const SeverEventDispatcherObserver& get_server_event_dispatcher_observer() const { return server_event_dispatcher_observer_; }
+      
+      inline void reset() { dataset_path = ""; application_handler_.closeSession(); }
+      
       std::string               dataset_path;
       std::vector<std::string>  report {"FEATUREDB","PIVOTTABLE","ALL"};
       std::vector<std::string>  report_sample_types {"ALL"};
@@ -118,6 +227,7 @@ namespace SmartPeak {
       SessionHandler session_handler_;
       WorkflowManager workflow_manager_;
       EventDispatcher event_dispatcher_;
+      SeverEventDispatcherObserver server_event_dispatcher_observer_;
       std::shared_ptr<ProgressInfo> progress_info_ptr_;
       std::vector<ApplicationHandler::Command> commands_;
       std::shared_ptr<serv::ServerAppender> server_appender_;

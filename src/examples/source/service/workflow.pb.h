@@ -47,7 +47,7 @@ struct TableStruct_workflow_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::AuxiliaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[7]
+  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[10]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::FieldMetadata field_metadata[];
   static const ::PROTOBUF_NAMESPACE_ID::internal::SerializationTable serialization_table[];
@@ -64,12 +64,21 @@ extern HeatmapDataDefaultTypeInternal _HeatmapData_default_instance_;
 class InquireLogs;
 struct InquireLogsDefaultTypeInternal;
 extern InquireLogsDefaultTypeInternal _InquireLogs_default_instance_;
+class Interrupter;
+struct InterrupterDefaultTypeInternal;
+extern InterrupterDefaultTypeInternal _Interrupter_default_instance_;
 class LogStream;
 struct LogStreamDefaultTypeInternal;
 extern LogStreamDefaultTypeInternal _LogStream_default_instance_;
+class ProgressInfo;
+struct ProgressInfoDefaultTypeInternal;
+extern ProgressInfoDefaultTypeInternal _ProgressInfo_default_instance_;
 class SingleAxisData;
 struct SingleAxisDataDefaultTypeInternal;
 extern SingleAxisDataDefaultTypeInternal _SingleAxisData_default_instance_;
+class WorkflowEvent;
+struct WorkflowEventDefaultTypeInternal;
+extern WorkflowEventDefaultTypeInternal _WorkflowEvent_default_instance_;
 class WorkflowParameters;
 struct WorkflowParametersDefaultTypeInternal;
 extern WorkflowParametersDefaultTypeInternal _WorkflowParameters_default_instance_;
@@ -81,8 +90,11 @@ PROTOBUF_NAMESPACE_OPEN
 template<> ::SmartPeakServer::GraphData* Arena::CreateMaybeMessage<::SmartPeakServer::GraphData>(Arena*);
 template<> ::SmartPeakServer::HeatmapData* Arena::CreateMaybeMessage<::SmartPeakServer::HeatmapData>(Arena*);
 template<> ::SmartPeakServer::InquireLogs* Arena::CreateMaybeMessage<::SmartPeakServer::InquireLogs>(Arena*);
+template<> ::SmartPeakServer::Interrupter* Arena::CreateMaybeMessage<::SmartPeakServer::Interrupter>(Arena*);
 template<> ::SmartPeakServer::LogStream* Arena::CreateMaybeMessage<::SmartPeakServer::LogStream>(Arena*);
+template<> ::SmartPeakServer::ProgressInfo* Arena::CreateMaybeMessage<::SmartPeakServer::ProgressInfo>(Arena*);
 template<> ::SmartPeakServer::SingleAxisData* Arena::CreateMaybeMessage<::SmartPeakServer::SingleAxisData>(Arena*);
+template<> ::SmartPeakServer::WorkflowEvent* Arena::CreateMaybeMessage<::SmartPeakServer::WorkflowEvent>(Arena*);
 template<> ::SmartPeakServer::WorkflowParameters* Arena::CreateMaybeMessage<::SmartPeakServer::WorkflowParameters>(Arena*);
 template<> ::SmartPeakServer::WorkflowResult* Arena::CreateMaybeMessage<::SmartPeakServer::WorkflowResult>(Arena*);
 PROTOBUF_NAMESPACE_CLOSE
@@ -113,6 +125,36 @@ inline bool WorkflowParameters_ExportReport_Parse(
     ::PROTOBUF_NAMESPACE_ID::ConstStringParam name, WorkflowParameters_ExportReport* value) {
   return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<WorkflowParameters_ExportReport>(
     WorkflowParameters_ExportReport_descriptor(), name, value);
+}
+enum LogStream_LogSeverity : int {
+  LogStream_LogSeverity_NONE = 0,
+  LogStream_LogSeverity_FATAL = 1,
+  LogStream_LogSeverity_ERROR = 2,
+  LogStream_LogSeverity_WARNING = 3,
+  LogStream_LogSeverity_INFO = 4,
+  LogStream_LogSeverity_DEBUG = 5,
+  LogStream_LogSeverity_VERBOSE = 6,
+  LogStream_LogSeverity_LogStream_LogSeverity_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::PROTOBUF_NAMESPACE_ID::int32>::min(),
+  LogStream_LogSeverity_LogStream_LogSeverity_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::PROTOBUF_NAMESPACE_ID::int32>::max()
+};
+bool LogStream_LogSeverity_IsValid(int value);
+constexpr LogStream_LogSeverity LogStream_LogSeverity_LogSeverity_MIN = LogStream_LogSeverity_NONE;
+constexpr LogStream_LogSeverity LogStream_LogSeverity_LogSeverity_MAX = LogStream_LogSeverity_VERBOSE;
+constexpr int LogStream_LogSeverity_LogSeverity_ARRAYSIZE = LogStream_LogSeverity_LogSeverity_MAX + 1;
+
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* LogStream_LogSeverity_descriptor();
+template<typename T>
+inline const std::string& LogStream_LogSeverity_Name(T enum_t_value) {
+  static_assert(::std::is_same<T, LogStream_LogSeverity>::value ||
+    ::std::is_integral<T>::value,
+    "Incorrect type passed to function LogStream_LogSeverity_Name.");
+  return ::PROTOBUF_NAMESPACE_ID::internal::NameOfEnum(
+    LogStream_LogSeverity_descriptor(), enum_t_value);
+}
+inline bool LogStream_LogSeverity_Parse(
+    ::PROTOBUF_NAMESPACE_ID::ConstStringParam name, LogStream_LogSeverity* value) {
+  return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<LogStream_LogSeverity>(
+    LogStream_LogSeverity_descriptor(), name, value);
 }
 // ===================================================================
 
@@ -503,6 +545,156 @@ class SingleAxisData final :
 };
 // -------------------------------------------------------------------
 
+class Interrupter final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:SmartPeakServer.Interrupter) */ {
+ public:
+  inline Interrupter() : Interrupter(nullptr) {}
+  ~Interrupter() override;
+  explicit constexpr Interrupter(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  Interrupter(const Interrupter& from);
+  Interrupter(Interrupter&& from) noexcept
+    : Interrupter() {
+    *this = ::std::move(from);
+  }
+
+  inline Interrupter& operator=(const Interrupter& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline Interrupter& operator=(Interrupter&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const Interrupter& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const Interrupter* internal_default_instance() {
+    return reinterpret_cast<const Interrupter*>(
+               &_Interrupter_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    2;
+
+  friend void swap(Interrupter& a, Interrupter& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(Interrupter* other) {
+    if (other == this) return;
+    if (GetOwningArena() == other->GetOwningArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(Interrupter* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline Interrupter* New() const final {
+    return new Interrupter();
+  }
+
+  Interrupter* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<Interrupter>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const Interrupter& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom(const Interrupter& from);
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message*to, const ::PROTOBUF_NAMESPACE_ID::Message&from);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(Interrupter* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "SmartPeakServer.Interrupter";
+  }
+  protected:
+  explicit Interrupter(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kToInterruptFieldNumber = 1,
+    kIsInterruptedFieldNumber = 2,
+  };
+  // bool to_interrupt = 1;
+  void clear_to_interrupt();
+  bool to_interrupt() const;
+  void set_to_interrupt(bool value);
+  private:
+  bool _internal_to_interrupt() const;
+  void _internal_set_to_interrupt(bool value);
+  public:
+
+  // bool is_interrupted = 2;
+  void clear_is_interrupted();
+  bool is_interrupted() const;
+  void set_is_interrupted(bool value);
+  private:
+  bool _internal_is_interrupted() const;
+  void _internal_set_is_interrupted(bool value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:SmartPeakServer.Interrupter)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  bool to_interrupt_;
+  bool is_interrupted_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_workflow_2eproto;
+};
+// -------------------------------------------------------------------
+
 class GraphData final :
     public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:SmartPeakServer.GraphData) */ {
  public:
@@ -547,7 +739,7 @@ class GraphData final :
                &_GraphData_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    2;
+    3;
 
   friend void swap(GraphData& a, GraphData& b) {
     a.Swap(&b);
@@ -941,7 +1133,7 @@ class HeatmapData final :
                &_HeatmapData_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    3;
+    4;
 
   friend void swap(HeatmapData& a, HeatmapData& b) {
     a.Swap(&b);
@@ -1289,7 +1481,7 @@ class WorkflowResult final :
                &_WorkflowResult_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    4;
+    5;
 
   friend void swap(WorkflowResult& a, WorkflowResult& b) {
     a.Swap(&b);
@@ -1505,7 +1697,7 @@ class InquireLogs final :
                &_InquireLogs_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    5;
+    6;
 
   friend void swap(InquireLogs& a, InquireLogs& b) {
     a.Swap(&b);
@@ -1644,7 +1836,7 @@ class LogStream final :
                &_LogStream_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    6;
+    7;
 
   friend void swap(LogStream& a, LogStream& b) {
     a.Swap(&b);
@@ -1712,10 +1904,51 @@ class LogStream final :
 
   // nested types ----------------------------------------------------
 
+  typedef LogStream_LogSeverity LogSeverity;
+  static constexpr LogSeverity NONE =
+    LogStream_LogSeverity_NONE;
+  static constexpr LogSeverity FATAL =
+    LogStream_LogSeverity_FATAL;
+  static constexpr LogSeverity ERROR =
+    LogStream_LogSeverity_ERROR;
+  static constexpr LogSeverity WARNING =
+    LogStream_LogSeverity_WARNING;
+  static constexpr LogSeverity INFO =
+    LogStream_LogSeverity_INFO;
+  static constexpr LogSeverity DEBUG =
+    LogStream_LogSeverity_DEBUG;
+  static constexpr LogSeverity VERBOSE =
+    LogStream_LogSeverity_VERBOSE;
+  static inline bool LogSeverity_IsValid(int value) {
+    return LogStream_LogSeverity_IsValid(value);
+  }
+  static constexpr LogSeverity LogSeverity_MIN =
+    LogStream_LogSeverity_LogSeverity_MIN;
+  static constexpr LogSeverity LogSeverity_MAX =
+    LogStream_LogSeverity_LogSeverity_MAX;
+  static constexpr int LogSeverity_ARRAYSIZE =
+    LogStream_LogSeverity_LogSeverity_ARRAYSIZE;
+  static inline const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor*
+  LogSeverity_descriptor() {
+    return LogStream_LogSeverity_descriptor();
+  }
+  template<typename T>
+  static inline const std::string& LogSeverity_Name(T enum_t_value) {
+    static_assert(::std::is_same<T, LogSeverity>::value ||
+      ::std::is_integral<T>::value,
+      "Incorrect type passed to function LogSeverity_Name.");
+    return LogStream_LogSeverity_Name(enum_t_value);
+  }
+  static inline bool LogSeverity_Parse(::PROTOBUF_NAMESPACE_ID::ConstStringParam name,
+      LogSeverity* value) {
+    return LogStream_LogSeverity_Parse(name, value);
+  }
+
   // accessors -------------------------------------------------------
 
   enum : int {
     kLogLineFieldNumber = 1,
+    kLogSeverityFieldNumber = 2,
   };
   // string log_line = 1;
   void clear_log_line();
@@ -1731,6 +1964,15 @@ class LogStream final :
   std::string* _internal_mutable_log_line();
   public:
 
+  // .SmartPeakServer.LogStream.LogSeverity log_severity = 2;
+  void clear_log_severity();
+  ::SmartPeakServer::LogStream_LogSeverity log_severity() const;
+  void set_log_severity(::SmartPeakServer::LogStream_LogSeverity value);
+  private:
+  ::SmartPeakServer::LogStream_LogSeverity _internal_log_severity() const;
+  void _internal_set_log_severity(::SmartPeakServer::LogStream_LogSeverity value);
+  public:
+
   // @@protoc_insertion_point(class_scope:SmartPeakServer.LogStream)
  private:
   class _Internal;
@@ -1739,6 +1981,348 @@ class LogStream final :
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr log_line_;
+  int log_severity_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_workflow_2eproto;
+};
+// -------------------------------------------------------------------
+
+class ProgressInfo final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:SmartPeakServer.ProgressInfo) */ {
+ public:
+  inline ProgressInfo() : ProgressInfo(nullptr) {}
+  ~ProgressInfo() override;
+  explicit constexpr ProgressInfo(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  ProgressInfo(const ProgressInfo& from);
+  ProgressInfo(ProgressInfo&& from) noexcept
+    : ProgressInfo() {
+    *this = ::std::move(from);
+  }
+
+  inline ProgressInfo& operator=(const ProgressInfo& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline ProgressInfo& operator=(ProgressInfo&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const ProgressInfo& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const ProgressInfo* internal_default_instance() {
+    return reinterpret_cast<const ProgressInfo*>(
+               &_ProgressInfo_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    8;
+
+  friend void swap(ProgressInfo& a, ProgressInfo& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(ProgressInfo* other) {
+    if (other == this) return;
+    if (GetOwningArena() == other->GetOwningArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(ProgressInfo* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline ProgressInfo* New() const final {
+    return new ProgressInfo();
+  }
+
+  ProgressInfo* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<ProgressInfo>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const ProgressInfo& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom(const ProgressInfo& from);
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message*to, const ::PROTOBUF_NAMESPACE_ID::Message&from);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(ProgressInfo* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "SmartPeakServer.ProgressInfo";
+  }
+  protected:
+  explicit ProgressInfo(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kStatusCodeFieldNumber = 1,
+  };
+  // string status_code = 1;
+  void clear_status_code();
+  const std::string& status_code() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_status_code(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_status_code();
+  PROTOBUF_MUST_USE_RESULT std::string* release_status_code();
+  void set_allocated_status_code(std::string* status_code);
+  private:
+  const std::string& _internal_status_code() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_status_code(const std::string& value);
+  std::string* _internal_mutable_status_code();
+  public:
+
+  // @@protoc_insertion_point(class_scope:SmartPeakServer.ProgressInfo)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr status_code_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_workflow_2eproto;
+};
+// -------------------------------------------------------------------
+
+class WorkflowEvent final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:SmartPeakServer.WorkflowEvent) */ {
+ public:
+  inline WorkflowEvent() : WorkflowEvent(nullptr) {}
+  ~WorkflowEvent() override;
+  explicit constexpr WorkflowEvent(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  WorkflowEvent(const WorkflowEvent& from);
+  WorkflowEvent(WorkflowEvent&& from) noexcept
+    : WorkflowEvent() {
+    *this = ::std::move(from);
+  }
+
+  inline WorkflowEvent& operator=(const WorkflowEvent& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline WorkflowEvent& operator=(WorkflowEvent&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const WorkflowEvent& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const WorkflowEvent* internal_default_instance() {
+    return reinterpret_cast<const WorkflowEvent*>(
+               &_WorkflowEvent_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    9;
+
+  friend void swap(WorkflowEvent& a, WorkflowEvent& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(WorkflowEvent* other) {
+    if (other == this) return;
+    if (GetOwningArena() == other->GetOwningArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(WorkflowEvent* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline WorkflowEvent* New() const final {
+    return new WorkflowEvent();
+  }
+
+  WorkflowEvent* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<WorkflowEvent>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const WorkflowEvent& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom(const WorkflowEvent& from);
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message*to, const ::PROTOBUF_NAMESPACE_ID::Message&from);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(WorkflowEvent* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "SmartPeakServer.WorkflowEvent";
+  }
+  protected:
+  explicit WorkflowEvent(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kCommandListFieldNumber = 4,
+    kEventNameFieldNumber = 1,
+    kItemNameFieldNumber = 3,
+    kEventIndexFieldNumber = 2,
+  };
+  // repeated string command_list = 4;
+  int command_list_size() const;
+  private:
+  int _internal_command_list_size() const;
+  public:
+  void clear_command_list();
+  const std::string& command_list(int index) const;
+  std::string* mutable_command_list(int index);
+  void set_command_list(int index, const std::string& value);
+  void set_command_list(int index, std::string&& value);
+  void set_command_list(int index, const char* value);
+  void set_command_list(int index, const char* value, size_t size);
+  std::string* add_command_list();
+  void add_command_list(const std::string& value);
+  void add_command_list(std::string&& value);
+  void add_command_list(const char* value);
+  void add_command_list(const char* value, size_t size);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>& command_list() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>* mutable_command_list();
+  private:
+  const std::string& _internal_command_list(int index) const;
+  std::string* _internal_add_command_list();
+  public:
+
+  // string event_name = 1;
+  void clear_event_name();
+  const std::string& event_name() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_event_name(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_event_name();
+  PROTOBUF_MUST_USE_RESULT std::string* release_event_name();
+  void set_allocated_event_name(std::string* event_name);
+  private:
+  const std::string& _internal_event_name() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_event_name(const std::string& value);
+  std::string* _internal_mutable_event_name();
+  public:
+
+  // string item_name = 3;
+  void clear_item_name();
+  const std::string& item_name() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_item_name(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_item_name();
+  PROTOBUF_MUST_USE_RESULT std::string* release_item_name();
+  void set_allocated_item_name(std::string* item_name);
+  private:
+  const std::string& _internal_item_name() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_item_name(const std::string& value);
+  std::string* _internal_mutable_item_name();
+  public:
+
+  // int64 event_index = 2;
+  void clear_event_index();
+  ::PROTOBUF_NAMESPACE_ID::int64 event_index() const;
+  void set_event_index(::PROTOBUF_NAMESPACE_ID::int64 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int64 _internal_event_index() const;
+  void _internal_set_event_index(::PROTOBUF_NAMESPACE_ID::int64 value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:SmartPeakServer.WorkflowEvent)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string> command_list_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr event_name_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr item_name_;
+  ::PROTOBUF_NAMESPACE_ID::int64 event_index_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_workflow_2eproto;
 };
@@ -2006,6 +2590,50 @@ inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
 SingleAxisData::mutable_axis_data() {
   // @@protoc_insertion_point(field_mutable_list:SmartPeakServer.SingleAxisData.axis_data)
   return _internal_mutable_axis_data();
+}
+
+// -------------------------------------------------------------------
+
+// Interrupter
+
+// bool to_interrupt = 1;
+inline void Interrupter::clear_to_interrupt() {
+  to_interrupt_ = false;
+}
+inline bool Interrupter::_internal_to_interrupt() const {
+  return to_interrupt_;
+}
+inline bool Interrupter::to_interrupt() const {
+  // @@protoc_insertion_point(field_get:SmartPeakServer.Interrupter.to_interrupt)
+  return _internal_to_interrupt();
+}
+inline void Interrupter::_internal_set_to_interrupt(bool value) {
+  
+  to_interrupt_ = value;
+}
+inline void Interrupter::set_to_interrupt(bool value) {
+  _internal_set_to_interrupt(value);
+  // @@protoc_insertion_point(field_set:SmartPeakServer.Interrupter.to_interrupt)
+}
+
+// bool is_interrupted = 2;
+inline void Interrupter::clear_is_interrupted() {
+  is_interrupted_ = false;
+}
+inline bool Interrupter::_internal_is_interrupted() const {
+  return is_interrupted_;
+}
+inline bool Interrupter::is_interrupted() const {
+  // @@protoc_insertion_point(field_get:SmartPeakServer.Interrupter.is_interrupted)
+  return _internal_is_interrupted();
+}
+inline void Interrupter::_internal_set_is_interrupted(bool value) {
+  
+  is_interrupted_ = value;
+}
+inline void Interrupter::set_is_interrupted(bool value) {
+  _internal_set_is_interrupted(value);
+  // @@protoc_insertion_point(field_set:SmartPeakServer.Interrupter.is_interrupted)
 }
 
 // -------------------------------------------------------------------
@@ -3613,9 +4241,276 @@ inline void LogStream::set_allocated_log_line(std::string* log_line) {
   // @@protoc_insertion_point(field_set_allocated:SmartPeakServer.LogStream.log_line)
 }
 
+// .SmartPeakServer.LogStream.LogSeverity log_severity = 2;
+inline void LogStream::clear_log_severity() {
+  log_severity_ = 0;
+}
+inline ::SmartPeakServer::LogStream_LogSeverity LogStream::_internal_log_severity() const {
+  return static_cast< ::SmartPeakServer::LogStream_LogSeverity >(log_severity_);
+}
+inline ::SmartPeakServer::LogStream_LogSeverity LogStream::log_severity() const {
+  // @@protoc_insertion_point(field_get:SmartPeakServer.LogStream.log_severity)
+  return _internal_log_severity();
+}
+inline void LogStream::_internal_set_log_severity(::SmartPeakServer::LogStream_LogSeverity value) {
+  
+  log_severity_ = value;
+}
+inline void LogStream::set_log_severity(::SmartPeakServer::LogStream_LogSeverity value) {
+  _internal_set_log_severity(value);
+  // @@protoc_insertion_point(field_set:SmartPeakServer.LogStream.log_severity)
+}
+
+// -------------------------------------------------------------------
+
+// ProgressInfo
+
+// string status_code = 1;
+inline void ProgressInfo::clear_status_code() {
+  status_code_.ClearToEmpty();
+}
+inline const std::string& ProgressInfo::status_code() const {
+  // @@protoc_insertion_point(field_get:SmartPeakServer.ProgressInfo.status_code)
+  return _internal_status_code();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void ProgressInfo::set_status_code(ArgT0&& arg0, ArgT... args) {
+ 
+ status_code_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:SmartPeakServer.ProgressInfo.status_code)
+}
+inline std::string* ProgressInfo::mutable_status_code() {
+  std::string* _s = _internal_mutable_status_code();
+  // @@protoc_insertion_point(field_mutable:SmartPeakServer.ProgressInfo.status_code)
+  return _s;
+}
+inline const std::string& ProgressInfo::_internal_status_code() const {
+  return status_code_.Get();
+}
+inline void ProgressInfo::_internal_set_status_code(const std::string& value) {
+  
+  status_code_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArenaForAllocation());
+}
+inline std::string* ProgressInfo::_internal_mutable_status_code() {
+  
+  return status_code_.Mutable(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArenaForAllocation());
+}
+inline std::string* ProgressInfo::release_status_code() {
+  // @@protoc_insertion_point(field_release:SmartPeakServer.ProgressInfo.status_code)
+  return status_code_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArenaForAllocation());
+}
+inline void ProgressInfo::set_allocated_status_code(std::string* status_code) {
+  if (status_code != nullptr) {
+    
+  } else {
+    
+  }
+  status_code_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), status_code,
+      GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set_allocated:SmartPeakServer.ProgressInfo.status_code)
+}
+
+// -------------------------------------------------------------------
+
+// WorkflowEvent
+
+// string event_name = 1;
+inline void WorkflowEvent::clear_event_name() {
+  event_name_.ClearToEmpty();
+}
+inline const std::string& WorkflowEvent::event_name() const {
+  // @@protoc_insertion_point(field_get:SmartPeakServer.WorkflowEvent.event_name)
+  return _internal_event_name();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void WorkflowEvent::set_event_name(ArgT0&& arg0, ArgT... args) {
+ 
+ event_name_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:SmartPeakServer.WorkflowEvent.event_name)
+}
+inline std::string* WorkflowEvent::mutable_event_name() {
+  std::string* _s = _internal_mutable_event_name();
+  // @@protoc_insertion_point(field_mutable:SmartPeakServer.WorkflowEvent.event_name)
+  return _s;
+}
+inline const std::string& WorkflowEvent::_internal_event_name() const {
+  return event_name_.Get();
+}
+inline void WorkflowEvent::_internal_set_event_name(const std::string& value) {
+  
+  event_name_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArenaForAllocation());
+}
+inline std::string* WorkflowEvent::_internal_mutable_event_name() {
+  
+  return event_name_.Mutable(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArenaForAllocation());
+}
+inline std::string* WorkflowEvent::release_event_name() {
+  // @@protoc_insertion_point(field_release:SmartPeakServer.WorkflowEvent.event_name)
+  return event_name_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArenaForAllocation());
+}
+inline void WorkflowEvent::set_allocated_event_name(std::string* event_name) {
+  if (event_name != nullptr) {
+    
+  } else {
+    
+  }
+  event_name_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), event_name,
+      GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set_allocated:SmartPeakServer.WorkflowEvent.event_name)
+}
+
+// int64 event_index = 2;
+inline void WorkflowEvent::clear_event_index() {
+  event_index_ = int64_t{0};
+}
+inline ::PROTOBUF_NAMESPACE_ID::int64 WorkflowEvent::_internal_event_index() const {
+  return event_index_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int64 WorkflowEvent::event_index() const {
+  // @@protoc_insertion_point(field_get:SmartPeakServer.WorkflowEvent.event_index)
+  return _internal_event_index();
+}
+inline void WorkflowEvent::_internal_set_event_index(::PROTOBUF_NAMESPACE_ID::int64 value) {
+  
+  event_index_ = value;
+}
+inline void WorkflowEvent::set_event_index(::PROTOBUF_NAMESPACE_ID::int64 value) {
+  _internal_set_event_index(value);
+  // @@protoc_insertion_point(field_set:SmartPeakServer.WorkflowEvent.event_index)
+}
+
+// string item_name = 3;
+inline void WorkflowEvent::clear_item_name() {
+  item_name_.ClearToEmpty();
+}
+inline const std::string& WorkflowEvent::item_name() const {
+  // @@protoc_insertion_point(field_get:SmartPeakServer.WorkflowEvent.item_name)
+  return _internal_item_name();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void WorkflowEvent::set_item_name(ArgT0&& arg0, ArgT... args) {
+ 
+ item_name_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:SmartPeakServer.WorkflowEvent.item_name)
+}
+inline std::string* WorkflowEvent::mutable_item_name() {
+  std::string* _s = _internal_mutable_item_name();
+  // @@protoc_insertion_point(field_mutable:SmartPeakServer.WorkflowEvent.item_name)
+  return _s;
+}
+inline const std::string& WorkflowEvent::_internal_item_name() const {
+  return item_name_.Get();
+}
+inline void WorkflowEvent::_internal_set_item_name(const std::string& value) {
+  
+  item_name_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArenaForAllocation());
+}
+inline std::string* WorkflowEvent::_internal_mutable_item_name() {
+  
+  return item_name_.Mutable(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArenaForAllocation());
+}
+inline std::string* WorkflowEvent::release_item_name() {
+  // @@protoc_insertion_point(field_release:SmartPeakServer.WorkflowEvent.item_name)
+  return item_name_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArenaForAllocation());
+}
+inline void WorkflowEvent::set_allocated_item_name(std::string* item_name) {
+  if (item_name != nullptr) {
+    
+  } else {
+    
+  }
+  item_name_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), item_name,
+      GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set_allocated:SmartPeakServer.WorkflowEvent.item_name)
+}
+
+// repeated string command_list = 4;
+inline int WorkflowEvent::_internal_command_list_size() const {
+  return command_list_.size();
+}
+inline int WorkflowEvent::command_list_size() const {
+  return _internal_command_list_size();
+}
+inline void WorkflowEvent::clear_command_list() {
+  command_list_.Clear();
+}
+inline std::string* WorkflowEvent::add_command_list() {
+  std::string* _s = _internal_add_command_list();
+  // @@protoc_insertion_point(field_add_mutable:SmartPeakServer.WorkflowEvent.command_list)
+  return _s;
+}
+inline const std::string& WorkflowEvent::_internal_command_list(int index) const {
+  return command_list_.Get(index);
+}
+inline const std::string& WorkflowEvent::command_list(int index) const {
+  // @@protoc_insertion_point(field_get:SmartPeakServer.WorkflowEvent.command_list)
+  return _internal_command_list(index);
+}
+inline std::string* WorkflowEvent::mutable_command_list(int index) {
+  // @@protoc_insertion_point(field_mutable:SmartPeakServer.WorkflowEvent.command_list)
+  return command_list_.Mutable(index);
+}
+inline void WorkflowEvent::set_command_list(int index, const std::string& value) {
+  command_list_.Mutable(index)->assign(value);
+  // @@protoc_insertion_point(field_set:SmartPeakServer.WorkflowEvent.command_list)
+}
+inline void WorkflowEvent::set_command_list(int index, std::string&& value) {
+  command_list_.Mutable(index)->assign(std::move(value));
+  // @@protoc_insertion_point(field_set:SmartPeakServer.WorkflowEvent.command_list)
+}
+inline void WorkflowEvent::set_command_list(int index, const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  command_list_.Mutable(index)->assign(value);
+  // @@protoc_insertion_point(field_set_char:SmartPeakServer.WorkflowEvent.command_list)
+}
+inline void WorkflowEvent::set_command_list(int index, const char* value, size_t size) {
+  command_list_.Mutable(index)->assign(
+    reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:SmartPeakServer.WorkflowEvent.command_list)
+}
+inline std::string* WorkflowEvent::_internal_add_command_list() {
+  return command_list_.Add();
+}
+inline void WorkflowEvent::add_command_list(const std::string& value) {
+  command_list_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add:SmartPeakServer.WorkflowEvent.command_list)
+}
+inline void WorkflowEvent::add_command_list(std::string&& value) {
+  command_list_.Add(std::move(value));
+  // @@protoc_insertion_point(field_add:SmartPeakServer.WorkflowEvent.command_list)
+}
+inline void WorkflowEvent::add_command_list(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  command_list_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add_char:SmartPeakServer.WorkflowEvent.command_list)
+}
+inline void WorkflowEvent::add_command_list(const char* value, size_t size) {
+  command_list_.Add()->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_add_pointer:SmartPeakServer.WorkflowEvent.command_list)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>&
+WorkflowEvent::command_list() const {
+  // @@protoc_insertion_point(field_list:SmartPeakServer.WorkflowEvent.command_list)
+  return command_list_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>*
+WorkflowEvent::mutable_command_list() {
+  // @@protoc_insertion_point(field_mutable_list:SmartPeakServer.WorkflowEvent.command_list)
+  return &command_list_;
+}
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------
@@ -3639,6 +4534,11 @@ template <> struct is_proto_enum< ::SmartPeakServer::WorkflowParameters_ExportRe
 template <>
 inline const EnumDescriptor* GetEnumDescriptor< ::SmartPeakServer::WorkflowParameters_ExportReport>() {
   return ::SmartPeakServer::WorkflowParameters_ExportReport_descriptor();
+}
+template <> struct is_proto_enum< ::SmartPeakServer::LogStream_LogSeverity> : ::std::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::SmartPeakServer::LogStream_LogSeverity>() {
+  return ::SmartPeakServer::LogStream_LogSeverity_descriptor();
 }
 
 PROTOBUF_NAMESPACE_CLOSE

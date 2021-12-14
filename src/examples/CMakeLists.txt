@@ -169,6 +169,14 @@ set(grpc_required_libs
     address_sorting
     grpc_plugin_support grpcpp_channelz)
 #------------------------------------------------------------------------------
+
+find_package(OpenSSL REQUIRED) 
+if(OpenSSL_FOUND)
+  include_directories(${OPENSSL_INCLUDE_DIRS})
+  link_directories(${OPENSSL_LIBRARIES})
+  message(STATUS "[examples] : Using OpenSSL ${OPENSSL_VERSION}")
+endif()
+
 # pipeline examples
 add_custom_target(PIPELINE_EXAMPLES)
 add_dependencies(PIPELINE_EXAMPLES ${pipeline_executables_list})

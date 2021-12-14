@@ -702,14 +702,71 @@ int main(int argc, char** argv)
     // ======================================
       if (run_workflow_widget_->server_fields_set)
       {
-        WorkflowClient workflow_client(grpc::CreateChannel(run_workflow_widget_->server_url, grpc::InsecureChannelCredentials()));
-        std::string workflow_status = workflow_client.runWorkflow(application_handler_.filenames_.getTagValue(Filenames::Tag::MAIN_DIR));
-        workflow_client.getLogstream();
-        LOGI << "GUI workflow status : " << workflow_status << std::endl;
-        ::serv::loadRawDataAndFeatures(application_handler_, session_handler_, workflow_manager_, event_dispatcher);
-        run_workflow_widget_->server_fields_set = false;
-      }
+        Utilities::createServerSessionFile(application_handler_.filenames_.getTag(Filenames::Tag::MAIN_DIR));
+        std::string id = run_workflow_widget_->username;
+        if (Utilities::checkLastServerWorkflowRun(application_handler_.filenames_.getTag(Filenames::Tag::MAIN_DIR), id))
+        {
+          ImGui::OpenPopup("Server Session Found");
+          if (ImGui::BeginPopupModal("Server Session Found", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+          {
+            ImGui::Text("Do you want to load the workflow results from the last run?\n\n");
+            ImGui::Separator();
 
+            if (ImGui::Button("Yes", ImVec2(120, 0))) {
+              ::serv::loadRawDataAndFeatures(application_handler_, session_handler_, workflow_manager_, event_dispatcher);
+              run_remote_workflow_ = false;
+              ImGui::CloseCurrentPopup();
+            }
+            ImGui::SetItemDefaultFocus();
+            ImGui::SameLine();
+            if (ImGui::Button("No - Rerun workflow", ImVec2(120, 0))) {
+              run_remote_workflow_ = true;
+              ImGui::CloseCurrentPopup();
+            }
+            ImGui::EndPopup();
+          }
+        }
+        
+        if (run_remote_workflow_)
+        {
+          auto ch_cred = grpc::InsecureChannelCredentials();
+          const auto channel = grpc::CreateChannel(run_workflow_widget_->server_url, ch_cred);
+          workflow_client_.setChannel(channel);
+
+          runworkflow_future_ = std::async(
+            std::launch::async,
+            &WorkflowClient::runWorkflow,
+            &workflow_client_,
+            application_handler_.filenames_.getTag(Filenames::Tag::MAIN_DIR),
+            run_workflow_widget_->username,
+            Utilities::sha256(run_workflow_widget_->password)
+          );
+        }
+        
+        run_workflow_widget_->server_fields_set = false;
+        RawDataAndFeatures_loaded_ = false;
+      }
+      
+      if (run_remote_workflow_)
+      {
+        if (runworkflow_future_.valid())
+        {
+          workflow_client_.getEvent(&event_dispatcher, &event_dispatcher, &event_dispatcher,
+                                    &event_dispatcher, &event_dispatcher, &event_dispatcher);
+          workflow_client_.getLogstream();
+          
+          if (runworkflow_future_.get() == "YES" && !RawDataAndFeatures_loaded_)
+          {
+            ::serv::loadRawDataAndFeatures(application_handler_, session_handler_, workflow_manager_, event_dispatcher);
+            RawDataAndFeatures_loaded_ = true;
+          }
+          
+          if (runworkflow_future_.valid() && runworkflow_future_.get() == "UNAUTHORIZED")
+          {
+            quickInfoText_->addErrorMessage("Failed to login as <" + run_workflow_widget_->username + "> !");
+          }
+        }
+      }
     // ======================================
     // Data updates
     //

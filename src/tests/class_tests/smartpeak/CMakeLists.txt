@@ -108,7 +108,14 @@ endif()
 find_package(ImPlot COMPONENTS Sources REQUIRED)
 include_directories(${IMPLOT_INCLUDE_DIR})
 #------------------------------------------------------------------------------
-
+# OpenSSL
+#------------------------------------------------------------------------------
+find_package(OpenSSL REQUIRED) 
+if(OpenSSL_FOUND)
+  include_directories(${OPENSSL_INCLUDE_DIRS})
+  link_directories(${OPENSSL_LIBRARIES})
+  message(STATUS "[class_tests] : Using OpenSSL ${OPENSSL_VERSION}")
+endif()
 #------------------------------------------------------------------------------
 # core
 add_custom_target(CORE_TEST)

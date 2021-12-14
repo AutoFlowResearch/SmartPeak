@@ -24,6 +24,9 @@ namespace SmartPeakServer {
 static const char* Workflow_method_names[] = {
   "/SmartPeakServer.Workflow/runWorkflow",
   "/SmartPeakServer.Workflow/getLogStream",
+  "/SmartPeakServer.Workflow/getProgressInfo",
+  "/SmartPeakServer.Workflow/getWorkflowEvent",
+  "/SmartPeakServer.Workflow/stopRunningWorkflow",
 };
 
 std::unique_ptr< Workflow::Stub> Workflow::NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options) {
@@ -35,6 +38,9 @@ std::unique_ptr< Workflow::Stub> Workflow::NewStub(const std::shared_ptr< ::grpc
 Workflow::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options)
   : channel_(channel), rpcmethod_runWorkflow_(Workflow_method_names[0], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   , rpcmethod_getLogStream_(Workflow_method_names[1], options.suffix_for_stats(),::grpc::internal::RpcMethod::SERVER_STREAMING, channel)
+  , rpcmethod_getProgressInfo_(Workflow_method_names[2], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_getWorkflowEvent_(Workflow_method_names[3], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_stopRunningWorkflow_(Workflow_method_names[4], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   {}
 
 ::grpc::Status Workflow::Stub::runWorkflow(::grpc::ClientContext* context, const ::SmartPeakServer::WorkflowParameters& request, ::SmartPeakServer::WorkflowResult* response) {
@@ -76,6 +82,75 @@ void Workflow::Stub::async::getLogStream(::grpc::ClientContext* context, const :
   return ::grpc::internal::ClientAsyncReaderFactory< ::SmartPeakServer::LogStream>::Create(channel_.get(), cq, rpcmethod_getLogStream_, context, request, false, nullptr);
 }
 
+::grpc::Status Workflow::Stub::getProgressInfo(::grpc::ClientContext* context, const ::SmartPeakServer::WorkflowParameters& request, ::SmartPeakServer::ProgressInfo* response) {
+  return ::grpc::internal::BlockingUnaryCall< ::SmartPeakServer::WorkflowParameters, ::SmartPeakServer::ProgressInfo, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_getProgressInfo_, context, request, response);
+}
+
+void Workflow::Stub::async::getProgressInfo(::grpc::ClientContext* context, const ::SmartPeakServer::WorkflowParameters* request, ::SmartPeakServer::ProgressInfo* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall< ::SmartPeakServer::WorkflowParameters, ::SmartPeakServer::ProgressInfo, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_getProgressInfo_, context, request, response, std::move(f));
+}
+
+void Workflow::Stub::async::getProgressInfo(::grpc::ClientContext* context, const ::SmartPeakServer::WorkflowParameters* request, ::SmartPeakServer::ProgressInfo* response, ::grpc::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_getProgressInfo_, context, request, response, reactor);
+}
+
+::grpc::ClientAsyncResponseReader< ::SmartPeakServer::ProgressInfo>* Workflow::Stub::PrepareAsyncgetProgressInfoRaw(::grpc::ClientContext* context, const ::SmartPeakServer::WorkflowParameters& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::SmartPeakServer::ProgressInfo, ::SmartPeakServer::WorkflowParameters, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_getProgressInfo_, context, request);
+}
+
+::grpc::ClientAsyncResponseReader< ::SmartPeakServer::ProgressInfo>* Workflow::Stub::AsyncgetProgressInfoRaw(::grpc::ClientContext* context, const ::SmartPeakServer::WorkflowParameters& request, ::grpc::CompletionQueue* cq) {
+  auto* result =
+    this->PrepareAsyncgetProgressInfoRaw(context, request, cq);
+  result->StartCall();
+  return result;
+}
+
+::grpc::Status Workflow::Stub::getWorkflowEvent(::grpc::ClientContext* context, const ::SmartPeakServer::WorkflowParameters& request, ::SmartPeakServer::WorkflowEvent* response) {
+  return ::grpc::internal::BlockingUnaryCall< ::SmartPeakServer::WorkflowParameters, ::SmartPeakServer::WorkflowEvent, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_getWorkflowEvent_, context, request, response);
+}
+
+void Workflow::Stub::async::getWorkflowEvent(::grpc::ClientContext* context, const ::SmartPeakServer::WorkflowParameters* request, ::SmartPeakServer::WorkflowEvent* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall< ::SmartPeakServer::WorkflowParameters, ::SmartPeakServer::WorkflowEvent, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_getWorkflowEvent_, context, request, response, std::move(f));
+}
+
+void Workflow::Stub::async::getWorkflowEvent(::grpc::ClientContext* context, const ::SmartPeakServer::WorkflowParameters* request, ::SmartPeakServer::WorkflowEvent* response, ::grpc::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_getWorkflowEvent_, context, request, response, reactor);
+}
+
+::grpc::ClientAsyncResponseReader< ::SmartPeakServer::WorkflowEvent>* Workflow::Stub::PrepareAsyncgetWorkflowEventRaw(::grpc::ClientContext* context, const ::SmartPeakServer::WorkflowParameters& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::SmartPeakServer::WorkflowEvent, ::SmartPeakServer::WorkflowParameters, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_getWorkflowEvent_, context, request);
+}
+
+::grpc::ClientAsyncResponseReader< ::SmartPeakServer::WorkflowEvent>* Workflow::Stub::AsyncgetWorkflowEventRaw(::grpc::ClientContext* context, const ::SmartPeakServer::WorkflowParameters& request, ::grpc::CompletionQueue* cq) {
+  auto* result =
+    this->PrepareAsyncgetWorkflowEventRaw(context, request, cq);
+  result->StartCall();
+  return result;
+}
+
+::grpc::Status Workflow::Stub::stopRunningWorkflow(::grpc::ClientContext* context, const ::SmartPeakServer::Interrupter& request, ::SmartPeakServer::Interrupter* response) {
+  return ::grpc::internal::BlockingUnaryCall< ::SmartPeakServer::Interrupter, ::SmartPeakServer::Interrupter, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_stopRunningWorkflow_, context, request, response);
+}
+
+void Workflow::Stub::async::stopRunningWorkflow(::grpc::ClientContext* context, const ::SmartPeakServer::Interrupter* request, ::SmartPeakServer::Interrupter* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall< ::SmartPeakServer::Interrupter, ::SmartPeakServer::Interrupter, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_stopRunningWorkflow_, context, request, response, std::move(f));
+}
+
+void Workflow::Stub::async::stopRunningWorkflow(::grpc::ClientContext* context, const ::SmartPeakServer::Interrupter* request, ::SmartPeakServer::Interrupter* response, ::grpc::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_stopRunningWorkflow_, context, request, response, reactor);
+}
+
+::grpc::ClientAsyncResponseReader< ::SmartPeakServer::Interrupter>* Workflow::Stub::PrepareAsyncstopRunningWorkflowRaw(::grpc::ClientContext* context, const ::SmartPeakServer::Interrupter& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::SmartPeakServer::Interrupter, ::SmartPeakServer::Interrupter, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_stopRunningWorkflow_, context, request);
+}
+
+::grpc::ClientAsyncResponseReader< ::SmartPeakServer::Interrupter>* Workflow::Stub::AsyncstopRunningWorkflowRaw(::grpc::ClientContext* context, const ::SmartPeakServer::Interrupter& request, ::grpc::CompletionQueue* cq) {
+  auto* result =
+    this->PrepareAsyncstopRunningWorkflowRaw(context, request, cq);
+  result->StartCall();
+  return result;
+}
+
 Workflow::Service::Service() {
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       Workflow_method_names[0],
@@ -97,6 +172,36 @@ Workflow::Service::Service() {
              ::grpc::ServerWriter<::SmartPeakServer::LogStream>* writer) {
                return service->getLogStream(ctx, req, writer);
              }, this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      Workflow_method_names[2],
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< Workflow::Service, ::SmartPeakServer::WorkflowParameters, ::SmartPeakServer::ProgressInfo, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
+          [](Workflow::Service* service,
+             ::grpc::ServerContext* ctx,
+             const ::SmartPeakServer::WorkflowParameters* req,
+             ::SmartPeakServer::ProgressInfo* resp) {
+               return service->getProgressInfo(ctx, req, resp);
+             }, this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      Workflow_method_names[3],
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< Workflow::Service, ::SmartPeakServer::WorkflowParameters, ::SmartPeakServer::WorkflowEvent, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
+          [](Workflow::Service* service,
+             ::grpc::ServerContext* ctx,
+             const ::SmartPeakServer::WorkflowParameters* req,
+             ::SmartPeakServer::WorkflowEvent* resp) {
+               return service->getWorkflowEvent(ctx, req, resp);
+             }, this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      Workflow_method_names[4],
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< Workflow::Service, ::SmartPeakServer::Interrupter, ::SmartPeakServer::Interrupter, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
+          [](Workflow::Service* service,
+             ::grpc::ServerContext* ctx,
+             const ::SmartPeakServer::Interrupter* req,
+             ::SmartPeakServer::Interrupter* resp) {
+               return service->stopRunningWorkflow(ctx, req, resp);
+             }, this)));
 }
 
 Workflow::Service::~Service() {
@@ -113,6 +218,27 @@ Workflow::Service::~Service() {
   (void) context;
   (void) request;
   (void) writer;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
+::grpc::Status Workflow::Service::getProgressInfo(::grpc::ServerContext* context, const ::SmartPeakServer::WorkflowParameters* request, ::SmartPeakServer::ProgressInfo* response) {
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
+::grpc::Status Workflow::Service::getWorkflowEvent(::grpc::ServerContext* context, const ::SmartPeakServer::WorkflowParameters* request, ::SmartPeakServer::WorkflowEvent* response) {
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
+::grpc::Status Workflow::Service::stopRunningWorkflow(::grpc::ServerContext* context, const ::SmartPeakServer::Interrupter* request, ::SmartPeakServer::Interrupter* response) {
+  (void) context;
+  (void) request;
+  (void) response;
   return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
 }
 

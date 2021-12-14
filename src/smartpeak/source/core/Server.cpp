@@ -222,9 +222,9 @@ namespace SmartPeak {
           for (auto& p : cmd.dynamic_filenames)
           {
             p.second.setTagValue(Filenames::Tag::MAIN_DIR, application_handler.main_dir_.generic_string());
-                      p.second.setTagValue(Filenames::Tag::MZML_INPUT_PATH, application_handler.filenames_.getTagValue(Filenames::Tag::MZML_INPUT_PATH));
-                      p.second.setTagValue(Filenames::Tag::FEATURES_INPUT_PATH, application_handler.filenames_.getTagValue(Filenames::Tag::FEATURES_INPUT_PATH));
-                      p.second.setTagValue(Filenames::Tag::FEATURES_OUTPUT_PATH, application_handler.filenames_.getTagValue(Filenames::Tag::FEATURES_OUTPUT_PATH));
+            p.second.setTagValue(Filenames::Tag::MZML_INPUT_PATH, application_handler.filenames_.getTagValue(Filenames::Tag::MZML_INPUT_PATH));
+            p.second.setTagValue(Filenames::Tag::FEATURES_INPUT_PATH, application_handler.filenames_.getTagValue(Filenames::Tag::FEATURES_INPUT_PATH));
+            p.second.setTagValue(Filenames::Tag::FEATURES_OUTPUT_PATH, application_handler.filenames_.getTagValue(Filenames::Tag::FEATURES_OUTPUT_PATH));
           }
         }
         
