@@ -29,7 +29,8 @@ set(sources_list_h
 	LoadValidationData.h
 	MapChromatograms.h
 	MatchSpectra.h
-	MergeFeatures.h
+	MergeFeaturesMS1.h
+	MergeFeaturesMS2.h
 	MergeSpectra.h
 	Pick2DFeatures.h
 	Pick3DFeatures.h
@@ -37,8 +38,8 @@ set(sources_list_h
 	PlotFeatures.h
 	QuantifyFeatures.h
 	SearchAccurateMass.h
-	SearchSpectrum.h
-	SearchSpectrumAndKeepUnknown.h
+	SearchSpectrumMS1.h
+	SearchSpectrumMS2.h
 	SelectFeatures.h
 	StoreAnnotations.h
 	StoreFeatureFiltersRDP.h

@@ -20,7 +20,7 @@
 // $Maintainer: Douglas McCloskey $
 // $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
 // --------------------------------------------------------------------------
-#include <SmartPeak/core/RawDataProcessors/SearchSpectrum.h>
+#include <SmartPeak/core/RawDataProcessors/SearchSpectrumMS1.h>
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/Utilities.h>
 #include <SmartPeak/core/FeatureFiltersUtils.h>
@@ -36,27 +36,28 @@
 namespace SmartPeak
 {
 
-  std::set<std::string> SearchSpectrum::getInputs() const
+  std::set<std::string> SearchSpectrumMS1::getInputs() const
   {
     return { "Features" };
   }
 
-  std::set<std::string> SearchSpectrum::getOutputs() const
+  std::set<std::string> SearchSpectrumMS1::getOutputs() const
   {
     return { "Features" };
   }
 
-  std::vector<std::string> SearchSpectrum::getRequirements() const
+  std::vector<std::string> SearchSpectrumMS1::getRequirements() const
   {
     return { "sequence", "traML" };
   }
 
-  ParameterSet SearchSpectrum::getParameterSchema() const
+  ParameterSet SearchSpectrumMS1::getParameterSchema() const
   {
     OpenMS::TargetedSpectraExtractor oms_params;
     return ParameterSet({ oms_params });
   }
-  void SearchSpectrum::doProcess(RawDataHandler& rawDataHandler_IO,
+
+  void SearchSpectrumMS1::doProcess(RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const

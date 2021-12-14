@@ -889,8 +889,8 @@ namespace SmartPeak
           if (s_string == "DDA")
             ids = { "LOAD_RAW_DATA",
                     "PICK_3D_FEATURES",
-                    "SEARCH_SPECTRUM",
-                    "MERGE_FEATURES",
+                    "SEARCH_SPECTRUM_MS1",
+                    "MERGE_FEATURES_MS1",
                     "CONSTRUCT_TRANSITIONS_LIST",
                     "STORE_FEATURES"};
           else if (s_string == "LCMS MRM Unknowns")
@@ -982,7 +982,7 @@ namespace SmartPeak
                     "ESTIMATE_FEATURE_BACKGROUND_INTERFERENCES",
                     "STORE_FEATURE_BACKGROUND_ESTIMATIONS",
                     "FILTER_FEATURES_BACKGROUND_INTERFERENCES",
-                    "MERGE_FEATURES",
+                    "MERGE_FEATURES_MS1",
                     "MERGE_INJECTIONS",
                     "STORE_FEATURES_SAMPLE_GROUP" };
           application_handler_.sequenceHandler_.setWorkflow(ids);

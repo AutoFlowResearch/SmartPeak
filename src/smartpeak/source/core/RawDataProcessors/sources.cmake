@@ -29,7 +29,9 @@ set(sources_list
 	LoadValidationData.cpp
 	MapChromatograms.cpp
 	MatchSpectra.cpp
-	MergeFeatures.cpp
+	MergeFeaturesMS1.cpp
+	MergeFeaturesMS2.cpp
+	MergeSpectra.cpp
 	MergeSpectra.cpp
 	PickMRMFeatures.cpp
 	Pick2DFeatures.cpp
@@ -37,8 +39,8 @@ set(sources_list
 	PlotFeatures.cpp
 	QuantifyFeatures.cpp
 	SearchAccurateMass.cpp
-	SearchSpectrum.cpp
-	SearchSpectrumAndKeepUnknown.cpp
+	SearchSpectrumMS1.cpp
+	SearchSpectrumMS2.cpp
 	SelectFeatures.cpp
 	StoreAnnotations.cpp
 	StoreFeatureFiltersRDP.cpp

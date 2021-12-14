@@ -17,10 +17,10 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Douglas McCloskey $
-// $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
+// $Maintainer: Douglas McCloskey, Bertrand Boudaud $
+// $Authors: Douglas McCloskey $
 // --------------------------------------------------------------------------
-#include <SmartPeak/core/RawDataProcessors/MergeFeatures.h>
+#include <SmartPeak/core/RawDataProcessors/SearchSpectrumMS2.h>
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/Utilities.h>
 #include <SmartPeak/core/FeatureFiltersUtils.h>
@@ -36,51 +36,42 @@
 namespace SmartPeak
 {
 
-  std::set<std::string> MergeFeatures::getInputs() const
-  {
-    return { "Features" };
-  }
-
-  std::set<std::string> MergeFeatures::getOutputs() const
-  {
-    return { "Features" };
-  }
-
-  std::vector<std::string> MergeFeatures::getRequirements() const
+  std::vector<std::string> SearchSpectrumMS2::getRequirements() const
   {
     return { "sequence", "traML" };
   }
 
-  ParameterSet MergeFeatures::getParameterSchema() const
+  ParameterSet SearchSpectrumMS2::getParameterSchema() const
   {
     OpenMS::TargetedSpectraExtractor oms_params;
-    ParameterSet parameters({ oms_params });
-    return parameters;
+    return ParameterSet({ oms_params });
   }
-
-  void MergeFeatures::doProcess(RawDataHandler& rawDataHandler_IO,
+  void SearchSpectrumMS2::process(RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
+    LOGD << "START SearchSpectrumMS2";
     getFilenames(filenames_I);
 
     // Complete user parameters with schema
     ParameterSet params(params_I);
     params.merge(getParameterSchema());
+    std::filesystem::path main_path(filenames_I.getTagValue(Filenames::Tag::MAIN_DIR));
+    Utilities::prepareFileParameterList(params, "TargetedSpectraExtractor", "AccurateMassSearchEngine:db:mapping", main_path);
+    Utilities::prepareFileParameterList(params, "TargetedSpectraExtractor", "AccurateMassSearchEngine:db:struct", main_path);
+    Utilities::prepareFileParameter(params, "TargetedSpectraExtractor", "AccurateMassSearchEngine:positive_adducts", main_path);
+    Utilities::prepareFileParameter(params, "TargetedSpectraExtractor", "AccurateMassSearchEngine:negative_adducts", main_path);
 
     OpenMS::TargetedSpectraExtractor targeted_spectra_extractor;
     Utilities::setUserParameters(targeted_spectra_extractor, params);
 
-    // merge features
-    OpenMS::FeatureMap& ms1_accurate_mass_found_feature_map = rawDataHandler_IO.getFeatureMap();
-    OpenMS::FeatureMap ms1_merged_features;
-    targeted_spectra_extractor.mergeFeatures(ms1_accurate_mass_found_feature_map, ms1_merged_features);
-    rawDataHandler_IO.setFeatureMap("ms1_merged_features", ms1_merged_features);
-    rawDataHandler_IO.setFeatureMap(ms1_merged_features);
-    rawDataHandler_IO.updateFeatureMapHistory();
+    OpenMS::FeatureMap feat_map_output;
+    targeted_spectra_extractor.searchSpectrum(rawDataHandler_IO.getFeatureMap(), feat_map_output, true);
+    rawDataHandler_IO.setFeatureMap(feat_map_output);
+    // rawDataHandler_IO.updateFeatureMapHistory();
 
-    LOGI << "MergeFeatures output size: " << rawDataHandler_IO.getFeatureMap().size();
+    LOGD << "END SearchSpectrumMS2";
   }
 
 }

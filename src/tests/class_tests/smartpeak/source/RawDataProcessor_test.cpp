@@ -50,9 +50,11 @@
 #include <SmartPeak/core/RawDataProcessors/Pick2DFeatures.h>
 #include <SmartPeak/core/RawDataProcessors/Pick3DFeatures.h>
 #include <SmartPeak/core/RawDataProcessors/SearchAccurateMass.h>
-#include <SmartPeak/core/RawDataProcessors/MergeFeatures.h>
+#include <SmartPeak/core/RawDataProcessors/MergeFeaturesMS1.h>
+#include <SmartPeak/core/RawDataProcessors/MergeFeaturesMS1.h>
 #include <SmartPeak/core/RawDataProcessors/LoadAnnotations.h>
-#include <SmartPeak/core/RawDataProcessors/SearchSpectrum.h>
+#include <SmartPeak/core/RawDataProcessors/SearchSpectrumMS1.h>
+#include <SmartPeak/core/RawDataProcessors/SearchSpectrumMS2.h>
 #include <SmartPeak/core/RawDataProcessors/StoreAnnotations.h>
 #include <SmartPeak/core/RawDataProcessors/ClearData.h>
 #include <SmartPeak/core/RawDataProcessors/StoreRawData.h>
@@ -1582,26 +1584,26 @@ TEST(RawDataProcessor, searchAccurateMass)
 }
 
 /**
-  MergeFeatures Tests
+  MergeFeaturesMS1 Tests
 */
-TEST(RawDataProcessor, constructorMergeFeatures)
+TEST(RawDataProcessor, constructorMergeFeaturesMS1)
 {
-  MergeFeatures* ptrPickFeatures = nullptr;
-  MergeFeatures* nullPointerPickFeatures = nullptr;
+  MergeFeaturesMS1* ptrPickFeatures = nullptr;
+  MergeFeaturesMS1* nullPointerPickFeatures = nullptr;
   EXPECT_EQ(ptrPickFeatures, nullPointerPickFeatures);
 }
 
 TEST(RawDataProcessor, destructorMergeFeatures)
 {
-  MergeFeatures* ptrPickFeatures = nullptr;
-  ptrPickFeatures = new MergeFeatures();
+  MergeFeaturesMS1* ptrPickFeatures = nullptr;
+  ptrPickFeatures = new MergeFeaturesMS1();
   delete ptrPickFeatures;
 }
 
-TEST(RawDataProcessor, gettersMergeFeatures)
+TEST(RawDataProcessor, gettersMergeFeaturesMS1)
 {
-  MergeFeatures processor;
-  EXPECT_EQ(processor.getName(), "MERGE_FEATURES");
+  MergeFeaturesMS1 processor;
+  EXPECT_EQ(processor.getName(), "MERGE_FEATURES_MS1");
 }
 
 TEST(RawDataProcessor, consensusFeatures)
@@ -1618,7 +1620,7 @@ TEST(RawDataProcessor, consensusFeatures)
   loadFeatures.process(rawDataHandler, params_1, filenames);
 
   // Test accurate mass search
-  MergeFeatures makeConsensusFeatures;
+  MergeFeaturesMS1 makeConsensusFeatures;
   makeConsensusFeatures.process(rawDataHandler, params_1, filenames);
 
   EXPECT_EQ(rawDataHandler.getFeatureMap().size(), 4);
@@ -2855,8 +2857,8 @@ TEST(RawDataProcessor, calculateMDVAccuracies)
 */
 TEST(RawDataProcessor, gettersSearchSpectrum)
 {
-  SearchSpectrum processor;
-  EXPECT_EQ(processor.getName(), "SEARCH_SPECTRUM");
+  SearchSpectrumMS1 processor;
+  EXPECT_EQ(processor.getName(), "SEARCH_SPECTRUM_MS1");
 }
 
 TEST(RawDataProcessor, SearchSpectrum)
@@ -2880,7 +2882,7 @@ TEST(RawDataProcessor, SearchSpectrum)
   filenames.setFullPath("featureXML_i", SMARTPEAK_GET_TEST_DATA_PATH("dda_min.featureXML"));
   loadFeatures.process(rawDataHandler, params_1, filenames);
 
-  SearchSpectrum searchSpectrum;
+  SearchSpectrumMS1 searchSpectrum;
   searchSpectrum.process(rawDataHandler, params_1, filenames);
 
   ASSERT_EQ(rawDataHandler.getFeatureMap().size(), 1986);
