@@ -33,10 +33,10 @@
 namespace SmartPeak
 {
 
-  struct SearchSpectrum : RawDataProcessor
+  struct SearchSpectrumMS1 : RawDataProcessor
   {
     /* IProcessorDescription */
-    virtual std::string getName() const override { return "SEARCH_SPECTRUM"; }
+    virtual std::string getName() const override { return "SEARCH_SPECTRUM_MS1"; }
     virtual std::string getDescription() const override { return "Search accurate masses and add identification (peptide hits) as features/sub-features"; }
     virtual ParameterSet getParameterSchema() const override;
     virtual std::vector<std::string> getRequirements() const override;

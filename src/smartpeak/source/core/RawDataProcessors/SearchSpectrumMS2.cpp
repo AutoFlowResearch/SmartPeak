@@ -17,10 +17,10 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Douglas McCloskey $
-// $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
+// $Maintainer: Douglas McCloskey, Bertrand Boudaud $
+// $Authors: Douglas McCloskey $
 // --------------------------------------------------------------------------
-#include <SmartPeak/core/RawDataProcessors/SearchSpectrum.h>
+#include <SmartPeak/core/RawDataProcessors/SearchSpectrumMS2.h>
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/Utilities.h>
 #include <SmartPeak/core/FeatureFiltersUtils.h>
@@ -36,22 +36,22 @@
 namespace SmartPeak
 {
 
-  std::vector<std::string> SearchSpectrum::getRequirements() const
+  std::vector<std::string> SearchSpectrumMS2::getRequirements() const
   {
     return { "sequence", "traML" };
   }
 
-  ParameterSet SearchSpectrum::getParameterSchema() const
+  ParameterSet SearchSpectrumMS2::getParameterSchema() const
   {
     OpenMS::TargetedSpectraExtractor oms_params;
     return ParameterSet({ oms_params });
   }
-  void SearchSpectrum::process(RawDataHandler& rawDataHandler_IO,
+  void SearchSpectrumMS2::process(RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START SearchSpectrum";
+    LOGD << "START SearchSpectrumMS2";
     getFilenames(filenames_I);
 
     // Complete user parameters with schema
@@ -67,10 +67,11 @@ namespace SmartPeak
     Utilities::setUserParameters(targeted_spectra_extractor, params);
 
     OpenMS::FeatureMap feat_map_output;
-    targeted_spectra_extractor.searchSpectrum(rawDataHandler_IO.getFeatureMap(), feat_map_output);
+    targeted_spectra_extractor.searchSpectrum(rawDataHandler_IO.getFeatureMap(), feat_map_output, true);
     rawDataHandler_IO.setFeatureMap(feat_map_output);
+    // rawDataHandler_IO.updateFeatureMapHistory();
 
-    LOGD << "END SearchSpectrum";
+    LOGD << "END SearchSpectrumMS2";
   }
 
 }

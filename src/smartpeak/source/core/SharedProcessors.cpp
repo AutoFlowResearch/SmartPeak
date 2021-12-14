@@ -49,10 +49,11 @@
 #include <SmartPeak/core/RawDataProcessors/Pick2DFeatures.h>
 #include <SmartPeak/core/RawDataProcessors/Pick3DFeatures.h>
 #include <SmartPeak/core/RawDataProcessors/SearchAccurateMass.h>
-#include <SmartPeak/core/RawDataProcessors/MergeFeatures.h>
+#include <SmartPeak/core/RawDataProcessors/MergeFeaturesMS1.h>
+#include <SmartPeak/core/RawDataProcessors/MergeFeaturesMS2.h>
 #include <SmartPeak/core/RawDataProcessors/LoadAnnotations.h>
-#include <SmartPeak/core/RawDataProcessors/SearchSpectrum.h>
-#include <SmartPeak/core/RawDataProcessors/SearchSpectrumAndKeepUnknown.h>
+#include <SmartPeak/core/RawDataProcessors/SearchSpectrumMS1.h>
+#include <SmartPeak/core/RawDataProcessors/SearchSpectrumMS2.h>
 #include <SmartPeak/core/RawDataProcessors/ConstructTransitionsList.h>
 #include <SmartPeak/core/RawDataProcessors/StoreAnnotations.h>
 #include <SmartPeak/core/RawDataProcessors/ClearData.h>
@@ -125,12 +126,13 @@ namespace SmartPeak {
     {"PICK_2D_FEATURES",                          std::make_shared<Pick2DFeatures>()},
     {"PICK_3D_FEATURES",                          std::make_shared<Pick3DFeatures>()},
     {"SEARCH_ACCURATE_MASS",                      std::make_shared<SearchAccurateMass>()},
-    {"MERGE_FEATURES",                            std::make_shared<MergeFeatures>()},
+    {"MERGE_FEATURES_MS1",                        std::make_shared<MergeFeaturesMS1>()},
+    {"MERGE_FEATURES_MS2",                        std::make_shared<MergeFeaturesMS2>()},
     {"LOAD_ANNOTATIONS",                          std::make_shared<LoadAnnotations>()},
-    {"SEARCH_SPECTRUM",                           std::make_shared<SearchSpectrum>()},
-    {"SEARCH_SPECTRUM",                           std::make_shared<SearchSpectrum>()},
-    {"SEARCH_SPECTRUM_KEEP_UNKNOWN",          std::make_shared<SearchSpectrumAndKeepUnknown>()},
-    {"CONSTRUCT_TRANSITIONS_LIST",                std::make_shared<ConstructTransitionsList>()},    {"STORE_ANNOTATIONS",                         std::make_shared<StoreAnnotations>()},
+    {"SEARCH_SPECTRUM_MS1",                       std::make_shared<SearchSpectrumMS1>()},
+    {"SEARCH_SPECTRUM_MS2",                       std::make_shared<SearchSpectrumMS2>()},
+    {"CONSTRUCT_TRANSITIONS_LIST",                std::make_shared<ConstructTransitionsList>()},
+    {"STORE_ANNOTATIONS",                         std::make_shared<StoreAnnotations>()},
     {"CLEAR_DATA",                                std::make_shared<ClearData>()},
     {"STORE_MSP",                                 std::make_shared<StoreMSP>()},
     {"STORE_RAW_DATA",                            std::make_shared<StoreRawData>()},

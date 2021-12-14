@@ -20,7 +20,7 @@
 // $Maintainer: Douglas McCloskey $
 // $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
 // --------------------------------------------------------------------------
-#include <SmartPeak/core/RawDataProcessors/MergeFeatures.h>
+#include <SmartPeak/core/RawDataProcessors/MergeFeaturesMS1.h>
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/Utilities.h>
 #include <SmartPeak/core/FeatureFiltersUtils.h>
@@ -36,24 +36,24 @@
 namespace SmartPeak
 {
 
-  std::vector<std::string> MergeFeatures::getRequirements() const
+  std::vector<std::string> MergeFeaturesMS1::getRequirements() const
   {
     return { "sequence", "traML" };
   }
 
-  ParameterSet MergeFeatures::getParameterSchema() const
+  ParameterSet MergeFeaturesMS1::getParameterSchema() const
   {
     OpenMS::TargetedSpectraExtractor oms_params;
     ParameterSet parameters({ oms_params });
     return parameters;
   }
 
-  void MergeFeatures::process(RawDataHandler& rawDataHandler_IO,
+  void MergeFeaturesMS1::process(RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START MergeFeatures";
+    LOGD << "START MergeFeaturesMS1";
     getFilenames(filenames_I);
 
     // Complete user parameters with schema
@@ -71,7 +71,7 @@ namespace SmartPeak
     rawDataHandler_IO.setFeatureMap(ms1_merged_features);
     rawDataHandler_IO.updateFeatureMapHistory();
 
-    LOGD << "END MergeFeatures";
+    LOGD << "END MergeFeaturesMS1";
   }
 
 }

@@ -17,10 +17,10 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Douglas McCloskey, Bertrand Boudaud $
-// $Authors: Douglas McCloskey $
+// $Maintainer: Douglas McCloskey $
+// $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
 // --------------------------------------------------------------------------
-#include <SmartPeak/core/RawDataProcessors/SearchSpectrumAndKeepUnknown.h>
+#include <SmartPeak/core/RawDataProcessors/SearchSpectrumMS1.h>
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/Utilities.h>
 #include <SmartPeak/core/FeatureFiltersUtils.h>
@@ -36,22 +36,23 @@
 namespace SmartPeak
 {
 
-  std::vector<std::string> SearchSpectrumAndKeepUnknown::getRequirements() const
+  std::vector<std::string> SearchSpectrumMS1::getRequirements() const
   {
     return { "sequence", "traML" };
   }
 
-  ParameterSet SearchSpectrumAndKeepUnknown::getParameterSchema() const
+  ParameterSet SearchSpectrumMS1::getParameterSchema() const
   {
     OpenMS::TargetedSpectraExtractor oms_params;
     return ParameterSet({ oms_params });
   }
-  void SearchSpectrumAndKeepUnknown::process(RawDataHandler& rawDataHandler_IO,
+
+  void SearchSpectrumMS1::process(RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START SearchSpectrumAndKeepUnknown";
+    LOGD << "START SearchSpectrumMS1";
     getFilenames(filenames_I);
 
     // Complete user parameters with schema
@@ -67,11 +68,10 @@ namespace SmartPeak
     Utilities::setUserParameters(targeted_spectra_extractor, params);
 
     OpenMS::FeatureMap feat_map_output;
-    targeted_spectra_extractor.searchSpectrum(rawDataHandler_IO.getFeatureMap(), feat_map_output, true);
+    targeted_spectra_extractor.searchSpectrum(rawDataHandler_IO.getFeatureMap(), feat_map_output);
     rawDataHandler_IO.setFeatureMap(feat_map_output);
-    // rawDataHandler_IO.updateFeatureMapHistory();
 
-    LOGD << "END SearchSpectrumAndKeepUnknown";
+    LOGD << "END SearchSpectrumMS1";
   }
 
 }

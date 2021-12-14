@@ -61,10 +61,7 @@ namespace SmartPeak
 
   void RawDataHandler::setFeatureMap(const std::string& name, const OpenMS::FeatureMap& feature_map)
   {
-    if (!named_feature_maps_.count(name))
-    {
-      named_feature_maps_.insert_or_assign(name, feature_map);
-    }
+    named_feature_maps_.insert_or_assign(name, feature_map);
   }
 
   OpenMS::FeatureMap& RawDataHandler::getFeatureMap(const std::string& name)

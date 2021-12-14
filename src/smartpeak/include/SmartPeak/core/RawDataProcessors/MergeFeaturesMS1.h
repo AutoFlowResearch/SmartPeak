@@ -33,10 +33,10 @@
 namespace SmartPeak
 {
 
-  struct MergeFeatures : RawDataProcessor
+  struct MergeFeaturesMS1 : RawDataProcessor
   {
     /* IProcessorDescription */
-    virtual std::string getName() const override { return "MERGE_FEATURES"; }
+    virtual std::string getName() const override { return "MERGE_FEATURES_MS1"; }
     virtual std::string getDescription() const override { return "Create merged features from accurate mass search results."; }
     virtual ParameterSet getParameterSchema() const override;
     virtual std::vector<std::string> getRequirements() const override;
