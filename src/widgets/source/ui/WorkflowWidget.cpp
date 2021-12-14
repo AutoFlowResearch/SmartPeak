@@ -869,7 +869,9 @@ namespace SmartPeak
     if (editable && ImGui::BeginCombo("Presets", NULL))
     {
       static const char* presets[] = {
-        "DDA",
+        "LCMS DDA Transitions Library Construction",
+        "LCMS DDA Spectra Library Construction",
+        "LCMS DDA Spectra Library Matching",
         "LCMS MRM Unknowns",
         "LCMS MRM Standards",
         "HPLC UV Unknowns",
@@ -885,14 +887,37 @@ namespace SmartPeak
         if (ImGui::Selectable(s))
         {
           std::vector<std::string> ids;
-          const std::string s_string{ s };
-          if (s_string == "DDA")
+          const std::string s_string { s };
+          if (s_string == "LCMS DDA Transitions Library Construction")
             ids = { "LOAD_RAW_DATA",
                     "PICK_3D_FEATURES",
                     "SEARCH_SPECTRUM_MS1",
                     "MERGE_FEATURES_MS1",
+                    "EXTRACT_SPECTRA_NON_TARGETED",
+                    "SEARCH_SPECTRUM_MS2",
+                    "MERGE_FEATURES_MS2",
                     "CONSTRUCT_TRANSITIONS_LIST",
                     "STORE_FEATURES"};
+          else if (s_string == "LCMS DDA Spectra Library Construction")
+            ids = { "LOAD_RAW_DATA",
+                    "PICK_3D_FEATURES",
+                    "SEARCH_SPECTRUM_MS1",
+                    "MERGE_FEATURES_MS1",
+                    "EXTRACT_SPECTRA_NON_TARGETED",
+                    "SEARCH_SPECTRUM_MS2",
+                    "MERGE_FEATURES_MS2",
+                    "STORE_MSP",
+                    "STORE_FEATURES" };
+          else if (s_string == "LCMS DDA Spectra Library Matching")
+            ids = { "LOAD_RAW_DATA",
+                    "PICK_3D_FEATURES",
+                    "SEARCH_SPECTRUM_MS1",
+                    "MERGE_FEATURES_MS1",
+                    "EXTRACT_SPECTRA_NON_TARGETED",
+                    "SEARCH_SPECTRUM_MS2",
+                    "MERGE_FEATURES_MS2",
+                    "MATCH_SPECTRA",
+                    "STORE_FEATURES" };
           else if (s_string == "LCMS MRM Unknowns")
             ids = { "LOAD_RAW_DATA",
                     "MAP_CHROMATOGRAMS",

@@ -51,6 +51,7 @@
 #include <SmartPeak/core/RawDataProcessors/SearchAccurateMass.h>
 #include <SmartPeak/core/RawDataProcessors/MergeFeaturesMS1.h>
 #include <SmartPeak/core/RawDataProcessors/MergeFeaturesMS2.h>
+#include <SmartPeak/core/RawDataProcessors/MatchSpectra.h>
 #include <SmartPeak/core/RawDataProcessors/LoadAnnotations.h>
 #include <SmartPeak/core/RawDataProcessors/SearchSpectrumMS1.h>
 #include <SmartPeak/core/RawDataProcessors/SearchSpectrumMS2.h>
@@ -132,6 +133,7 @@ namespace SmartPeak {
     {"LOAD_ANNOTATIONS",                          std::make_shared<LoadAnnotations>()},
     {"SEARCH_SPECTRUM_MS1",                       std::make_shared<SearchSpectrumMS1>()},
     {"SEARCH_SPECTRUM_MS2",                       std::make_shared<SearchSpectrumMS2>()},
+    {"MATCH_SPECTRA",                             std::make_shared<MatchSpectra>()},
     {"CONSTRUCT_TRANSITIONS_LIST",                std::make_shared<ConstructTransitionsList>()},
     {"STORE_ANNOTATIONS",                         std::make_shared<StoreAnnotations>()},
     {"CLEAR_DATA",                                std::make_shared<ClearData>()},
