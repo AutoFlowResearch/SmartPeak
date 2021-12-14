@@ -66,8 +66,9 @@ namespace SmartPeak
     ImGuiIO& io = ImGui::GetIO();
     static const int menu_height = 18;
     static const int padding_height = 50;
+    auto main_view_pos = ImGui::GetMainViewport()->Pos;
     ImGui::SetNextWindowSize(ImVec2(io.DisplaySize.x, io.DisplaySize.y - menu_height));
-    ImGui::SetNextWindowPos(ImVec2(0, menu_height));
+    ImGui::SetNextWindowPos(ImVec2(main_view_pos.x, main_view_pos.y + menu_height));
     ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0);
     static bool visible = true;
     if (ImGui::Begin("Splitter", &visible, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus))
@@ -105,9 +106,8 @@ namespace SmartPeak
       showWindows(left_windows_);
       showWindows(top_windows_);
       showWindows(bottom_windows_);
-
-      ImGui::End();
     }
+    ImGui::End();
     ImGui::PopStyleVar();
     return;
   }
