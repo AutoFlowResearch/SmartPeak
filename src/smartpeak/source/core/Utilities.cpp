@@ -928,7 +928,8 @@ namespace SmartPeak
   bool Utilities::checkLastServerWorkflowRun(std::filesystem::path file_path, std::string& username)
   {
     bool load_last_run = false;
-    io::CSVReader<7,io::trim_chars<' ','\t'>,io::no_quote_escape<','>> serversession(file_path / ".serversession.ssi");
+    const auto serversession_file_path = file_path / ".serversession.ssi";
+    io::CSVReader<7, io::trim_chars<' ','\t'>, io::no_quote_escape<','>, io::no_comment> serversession(serversession_file_path.string());
     
     serversession.read_header(io::ignore_extra_column,
                               "usr_id","dataset_name","workflow_status",
@@ -944,6 +945,7 @@ namespace SmartPeak
         return true;
       }
     }
+    return load_last_run;
   }
 }
 
