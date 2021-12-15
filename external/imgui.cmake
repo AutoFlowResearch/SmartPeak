@@ -13,4 +13,5 @@ ExternalProject_Add(imgui
   CONFIGURE_COMMAND ""
   BUILD_COMMAND ""
   INSTALL_COMMAND ""
+  PATCH_COMMAND git apply ${CMAKE_CURRENT_LIST_DIR}/patches/imgui.patch
 )
