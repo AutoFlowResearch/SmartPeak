@@ -112,7 +112,7 @@ include_directories(${IMPLOT_INCLUDE_DIR})
 #------------------------------------------------------------------------------
 find_package(OpenSSL REQUIRED) 
 if(OpenSSL_FOUND)
-  include_directories(${OPENSSL_INCLUDE_DIRS})
+  include_directories(${OPENSSL_INCLUDE_DIR})
   link_directories(${OPENSSL_LIBRARIES})
   message(STATUS "[class_tests] : Using OpenSSL ${OPENSSL_VERSION}")
 endif()

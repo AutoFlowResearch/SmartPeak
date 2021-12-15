@@ -17,7 +17,7 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Douglas McCloskey $
+// $Maintainer: Douglas McCloskey, Ahmed Khalil $
 // $Authors: Douglas McCloskey, Bertrand Boudaud $
 // --------------------------------------------------------------------------
 
@@ -100,6 +100,18 @@ namespace SmartPeak
       ImGui::PushID(4);
       ImGui::InputTextWithHint("", "localhost:50051", &server_url);
       ImGui::PopID();
+      
+      if (ImGui::TreeNode("Sign In"))
+      {
+        ImGui::Text("Please enter your username and password");
+        ImGui::PushID(5);
+        ImGui::InputTextWithHint("", "username", &username);
+        ImGui::PopID();
+        ImGui::PushID(6);
+        ImGui::InputTextWithHint("", "password", &password, ImGuiInputTextFlags_Password);
+        ImGui::PopID();
+        ImGui::TreePop();
+      }
       
       ImGui::Separator();
       bool run_workflow_clicked = false;

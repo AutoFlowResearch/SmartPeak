@@ -26,6 +26,7 @@
 
 #include <SmartPeak/core/ApplicationHandler.h>
 #include <SmartPeak/core/SessionHandler.h>
+#include <SmartPeak/core/ServerAppender.h>
 #include <SmartPeak/core/WorkflowManager.h>
 #include <SmartPeak/core/EventDispatcher.h>
 #include <SmartPeak/core/ProgressInfo.h>
@@ -42,6 +43,7 @@
 #include <SmartPeak/iface/ISequenceSegmentProcessorObserver.h>
 
 #include <plog/Log.h>
+#include <sqlite3.h>
 
 #include <iostream>
 #include <mutex>
@@ -55,20 +57,6 @@
 
 namespace SmartPeak {
   namespace serv {
-  
-    class ServerAppender : public plog::IAppender
-    {
-    public:
-      typedef std::pair<plog::Severity, plog::util::nstring> ServerAppenderRecord;
-      
-      void write(const plog::Record& record) override;
-      
-      std::vector<ServerAppenderRecord> getAppenderRecordList(plog::Severity severity);
-
-    private:
-      std::vector<ServerAppenderRecord> messages;
-      mutable std::mutex messages_mutex;
-    };
   
     struct SeverEventDispatcherObserver :
       IApplicationProcessorObserver,
@@ -97,6 +85,10 @@ namespace SmartPeak {
       {
         events_.push_back(std::make_tuple("onApplicationProcessorEnd", 0, "", std::vector<std::string>()));
       }
+      virtual void onApplicationProcessorError(const std::string& error) override
+      {
+        events_.push_back(std::make_tuple("onApplicationProcessorError", 0, "", std::vector<std::string>({ error })));
+      }
       /**
         ISequenceProcessorObserver
       */
@@ -115,6 +107,10 @@ namespace SmartPeak {
       virtual void onSequenceProcessorEnd() override
       {
         events_.push_back(std::make_tuple("onSequenceProcessorEnd", 0, "", std::vector<std::string>()));
+      }
+      virtual void onSequenceProcessorError(const std::string& sample_name, const std::string& processor_name, const std::string& error) override
+      {
+        events_.push_back(std::make_tuple("onSequenceProcessorError", 0, sample_name, std::vector<std::string>({ processor_name , error })));
       }
       /**
         ISequenceSegmentProcessorObserver
@@ -135,6 +131,10 @@ namespace SmartPeak {
       {
         events_.push_back(std::make_tuple("onSequenceSegmentProcessorEnd", 0, "", std::vector<std::string>()));
       }
+      virtual void onSequenceSegmentProcessorError(const std::string& segment_name, const std::string& processor_name, const std::string& error) override
+      {
+        events_.push_back(std::make_tuple("onSequenceSegmentProcessorError", 0, segment_name, std::vector<std::string>({ processor_name , error })));
+      }
       /**
         ISampleGroupProcessorObserver
       */
@@ -153,6 +153,10 @@ namespace SmartPeak {
       virtual void onSampleGroupProcessorEnd() override
       {
         events_.push_back(std::make_tuple("onSampleGroupProcessorEnd", 0, "", std::vector<std::string>()));
+      }
+      virtual void onSampleGroupProcessorError(const std::string& group_name, const std::string& processor_name, const std::string& error)
+      {
+        events_.push_back(std::make_tuple("onSampleGroupProcessorError", 0, group_name, std::vector<std::string>({ processor_name , error})));
       }
 
       /**
@@ -230,7 +234,7 @@ namespace SmartPeak {
       SeverEventDispatcherObserver server_event_dispatcher_observer_;
       std::shared_ptr<ProgressInfo> progress_info_ptr_;
       std::vector<ApplicationHandler::Command> commands_;
-      std::shared_ptr<serv::ServerAppender> server_appender_;
+      std::shared_ptr<ServerAppender> server_appender_;
     };
 
     void extract_report_sampletypes(

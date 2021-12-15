@@ -24,6 +24,7 @@ set(sources_list
 	SequenceSegmentHandler.cpp
 	SequenceSegmentProcessor.cpp
 	SessionHandler.cpp
+	ServerAppender.cpp
 	SessionLoaderGenerator.cpp
 	SharedProcessors.cpp
 	Server.cpp

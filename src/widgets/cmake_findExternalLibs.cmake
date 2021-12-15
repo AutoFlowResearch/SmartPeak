@@ -40,6 +40,16 @@ find_package(ImPlot REQUIRED)
 find_package(Plog REQUIRED)
 
 #------------------------------------------------------------------------------
+# Find OpenSSL
+#------------------------------------------------------------------------------
+find_package(OpenSSL REQUIRED) 
+if(OpenSSL_FOUND)
+  include_directories(${OPENSSL_INCLUDE_DIR})
+  link_directories(${OPENSSL_LIBRARIES})
+  message(STATUS "[libSmartPeak] : Using OpenSSL ${OPENSSL_VERSION}")
+endif()
+
+#------------------------------------------------------------------------------
 # Find OpenMS
 #------------------------------------------------------------------------------
 find_package(OpenMS REQUIRED)

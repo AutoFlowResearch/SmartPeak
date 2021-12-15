@@ -61,7 +61,9 @@ include (${PROJECT_SOURCE_DIR}/includes.cmake)
 
 #------------------------------------------------------------------------------
 # all the dependency libraries are linked into libSmartPeak.so
-set(SMARTPEAK_DEP_LIBRARIES ${OpenMS_LIBRARIES} OpenSSL::SSL OpenSSL::Crypto)
+# set(SMARTPEAK_DEP_LIBRARIES ${OpenMS_LIBRARIES} OpenSSL::SSL OpenSSL::Crypto)
+set(SMARTPEAK_DEP_LIBRARIES ${OpenMS_LIBRARIES})
+include_directories(${OPENSSL_INCLUDE_DIR})
 
 # xerces requires linking against CoreFoundation&CoreServices
 if(APPLE)
@@ -86,9 +88,10 @@ smartpeak_add_library(TARGET_NAME  SmartPeak
                                      ${EIGEN3_INCLUDE_DIR}
                                      ${PLOG_INCLUDE_DIR}
                                      ${SQLITE_INCLUDE_DIR}
-                                     ${OPENSSL_INCLUDE_DIRS}
+                                     ${OPENSSL_INCLUDE_DIR}
                    LINK_LIBRARIES ${APPLE_EXTRA_LIBS}
                                   ${SMARTPEAK_DEP_LIBRARIES}
+                                  ${OPENSSL_LIBRARIES}
                    DLL_EXPORT_PATH "SmartPeak/")
 
 #------------------------------------------------------------------------------

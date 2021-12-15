@@ -172,7 +172,8 @@ set(grpc_required_libs
 
 find_package(OpenSSL REQUIRED) 
 if(OpenSSL_FOUND)
-  include_directories(${OPENSSL_INCLUDE_DIRS})
+  include_directories(${OPENSSL_INCLUDE_DIR})
+  message(">> OPENSSL_INCLUDE_DIR : ${OPENSSL_INCLUDE_DIR}")
   link_directories(${OPENSSL_LIBRARIES})
   message(STATUS "[examples] : Using OpenSSL ${OPENSSL_VERSION}")
 endif()
@@ -199,7 +200,7 @@ foreach(_examples ${EXAMPLE_executables})
             OpenMS ${SDL2_LIBRARY} ${OPENGL_LIBRARIES} ImPlot::ImPlot ImGui::ImGui 
             ${COREFOUNDATION_LIBRARY} ${APPLICATIONSERVICES_LIBRARY}
             PRIVATE ImPlot::Sources ImGui::Sources ImGui::Examples ImGui::SourcesMiscCpp
-            ${grpc_required_libs})
+            ${grpc_required_libs} OpenSSL::SSL OpenSSL::Crypto)
       install(TARGETS ${_examples}  BUNDLE DESTINATION .  COMPONENT Applications)
     else()
       add_executable(${_examples} source/${_examples})

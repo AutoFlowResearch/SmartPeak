@@ -110,10 +110,14 @@ int main(int argc, char** argv)
   bool exceeding_table_size_ = false;
   bool ran_integrity_check_ = false;
   bool integrity_check_failed_ = false;
+  bool RawDataAndFeatures_loaded_ = false;
+  bool run_remote_workflow_ = true;
   ApplicationHandler application_handler_;
   SessionHandler session_handler_;
   WorkflowManager workflow_manager_;
   GuiAppender appender_;
+  WorkflowClient workflow_client_;
+  std::future<std::string> runworkflow_future_;
   SplitWindow split_window;
   LayoutLoader layout_loader(application_handler_);
 
@@ -702,9 +706,9 @@ int main(int argc, char** argv)
     // ======================================
       if (run_workflow_widget_->server_fields_set)
       {
-        Utilities::createServerSessionFile(application_handler_.filenames_.getTag(Filenames::Tag::MAIN_DIR));
+        Utilities::createServerSessionFile(application_handler_.filenames_.getTagValue(Filenames::Tag::MAIN_DIR));
         std::string id = run_workflow_widget_->username;
-        if (Utilities::checkLastServerWorkflowRun(application_handler_.filenames_.getTag(Filenames::Tag::MAIN_DIR), id))
+        if (Utilities::checkLastServerWorkflowRun(application_handler_.filenames_.getTagValue(Filenames::Tag::MAIN_DIR), id))
         {
           ImGui::OpenPopup("Server Session Found");
           if (ImGui::BeginPopupModal("Server Session Found", NULL, ImGuiWindowFlags_AlwaysAutoResize))
@@ -737,7 +741,7 @@ int main(int argc, char** argv)
             std::launch::async,
             &WorkflowClient::runWorkflow,
             &workflow_client_,
-            application_handler_.filenames_.getTag(Filenames::Tag::MAIN_DIR),
+            application_handler_.filenames_.getTagValue(Filenames::Tag::MAIN_DIR),
             run_workflow_widget_->username,
             Utilities::sha256(run_workflow_widget_->password)
           );

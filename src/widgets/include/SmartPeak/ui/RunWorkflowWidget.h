@@ -73,6 +73,8 @@ namespace SmartPeak
     std::string features_out_dir_old_;
   public:
     std::string server_url;
+    std::string username;
+    std::string password;
     bool server_fields_set;
   };
 }
