@@ -895,7 +895,7 @@ namespace SmartPeak
     SHA256_Update(&sha256, str.c_str(), str.size());
     SHA256_Final(hash, &sha256);
     std::stringstream ss;
-    for(int i = 0; i < SHA256_DIGEST_LENGTH; i++)
+    for (int i = 0; i < SHA256_DIGEST_LENGTH; i++)
     {
       ss << std::hex << std::setw(2) << std::setfill('0') << (int)hash[i];
     }
@@ -936,7 +936,8 @@ namespace SmartPeak
     
     std::string usr_id; std::string dataset_name; std::string workflow_status;
     std::string started_at; std::string finished_at; std::string path_to_exports; std::string log_file;
-    while(serversession.read_row(usr_id, dataset_name, workflow_status, started_at, finished_at, path_to_exports, log_file)){
+    while (serversession.read_row(usr_id, dataset_name, workflow_status, started_at, finished_at, path_to_exports, log_file))
+    {
       if (username == usr_id && workflow_status == "YES") {
         LOGI  << "Loading workflow processed for : " << usr_id
               << ", started : " << started_at << ", finished : " << finished_at << std::endl;

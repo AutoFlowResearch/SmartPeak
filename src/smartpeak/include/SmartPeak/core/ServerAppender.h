@@ -2,7 +2,7 @@
 //   SmartPeak -- Fast and Accurate CE-, GC- and LC-MS(/MS) Data Processing
 // --------------------------------------------------------------------------
 // Copyright The SmartPeak Team -- Novo Nordisk Foundation
-// Center for Biosustainability, Technical University of Denmark 2018-2021.
+// Center for Biosustainability, Technical University of Denmark 2018-2022.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 // AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -23,6 +23,8 @@
 
 #pragma once
 #include <plog/Log.h>
+#include <mutex>
+#include <vector>
 
 namespace SmartPeak {
 	class ServerAppender : public plog::IAppender
