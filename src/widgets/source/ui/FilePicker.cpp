@@ -226,7 +226,7 @@ namespace SmartPeak
     ImGui::EndChild();
     ImGui::Separator();
 
-    ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.9f);
+    ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.8f);
     if (mode_ == Mode::EDirectory)
     {
       ImGui::InputTextWithHint("", "Directory name", &selected_filename_);
@@ -238,10 +238,11 @@ namespace SmartPeak
     ImGui::PopItemWidth();
 
     ImGui::SameLine();
-    ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.5f);
-    if (ImGui::Button(open_button_text_.c_str()))
+    auto button_width = ImGui::GetContentRegionAvail().x * 0.5f;
+    if (ImGui::Button(open_button_text_.c_str(), ImVec2(button_width, 0)))
     {
-      picked_pathname_ = current_pathname_.string();      if (picked_pathname_.back() != '/')
+      picked_pathname_ = current_pathname_.string();
+      if (picked_pathname_.back() != '/')
       {
         picked_pathname_.append("/");
       }
@@ -255,18 +256,16 @@ namespace SmartPeak
         doOpenFile();
       }
     }
-    ImGui::PopItemWidth();
 
     ImGui::SameLine();
-    ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth());
-    if (ImGui::Button("Cancel"))
+    button_width = ImGui::GetContentRegionAvail().x;
+    if (ImGui::Button("Cancel", ImVec2(button_width, 0)))
     {
       picked_pathname_.clear();
       selected_entry_ = -1;
       visible_ = false;
       ImGui::CloseCurrentPopup();
     }
-    ImGui::PopItemWidth();
 
     if (show_confirmation_popup)
     {
