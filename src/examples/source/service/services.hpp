@@ -319,6 +319,7 @@ public:
                                              ::SmartPeakServer::Interrupter* response) override
   {
     workflow_process_interrupted = true;
+    return grpc::Status(grpc::StatusCode::CANCELLED, "CANCELLED");
   }
   
   virtual ::grpc::Status runWorkflow(::grpc::ServerContext* context,
