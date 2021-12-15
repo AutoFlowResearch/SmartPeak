@@ -31,7 +31,7 @@
 
 namespace SmartPeak
 {
-  static int max_nb_points = 1000000;
+  static int max_nb_points = 10000000;
   
   void SessionHandler::onSequenceUpdated()
   {
