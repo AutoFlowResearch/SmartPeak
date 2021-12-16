@@ -413,15 +413,45 @@ public:
     */
     static std::string getCurrentTime();
     
+    /**
+     @brief Calculates sha256 hash on a given string
+     
+     @param[in] str string to perfrom the sha256 hashing on
+     
+     @returns hashed string
+    */
     static std::string sha256(const std::string str);
     
+    /**
+     @brief Creates .serversession.ssi file
+     
+     @param[in] file_path pull path to the location of where to create the .serversession.ssi if not existing
+    */
     static void createServerSessionFile(std::filesystem::path file_path);
     
+    /**
+     @brief Writes comma seperated values to .serversession.ssi file
+     
+     @param[in] file_path pull path to the location of where to create the .serversession.ssi if not existing
+     @param[in] user_id user id as provided in the login dialog
+     @param[in] dataset_name the name of the dataset name
+     @param[in] workflow_status workflow status if the current/last workflow run
+     @param[in] started_at the start time of the workflow
+     @param[in] finished_at the end time of the workflow
+     @param[in] path_to_exports the full path to the exported reports
+     @param[in] log_file full path to the generated log file
+    */
     static void writeToServerSessionFile(std::filesystem::path file_path,
                                          std::string usr_id, std::string dataset_name, std::string workflow_status,
                                          std::string started_at, std::string finished_at, std::string path_to_exports,
                                          std::string log_file);
     
+    /**
+     @brief Checks for the last workflow status
+     
+     @param[in] file_path pull path to the location of the dataset
+     @param[in] username user id of the current user
+    */
     static bool checkLastServerWorkflowRun(std::filesystem::path file_path, std::string& username);
 
   };
