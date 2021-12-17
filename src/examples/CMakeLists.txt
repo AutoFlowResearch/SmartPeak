@@ -23,7 +23,6 @@
 
 cmake_minimum_required(VERSION 3.8.2 FATAL_ERROR)
 project("SmartPeak_class_examples_smartpeak")
-#cmake_policy(SET CMP0115 OLD)
 message(STATUS "building examples...")
 
 #------------------------------------------------------------------------------

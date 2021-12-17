@@ -237,15 +237,15 @@ namespace SmartPeak {
       std::shared_ptr<ServerAppender> server_appender_;
     };
 
-    void extract_report_sampletypes(
+    void extractReportSampletypes(
       const std::vector<std::string>& application_settings,
       std::set<SmartPeak::SampleType>& report_sample_types);
 
-    void extract_report_metadata(
+    void extractReportMetadata(
       const std::vector<std::string>& application_settings,
       std::vector<SmartPeak::FeatureMetadata>& report_metadata);
   
-    static bool contains_option(
+    static bool containsOption(
       const std::vector<std::string>& list,
       const std::string& option, std::string log_msg="");
   

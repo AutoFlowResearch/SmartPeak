@@ -27,7 +27,7 @@
 namespace SmartPeak {
   namespace serv {
   
-    bool contains_option(
+    bool containsOption(
       const std::vector<std::string>& list,
       const std::string& option,
       std::string log_msg)
@@ -43,12 +43,12 @@ namespace SmartPeak {
       return flag;
     }
 
-    void extract_report_sampletypes(const std::vector<std::string>& selected_report_sample_types,
+    void extractReportSampletypes(const std::vector<std::string>& selected_report_sample_types,
                                     std::set<SmartPeak::SampleType>& report_sample_types)
     {
       auto& available_types = SmartPeak::sampleTypeToString;
       auto& types = selected_report_sample_types;
-      if (contains_option(types, "ALL", "Detected report-sample-types option: "))
+      if (containsOption(types, "ALL", "Detected report-sample-types option: "))
       {
         std::transform(available_types.cbegin(), available_types.cend(),
             std::inserter(report_sample_types, report_sample_types.begin()),
@@ -70,13 +70,13 @@ namespace SmartPeak {
       }
     }
 
-    void extract_report_metadata(
+    void extractReportMetadata(
       const std::vector<std::string>& selected_report_metadata,
       std::vector<SmartPeak::FeatureMetadata>& report_metadata)
     {
       auto& available_metadata = SmartPeak::metadataToString;
       auto& meta = selected_report_metadata;
-      if (contains_option(meta, "ALL", "Detected report-metadata option: "))
+      if (containsOption(meta, "ALL", "Detected report-metadata option: "))
       {
         std::transform(available_metadata.cbegin(), available_metadata.cend(),
             std::back_inserter(report_metadata), [](const auto& m){ return m.first; });
@@ -224,8 +224,8 @@ namespace SmartPeak {
           auto pivot_table = all_reports;
           auto report_sample_types = std::set<SmartPeak::SampleType>{};
           auto report_metadata = std::vector<SmartPeak::FeatureMetadata>{};
-          extract_report_sampletypes(application_manager->report_sample_types, report_sample_types);
-          extract_report_metadata(application_manager->report_metadata, report_metadata);
+          extractReportSampletypes(application_manager->report_sample_types, report_sample_types);
+          extractReportMetadata(application_manager->report_metadata, report_metadata);
 
           std::filesystem::path reports_out_dir = application_manager->reports_out_dir;
           if (reports_out_dir.is_relative())
