@@ -46,6 +46,7 @@
 #include <SmartPeak/core/RawDataProcessors/FilterFeaturesBackgroundInterferences.h>
 #include <SmartPeak/core/RawDataProcessors/CheckFeaturesBackgroundInterferences.h>
 #include <SmartPeak/core/RawDataProcessors/ExtractSpectraWindows.h>
+#include <SmartPeak/core/RawDataProcessors/MatchSpectra.h>
 #include <SmartPeak/core/RawDataProcessors/MergeSpectra.h>
 #include <SmartPeak/core/RawDataProcessors/Pick2DFeatures.h>
 #include <SmartPeak/core/RawDataProcessors/Pick3DFeatures.h>
@@ -56,6 +57,7 @@
 #include <SmartPeak/core/RawDataProcessors/SearchSpectrumMS1.h>
 #include <SmartPeak/core/RawDataProcessors/SearchSpectrumMS2.h>
 #include <SmartPeak/core/RawDataProcessors/StoreAnnotations.h>
+#include <SmartPeak/core/RawDataProcessors/StoreMSP.h>
 #include <SmartPeak/core/RawDataProcessors/ClearData.h>
 #include <SmartPeak/core/RawDataProcessors/StoreRawData.h>
 #include <SmartPeak/core/RawDataProcessors/CalculateMDVs.h>
@@ -77,6 +79,7 @@
 #include <OpenMS/FORMAT/FeatureXMLFile.h>  // load/store featureXML
 #include <OpenMS/FORMAT/TraMLFile.h>
 #include <OpenMS/FORMAT/MzMLFile.h>
+#include <OpenMS/FORMAT/MSPGenericFile.h>
 
 using namespace SmartPeak;
 using namespace std;
@@ -2899,3 +2902,66 @@ TEST(RawDataProcessor, SearchSpectrum)
   EXPECT_NEAR(s.getMetaValue("mz_error_ppm"), 0.180061646746413, 1e-6);
   EXPECT_NEAR(s.getMetaValue("mz_error_Da"), 1.4228891060952265e-05, 1e-6);
 }
+
+/**
+  Match Spectra Tests
+*/
+TEST(RawDataProcessor, getterMatchSpectra)
+{
+  MatchSpectra processor;
+  EXPECT_EQ(processor.getName(), "MATCH_SPECTRA");
+}
+
+TEST(RawDataProcessor, MatchSpectra)
+{
+  Filenames filenames;
+
+  ParameterSet params;
+  RawDataHandler rawDataHandler;
+  filenames.setFullPath("cmp_spectra", SMARTPEAK_GET_TEST_DATA_PATH("Germicidin A standard 5e-2_GA1_01_27401_13_BatchName_1900-01-01_000000.msp"));
+  MatchSpectra match_spectra;
+  match_spectra.process(rawDataHandler, params, filenames);
+}
+
+/**
+  Store MSP Tests
+*/
+TEST(RawDataProcessor, getterStoreMSP)
+{
+  StoreMSP processor;
+  EXPECT_EQ(processor.getName(), "STORE_MSP");
+}
+
+TEST(RawDataProcessor, StoreMSP)
+{
+  ParameterSet params_1;
+  ParameterSet params_2;
+  load_data(params_1, params_2);
+  RawDataHandler rawDataHandler;
+
+  Filenames filenames;
+  filenames.setFullPath("traML", SMARTPEAK_GET_TEST_DATA_PATH("dda_min_traML.csv"));
+  LoadTransitions loadTransitions;
+  loadTransitions.process(rawDataHandler, params_1, filenames);
+
+  filenames.setFullPath("mzML_i", SMARTPEAK_GET_TEST_DATA_PATH("dda_min.mzML"));
+  LoadRawData loadRawData;
+  loadRawData.process(rawDataHandler, params_1, filenames);
+  loadRawData.extractMetaData(rawDataHandler);
+
+  LoadFeatures loadFeatures;
+  filenames.setFullPath("featureXML_i", SMARTPEAK_GET_TEST_DATA_PATH("dda_min.featureXML"));
+  loadFeatures.process(rawDataHandler, params_1, filenames);
+
+  auto path_msp = std::tmpnam(nullptr);
+  filenames.setFullPath("output_ms2", path_msp);
+  StoreMSP store_msp;
+  store_msp.process(rawDataHandler, params_1, filenames);
+
+  OpenMS::MSPGenericFile msp_file;
+  OpenMS::MSExperiment experiment;
+  msp_file.load(path_msp, experiment);
+
+  ASSERT_EQ(experiment.size(), 926);
+}
+

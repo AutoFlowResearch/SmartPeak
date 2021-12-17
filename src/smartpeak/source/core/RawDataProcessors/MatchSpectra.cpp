@@ -81,7 +81,6 @@ namespace SmartPeak
     cmp.init(library.getSpectra(), options);
     targeted_spectra_extractor.targetedMatching(rawDataHandler_IO.getExperiment().getSpectra(), cmp, rawDataHandler_IO.getFeatureMap());
 
-    // rawDataHandler_IO.setFeatureMap(feature_map);
     rawDataHandler_IO.updateFeatureMapHistory();
     LOGD << "END MatchSpectra";
   }
