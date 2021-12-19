@@ -17,7 +17,7 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Douglas McCloskey $
+// $Maintainer: Douglas McCloskey, Ahmed Khalil $
 // $Authors: Douglas McCloskey, Bertrand Boudaud $
 // --------------------------------------------------------------------------
 #pragma once
@@ -26,7 +26,6 @@
 #include <SmartPeak/core/ApplicationHandler.h>
 #include <SmartPeak/core/WorkflowManager.h>
 #include <SmartPeak/ui/FilePicker.h>
-#include <SmartPeak/core/server.h>
 #include <SmartPeak/core/EventDispatcher.h>
 
 #include <string>
