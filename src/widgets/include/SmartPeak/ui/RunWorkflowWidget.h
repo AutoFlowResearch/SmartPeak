@@ -26,9 +26,12 @@
 #include <SmartPeak/core/ApplicationHandler.h>
 #include <SmartPeak/core/WorkflowManager.h>
 #include <SmartPeak/ui/FilePicker.h>
+#include <SmartPeak/core/server.h>
+#include <SmartPeak/core/EventDispatcher.h>
 
 #include <string>
 #include <vector>
+#include <future>
 
 namespace SmartPeak
 {
@@ -49,7 +52,9 @@ namespace SmartPeak
       sample_group_processor_observer_(sample_group_processor_observer),
       application_handler_(application_handler),
       session_handler_(session_handler),
-      workflow_manager_(workflow_manager)
+      workflow_manager_(workflow_manager),
+      show_serversession_popup_(false),
+      run_remote_workflow(false)
     {
     };
 
@@ -65,16 +70,20 @@ namespace SmartPeak
     ApplicationHandler& application_handler_;
     SessionHandler& session_handler_;
     WorkflowManager& workflow_manager_;
+    EventDispatcher event_dispatcher_;
     std::string mzML_dir_edit_;
     std::string features_in_dir_edit_;
     std::string features_out_dir_edit_;
     std::string mzML_dir_old_;
     std::string features_in_dir_old_;
     std::string features_out_dir_old_;
+    bool show_serversession_popup_;
+    
   public:
     std::string server_url;
     std::string username;
     std::string password;
     bool server_fields_set;
+    bool run_remote_workflow;
   };
 }

@@ -301,5 +301,26 @@ namespace SmartPeak {
                                      &event_dispatcher, &event_dispatcher, &event_dispatcher);
       }
     }
+  
+  
+    void processRemoteWorkflow(
+        std::future<std::string>& runworkflow_future, std::string& username,
+        ApplicationHandler& application_handler, SessionHandler& session_handler,
+        WorkflowManager& workflow_manager, EventDispatcher& event_dispatcher, bool& RawDataAndFeatures_loaded)
+    {
+      if (runworkflow_future.valid())
+      {
+        if (runworkflow_future.get() == "YES" && !RawDataAndFeatures_loaded)
+        {
+          loadRawDataAndFeatures(application_handler, session_handler, workflow_manager, event_dispatcher);
+          RawDataAndFeatures_loaded = true;
+        }
+        
+        if (runworkflow_future.valid() && runworkflow_future.get() == "UNAUTHORIZED")
+        {
+          LOGE << "Failed to login as <" + username + "> !";
+        }
+      }
+    }
   }
 }

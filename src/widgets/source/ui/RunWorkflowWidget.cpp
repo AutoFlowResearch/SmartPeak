@@ -30,8 +30,6 @@
 
 namespace SmartPeak
 {
-  namespace fs = std::filesystem;
-
   void RunWorkflowWidget::draw()
   {
 		ImGui::SetNextWindowSizeConstraints(ImVec2(320, 100), ImVec2(FLT_MAX, FLT_MAX));
@@ -121,7 +119,11 @@ namespace SmartPeak
         application_handler_.filenames_.setTagValue(Filenames::Tag::FEATURES_INPUT_PATH, features_in_dir_edit_);
         application_handler_.filenames_.setTagValue(Filenames::Tag::FEATURES_OUTPUT_PATH, features_out_dir_edit_);
         for (const auto& pathname : { mzML_dir_edit_, features_in_dir_edit_, features_out_dir_edit_ }) {
-          fs::create_directories(fs::path(pathname));
+          if (std::filesystem::exists(pathname)) {
+            std::filesystem::create_directories(std::filesystem::path(pathname));
+          } else {
+            LOGE << "Invalid mzML, Features Input or Features Output path. No directories created.";
+          }
         }
         BuildCommandsFromNames buildCommandsFromNames(application_handler_);
         buildCommandsFromNames.names_ = application_handler_.sequenceHandler_.getWorkflow();
@@ -156,16 +158,47 @@ namespace SmartPeak
         visible_ = false;
         ImGui::CloseCurrentPopup();
       }
-      if (run_workflow_clicked && !server_url.empty() && run_on_server)
+      if (run_workflow_clicked && !server_url.empty() && !username.empty() && run_on_server)
       {
         application_handler_.filenames_.setTagValue(Filenames::Tag::MZML_INPUT_PATH, mzML_dir_edit_);
         application_handler_.filenames_.setTagValue(Filenames::Tag::FEATURES_INPUT_PATH, features_in_dir_edit_);
         application_handler_.filenames_.setTagValue(Filenames::Tag::FEATURES_OUTPUT_PATH, features_out_dir_edit_);
         
+        Utilities::createServerSessionFile(application_handler_.filenames_.getTagValue(Filenames::Tag::MAIN_DIR));
+        show_serversession_popup_ = Utilities::checkLastServerWorkflowRun(application_handler_.filenames_.getTagValue(Filenames::Tag::MAIN_DIR), username);
         server_fields_set = true;
+        run_remote_workflow = true;
         visible_ = false;
         ImGui::CloseCurrentPopup();
       }
+      if (show_serversession_popup_)
+      {
+        ImGui::OpenPopup("Server Session Found");
+        if (ImGui::BeginPopupModal("Server Session Found", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+        {
+          ImGui::Text("Do you want to load the workflow results from the last run?\n\n");
+          ImGui::Separator();
+
+          if (ImGui::Button("Yes", ImVec2(120, 0))) {
+            serv::loadRawDataAndFeatures(application_handler_, session_handler_, workflow_manager_, event_dispatcher_);
+            run_remote_workflow = false;
+            show_serversession_popup_ = false;
+            visible_ = false;
+            ImGui::CloseCurrentPopup();
+          }
+          ImGui::SetItemDefaultFocus();
+          ImGui::SameLine();
+          if (ImGui::Button("No - Rerun workflow", ImVec2(160, 0))) {
+            run_remote_workflow = true;
+            server_fields_set = true;
+            show_serversession_popup_ = false;
+            visible_ = false;
+            ImGui::CloseCurrentPopup();
+          }
+          ImGui::EndPopup();
+        }
+      }
+      
       ImGui::SameLine();
       if (ImGui::Button("Close"))
       {

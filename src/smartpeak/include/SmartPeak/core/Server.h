@@ -34,6 +34,7 @@
 #include <SmartPeak/core/SequenceProcessor.h>
 #include <SmartPeak/core/FeatureMetadata.h>
 #include <SmartPeak/core/SharedProcessors.h>
+#include <SmartPeak/core/WorkflowManager.h>
 #include <SmartPeak/core/ApplicationProcessors/LoadSession.h>
 #include <SmartPeak/core/ApplicationProcessors/BuildCommandsFromNames.h>
 
@@ -254,5 +255,11 @@ namespace SmartPeak {
     void loadRawDataAndFeatures(
       ApplicationHandler& application_handler, SessionHandler& session_handler,
       WorkflowManager& workflow_manager, EventDispatcher& event_dispatcher);
+  
+    void processRemoteWorkflow(
+      std::future<std::string>& runworkflow_future, std::string& username,
+      ApplicationHandler& application_handler, SessionHandler& session_handler,
+      WorkflowManager& workflow_manager, EventDispatcher& event_dispatcher, bool& RawDataAndFeatures_loaded);
+  
   }
 }

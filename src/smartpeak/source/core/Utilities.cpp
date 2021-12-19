@@ -929,20 +929,23 @@ namespace SmartPeak
   {
     bool load_last_run = false;
     const auto serversession_file_path = file_path / ".serversession.ssi";
-    io::CSVReader<7, io::trim_chars<' ','\t'>, io::no_quote_escape<','>, io::no_comment> serversession(serversession_file_path.string());
-    
-    serversession.read_header(io::ignore_extra_column,
-                              "usr_id","dataset_name","workflow_status",
-                              "started_at","finished_at","path_to_exports","log_file");
-    
-    std::string usr_id; std::string dataset_name; std::string workflow_status;
-    std::string started_at; std::string finished_at; std::string path_to_exports; std::string log_file;
-    while (serversession.read_row(usr_id, dataset_name, workflow_status, started_at, finished_at, path_to_exports, log_file))
+    if (std::filesystem::exists(serversession_file_path))
     {
-      if (username == usr_id && workflow_status == "YES") {
-        LOGI  << "Loading workflow processed for : " << usr_id
-              << ", started : " << started_at << ", finished : " << finished_at << std::endl;
-        return true;
+      io::CSVReader<7, io::trim_chars<' ','\t'>, io::no_quote_escape<','>, io::no_comment> serversession(serversession_file_path.string());
+      
+      serversession.read_header(io::ignore_extra_column,
+                                "usr_id","dataset_name","workflow_status",
+                                "started_at","finished_at","path_to_exports","log_file");
+      
+      std::string usr_id; std::string dataset_name; std::string workflow_status;
+      std::string started_at; std::string finished_at; std::string path_to_exports; std::string log_file;
+      while (serversession.read_row(usr_id, dataset_name, workflow_status, started_at, finished_at, path_to_exports, log_file))
+      {
+        if (username == usr_id && workflow_status == "YES") {
+          LOGI  << "Loading workflow processed for : " << usr_id
+                << ", started : " << started_at << ", finished : " << finished_at << std::endl;
+          return true;
+        }
       }
     }
     return load_last_run;
