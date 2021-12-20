@@ -22,7 +22,6 @@
 // --------------------------------------------------------------------------
 
 #include <SmartPeak/ui/RunWorkflowWidget.h>
-#include <SmartPeak/core/server.h>
 #include <SmartPeak/core/ApplicationProcessors/BuildCommandsFromNames.h>
 #include <imgui.h>
 #include <misc/cpp/imgui_stdlib.h>
@@ -181,7 +180,7 @@ namespace SmartPeak
           ImGui::Separator();
 
           if (ImGui::Button("Yes", ImVec2(120, 0))) {
-            serv::loadRawDataAndFeatures(application_handler_, session_handler_, workflow_manager_, event_dispatcher_);
+            Utilities::loadRawDataAndFeatures(application_handler_, session_handler_, workflow_manager_, event_dispatcher_);
             run_remote_workflow = false;
             show_serversession_popup_ = false;
             visible_ = false;

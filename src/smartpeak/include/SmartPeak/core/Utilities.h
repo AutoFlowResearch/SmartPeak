@@ -27,6 +27,10 @@
 #include <SmartPeak/core/Parameters.h>
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/ApplicationHandler.h>
+#include <SmartPeak/core/EventDispatcher.h>
+#include <SmartPeak/core/WorkflowManager.h>
+#include <SmartPeak/core/SessionHandler.h>
+#include <SmartPeak/core/ApplicationProcessors/BuildCommandsFromNames.h>
 #include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureSelector.h>
 #include <OpenMS/DATASTRUCTURES/Param.h>
 #include <OpenMS/FORMAT/MRMFeatureQCFile.h>
@@ -441,10 +445,11 @@ public:
      @param[in] path_to_exports the full path to the exported reports
      @param[in] log_file full path to the generated log file
     */
-    static void writeToServerSessionFile(std::filesystem::path file_path,
-                                         std::string usr_id, std::string dataset_name, std::string workflow_status,
-                                         std::string started_at, std::string finished_at, std::string path_to_exports,
-                                         std::string log_file);
+    static void writeToServerSessionFile(
+      std::filesystem::path file_path,
+      std::string usr_id, std::string dataset_name, std::string workflow_status,
+      std::string started_at, std::string finished_at, std::string path_to_exports,
+      std::string log_file);
     
     /**
      @brief Checks for the last workflow status
@@ -453,6 +458,18 @@ public:
      @param[in] username user id of the current user
     */
     static bool checkLastServerWorkflowRun(std::filesystem::path file_path, std::string& username);
+    
+    /**
+     @brief Loads processed raw data and features
+     
+     @param[in] application_handler application handler
+     @param[in] session_handler session handler
+     @param[in] workflow_manager workflow manager
+     @param[in] event_dispatcher event dispatcher
+    */
+    static void loadRawDataAndFeatures(
+      ApplicationHandler& application_handler, SessionHandler& session_handler,
+      WorkflowManager& workflow_manager, EventDispatcher& event_dispatcher);
 
   };
 }

@@ -950,5 +950,31 @@ namespace SmartPeak
     }
     return load_last_run;
   }
+
+  void Utilities::loadRawDataAndFeatures(ApplicationHandler& application_handler, SessionHandler& session_handler,
+                              WorkflowManager& workflow_manager, EventDispatcher& event_dispatcher)
+  {
+    BuildCommandsFromNames buildCommandsFromNames(application_handler);
+    buildCommandsFromNames.names_ = {"LOAD_RAW_DATA","LOAD_FEATURES","MAP_CHROMATOGRAMS"};
+    if (!buildCommandsFromNames.process()) {
+      LOGE << "Failed to create Commands, aborting.";
+    } else {
+      for (auto& cmd : buildCommandsFromNames.commands_) {
+        for (auto& p : cmd.dynamic_filenames) {
+          p.second.setTagValue(Filenames::Tag::MAIN_DIR, application_handler.main_dir_.generic_string());
+          p.second.setTagValue(Filenames::Tag::MZML_INPUT_PATH, application_handler.filenames_.getTagValue(Filenames::Tag::MZML_INPUT_PATH));
+          p.second.setTagValue(Filenames::Tag::FEATURES_INPUT_PATH, application_handler.filenames_.getTagValue(Filenames::Tag::FEATURES_INPUT_PATH));
+          p.second.setTagValue(Filenames::Tag::FEATURES_OUTPUT_PATH, application_handler.filenames_.getTagValue(Filenames::Tag::FEATURES_OUTPUT_PATH));
+        }
+      }
+      const std::set<std::string> injection_names = session_handler.getSelectInjectionNamesWorkflow(application_handler.sequenceHandler_);
+      const std::set<std::string> sequence_segment_names = session_handler.getSelectSequenceSegmentNamesWorkflow(application_handler.sequenceHandler_);
+      const std::set<std::string> sample_group_names = session_handler.getSelectSampleGroupNamesWorkflow(application_handler.sequenceHandler_);
+      
+      workflow_manager.addWorkflow(application_handler, injection_names, sequence_segment_names,
+                                   sample_group_names, buildCommandsFromNames.commands_, &event_dispatcher,
+                                   &event_dispatcher, &event_dispatcher, &event_dispatcher);
+    }
+  }
 }
 

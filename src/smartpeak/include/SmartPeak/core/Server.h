@@ -252,14 +252,9 @@ namespace SmartPeak {
   
     bool handleWorkflowRequest(ServerManager* application_manager, bool export_all);
   
-    void loadRawDataAndFeatures(
-      ApplicationHandler& application_handler, SessionHandler& session_handler,
-      WorkflowManager& workflow_manager, EventDispatcher& event_dispatcher);
-  
     void processRemoteWorkflow(
       std::future<std::string>& runworkflow_future, std::string& username,
       ApplicationHandler& application_handler, SessionHandler& session_handler,
       WorkflowManager& workflow_manager, EventDispatcher& event_dispatcher, bool& RawDataAndFeatures_loaded);
-  
   }
 }
