@@ -15,7 +15,7 @@ SmartPeak
    
 .. toctree::
    :caption: Step-by-step guides
-   :maxdepth: 3
+   :maxdepth: 4
 
    guide/install
    guide/build

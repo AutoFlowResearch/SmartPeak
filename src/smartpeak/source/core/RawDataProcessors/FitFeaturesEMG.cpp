@@ -17,7 +17,7 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Douglas McCloskey $
+// $Maintainer: Douglas McCloskey, Ahmed Khalil $
 // $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
 // --------------------------------------------------------------------------
 #include <SmartPeak/core/RawDataProcessors/FitFeaturesEMG.h>
@@ -127,8 +127,8 @@ namespace SmartPeak
         std::cout << "Updating ranges...\n";
         emg_chrom.updateRanges();
         std::cout << "Ranges updated.\n";
-        const double emg_chrom_left { emg_chrom.getMin()[0] };
-        const double emg_chrom_right { emg_chrom.getMax()[0] };
+        const double emg_chrom_left { emg_chrom.getMinRT() };
+        const double emg_chrom_right { emg_chrom.getMaxRT() };
         std::cout << "Positions calculated.\n";
         OpenMS::PeakIntegrator::PeakArea pa = pi.integratePeak(emg_chrom, emg_chrom_left, emg_chrom_right);
         std::cout << "Area calculated.\n";
