@@ -31,6 +31,8 @@
 
 namespace SmartPeak
 {
+  static int max_nb_points = 10000000;
+  
   void SessionHandler::onSequenceUpdated()
   {
     sequence_table.clear();
@@ -1652,7 +1654,7 @@ namespace SmartPeak
     {
       LOGD << "Making the chromatogram data for plotting";
       // Set the axes titles and min/max defaults
-      result.reset("Time (sec)", "Intensity (au)", {}, 6000);
+      result.reset("Time (sec)", "Intensity (au)", {}, max_nb_points);
       for (const auto& injection : sequence_handler.getSequence()) {
         if (sample_names.count(injection.getMetaData().getSampleName()) == 0) continue;
         // Extract out the raw data for plotting
@@ -1703,7 +1705,7 @@ namespace SmartPeak
   {
     LOGD << "Making the chromatogram TIC data for plotting";
     // Set the axes titles and min/max defaults
-    result.reset("Time (sec)", "Intensity (au)", {}, 6000);
+    result.reset("Time (sec)", "Intensity (au)", {}, max_nb_points);
     for (const auto& injection : sequence_handler.getSequence())
     {
       if (sample_names.count(injection.getMetaData().getSampleName()) == 0) continue;
@@ -1739,7 +1741,7 @@ namespace SmartPeak
     {
       LOGD << "Making the chromatogram data for plotting";
       // Set the axes titles and min/max defaults
-      result.reset("Time (sec)", "Intensity (au)", {}, 6000);
+      result.reset("Time (sec)", "Intensity (au)", {}, max_nb_points);
       for (const auto& injection : sequence_handler.getSequence())
       {
         // Extract out the smoothed points for plotting
@@ -1805,7 +1807,7 @@ namespace SmartPeak
     {
       LOGD << "Making the spectra data for plotting";
       // Set the axes titles and min/max defaults
-      result.reset("m/z (Da)", "Intensity (au)", {}, 6000);
+      result.reset("m/z (Da)", "Intensity (au)", {}, max_nb_points);
       for (const auto& injection : sequence_handler.getSequence()) {
         if (sample_names.count(injection.getMetaData().getSampleName()) == 0) continue;
         // Extract out the raw data for plotting
@@ -1861,7 +1863,7 @@ namespace SmartPeak
         sequence_handler.getSequence().at(0).getRawData().getFeatureMapHistory().size() > 0)) {
       LOGD << "Making the spectra data for plotting";
       // Set the axes titles and min/max defaults
-      result.reset("m/z (Da)", "Intensity (au)", "Retention Time (s)", 10000);
+      result.reset("m/z (Da)", "Intensity (au)", "Retention Time (s)", max_nb_points);
       int total_nb_points = 0;
       for (const auto& injection : sequence_handler.getSequence())
       {

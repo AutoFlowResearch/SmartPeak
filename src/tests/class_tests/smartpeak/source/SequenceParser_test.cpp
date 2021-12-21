@@ -30,6 +30,11 @@
 #include <SmartPeak/core/ApplicationHandler.h>
 #include <SmartPeak/core/RawDataProcessors/LoadFeatures.h>
 
+#ifndef CSV_IO_NO_THREAD
+#define CSV_IO_NO_THREAD
+#endif
+#include <SmartPeak/io/csv.h>
+
 using namespace SmartPeak;
 using namespace std;
 

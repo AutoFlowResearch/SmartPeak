@@ -32,6 +32,12 @@
 #include <SmartPeak/io/InputDataValidation.h>
 #include <SmartPeak/io/SequenceParser.h>
 #include <SmartPeak/io/CSVWriter.h>
+
+#ifndef CSV_IO_NO_THREAD
+#define CSV_IO_NO_THREAD
+#endif
+#include <SmartPeak/io/csv.h>
+
 #include <plog/Log.h>
 #include <atomic>
 #include <future>

@@ -1,0 +1,24 @@
+
+
+#ifndef SMARTPEAK_DATA_PATH_H
+#define SMARTPEAK_DATA_PATH_H
+
+// The path to the directory where OpenMS data is installed
+#define SMARTPEAK_DATA_PATH "@CF_SMARTPEAK_DATA_PATH@"
+
+// The path to the directory where OpenMS doc is installed
+#define SMARTPEAK_DOC_PATH "@CF_SMARTPEAK_DOC_PATH@"
+
+// The directory where OpenMS is build
+#define SMARTPEAK_SOURCE_PATH "@PROJECT_SOURCE_DIR@"
+
+// The directory where the OpenMS sources are located
+#define SMARTPEAK_BINARY_PATH "@PROJECT_BINARY_DIR@"
+
+// The directory containing the installed shared documents of OpenMS
+#define SMARTPEAK_INSTALL_DATA_PATH "@CF_SMARTPEAK_INSTALL_DATA_PATH@"
+
+// The directory containing the installed documentation of OpenMS
+#define SMARTPEAK_INSTALL_DOC_PATH "@CF_SMARTPEAK_INSTALL_DOC_PATH@"
+
+#endif // #ifndef SMARTPEAK_DATA_PATH_H

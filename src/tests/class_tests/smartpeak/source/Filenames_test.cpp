@@ -42,6 +42,17 @@ TEST(Filenames, addFileName)
   ASSERT_EQ(file_ids.size(), 1);
 }
 
+TEST(Filenames, addFileNameOverwrite)
+{
+  Filenames filenames;
+  filenames.addFileName("my_file", "file.txt");
+  EXPECT_STREQ(filenames.getFullPath("my_file").generic_string().c_str(), "file.txt");
+  filenames.addFileName("my_file", "file_non_overwrite.txt");
+  EXPECT_STREQ(filenames.getFullPath("my_file").generic_string().c_str(), "file.txt");
+  filenames.addFileName("my_file", "file_overwrite.txt", "description", false, false, true);
+  EXPECT_STREQ(filenames.getFullPath("my_file").generic_string().c_str(), "file_overwrite.txt");
+}
+
 TEST(Filenames, getFullPath)
 {
   Filenames filenames;

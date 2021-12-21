@@ -26,6 +26,11 @@
 #include <SmartPeak/core/FeatureFiltersUtils.h>
 #include <SmartPeak/io/InputDataValidation.h>
 
+#ifndef CSV_IO_NO_THREAD
+#define CSV_IO_NO_THREAD
+#endif
+#include <SmartPeak/io/csv.h>
+
 #include <plog/Log.h>
 
 #include <algorithm>
