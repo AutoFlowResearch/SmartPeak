@@ -95,7 +95,7 @@ jobs:
 
   build_macos:
     macos:
-      xcode: "11.2.1"
+      xcode: "13.1"
     resource_class: medium
     working_directory: ~/SmartPeak
     steps:
