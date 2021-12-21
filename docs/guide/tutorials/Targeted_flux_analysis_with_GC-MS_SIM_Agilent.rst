@@ -101,3 +101,4 @@ STORE_FEATURES
 	The resulting ``featureXML`` and ``mzTab`` are saved in the features folder. ``featureXML`` files describe the spectra
 	data for a given injection sample which includes a list of features with a set of ``UserParam`` for each feature such as
 	``PeptideRef``, ``native_id`` and ``scan_polarity``.
+  

@@ -17,7 +17,7 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Douglas McCloskey $
+// $Maintainer: Douglas McCloskey, Bertrand Boudaud $
 // $Authors: Douglas McCloskey, Bertrand Boudaud $
 // --------------------------------------------------------------------------
 #pragma once
@@ -48,9 +48,14 @@ namespace SmartPeak
     */
     void setupLayoutLoader(LayoutLoader& layout_loader);
 
-    WindowSizesAndPositions win_size_and_pos;
-    std::vector<std::shared_ptr<Widget>> top_windows;
-    std::vector<std::shared_ptr<Widget>> bottom_windows;
-    std::vector<std::shared_ptr<Widget>> left_windows;
+    WindowSizesAndPositions win_size_and_pos_;
+    std::vector<std::shared_ptr<Widget>> top_windows_;
+    std::vector<std::shared_ptr<Widget>> bottom_windows_;
+    std::vector<std::shared_ptr<Widget>> left_windows_;
+
+    bool reset_layout_ = true;
+
+  protected:
+    void showWindows(std::vector<std::shared_ptr<Widget>> &windows);
   };
 }
