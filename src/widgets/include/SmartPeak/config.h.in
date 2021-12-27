@@ -1,0 +1,120 @@
+// --------------------------------------------------------------------------
+//   SmartPeak -- Fast and Accurate CE-, GC- and LC-MS(/MS) Data Processing
+// --------------------------------------------------------------------------
+// Copyright The SmartPeak Team -- Novo Nordisk Foundation 
+// Center for Biosustainability, Technical University of Denmark 2018-2021.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL ANY OF THE AUTHORS OR THE CONTRIBUTING
+// INSTITUTIONS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+// OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+// WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+// ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//
+// --------------------------------------------------------------------------
+// $Maintainer: Douglas McCloskey $
+// $Authors: Douglas McCloskey $
+// --------------------------------------------------------------------------
+
+#ifndef SMARTPEAK_CONFIG_H
+#define SMARTPEAK_CONFIG_H
+
+// include SMARTPEAK_DLLAPI macros
+#include <SmartPeak/SmartPeakConfig.h>
+
+// Here are some global configuration flags for SmartPeak
+
+// Define compiler specifics (used in VERY few places only)
+// Microsoft Visual Studio .NET, 2005, 2008
+#cmakedefine SMARTPEAK_COMPILER_MSVC
+// GNU g++
+#cmakedefine SMARTPEAK_COMPILER_GXX
+
+// __PRETTY_FUNCTION__ is a GNU G++ extension so we use the alternative in boost
+#define SMARTPEAK_PRETTY_FUNCTION BOOST_CURRENT_FUNCTION
+
+// SMARTPEAK_ASSERTIONS enables some debugging methods within some SmartPeak classes
+#ifdef SMARTPEAK_COMPILER_MSVC
+// we define this using NDEBUG on MSVC as there are multiple build types simultaneously in the Solution file,
+// thus setting one value will not fit them all
+#	ifndef NDEBUG // hopefully defined automatically by MS-compiler in Debug Mode
+#		define SMARTPEAK_ASSERTIONS
+#	endif
+#else // linux & Co (only one build type at a time)
+#  if (@CF_SMARTPEAK_ASSERTIONS@)
+#    define SMARTPEAK_ASSERTIONS
+#  endif
+#endif
+
+
+// let Cmake decide if we are using Windows (i.e. if windows.h is available).
+//   GCC and MSVC have pre-defined macros for this as well but using -ansi in GCC will disable those, thus asking the compiler is fragile
+#ifndef WIN32  //avoid warning of redefinition
+#cmakedefine WIN32
+#endif
+
+#ifdef WIN32   //should be true on: MinGW (32bit + 64bit) & MSVS compiler
+#define SMARTPEAK_WINDOWSPLATFORM 1
+#endif
+
+// are we building a shared lib?
+#cmakedefine BUILD_SHARED_LIBS
+
+#cmakedefine SMARTPEAK_BIG_ENDIAN
+
+// Define on 64 bit architectures
+#cmakedefine SMARTPEAK_64BIT_ARCHITECTURE
+
+#define SMARTPEAK_INT32_TYPE @CF_SMARTPEAK_INT32_TYPE@
+#define SMARTPEAK_INT64_TYPE @CF_SMARTPEAK_INT64_TYPE@
+#define SMARTPEAK_BYTE_TYPE @CF_SMARTPEAK_BYTE_TYPE@
+#define SMARTPEAK_UINT32_TYPE @CF_SMARTPEAK_UINT32_TYPE@
+#define SMARTPEAK_UINT64_TYPE @CF_SMARTPEAK_UINT64_TYPE@
+//#define SMARTPEAK_SIZE_T_SIGNED @CF_SMARTPEAK_SIZE_T_SIGNED@
+
+// if you ever want to do abs() or floor() on this type in VC then use _abs64() and include <stdlib.h> (no kidding!)
+#define PointerSizeInt @CF_SMARTPEAK_INT64_TYPE@
+#define PointerSizeUInt @CF_SMARTPEAK_UINT64_TYPE@
+
+#cmakedefine SMARTPEAK_HAS_UNISTD_H
+#cmakedefine SMARTPEAK_HAS_PROCESS_H
+#cmakedefine SMARTPEAK_HAS_STDINT_H
+
+#cmakedefine SMARTPEAK_HAS_TIME_H
+#cmakedefine SMARTPEAK_HAS_SYS_TYPES_H
+#cmakedefine SMARTPEAK_HAS_SYS_TIMES_H
+#cmakedefine SMARTPEAK_HAS_SYS_TIME_H
+
+#cmakedefine SMARTPEAK_HAS_KILL
+#cmakedefine SMARTPEAK_HAS_SYSCONF
+
+#cmakedefine ENABLE_UPDATE_CHECK
+
+// is libc++ or has stream bug
+#cmakedefine SMARTPEAK_HAS_STREAM_EXTRACTION_BUG
+
+#define SMARTPEAK_BOOST_VERSION_MAJOR @CF_SMARTPEAK_BOOST_VERSION_MAJOR@
+#define SMARTPEAK_BOOST_VERSION_MINOR @CF_SMARTPEAK_BOOST_VERSION_MINOR@
+#define SMARTPEAK_BOOST_VERSION_SUBMINOR @CF_SMARTPEAK_BOOST_VERSION_SUBMINOR@
+#define SMARTPEAK_BOOST_VERSION @CF_SMARTPEAK_BOOST_VERSION@
+
+#define COINOR_SOLVER @CF_USECOINOR@
+
+#define SMARTPEAK_GLPK_VERSION @CF_SMARTPEAK_GLPK_VERSION@
+#define SMARTPEAK_GLPK_VERSION_MAJOR @CF_SMARTPEAK_GLPK_VERSION_MAJOR@
+#define SMARTPEAK_GLPK_VERSION_MINOR @CF_SMARTPEAK_GLPK_VERSION_MINOR@
+
+// class tests
+
+#ifdef _OPENMP
+  #define IF_MASTERTHREAD if (omp_get_thread_num() ==0)
+#else
+  #define IF_MASTERTHREAD
+#endif
+
+#endif // SMARTPEAK_CONFIG_H

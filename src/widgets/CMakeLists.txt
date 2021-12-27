@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2 FATAL_ERROR)
-project("SmartPeak")
+project("SmartPeakWidgets")
 
 #------------------------------------------------------------------------------
 # naming conventions:
@@ -52,17 +52,22 @@ endif()
 if (TBB_FOUND)
  list(APPEND SMARTPEAK_DEP_LIBRARIES ${TBB_LIBRARIES})
 endif()
+if (MSVC)
+	list(APPEND SMARTPEAK_DEP_LIBRARIES opengl32.lib)
+endif()
 
-smartpeak_add_library(TARGET_NAME  SmartPeak
-                   SOURCE_FILES  ${SmartPeak_sources}
-                   HEADER_FILES  ${SmartPeak_sources_h}
+smartpeak_add_library(TARGET_NAME  SmartPeakWidgets
+                   SOURCE_FILES  ${SmartPeakWidgets_sources}
+                   HEADER_FILES  ${SmartPeakWidgets_sources_h}
                                  ${SmartPeak_configured_headers}
                    INTERNAL_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/include
                                      ${CMAKE_CURRENT_BINARY_DIR}/include
-                   EXTERNAL_INCLUDES ${OpenMS_INCLUDE_DIRECTORIES}
+                   EXTERNAL_INCLUDES ${SmartPeak_INCLUDE_DIRECTORIES}
+                                     ${OpenMS_INCLUDE_DIRECTORIES}
+                                     ${ImGui_INCLUDE_DIR}
+                                     ${IMPLOT_INCLUDE_DIR}
                                      ${EIGEN3_INCLUDE_DIR}
                                      ${PLOG_INCLUDE_DIR}
-                                     ${SQLITE_INCLUDE_DIR}
                    LINK_LIBRARIES ${APPLE_EXTRA_LIBS}
                                   ${SMARTPEAK_DEP_LIBRARIES}
                    DLL_EXPORT_PATH "SmartPeak/")

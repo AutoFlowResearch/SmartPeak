@@ -377,10 +377,11 @@ namespace SmartPeak
     bool is_hovered = false;
     ImPlotPoint plot_point;
     ImPlotPoint plot_threshold;
+    auto window_size = ImGui::GetWindowSize();
     if (ImPlot::BeginPlot(plot_title_.c_str(),
                           x_axis_title_.c_str(),
                           y_axis_title_.c_str(),
-                          ImVec2(width_ - 25, height_ - 40),
+                          ImVec2(window_size.x - 25, window_size.y - 40),
                           imPlotFlags,
                           imPlotAxisFlagsX)) {
       for (int i = 0; i < x_data_.dimension(1); ++i) {

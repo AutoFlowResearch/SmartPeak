@@ -178,8 +178,8 @@ int main(int argc, char** argv)
   auto spectrum_explorer_window_ = std::make_shared<ExplorerWidget>("SpectrumExplorerWindow", "Scans", &event_dispatcher);
   auto sequence_main_window_ = std::make_shared<SequenceTableWidget>("SequenceMainWindow", "Sequence",
                                                                       &session_handler_, &application_handler_.sequenceHandler_);
-  auto transitions_main_window_ = std::make_shared<GenericTableWidget>("TransitionsMainWindow", "Transitions");
-  auto spectrum_main_window_ = std::make_shared<GenericTableWidget>("SpectrumMainWindow", "Scans");
+  auto transitions_main_window_ = std::make_shared<GenericTableWidget>("TransitionsMainWindow", "Transitions Table");
+  auto spectrum_main_window_ = std::make_shared<GenericTableWidget>("SpectrumMainWindow", "Scans Table");
   auto quant_method_main_window_ = std::make_shared<SequenceSegmentWidget>("QuantMethodMainWindow", "Quantitation Method",
                                    &session_handler_, &application_handler_.sequenceHandler_,
                                    &SessionHandler::setQuantMethodTable, &SessionHandler::getFiltersTable, &application_handler_.sequenceHandler_);
@@ -244,7 +244,7 @@ int main(int argc, char** argv)
   transitions_explorer_window_->visible_ = true;
 
   // windows organization
-  split_window.top_windows = {
+  split_window.top_windows_ = {
     statistics_,
     sequence_main_window_,
     transitions_main_window_,
@@ -281,14 +281,14 @@ int main(int argc, char** argv)
     calibrators_line_plot_
   };
 
-  split_window.bottom_windows = {
+  split_window.bottom_windows_ = {
     quickInfoText_,
     log_widget_,
     spectra_msms_plot_widget_,
     spectra_ms2_plot_widget_,
   };
 
-  split_window.left_windows = {
+  split_window.left_windows_ = {
     injections_explorer_window_,
     transitions_explorer_window_,
     features_explorer_window_,
@@ -309,9 +309,9 @@ int main(int argc, char** argv)
   split_window.setupLayoutLoader(layout_loader);
 
   // We need titles for all sub windows
-  checkTitles(split_window.top_windows);
-  checkTitles(split_window.bottom_windows);
-  checkTitles(split_window.left_windows);
+  checkTitles(split_window.top_windows_);
+  checkTitles(split_window.bottom_windows_);
+  checkTitles(split_window.left_windows_);
 
   // Create log path
   const std::time_t t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
@@ -375,10 +375,12 @@ int main(int argc, char** argv)
   SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
-  SDL_DisplayMode current;
-  SDL_GetCurrentDisplayMode(0, &current);
+  SDL_DisplayMode display_mode;
+  SDL_GetCurrentDisplayMode(0, &display_mode);
+  auto starting_window_width = display_mode.w * 0.75;
+  auto starting_window_height = display_mode.h * 0.75;
   SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
-  SDL_Window* window = SDL_CreateWindow(getMainWindowTitle(application_handler_).c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, window_flags);
+  SDL_Window* window = SDL_CreateWindow(getMainWindowTitle(application_handler_).c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, starting_window_width, starting_window_height, window_flags);
   SDL_GLContext gl_context = SDL_GL_CreateContext(window);
   SDL_GL_SetSwapInterval(1); // Enable vsync
 
@@ -386,6 +388,8 @@ int main(int argc, char** argv)
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
   ImGuiIO& io = ImGui::GetIO(); (void)io;
+  ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+  ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
   //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
 
   // Setup Dear ImGui style
@@ -409,33 +413,34 @@ int main(int argc, char** argv)
       ImGui_ImplSDL2_ProcessEvent(&event);
       if (event.type == SDL_QUIT)
         done = true;
+      if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(window))
+        done = true;
     }
 
     // Start the Dear ImGui frame
     ImGui_ImplOpenGL2_NewFrame();
     ImGui_ImplSDL2_NewFrame(window);
+
+    split_window.win_size_and_pos_.applyLayout();
     ImGui::NewFrame();
 
-    { // keeping this block to easily collapse/expand the bulk of the loop
+    event_dispatcher.dispatchEvents();
 
-      event_dispatcher.dispatchEvents();
+    session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
 
-      session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
+    if ((!workflow_is_done_) && workflow_manager_.isWorkflowDone()) // workflow just finished
+    {
+      workflow_manager_.updateApplicationHandler(application_handler_);
+    }
+    workflow_is_done_ = workflow_manager_.isWorkflowDone();
+    file_loading_is_done_ = file_picker_->fileLoadingIsDone();
 
-      split_window.win_size_and_pos.setXAndYSizes(io.DisplaySize.x, io.DisplaySize.y);
-      if ((!workflow_is_done_) && workflow_manager_.isWorkflowDone()) // workflow just finished
-      {
-        workflow_manager_.updateApplicationHandler(application_handler_);
-      }
-      workflow_is_done_ = workflow_manager_.isWorkflowDone();
-      file_loading_is_done_ = file_picker_->fileLoadingIsDone();
-
-      // Make the quick info text
-      quickInfoText_->clearErrorMessages();
-      if (exceeding_plot_points_) quickInfoText_->addErrorMessage("Plot rendering limit reached.  Not plotting all selected data.");
-      if (exceeding_table_size_) quickInfoText_->addErrorMessage("Table rendering limit reached.  Not showing all selected data.");
-      if (ran_integrity_check_ && integrity_check_failed_) quickInfoText_->addErrorMessage("Integrity check failed.  Check the `Information` log.");
-      if (ran_integrity_check_ && !integrity_check_failed_) quickInfoText_->addErrorMessage("Integrity check passed.");
+    // Make the quick info text
+    quickInfoText_->clearErrorMessages();
+    if (exceeding_plot_points_) quickInfoText_->addErrorMessage("Plot rendering limit reached.  Not plotting all selected data.");
+    if (exceeding_table_size_) quickInfoText_->addErrorMessage("Table rendering limit reached.  Not showing all selected data.");
+    if (ran_integrity_check_ && integrity_check_failed_) quickInfoText_->addErrorMessage("Integrity check failed.  Check the `Information` log.");
+    if (ran_integrity_check_ && !integrity_check_failed_) quickInfoText_->addErrorMessage("Integrity check passed.");
       
     // ======================================
     // Popups
@@ -541,6 +546,10 @@ int main(int argc, char** argv)
             }
           }
           ImGui::EndMenu();
+        }
+        ImGui::Separator();
+        if (ImGui::MenuItem("Exit")) {
+          done = true;
         }
         ImGui::EndMenu();
         showQuickHelpToolTip("export_file");
@@ -672,6 +681,15 @@ int main(int argc, char** argv)
       }
       showQuickHelpToolTip("actions");
       
+      if (ImGui::BeginMenu("Window"))
+      {
+        if (ImGui::MenuItem("Reset Window Layout"))
+        {
+          split_window.reset_layout_ = true;
+        }
+        ImGui::EndMenu();
+      }
+
       if (ImGui::BeginMenu("Help"))
       {
         ImGui::MenuItem("About", NULL, &about_widget_->visible_);
@@ -816,15 +834,27 @@ int main(int argc, char** argv)
     // =====================================================
     layout_loader.process();
 
-    }
-
+    // =====================================================
     // Rendering
+    // =====================================================
     ImGui::Render();
     glViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
     glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
     glClear(GL_COLOR_BUFFER_BIT);
     //glUseProgram(0); // You may want this if using this code in an OpenGL 3+ context where shaders may be bound
     ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
+
+    // Update and Render additional Platform Windows
+    // (Platform functions may change the current OpenGL context, so we save/restore it to make it easier to paste this code elsewhere.
+    //  For this specific demo app we could also call SDL_GL_MakeCurrent(window, gl_context) directly)
+    if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+    {
+      SDL_Window* backup_current_window = SDL_GL_GetCurrentWindow();
+      SDL_GLContext backup_current_context = SDL_GL_GetCurrentContext();
+      ImGui::UpdatePlatformWindows();
+      ImGui::RenderPlatformWindowsDefault();
+      SDL_GL_MakeCurrent(backup_current_window, backup_current_context);
+    }
     SDL_GL_SwapWindow(window);
   }
 

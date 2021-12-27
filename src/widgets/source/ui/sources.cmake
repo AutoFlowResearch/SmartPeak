@@ -33,6 +33,7 @@ set(sources_list
 	SpectraPlotWidget.cpp
 	SplitWindow.cpp
 	StatisticsWidget.cpp
+	UIUtilities.cpp
 	Widget.cpp
 	WindowSizesAndPositions.cpp
 	WorkflowWidget.cpp
@@ -46,7 +47,7 @@ foreach(i ${sources_list})
 endforeach(i)
 
 ### pass source file list to the upper instance
-set(SmartPeak_sources ${SmartPeak_sources} ${sources})
+set(SmartPeakWidgets_sources ${SmartPeakWidgets_sources} ${sources})
 
 ### source group definition
 source_group("Source Files\\ui" FILES ${sources})

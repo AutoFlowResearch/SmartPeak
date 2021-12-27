@@ -1,6 +1,23 @@
 SmartPeak Changelog
 ===================
 
+v1.18.0 (2020-12-16)
+--------------------
+
+Features
+~~~~~~~~
+- ReadTheDocs Walkthrough : Targeted quantitation with HPLC data `(#454) <https://github.com/AutoFlowResearch/SmartPeak/pull/454>`_
+- UI Splitting and Docking `(#464) <https://github.com/AutoFlowResearch/SmartPeak/pull/464>`_
+- Support for small screens `(#466) <https://github.com/AutoFlowResearch/SmartPeak/pull/466>`_
+- Enabled viewports `(#467) <https://github.com/AutoFlowResearch/SmartPeak/pull/467>`_
+- Increased max points to be displayed to 10 millions `(#470) <https://github.com/AutoFlowResearch/SmartPeak/pull/470>`_
+
+Fix
+~~~
+- Fixing SVG exports and deprecating HTML support `(#458) <https://github.com/AutoFlowResearch/SmartPeak/pull/458>`_
+- Fixing FIAMS workflow and quantitationMethods.csv override `(#461) <https://github.com/AutoFlowResearch/SmartPeak/pull/461>`_
+- Fixed Cancel button size for directory selection dialog box `(#469) <https://github.com/AutoFlowResearch/SmartPeak/pull/469>`_
+
 v1.17.0 (2020-11-16)
 --------------------
 

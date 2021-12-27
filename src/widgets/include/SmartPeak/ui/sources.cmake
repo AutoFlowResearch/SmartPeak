@@ -34,6 +34,7 @@ set(sources_list_h
 	SpectraPlotWidget.h
 	SplitWindow.h
 	StatisticsWidget.h
+	UIUtilities.h
 	Widget.h
 	WindowSizesAndPositions.h
 	WorkflowWidget.h
@@ -49,4 +50,4 @@ endforeach(i)
 ### source group definition
 source_group("Header Files\\SmartPeak\\ui" FILES ${sources_h})
 
-set(SmartPeak_sources_h ${SmartPeak_sources_h} ${sources_h})
+set(SmartPeakWidgets_sources_h ${SmartPeakWidgets_sources_h} ${sources_h})

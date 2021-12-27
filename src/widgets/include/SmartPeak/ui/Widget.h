@@ -72,12 +72,8 @@ namespace SmartPeak
     */
     virtual void draw() = 0;
 
-    void setWindowSize(float width, float height) { width_ = width; height_ = height; };
-
     bool visible_ = false;
     std::string title_;
-    float width_ = 0.0;
-    float height_ = 0.0;
   };
 
   class GenericTextWidget : public Widget

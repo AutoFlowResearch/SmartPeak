@@ -146,15 +146,16 @@ namespace SmartPeak
           {
             bool is_hovered = false;
             ImPlotPoint plot_point;
+            auto window_size = ImGui::GetWindowSize();
             ImPlot::SetColormap(ImPlotColormap_Jet);
-            ImPlot::ShowColormapScale(heatmap_data_.feat_value_min_, heatmap_data_.feat_value_max_, height_ - 70);
+            ImPlot::ShowColormapScale(heatmap_data_.feat_value_min_, heatmap_data_.feat_value_max_, window_size.y - 70);
             float available_width = ImGui::GetContentRegionAvailWidth();
             ImGui::SameLine();
             const ImPlotFlags imPlotFlags = ImPlotAxisFlags_LockMin | ImPlotAxisFlags_LockMax | ImPlotAxisFlags_TickLabels;
             if (ImPlot::BeginPlot(plot_title_.c_str(),
               heatmap_data_.feat_heatmap_x_axis_title.c_str(),
               heatmap_data_.feat_heatmap_y_axis_title.c_str(),
-              ImVec2(available_width - 80, height_ - 70),
+              ImVec2(available_width - 80, window_size.y - 70),
               imPlotFlags,
               ImPlotAxisFlags_GridLines,
               ImPlotAxisFlags_GridLines))
