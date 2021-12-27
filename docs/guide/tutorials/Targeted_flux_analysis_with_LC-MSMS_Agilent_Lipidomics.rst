@@ -45,14 +45,15 @@ can be found in :ref:`Workflow Commands`.
 	* MAP_CHROMATOGRAMS
 	* PICK_MRM_FEATURES
 	* FILTER_FEATURES
-	* VALIDATE_FEATURES
+	* CHECK_FEATURES
 	* STORE_FEATURES
 
 	The workflow pipeline is initialized by loading the raw data followed 
 	by mapping the chromatograms to the loaded set og transitions. Once done, the peak picking routine
 	will be executed on the SRM/MRM features followed by filtering the transitions and transition
 	groups based on the user defined criteria. Before storing the features for the sample group to disk as a 
-	``featureXML`` file, the selected features are compared with the reference dataset.
+	``featureXML`` file, transitions and transition groups are flagged and scored based on the user's
+	criteria.
 
 	To plot the intensities over time for given injections and transitions, view the "chromatogram" from the "view" menu
 	then select the injections and transitions to plot from their respective tabs on the left. The following shows the chromatogram
@@ -75,12 +76,7 @@ can be found in :ref:`Workflow Commands`.
 
 	Based in the data you wish to export, select the desired "Sample types" from the left pane
 	and select the "Metadata" from the right pane then click on one of the buttons below to create
-	the report with the selected items in the csv format. 
-	
-	Other options to export the data includes "Group Feature DB" and "Group Pivot Table". The Group Feature DB
-	includes all ``sample_group_name``, ``component_group_name``, ``component_name`` and any other additional metadata
-	such as ``peak_apex_int``, ``peak_area``, and ``mz`` values. While the Group Pivot Table would include ``component_name``
-	``component_group_name``, ``meta_value`` such as ``peak_apex_int`` and ``RT``, and ``CM`` values.
+	the report with the selected items in the csv format.
 	
 	More details on exporting the results can be found in :ref:`Export report`.
 
