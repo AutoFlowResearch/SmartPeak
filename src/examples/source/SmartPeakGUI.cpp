@@ -648,6 +648,15 @@ int main(int argc, char** argv)
         }
         showQuickHelpToolTip("run_workflow");
         
+        if (ImGui::MenuItem("Cancel Workflow"))
+        {
+          if (run_on_server) {
+            if (workflow_client_.isChannelSet()) {
+              workflow_client_.stopRunningWorkflow();
+            }
+          }
+        }
+        
         if (ImGui::BeginMenu("Integrity checks"))
         {
           if (ImGui::MenuItem("Sample consistency")) {

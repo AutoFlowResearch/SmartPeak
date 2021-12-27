@@ -129,43 +129,7 @@ include_directories(${IMPLOT_INCLUDE_DIR})
 #------------------------------------------------------------------------------
 # gRPC
 #------------------------------------------------------------------------------
-option(FETCHCONTENT_QUIET OFF)
-option(abseil-cpp_BUILD_TESTS OFF)
-option(gRPC_BUILD_TESTS OFF)
-option(ABSL_BUILD_TESTING OFF)
-option(ABSL_RUN_TESTS OFF) 
-option(protobuf_BUILD_TESTS OFF)
-option(gRPC_BUILD_CSHARP_EXT OFF)
-option(gRPC_BUILD_GRPC_CSHARP_PLUGIN OFF)
-option(gRPC_BUILD_GRPC_NODE_PLUGIN OFF)
-option(gRPC_BUILD_GRPC_JAVA_PLUGIN OFF)
-option(gRPC_BUILD_GRPC_OBJECTIVE_C_PLUGIN OFF)
-option(gRPC_BUILD_GRPC_PHP_PLUGIN OFF)
-option(gRPC_BUILD_GRPC_PYTHON_PLUGIN OFF)
-option(gRPC_BUILD_GRPC_RUBY_PLUGIN OFF)
-option(ABSL_USE_GOOGLETEST_HEAD ON)
-option(ABSL_USE_EXTERNAL_GOOGLETEST ON)
-# set(ABSL_LOCAL_GOOGLETEST_DIR ${googletest-distribution_SOURCE_DIR})
-set(absl_gtest_download_url "https://github.com/google/googletest/archive/refs/tags/release-1.11.0.zip")
-include(FetchContent)
-FetchContent_Declare(
-  gRPC
-  GIT_REPOSITORY https://github.com/grpc/grpc.git
-  GIT_TAG        v1.41.0
-  GIT_PROGRESS   TRUE
-)
-FetchContent_MakeAvailable(gRPC)
-
-set(grpc_required_libs 
-    libprotobuf grpc++ 
-    grpc++_reflection 
-    grpc++_unsecure grpc_unsecure
-    grpc++_error_details
-    grpc gpr
-    absl_flags
-    crypto
-    address_sorting
-    grpc_plugin_support grpcpp_channelz)
+include(../../cmake/fetch_grpc.cmake)
 #------------------------------------------------------------------------------
 
 find_package(OpenSSL REQUIRED) 
@@ -200,12 +164,14 @@ foreach(_examples ${EXAMPLE_executables})
             PRIVATE ImPlot::Sources ImGui::Sources ImGui::Examples ImGui::SourcesMiscCpp
             ${grpc_required_libs} OpenSSL::SSL OpenSSL::Crypto)
       install(TARGETS ${_examples}  BUNDLE DESTINATION .  COMPONENT Applications)
+      target_include_directories(${_examples} SYSTEM INTERFACE  ${CMAKE_CURRENT_SOURCE_DIR}/source/service/)
+    elseif(${_examples} STREQUAL "SmartPeakServer")
+      add_executable(${_examples} source/${_examples})
+      target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} OpenMS PRIVATE ${grpc_required_libs})
+      target_include_directories(${_examples} SYSTEM INTERFACE  ${CMAKE_CURRENT_SOURCE_DIR}/source/service/)
     else()
       add_executable(${_examples} source/${_examples})
-      target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} OpenMS 
-						PRIVATE 
-						${grpc_required_libs})
-      target_include_directories(${_examples} SYSTEM INTERFACE  "${PROJECT_BINARY_DIR}/source/service/")
+      target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} OpenMS)
     endif()
 
   elseif(UNIX AND CMAKE_SYSTEM_NAME MATCHES Linux) 
@@ -229,8 +195,12 @@ foreach(_examples ${EXAMPLE_executables})
       install(DIRECTORY ${OpenMS_SHARE_DIR} DESTINATION share/OpenMS COMPONENT share)
     elseif(${_examples} STREQUAL "SmartPeakCLI")
       add_executable(${_examples} source/${_examples})
-      target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} OpenMS ${grpc_required_libs})
+      target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} OpenMS)
       install_tool(${_examples}) 
+    elseif(${_examples} STREQUAL "SmartPeakServer")
+      add_executable(${_examples} source/${_examples})
+      target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} OpenMS PRIVATE ${grpc_required_libs})
+      target_include_directories(${_examples} SYSTEM INTERFACE  ${CMAKE_CURRENT_SOURCE_DIR}/source/service/)
     else()
       add_executable(${_examples} source/${_examples})
       target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} OpenMS ${grpc_required_libs})
@@ -245,6 +215,10 @@ foreach(_examples ${EXAMPLE_executables})
         PRIVATE ImPlot::Sources ImGui::Sources ImGui::Examples ImGui::SourcesMiscCpp
         ${grpc_required_libs})
       install_tool(${_examples})
+    elseif(${_examples} STREQUAL "SmartPeakServer")
+      add_executable(${_examples} source/${_examples})
+      target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} OpenMS PRIVATE ${grpc_required_libs})
+      target_include_directories(${_examples} SYSTEM INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/source/service/)
     else()
       add_executable(${_examples} source/${_examples})
       target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} OpenMS)
