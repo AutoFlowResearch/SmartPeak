@@ -43,20 +43,16 @@ can be found in :ref:`Workflow Commands`.
 
 	* LOAD_RAW_DATA
 	* MAP_CHROMATOGRAMS
+	* EXTRACT_CHROMATOGRAM_WINDOWS
+	* ZERO_CHROMATOGRAM_BASELINE
 	* PICK_MRM_FEATURES
-	* FILTER_FEATURES
-	* VALIDATE_FEATURES
+	* QUANTIFY_FEATURES
+	* CHECK_FEATURES
+	* SELECT_FEATURES
+	* CALCULATE_MDVS
+	* ISOTOPIC_CORRECTIONS
+	* CALCULATE_MDV_ACCURACIES
 	* STORE_FEATURES
-
-	LOAD_RAW_DATA
-MAP_CHROMATOGRAMS
-EXTRACT_CHROMATOGRAM_WINDOWS
-ZERO_CHROMATOGRAM_BASELINE
-PICK_MRM_FEATURES
-QUANTIFY_FEATURES
-CHECK_FEATURES
-SELECT_FEATURES
-STORE_FEATURES
 
 	The workflow pipeline is initialized by loading the raw data followed 
 	by mapping the chromatograms to the loaded set of transitions. Once done,
@@ -66,7 +62,9 @@ STORE_FEATURES
 	features followed by applying a calibration model to each transition as defined
 	in the quantitationMethods parameters. Transitions and transition groups are
 	flagged and scored per user pre-defined criteria, then the peak selection/
-	alignment algorithms is executed. As the final step in the workflow, the features
+	alignment algorithms is executed. Mass distribution vectors can then be 
+	calculated followed by isotopic corrections and comparing the MDVs to the
+	theoretical values. As the final step in the workflow, the features
 	 for the sample group is stored to disk as a ``featureXML`` files.
 
 	To plot the intensities over time for given injections and transitions, view the "chromatogram" from the "view" menu
@@ -89,12 +87,7 @@ STORE_FEATURES
 
 	Based in the data you wish to export, select the desired "Sample types" from the left pane
 	and select the "Metadata" from the right pane then click on one of the buttons below to create
-	the report with the selected items in the csv format. 
-	
-	Other options to export the data includes "Group Feature DB" and "Group Pivot Table". The Group Feature DB
-	includes all ``sample_group_name``, ``component_group_name``, ``component_name`` and any other additional metadata
-	such as ``peak_apex_int``, ``peak_area``, and ``mz`` values. While the Group Pivot Table would include ``component_name``
-	``component_group_name``, ``meta_value`` such as ``peak_apex_int`` and ``RT``, and ``CM`` values.
+	the report with the selected items in the csv format.
 	
 	More details on exporting the results can be found in :ref:`Export report`.
 
