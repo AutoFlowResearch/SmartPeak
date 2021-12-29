@@ -17,7 +17,7 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Ahmed Khalil $
+// $Maintainer: Ahmed Khalil, Douglas McCloskey $
 // $Authors: Ahmed Khalil $
 // --------------------------------------------------------------------------
 #pragma once
@@ -246,7 +246,7 @@ namespace SmartPeak {
       const std::vector<std::string>& application_settings,
       std::vector<SmartPeak::FeatureMetadata>& report_metadata);
   
-    static bool containsOption(
+    bool containsOption(
       const std::vector<std::string>& list,
       const std::string& option, std::string log_msg="");
   

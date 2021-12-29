@@ -23,6 +23,7 @@ set(core_executables_list
 	SequenceSegmentHandler_test
 	SequenceSegmentProcessor_test
 	SessionDB_test
+	Server_test
 	SessionHandler_test
 	SessionLoaderGenerator_test
 	Task_test
