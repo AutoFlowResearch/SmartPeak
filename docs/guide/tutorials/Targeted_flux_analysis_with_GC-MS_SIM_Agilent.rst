@@ -71,9 +71,9 @@ can be found in :ref:`Workflow Commands`.
 	then select the injections and transitions to plot from their respective tabs on the left. The following shows the chromatogram
 	for one injection using Lactate, PEP and Succinate transitions and their intensity differences over time.
 
-	.. image:: ../images/gcms_sim_unknowns_chromatogram.png
+	.. image:: ../../images/gcms_sim_unknowns_chromatogram.png
 
-	The features can also be plotted as a heatmap, under "view" select "Features (heatmap)" then select the "logSN"
+	The features can also be plotted as a heatmap, under "view" select "Features (heatmap)" then select the "peak_apex_int"
 	feature to display transition groups as a heatmap and compare the values from the same injection as shown below:
 
 	.. image:: ../../images/gcms_sim_unknowns_heatmap.png
