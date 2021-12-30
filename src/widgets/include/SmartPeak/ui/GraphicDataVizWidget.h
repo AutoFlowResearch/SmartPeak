@@ -34,6 +34,7 @@
 #include <vector>
 #include <functional>
 #include <optional>
+#include <iomanip>
 
 namespace SmartPeak
 {
