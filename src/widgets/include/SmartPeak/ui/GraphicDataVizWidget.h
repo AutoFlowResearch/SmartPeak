@@ -34,6 +34,7 @@
 #include <vector>
 #include <functional>
 #include <optional>
+#include <iomanip>
 
 namespace SmartPeak
 {
@@ -73,6 +74,7 @@ namespace SmartPeak
     virtual void showInstallationInstructions();
     virtual std::tuple<float, float, float, float> plotLimits() const;
     virtual void updateRanges();
+    virtual void plotHighestValue(int idx);
     
     // Utility methods
     std::set<std::string> getSelectedSampleNames() const;
@@ -100,6 +102,9 @@ namespace SmartPeak
     bool use_markers_ = false;
     bool is_spectra_ = false;
     bool show_installation_guide_ = false;
+    bool search_highest_value_ = false;
+    std::vector<float> highest_values_x_;
+    std::vector<float> highest_values_y_;
   };
 
 }

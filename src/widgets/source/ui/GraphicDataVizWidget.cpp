@@ -39,13 +39,16 @@ namespace SmartPeak
 
   void GraphicDataVizWidget::drawSliders()
   {
-    ImGui::DragFloatRange2("Time-Range",
+    if (ImGui::DragFloatRange2("Time-Range",
                            &current_range_.first, &current_range_.second, 0.25f,
                            slider_min_max_.first, slider_min_max_.second,
                            std::string("min: %.4f "+graph_viz_data_.x_axis_title_).c_str(),
                            std::string("max: %.4f "+graph_viz_data_.x_axis_title_).c_str(),
-                           ImGuiSliderFlags_AlwaysClamp);
-    if (current_range_.first < 0.0f) current_range_.first = 0.0f;
+                               ImGuiSliderFlags_AlwaysClamp)) {
+    
+      if (current_range_.first < 0.0f) current_range_.first = 0.0f;
+      search_highest_value_ = true;
+    }
     
     float controls_pos_start_y = ImGui::GetCursorPosY();
     ImGui::Checkbox("Compact View", &compact_view_);
@@ -112,6 +115,7 @@ namespace SmartPeak
       current_range_ = *serialized_range_;
       serialized_range_ = std::nullopt;
     }
+    search_highest_value_ = true;
   }
 
   void GraphicDataVizWidget::drawGraph()
@@ -159,6 +163,9 @@ namespace SmartPeak
                                bar_width);
             }
           }
+          
+          plotHighestValue(i);
+          
           ImPlotMarker plot_marker = ImPlotMarker_Circle;
           int feature_index = 0;
           for (int j = 0; j < graph_viz_data_.x_data_scatter_.size(); ++j) {
@@ -321,6 +328,53 @@ namespace SmartPeak
         ImGui::CloseCurrentPopup();
       }
       ImGui::EndPopup();
+    }
+  }
+
+  void GraphicDataVizWidget::plotHighestValue(int idx)
+  {
+    if (search_highest_value_ || refresh_needed_)
+    {
+      highest_values_x_.clear(); highest_values_y_.clear();
+      if (graph_viz_data_.x_data_area_.size() && graph_viz_data_.y_data_area_.size())
+      {
+        for (int i=0; i < graph_viz_data_.x_data_area_.size(); ++i)
+        {
+          if (graph_viz_data_.x_data_area_.at(i).size() && graph_viz_data_.y_data_area_.at(i).size())
+          {
+            auto highest_value_it = std::max_element(
+              graph_viz_data_.y_data_area_.at(i).begin(),
+              graph_viz_data_.y_data_area_.at(i).end());
+           
+            highest_values_x_.push_back(
+              static_cast<float>(graph_viz_data_.x_data_area_.at(i).at(
+                std::distance(graph_viz_data_.y_data_area_.at(i).begin(), highest_value_it))));
+            highest_values_y_.push_back(*highest_value_it);
+          }
+        }
+      }
+      search_highest_value_ = false;
+    }
+    
+    if (highest_values_x_.size() == highest_values_y_.size())
+    {
+      ImPlot::PushStyleColor(0, ImVec4(ImColor(255,255,255)));
+      ImPlot::PlotScatter("HIGHEST VALUE(S)",
+        highest_values_x_.data(),
+        highest_values_y_.data(),
+        highest_values_x_.size());
+      
+      for (int idx = 0; idx < highest_values_x_.size(); ++idx)
+      {
+        std::stringstream highest_value_ss;
+        highest_value_ss << std::fixed << std::setprecision(1) << highest_values_y_[idx];
+        ImPlot::PlotText(
+          highest_value_ss.str().c_str(),
+          highest_values_x_[idx] + 0.2f,
+          highest_values_y_[idx] + 0.8f);
+        }
+      
+      ImPlot::PopStyleColor();
     }
   }
 
