@@ -405,5 +405,9 @@ public:
       const std::string& parameter_name,
       const std::filesystem::path main_path);
 
+    /**
+     @brief returns true if the string is a list of items matching the regex.
+     */
+    static bool isList(const std::string& str, const std::regex& re);
   };
 }

@@ -263,6 +263,49 @@ TEST(utilities, parseString)
   EXPECT_STREQ(c.sl_[2].c_str(), "third string");
 }
 
+TEST(utilities, parseString_bigString)
+{
+  std::vector<bool> bool_list;
+  std::ostringstream os;
+  os << "[";
+  std::string sep;
+  for (int i = 0; i < 1000; ++i)
+  {
+    os << sep;
+    os << "false";
+    bool_list.push_back(false);
+    sep = ",";
+  }
+  os << "]";
+  std::string big_string = os.str();
+  CastValue c;
+
+  Utilities::parseString(big_string, c);
+  ASSERT_EQ(c.getTag(), CastValue::Type::BOOL_LIST);
+  EXPECT_EQ(c.bl_ , bool_list);
+}
+
+TEST(utilities, isList)
+{
+  std::regex re_integer_number("[+-]?\\d+");
+  EXPECT_TRUE(Utilities::isList("1,2,3", re_integer_number));
+  EXPECT_FALSE(Utilities::isList("1,3.14,3", re_integer_number));
+  EXPECT_FALSE(Utilities::isList("", re_integer_number));
+
+  std::regex re_float_number("[+-]?\\d+(?:\\.\\d+)?"); // can match also integers: check for integer before checking for float
+  EXPECT_TRUE(Utilities::isList("1,2,3", re_float_number));
+  EXPECT_TRUE(Utilities::isList("1,3.14,3", re_float_number));
+  EXPECT_FALSE(Utilities::isList("1,one,two", re_float_number));
+
+  std::regex re_bool("true|false", std::regex::icase);
+  EXPECT_TRUE(Utilities::isList("false,TRUE,fAlse", re_bool));
+  EXPECT_FALSE(Utilities::isList("1,one,two", re_bool));
+
+  std::regex re_s("[\"']([^,]+)[\"']");
+  EXPECT_TRUE(Utilities::isList("\"1\",\"one\",\"two\"", re_s));
+  EXPECT_FALSE(Utilities::isList("false,TRUE,fAlse", re_s));
+}
+
 TEST(utilities, parseList)
 {
   const string floats = "[1.1,-2.1,+3.1,4]";

@@ -250,6 +250,23 @@ namespace SmartPeak
     }
   }
 
+  bool Utilities::isList(const std::string& str, const std::regex& re)
+  {
+    auto items = Utilities::splitString(str, ',');
+    if (items.empty())
+    {
+      return false;
+    }
+    for (const auto& item : items)
+    {
+      if (!std::regex_match(item, re))
+      {
+        return false;
+      }
+    }
+    return true;
+  }
+
   void Utilities::parseString(const std::string& str_I, CastValue& cast)
   {
     std::regex re_integer_number("[+-]?\\d+");
@@ -279,16 +296,13 @@ namespace SmartPeak
           if (c != ' ')
             stripped.push_back(c);
         });
-        const std::regex re_integer_list("[+-]?\\d+(?:,[+-]?\\d+)*");
-        const std::regex re_float_list("[+-]?\\d+(?:\\.\\d+)?(?:,[+-]?\\d+(?:\\.\\d+)?)*");
-        const std::regex re_bool_list("(?:true|false)(?:,(?:true|false))*", std::regex::icase);
-        if (std::regex_match(stripped, re_integer_list)) {
+        if (Utilities::isList(stripped, re_integer_number)) {
           cast = std::vector<int>();
           parseList(stripped, re_integer_number, cast);
-        } else if (std::regex_match(stripped, re_float_list)) {
+        } else if (Utilities::isList(stripped, re_float_number)) {
           cast = std::vector<float>();
           parseList(stripped, re_float_number, cast);
-        } else if (std::regex_match(stripped, re_bool_list)) {
+        } else if (Utilities::isList(stripped, re_bool)) {
           cast = std::vector<bool>();
           parseList(stripped, re_bool, cast);
         } else {
