@@ -72,18 +72,12 @@ namespace SmartPeak
                     "SEARCH_SPECTRUM_MS1",
                     "MERGE_FEATURES_MS1",
                     "EXTRACT_SPECTRA_NON_TARGETED",
-                    "SEARCH_SPECTRUM_MS2",
-                    "MERGE_FEATURES_MS2",
                     "STORE_MSP",
                     "STORE_FEATURES" };
           else if (s_string == "LCMS DDA Spectra Library Matching")
             ids = { "LOAD_RAW_DATA",
                     "PICK_3D_FEATURES",
-                    "SEARCH_SPECTRUM_MS1",
-                    "MERGE_FEATURES_MS1",
                     "EXTRACT_SPECTRA_NON_TARGETED",
-                    "SEARCH_SPECTRUM_MS2",
-                    "MERGE_FEATURES_MS2",
                     "MATCH_SPECTRA",
                     "STORE_FEATURES" };
           else if (s_string == "LCMS MRM Unknowns")

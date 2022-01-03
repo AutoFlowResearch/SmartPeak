@@ -73,10 +73,10 @@ namespace SmartPeak
     OpenMS::MSPGenericFile msp_file;
     OpenMS::MSExperiment library;
     msp_file.load(cmp_spectra_file_name, library);
+    library.sortSpectra();
 
     // Compare
     OpenMS::TargetedSpectraExtractor::BinnedSpectrumComparator cmp;
-    // OpenMS::FeatureMap feature_map;
     std::map<OpenMS::String, OpenMS::DataValue> options;
     cmp.init(library.getSpectra(), options);
     targeted_spectra_extractor.targetedMatching(rawDataHandler_IO.getExperiment().getSpectra(), cmp, rawDataHandler_IO.getFeatureMap());
