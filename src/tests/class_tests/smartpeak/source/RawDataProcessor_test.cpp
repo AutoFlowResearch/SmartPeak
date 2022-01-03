@@ -2965,3 +2965,47 @@ TEST(RawDataProcessor, StoreMSP)
   ASSERT_EQ(experiment.size(), 926);
 }
 
+/**
+  Extract Spectra Non Targeted
+*/
+TEST(RawDataProcessor, getterExtractSpectraNonTargeted)
+{
+  StoreMSP processor;
+  EXPECT_EQ(processor.getName(), "EXTRACT_SPECTRA_NON_TARGETED");
+}
+
+TEST(RawDataProcessor, ExtractSpectraNonTargeted)
+{
+  /*
+  ParameterSet params_1;
+  ParameterSet params_2;
+  load_data(params_1, params_2);
+  RawDataHandler rawDataHandler;
+
+  Filenames filenames;
+  filenames.setFullPath("traML", SMARTPEAK_GET_TEST_DATA_PATH("dda_min_traML.csv"));
+  LoadTransitions loadTransitions;
+  loadTransitions.process(rawDataHandler, params_1, filenames);
+
+  filenames.setFullPath("mzML_i", SMARTPEAK_GET_TEST_DATA_PATH("dda_min.mzML"));
+  LoadRawData loadRawData;
+  loadRawData.process(rawDataHandler, params_1, filenames);
+  loadRawData.extractMetaData(rawDataHandler);
+
+  LoadFeatures loadFeatures;
+  filenames.setFullPath("featureXML_i", SMARTPEAK_GET_TEST_DATA_PATH("dda_min.featureXML"));
+  loadFeatures.process(rawDataHandler, params_1, filenames);
+
+  auto path_msp = std::tmpnam(nullptr);
+  filenames.setFullPath("output_ms2", path_msp);
+  StoreMSP store_msp;
+  store_msp.process(rawDataHandler, params_1, filenames);
+
+  OpenMS::MSPGenericFile msp_file;
+  OpenMS::MSExperiment experiment;
+  msp_file.load(path_msp, experiment);
+
+  ASSERT_EQ(experiment.size(), 926);
+  */
+}
+
