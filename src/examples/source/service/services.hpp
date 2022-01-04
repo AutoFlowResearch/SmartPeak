@@ -467,7 +467,8 @@ bool WorkflowService::validateCredentials(const std::string& username, const std
       
       const auto app_hand = server_manager_.get_application_handler();
       const auto seq_hand = app_hand.sequenceHandler_;
-      
+        
+      LOGE << "Writing to serversession in : " << app_hand.main_dir_.string();
       SmartPeak::Utilities::writeToServerSessionFile(
         app_hand.main_dir_.string(),
         username->second.data(), app_hand.main_dir_.string(),
