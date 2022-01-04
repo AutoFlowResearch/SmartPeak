@@ -2975,30 +2975,33 @@ TEST(RawDataProcessor, getterExtractSpectraNonTargeted)
   EXPECT_EQ(processor.getName(), "EXTRACT_SPECTRA_NON_TARGETED");
 }
 
+
 TEST(RawDataProcessor, ExtractSpectraNonTargeted)
 {
-  /*
-  ParameterSet params_1;
-  ParameterSet params_2;
-  load_data(params_1, params_2);
-  RawDataHandler rawDataHandler;
-
   Filenames filenames;
-  filenames.setFullPath("traML", SMARTPEAK_GET_TEST_DATA_PATH("dda_min_traML.csv"));
-  LoadTransitions loadTransitions;
-  loadTransitions.process(rawDataHandler, params_1, filenames);
+  RawDataHandler rawDataHandler;
+  ParameterSet params;
 
-  filenames.setFullPath("mzML_i", SMARTPEAK_GET_TEST_DATA_PATH("dda_min.mzML"));
+  filenames.setFullPath("parameters", SMARTPEAK_GET_TEST_DATA_PATH("ExtractSpectraNonTargeted/parameters.csv"));
+  LoadParameters load_parameters;
+  load_parameters.process(rawDataHandler, params, filenames);
+  params = rawDataHandler.getParameters();
+
+  filenames.setFullPath("mzML_i", SMARTPEAK_GET_TEST_DATA_PATH("ExtractSpectraNonTargeted/Germicidin A standard.mzML"));
   LoadRawData loadRawData;
-  loadRawData.process(rawDataHandler, params_1, filenames);
+  loadRawData.process(rawDataHandler, params, filenames);
   loadRawData.extractMetaData(rawDataHandler);
 
   LoadFeatures loadFeatures;
-  filenames.setFullPath("featureXML_i", SMARTPEAK_GET_TEST_DATA_PATH("dda_min.featureXML"));
-  loadFeatures.process(rawDataHandler, params_1, filenames);
+  filenames.setFullPath("featureXML_i", SMARTPEAK_GET_TEST_DATA_PATH("ExtractSpectraNonTargeted/Germicidin A standard.featureXML"));
+  loadFeatures.process(rawDataHandler, params, filenames);
 
   ExtractSpectraNonTargeted extract_spectra_non_targeted;
-  extract_spectra_non_targeted.process(rawDataHandler, params_1, filenames);
-  */
+  extract_spectra_non_targeted.process(rawDataHandler, params, filenames);
+  const auto& feature_map = rawDataHandler.getFeatureMap();
+  ASSERT_EQ(feature_map.size(), 1);
+  const auto& feature = feature_map.begin();
+  EXPECT_FLOAT_EQ(feature->getRT(), 390.259);
+  EXPECT_FLOAT_EQ(feature->getMZ(), 149.02496);
+  EXPECT_EQ(feature->getMetaValue("transition_name"), std::string("HMDB:HMDB0000001"));
 }
-
