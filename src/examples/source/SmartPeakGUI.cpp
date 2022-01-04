@@ -449,7 +449,10 @@ int main(int argc, char** argv)
     {
       if (popup->visible_)
       {
-        ImGui::OpenPopup(popup->title_.c_str());
+        if (!ImGui::IsPopupOpen(popup->title_.c_str()))
+        {
+          ImGui::OpenPopup(popup->title_.c_str());
+        }
         popup->draw();
       }
     }
