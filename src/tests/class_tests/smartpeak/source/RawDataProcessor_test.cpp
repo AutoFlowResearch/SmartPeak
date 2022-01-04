@@ -71,6 +71,7 @@
 #include <SmartPeak/core/RawDataProcessors/StoreFeatureFiltersRDP.h>
 #include <SmartPeak/core/RawDataProcessors/StoreFeatureQCsRDP.h>
 #include <SmartPeak/core/RawDataProcessors/PlotFeatures.h>
+#include <SmartPeak/core/RawDataProcessors/ExtractSpectraNonTargeted.h>
 #include <SmartPeak/core/SequenceSegmentProcessors/LoadQuantitationMethods.h>
 
 #include <OpenMS/ANALYSIS/OPENSWATH/DATAACCESS/DataAccessHelper.h>
@@ -2970,7 +2971,7 @@ TEST(RawDataProcessor, StoreMSP)
 */
 TEST(RawDataProcessor, getterExtractSpectraNonTargeted)
 {
-  StoreMSP processor;
+  ExtractSpectraNonTargeted processor;
   EXPECT_EQ(processor.getName(), "EXTRACT_SPECTRA_NON_TARGETED");
 }
 
@@ -2996,16 +2997,8 @@ TEST(RawDataProcessor, ExtractSpectraNonTargeted)
   filenames.setFullPath("featureXML_i", SMARTPEAK_GET_TEST_DATA_PATH("dda_min.featureXML"));
   loadFeatures.process(rawDataHandler, params_1, filenames);
 
-  auto path_msp = std::tmpnam(nullptr);
-  filenames.setFullPath("output_ms2", path_msp);
-  StoreMSP store_msp;
-  store_msp.process(rawDataHandler, params_1, filenames);
-
-  OpenMS::MSPGenericFile msp_file;
-  OpenMS::MSExperiment experiment;
-  msp_file.load(path_msp, experiment);
-
-  ASSERT_EQ(experiment.size(), 926);
+  ExtractSpectraNonTargeted extract_spectra_non_targeted;
+  extract_spectra_non_targeted.process(rawDataHandler, params_1, filenames);
   */
 }
 
