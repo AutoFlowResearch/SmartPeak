@@ -181,7 +181,7 @@ namespace SmartPeak
 
     if (popup_file_picker_)
     {
-      file_picker_.open(filenames_.getDescription(*popup_file_picker_),
+      file_picker_.open(std::string("Select ") + filenames_.getDescription(*popup_file_picker_),
         std::make_shared<SetInputFile>(file_editor_fields_.at(*popup_file_picker_).text_editor_),
         FilePicker::Mode::EFileRead,
         application_handler_);
