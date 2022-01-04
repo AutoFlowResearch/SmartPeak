@@ -2918,7 +2918,7 @@ TEST(RawDataProcessor, MatchSpectra)
 
   ParameterSet params;
   RawDataHandler rawDataHandler;
-  filenames.setFullPath("cmp_spectra", SMARTPEAK_GET_TEST_DATA_PATH("Germicidin A standard 5e-2_GA1_01_27401_13_BatchName_1900-01-01_000000.msp"));
+  filenames.setFullPath("cmp_spectra", SMARTPEAK_GET_TEST_DATA_PATH("Germicidin_A_standard.msp"));
   MatchSpectra match_spectra;
   match_spectra.process(rawDataHandler, params, filenames);
 }
