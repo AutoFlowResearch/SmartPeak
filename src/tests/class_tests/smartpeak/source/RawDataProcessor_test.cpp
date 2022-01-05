@@ -64,6 +64,7 @@
 #include <SmartPeak/core/RawDataProcessors/IsotopicCorrections.h>
 #include <SmartPeak/core/RawDataProcessors/CalculateIsotopicPurities.h>
 #include <SmartPeak/core/RawDataProcessors/CalculateMDVAccuracies.h>
+#include <SmartPeak/core/RawDataProcessors/ConstructTransitionsList.h>
 #include <SmartPeak/core/RawDataProcessors/LoadParameters.h>
 #include <SmartPeak/core/RawDataProcessors/LoadFeatureFiltersRDP.h>
 #include <SmartPeak/core/RawDataProcessors/LoadFeatureQCsRDP.h>
@@ -2982,18 +2983,18 @@ TEST(RawDataProcessor, ExtractSpectraNonTargeted)
   RawDataHandler rawDataHandler;
   ParameterSet params;
 
-  filenames.setFullPath("parameters", SMARTPEAK_GET_TEST_DATA_PATH("ExtractSpectraNonTargeted/parameters.csv"));
+  filenames.setFullPath("parameters", SMARTPEAK_GET_TEST_DATA_PATH("DDA/parameters.csv"));
   LoadParameters load_parameters;
   load_parameters.process(rawDataHandler, params, filenames);
   params = rawDataHandler.getParameters();
 
-  filenames.setFullPath("mzML_i", SMARTPEAK_GET_TEST_DATA_PATH("ExtractSpectraNonTargeted/Germicidin A standard.mzML"));
+  filenames.setFullPath("mzML_i", SMARTPEAK_GET_TEST_DATA_PATH("DDA/Germicidin A standard.mzML"));
   LoadRawData loadRawData;
   loadRawData.process(rawDataHandler, params, filenames);
   loadRawData.extractMetaData(rawDataHandler);
 
   LoadFeatures loadFeatures;
-  filenames.setFullPath("featureXML_i", SMARTPEAK_GET_TEST_DATA_PATH("ExtractSpectraNonTargeted/Germicidin A standard.featureXML"));
+  filenames.setFullPath("featureXML_i", SMARTPEAK_GET_TEST_DATA_PATH("DDA/ExtractSpectraNonTargeted/Germicidin A standard.featureXML"));
   loadFeatures.process(rawDataHandler, params, filenames);
 
   ExtractSpectraNonTargeted extract_spectra_non_targeted;
@@ -3004,4 +3005,63 @@ TEST(RawDataProcessor, ExtractSpectraNonTargeted)
   EXPECT_FLOAT_EQ(feature->getRT(), 390.259);
   EXPECT_FLOAT_EQ(feature->getMZ(), 149.02496);
   EXPECT_EQ(feature->getMetaValue("transition_name"), std::string("HMDB:HMDB0000001"));
+}
+
+
+TEST(RawDataProcessor, ConstructTransitionsList_csv)
+{
+  Filenames filenames;
+  RawDataHandler rawDataHandler;
+  ParameterSet params;
+
+  filenames.setFullPath("parameters", SMARTPEAK_GET_TEST_DATA_PATH("DDA/parameters.csv"));
+  LoadParameters load_parameters;
+  load_parameters.process(rawDataHandler, params, filenames);
+  params = rawDataHandler.getParameters();
+
+  filenames.setFullPath("mzML_i", SMARTPEAK_GET_TEST_DATA_PATH("DDA/Germicidin A standard.mzML"));
+  LoadRawData loadRawData;
+  loadRawData.process(rawDataHandler, params, filenames);
+  loadRawData.extractMetaData(rawDataHandler);
+
+  LoadFeatures loadFeatures_ms1;
+  RawDataHandler rawDataHandler_ms1;
+  filenames.setFullPath("featureXML_i", SMARTPEAK_GET_TEST_DATA_PATH("DDA/ConstructTransitionsList/Germicidin A standard ms1 merged features.featureXML"));
+  loadFeatures_ms1.process(rawDataHandler_ms1, params, filenames);
+
+  LoadFeatures loadFeatures;
+  filenames.setFullPath("featureXML_i", SMARTPEAK_GET_TEST_DATA_PATH("DDA/ConstructTransitionsList/Germicidin A standard ms2 merged features.featureXML"));
+  loadFeatures.process(rawDataHandler, params, filenames);
+
+  rawDataHandler.setFeatureMap("ms1_merged_features", rawDataHandler_ms1.getFeatureMap());
+
+  std::string output_file_path = std::tmpnam(nullptr);
+  filenames.setFullPath("output_transitions_csv", output_file_path);
+  ConstructTransitionsList construct_transitions_list;
+  construct_transitions_list.process(rawDataHandler, params, filenames);
+
+  const auto& feature_map = rawDataHandler.getFeatureMap();
+  ASSERT_EQ(feature_map.size(), 2);
+  const auto& feature_1 = feature_map.at(0);
+  EXPECT_FLOAT_EQ(feature_1.getRT(), 404.30066);
+  EXPECT_FLOAT_EQ(feature_1.getMZ(), 195.10199);
+  EXPECT_EQ(static_cast<int>(feature_1.getMetaValue("ms_level")), 1);
+
+  const auto& feature_2 = feature_map.at(1);
+  EXPECT_FLOAT_EQ(feature_2.getRT(), 390.259);
+  EXPECT_FLOAT_EQ(feature_2.getMZ(), 149.02496);
+  EXPECT_EQ(static_cast<int>(feature_2.getMetaValue("ms_level")), 2);
+
+  // load and check transitions file
+  LoadTransitions load_transition;
+  filenames.setFullPath("traML", output_file_path);
+  load_transition.process(rawDataHandler, params, filenames);
+  const auto& transitions = rawDataHandler.getTargetedExperiment().getTransitions();
+  ASSERT_EQ(transitions.size(), 1);
+  const auto& transition = transitions.at(0);
+  EXPECT_EQ(std::string(transition.getName()), std::string("Unknown 1_HMDB:HMDB0000001"));
+  EXPECT_FLOAT_EQ(transition.getLibraryIntensity(), 90780);
+  EXPECT_EQ(std::string(transition.getPeptideRef()), std::string("HMDB:HMDB0000001"));
+  EXPECT_FLOAT_EQ(transition.getPrecursorMZ(), 195.102);
+  EXPECT_FLOAT_EQ(transition.getProductMZ(), 149.025);
 }
