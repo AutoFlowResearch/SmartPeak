@@ -598,7 +598,7 @@ namespace SmartPeak
     const std::optional<size_t> cnt0 = writer.writeDataInRow(pre_headers.cbegin(), pre_headers.cend());
     const std::optional<size_t> cnt1 = writer.writeDataInRow(headers.cbegin(), headers.cend());
 
-    if ((!cnt0 || *cnt0 < headers.size()) || (!cnt1 || *cnt1 < headers.size())){
+    if ((!cnt0 || *cnt0 < headers.size()) || (!cnt1 || *cnt1 < headers.size())) {
       LOGD << "END writeSequenceFileXcalibur";
     }
 
