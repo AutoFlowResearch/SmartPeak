@@ -880,7 +880,7 @@ namespace SmartPeak
 
       std::vector<std::string> headers = { "command_name" };
       CSVWriter writer(filenames_I.getFullPath("workflow").generic_string(), ",");
-      const size_t cnt = writer.writeDataInRow(headers.cbegin(), headers.cend());
+      const std::optional<size_t> cnt = writer.writeDataInRow(headers.cbegin(), headers.cend());
 
       if (cnt < headers.size()) {
         LOGD << "END writeDataTableFromMetaValue";
