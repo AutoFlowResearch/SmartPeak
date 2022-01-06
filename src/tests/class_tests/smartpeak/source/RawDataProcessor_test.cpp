@@ -2858,15 +2858,15 @@ TEST(RawDataProcessor, calculateMDVAccuracies)
 }
 
 /**
-  SearchSpectrum Tests
+  SearchSpectrumMS1 Tests
 */
-TEST(RawDataProcessor, gettersSearchSpectrum)
+TEST(RawDataProcessor, gettersSearchSpectrumMS1)
 {
   SearchSpectrumMS1 processor;
   EXPECT_EQ(processor.getName(), "SEARCH_SPECTRUM_MS1");
 }
 
-TEST(RawDataProcessor, SearchSpectrum)
+TEST(RawDataProcessor, SearchSpectrumMS1)
 {
   ParameterSet params_1;
   ParameterSet params_2;
@@ -3064,4 +3064,47 @@ TEST(RawDataProcessor, ConstructTransitionsList_csv)
   EXPECT_EQ(std::string(transition.getPeptideRef()), std::string("HMDB:HMDB0000001"));
   EXPECT_FLOAT_EQ(transition.getPrecursorMZ(), 195.102);
   EXPECT_FLOAT_EQ(transition.getProductMZ(), 149.025);
+}
+
+/**
+  SearchSpectrumMS2 Tests
+*/
+TEST(RawDataProcessor, gettersSearchSpectrumMS2)
+{
+  SearchSpectrumMS2 processor;
+  EXPECT_EQ(processor.getName(), "SEARCH_SPECTRUM_MS2");
+}
+
+TEST(RawDataProcessor, SearchSpectrumMS2)
+{
+  Filenames filenames;
+  RawDataHandler rawDataHandler;
+  ParameterSet params;
+  filenames.setTagValue(Filenames::Tag::MAIN_DIR, SMARTPEAK_GET_TEST_DATA_PATH("DDA"));
+
+  filenames.setFullPath("parameters", SMARTPEAK_GET_TEST_DATA_PATH("DDA/parameters.csv"));
+  LoadParameters load_parameters;
+  load_parameters.process(rawDataHandler, params, filenames);
+  params = rawDataHandler.getParameters();
+
+  filenames.setFullPath("mzML_i", SMARTPEAK_GET_TEST_DATA_PATH("DDA/Germicidin A standard.mzML"));
+  LoadRawData loadRawData;
+  loadRawData.process(rawDataHandler, params, filenames);
+  loadRawData.extractMetaData(rawDataHandler);
+
+  LoadFeatures loadFeatures;
+  filenames.setFullPath("featureXML_i", SMARTPEAK_GET_TEST_DATA_PATH("DDA/SearchSpectrumMS2/Germicidin A standard search spectrum ms2.featureXML"));
+  loadFeatures.process(rawDataHandler, params, filenames);
+
+  SearchSpectrumMS2 search_spectrum_ms2;
+  search_spectrum_ms2.process(rawDataHandler, params, filenames);
+
+  const auto& feature_map = rawDataHandler.getFeatureMap();
+  ASSERT_EQ(feature_map.size(), 1);
+  const auto& feature_1 = feature_map.at(0);
+  EXPECT_EQ(std::string(feature_1.getMetaValue("PeptideRef")), std::string("149.025"));
+  const auto& sub_features = feature_1.getSubordinates();
+  ASSERT_EQ(sub_features.size(), 1);
+  const auto& sub_feature_1 = feature_map.at(0);
+  EXPECT_EQ(std::string(sub_feature_1.getMetaValue("PeptideRef")), std::string("149.025"));
 }
