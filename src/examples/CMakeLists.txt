@@ -1,8 +1,28 @@
-
+# --------------------------------------------------------------------------
+#   SmartPeak -- Fast and Accurate CE-, GC- and LC-MS(/MS) Data Processing
+# --------------------------------------------------------------------------
+# Copyright The SmartPeak Team -- Novo Nordisk Foundation 
+# Center for Biosustainability, Technical University of Denmark 2018-2022.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL ANY OF THE AUTHORS OR THE CONTRIBUTING
+# INSTITUTIONS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+# EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+# PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+# OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+# OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+# ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+# --------------------------------------------------------------------------
+# $Maintainer: Ahmed Khalil, Bertrand Boudaud $
+# $Authors: Douglas McCloskey $
+# --------------------------------------------------------------------------
 
 cmake_minimum_required(VERSION 3.8.2 FATAL_ERROR)
 project("SmartPeak_class_examples_smartpeak")
-
 message(STATUS "building examples...")
 
 #------------------------------------------------------------------------------
@@ -18,9 +38,11 @@ include(executables.cmake)
 #------------------------------------------------------------------------------
 # Include directories for examples
 set(SMARTPEAK_EXAMPLES_INTERNAL_INCLUDE_DIRECTORIES "${PROJECT_BINARY_DIR}/include/")
+set(SMARTPEAK_SERVICES_INTERNAL_INCLUDE_DIRECTORIES "${PROJECT_BINARY_DIR}/source/service/")
 # add SmartPeak directories
 set(SMARTPEAK_EXAMPLES_EXTERNAL_INCLUDE_DIRECTORIES "${SmartPeak_INCLUDE_DIRECTORIES}" "${SmartPeakWidgets_INCLUDE_DIRECTORIES}")
 include_directories(${SMARTPEAK_EXAMPLES_INTERNAL_INCLUDE_DIRECTORIES})
+include_directories(${SMARTPEAK_SERVICES_INTERNAL_INCLUDE_DIRECTORIES})
 include_directories(SYSTEM ${SMARTPEAK_EXAMPLES_EXTERNAL_INCLUDE_DIRECTORIES})
 
 #------------------------------------------------------------------------------
@@ -105,6 +127,19 @@ find_package(ImPlot COMPONENTS Sources REQUIRED)
 include_directories(${IMPLOT_INCLUDE_DIR})
 
 #------------------------------------------------------------------------------
+# gRPC
+#------------------------------------------------------------------------------
+include(../../cmake/fetch_grpc.cmake)
+#------------------------------------------------------------------------------
+
+find_package(OpenSSL REQUIRED) 
+if(OpenSSL_FOUND)
+  include_directories(${OPENSSL_INCLUDE_DIR})
+  message(">> OPENSSL_INCLUDE_DIR : ${OPENSSL_INCLUDE_DIR}")
+  link_directories(${OPENSSL_LIBRARIES})
+  message(STATUS "[examples] : Using OpenSSL ${OPENSSL_VERSION}")
+endif()
+
 # pipeline examples
 add_custom_target(PIPELINE_EXAMPLES)
 add_dependencies(PIPELINE_EXAMPLES ${pipeline_executables_list})
@@ -119,16 +154,21 @@ add_dependencies(INTERACTIVE_EXAMPLES ${interactive_executables_list})
 foreach(_examples ${EXAMPLE_executables})
   if (APPLE)
     if (${_examples} STREQUAL "SmartPeakGUI")
-      set(ASSETS ${SMARTPEAK_HOST_DIRECTORY}/cmake/MacOSX/sp.icns)
+      set(ASSETS ${PROJECT_SOURCE_DIR}/../../cmake/MacOSX/sp.icns)
       set_source_files_properties(${ASSETS} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
       source_group("Resources" FILES ${ASSETS})
       add_executable(${_examples} MACOSX_BUNDLE source/${_examples} ${ASSETS})
       target_link_libraries(${_examples} PUBLIC ${SmartPeakWidgets_LIBRARIES} ${SmartPeak_LIBRARIES} 
             OpenMS ${SDL2_LIBRARY} ${OPENGL_LIBRARIES} ImPlot::ImPlot ImGui::ImGui 
             ${COREFOUNDATION_LIBRARY} ${APPLICATIONSERVICES_LIBRARY}
-            PRIVATE ImPlot::Sources ImGui::Sources ImGui::Examples ImGui::SourcesMiscCpp)
-      # set_target_properties(${_examples} PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${SMARTPEAK_HOST_DIRECTORY}/cmake/MacOSX/Info.plist)
+            PRIVATE ImPlot::Sources ImGui::Sources ImGui::Examples ImGui::SourcesMiscCpp
+            ${grpc_required_libs} OpenSSL::SSL OpenSSL::Crypto)
       install(TARGETS ${_examples}  BUNDLE DESTINATION .  COMPONENT Applications)
+      target_include_directories(${_examples} SYSTEM INTERFACE  ${CMAKE_CURRENT_SOURCE_DIR}/source/service/)
+    elseif(${_examples} STREQUAL "SmartPeakServer")
+      add_executable(${_examples} source/${_examples})
+      target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} OpenMS PRIVATE ${grpc_required_libs})
+      target_include_directories(${_examples} SYSTEM INTERFACE  ${CMAKE_CURRENT_SOURCE_DIR}/source/service/)
     else()
       add_executable(${_examples} source/${_examples})
       target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} OpenMS)
@@ -140,7 +180,8 @@ foreach(_examples ${EXAMPLE_executables})
       add_executable(${_examples} source/${_examples})
       target_link_libraries(${_examples} PUBLIC ${SmartPeakWidgets_LIBRARIES} ${SmartPeak_LIBRARIES} 
           OpenMS ${SDL2_LIBRARIES} ${OPENGL_LIBRARIES} ImPlot::ImPlot ImGui::ImGui 
-          PRIVATE ImPlot::Sources ImGui::Sources ImGui::Examples ImGui::SourcesMiscCpp)
+          PRIVATE ImPlot::Sources ImGui::Sources ImGui::Examples ImGui::SourcesMiscCpp
+					${grpc_required_libs})
       install_tool(${_examples}) 
     
       file(GLOB_RECURSE OpenMSLibs ${OpenMS_DIR}/lib/*.so)
@@ -156,9 +197,13 @@ foreach(_examples ${EXAMPLE_executables})
       add_executable(${_examples} source/${_examples})
       target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} OpenMS)
       install_tool(${_examples}) 
+    elseif(${_examples} STREQUAL "SmartPeakServer")
+      add_executable(${_examples} source/${_examples})
+      target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} OpenMS PRIVATE ${grpc_required_libs})
+      target_include_directories(${_examples} SYSTEM INTERFACE  ${CMAKE_CURRENT_SOURCE_DIR}/source/service/)
     else()
       add_executable(${_examples} source/${_examples})
-      target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} OpenMS)
+      target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} OpenMS ${grpc_required_libs})
     endif()
 
   else() # Win
@@ -167,8 +212,13 @@ foreach(_examples ${EXAMPLE_executables})
       add_executable(${_examples} source/${_examples} ${CMAKE_SOURCE_DIR}/cmake/Windows/SmartPeakGUI.rc)
       target_link_libraries(${_examples} PUBLIC ${SmartPeakWidgets_LIBRARIES} ${SmartPeak_LIBRARIES} 
         OpenMS ${SDL2_LIBRARIES} ${OPENGL_LIBRARIES} ImPlot::ImPlot ImGui::ImGui 
-        PRIVATE ImPlot::Sources ImGui::Sources ImGui::Examples ImGui::SourcesMiscCpp)
+        PRIVATE ImPlot::Sources ImGui::Sources ImGui::Examples ImGui::SourcesMiscCpp
+        ${grpc_required_libs})
       install_tool(${_examples})
+    elseif(${_examples} STREQUAL "SmartPeakServer")
+      add_executable(${_examples} source/${_examples})
+      target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} OpenMS PRIVATE ${grpc_required_libs})
+      target_include_directories(${_examples} SYSTEM INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/source/service/)
     else()
       add_executable(${_examples} source/${_examples})
       target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} OpenMS)

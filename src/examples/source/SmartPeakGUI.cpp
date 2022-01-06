@@ -80,10 +80,12 @@
 #include <backends/imgui_impl_sdl.h>
 #include <backends/imgui_impl_opengl2.h>
 #include <misc/cpp/imgui_stdlib.h>
+#include "service/services.hpp"
 
 using namespace SmartPeak;
 
 bool SmartPeak::enable_quick_help = true;
+bool SmartPeak::run_on_server = false;
 
 void initializeDataDirs(ApplicationHandler& state);
 
@@ -108,10 +110,14 @@ int main(int argc, char** argv)
   bool exceeding_table_size_ = false;
   bool ran_integrity_check_ = false;
   bool integrity_check_failed_ = false;
+  bool RawDataAndFeatures_loaded_ = false;
+  bool run_remote_workflow_ = true;
   ApplicationHandler application_handler_;
   SessionHandler session_handler_;
   WorkflowManager workflow_manager_;
   GuiAppender appender_;
+  WorkflowClient workflow_client_;
+  std::future<std::string> runworkflow_future_;
   SplitWindow split_window;
   LayoutLoader layout_loader(application_handler_);
 
@@ -654,6 +660,15 @@ int main(int argc, char** argv)
         }
         showQuickHelpToolTip("run_workflow");
         
+        if (ImGui::MenuItem("Cancel Workflow"))
+        {
+          if (run_on_server) {
+            if (workflow_client_.isChannelSet()) {
+              workflow_client_.stopRunningWorkflow();
+            }
+          }
+        }
+        
         if (ImGui::BeginMenu("Integrity checks"))
         {
           if (ImGui::MenuItem("Sample consistency")) {
@@ -706,7 +721,47 @@ int main(int argc, char** argv)
       
       ImGui::EndMainMenuBar();
     }
+      
+    // ======================================
+    // Server-Side Execution
+    // ======================================
+      if (run_workflow_widget_->server_fields_set)
+      {
+        if (run_workflow_widget_->run_remote_workflow)
+        {
+          workflow_client_.setChannel(grpc::CreateChannel(
+            run_workflow_widget_->server_url,
+            grpc::InsecureChannelCredentials()));
 
+          runworkflow_future_ = std::async(
+            std::launch::async,
+            &WorkflowClient::runWorkflow,
+            &workflow_client_,
+            application_handler_.filenames_.getTagValue(Filenames::Tag::MAIN_DIR),
+            run_workflow_widget_->username,
+            Utilities::sha256(run_workflow_widget_->password)
+          );
+        }
+        
+        run_workflow_widget_->server_fields_set = false;
+        RawDataAndFeatures_loaded_ = false;
+      }
+      
+      if (run_workflow_widget_->run_remote_workflow)
+      {
+        if (runworkflow_future_.valid())
+        {
+          workflow_client_.getEvent(
+            &event_dispatcher, &event_dispatcher, &event_dispatcher,
+            &event_dispatcher, &event_dispatcher, &event_dispatcher);
+          workflow_client_.getLogstream();
+          
+          ::serv::processRemoteWorkflow(
+            runworkflow_future_, run_workflow_widget_->username,
+            application_handler_, session_handler_, workflow_manager_,
+            event_dispatcher, RawDataAndFeatures_loaded_);
+        }
+      }
     // ======================================
     // Data updates
     //

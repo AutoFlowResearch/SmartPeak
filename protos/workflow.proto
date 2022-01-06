@@ -1,0 +1,129 @@
+// --------------------------------------------------------------------------
+//   SmartPeak -- Fast and Accurate CE-, GC- and LC-MS(/MS) Data Processing
+// --------------------------------------------------------------------------
+// Copyright The SmartPeak Team -- Novo Nordisk Foundation
+// Center for Biosustainability, Technical University of Denmark 2018-2022.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL ANY OF THE AUTHORS OR THE CONTRIBUTING
+// INSTITUTIONS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+// OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+// WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+// ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//
+// --------------------------------------------------------------------------
+// $Maintainer: Ahmed Khalil $
+// $Authors: Ahmed Khalil $
+// --------------------------------------------------------------------------
+// To generate :
+// protoc -I . --grpc_out=. --plugin=protoc-gen-grpc=grpc_cpp_plugin \
+// workflow.proto
+// protoc -I . --cpp_out=. workflow.proto
+
+syntax = "proto3";
+package SmartPeakServer;
+
+service Workflow {
+  rpc runWorkflow (WorkflowParameters) returns (WorkflowResult) {}
+  rpc getLogStream (InquireLogs) returns (stream LogStream) {}
+  rpc getProgressInfo (WorkflowParameters) returns (ProgressInfo) {}
+  rpc getWorkflowEvent (WorkflowParameters) returns (WorkflowEvent) {}
+  rpc stopRunningWorkflow (Interrupter) returns (Interrupter) {}
+}
+
+message WorkflowParameters {
+  enum ExportReport {
+    ALL = 0;
+    FEATUREDB = 1;
+    PIVOTTABLE = 2;
+  }
+  string dataset_path = 1;
+  ExportReport export = 2;
+  string report_metadata = 3;
+  string report_sample_types = 4;
+  string integrity = 5; 
+}
+
+message Interrupter {
+  bool to_interrupt = 1;
+  bool is_interrupted = 2;
+}
+
+// message SingleAxisData {
+//   repeated float axis_data = 1;
+// }
+
+// message GraphData {
+//   repeated string series_names_area = 1;
+//   repeated SingleAxisData x_data = 2;
+//   repeated SingleAxisData y_data = 3;
+//   repeated SingleAxisData z_data = 4;
+//   repeated string series_names_scatter = 5;
+//   repeated SingleAxisData x_data_scatter = 6;
+//   repeated SingleAxisData y_data_scatter = 7;
+//   string x_axis_title = 8;
+//   string y_axis_title = 9;
+//   string z_axis_title = 10;
+//   float x_min = 11;
+//   float x_max = 12;
+//   float y_min = 13;
+//   float y_max = 14;
+//   int32 nb_points = 15;
+//   int32 max_nb_points = 16;
+// }
+
+// message HeatmapData {
+//   repeated string selected_sample_names = 1;
+//   repeated string selected_transitions = 2;
+//   repeated string selected_transition_groups = 3;
+//   repeated string header_row = 4;
+//   repeated string header_column = 5;
+//   repeated SingleAxisData column_data = 6;
+//   string x_axis_title = 7;
+//   string y_axis_title = 8;
+//   string selected_feature = 9;
+//   float feat_value_min = 10;
+//   float feat_value_max = 11;
+// }
+
+message WorkflowResult {
+  string status_code = 1;
+  string session_id = 2;
+  string path_to_results = 3;
+  // GraphData graph_data = 4;
+  // HeatmapData heatmap_data = 5;
+}
+
+message InquireLogs {
+  int32 nr_lines = 1;
+}
+
+message LogStream {
+  enum LogSeverity {
+    NONE = 0;
+    FATAL = 1;
+    ERROR = 2;
+    WARNING = 3;
+    INFO = 4;
+    DEBUG = 5;
+    VERBOSE = 6;
+  }
+  string log_line = 1;
+  LogSeverity log_severity = 2;
+}
+
+message ProgressInfo {
+  string status_code = 1;
+}
+
+message WorkflowEvent {
+  string event_name = 1;
+  int64 event_index = 2;
+  string item_name = 3;
+  repeated string command_list = 4;
+}
