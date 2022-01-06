@@ -52,7 +52,7 @@
 #include <SmartPeak/core/RawDataProcessors/Pick3DFeatures.h>
 #include <SmartPeak/core/RawDataProcessors/SearchAccurateMass.h>
 #include <SmartPeak/core/RawDataProcessors/MergeFeaturesMS1.h>
-#include <SmartPeak/core/RawDataProcessors/MergeFeaturesMS1.h>
+#include <SmartPeak/core/RawDataProcessors/MergeFeaturesMS2.h>
 #include <SmartPeak/core/RawDataProcessors/LoadAnnotations.h>
 #include <SmartPeak/core/RawDataProcessors/SearchSpectrumMS1.h>
 #include <SmartPeak/core/RawDataProcessors/SearchSpectrumMS2.h>
@@ -1598,7 +1598,7 @@ TEST(RawDataProcessor, constructorMergeFeaturesMS1)
   EXPECT_EQ(ptrPickFeatures, nullPointerPickFeatures);
 }
 
-TEST(RawDataProcessor, destructorMergeFeatures)
+TEST(RawDataProcessor, destructorMergeFeaturesMS1)
 {
   MergeFeaturesMS1* ptrPickFeatures = nullptr;
   ptrPickFeatures = new MergeFeaturesMS1();
@@ -1720,6 +1720,63 @@ TEST(RawDataProcessor, consensusFeatures)
   EXPECT_NEAR(static_cast<double>(hhits2_sub1.getMetaValue("mz_error_ppm")), 0.449344462258211, 1e-6);
   EXPECT_NEAR(static_cast<double>(hhits2_sub1.getMetaValue("mz_error_Da")), 4.942764675774924e-05, 1e-6);
   EXPECT_EQ(static_cast<int>(hhits2_sub1.getCharge()), 3);
+}
+
+/**
+  MergeFeaturesMS1 Tests
+*/
+TEST(RawDataProcessor, constructorMergeFeaturesMS2)
+{
+  MergeFeaturesMS2* ptrPickFeatures = nullptr;
+  MergeFeaturesMS2* nullPointerPickFeatures = nullptr;
+  EXPECT_EQ(ptrPickFeatures, nullPointerPickFeatures);
+}
+
+TEST(RawDataProcessor, destructorMergeFeaturesMS2)
+{
+  MergeFeaturesMS2* ptrPickFeatures = nullptr;
+  ptrPickFeatures = new MergeFeaturesMS2();
+  delete ptrPickFeatures;
+}
+
+TEST(RawDataProcessor, gettersMergeFeaturesMS2)
+{
+  MergeFeaturesMS2 processor;
+  EXPECT_EQ(processor.getName(), "MERGE_FEATURES_MS2");
+}
+
+TEST(RawDataProcessor, MergeFeaturesMS2)
+{
+  Filenames filenames;
+  RawDataHandler rawDataHandler;
+  ParameterSet params;
+  filenames.setTagValue(Filenames::Tag::MAIN_DIR, SMARTPEAK_GET_TEST_DATA_PATH("DDA"));
+
+  filenames.setFullPath("parameters", SMARTPEAK_GET_TEST_DATA_PATH("DDA/parameters.csv"));
+  LoadParameters load_parameters;
+  load_parameters.process(rawDataHandler, params, filenames);
+  params = rawDataHandler.getParameters();
+
+  filenames.setFullPath("mzML_i", SMARTPEAK_GET_TEST_DATA_PATH("DDA/Germicidin A standard.mzML"));
+  LoadRawData loadRawData;
+  loadRawData.process(rawDataHandler, params, filenames);
+  loadRawData.extractMetaData(rawDataHandler);
+
+  LoadFeatures loadFeatures;
+  filenames.setFullPath("featureXML_i", SMARTPEAK_GET_TEST_DATA_PATH("DDA/MergeFeaturesMS2/Germicidin A standard merge features ms2.featureXML"));
+  loadFeatures.process(rawDataHandler, params, filenames);
+
+  MergeFeaturesMS2 merge_features_ms2;
+  merge_features_ms2.process(rawDataHandler, params, filenames);
+
+  const auto& feature_map = rawDataHandler.getFeatureMap();
+  ASSERT_EQ(feature_map.size(), 1);
+  const auto& feature_1 = feature_map.at(0);
+  EXPECT_EQ(std::string(feature_1.getMetaValue("PeptideRef")), std::string("Unknown 1"));
+  const auto& sub_features = feature_1.getSubordinates();
+  ASSERT_EQ(sub_features.size(), 1);
+  const auto& sub_feature_1 = feature_map.at(0);
+  EXPECT_EQ(std::string(sub_feature_1.getMetaValue("PeptideRef")), std::string("Unknown 1"));
 }
 
 /**
