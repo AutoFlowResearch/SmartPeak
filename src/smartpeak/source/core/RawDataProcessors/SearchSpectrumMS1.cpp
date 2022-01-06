@@ -79,6 +79,8 @@ namespace SmartPeak
     OpenMS::FeatureMap feat_map_output;
     targeted_spectra_extractor.searchSpectrum(rawDataHandler_IO.getFeatureMap(), feat_map_output);
     rawDataHandler_IO.setFeatureMap(feat_map_output);
+	#error check here if this line is here
+    rawDataHandler_IO.updateFeatureMapHistory();
   }
 
 }
