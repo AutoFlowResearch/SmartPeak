@@ -1611,6 +1611,40 @@ TEST(RawDataProcessor, gettersMergeFeaturesMS1)
   EXPECT_EQ(processor.getName(), "MERGE_FEATURES_MS1");
 }
 
+TEST(RawDataProcessor, MergeFeaturesMS1)
+{
+  Filenames filenames;
+  RawDataHandler rawDataHandler;
+  ParameterSet params;
+  filenames.setTagValue(Filenames::Tag::MAIN_DIR, SMARTPEAK_GET_TEST_DATA_PATH("DDA"));
+
+  filenames.setFullPath("parameters", SMARTPEAK_GET_TEST_DATA_PATH("DDA/parameters.csv"));
+  LoadParameters load_parameters;
+  load_parameters.process(rawDataHandler, params, filenames);
+  params = rawDataHandler.getParameters();
+
+  filenames.setFullPath("mzML_i", SMARTPEAK_GET_TEST_DATA_PATH("DDA/Germicidin A standard.mzML"));
+  LoadRawData loadRawData;
+  loadRawData.process(rawDataHandler, params, filenames);
+  loadRawData.extractMetaData(rawDataHandler);
+
+  LoadFeatures loadFeatures;
+  filenames.setFullPath("featureXML_i", SMARTPEAK_GET_TEST_DATA_PATH("DDA/MergeFeaturesMS1/Germicidin A standard merge features ms1.featureXML"));
+  loadFeatures.process(rawDataHandler, params, filenames);
+
+  MergeFeaturesMS1 merge_features_ms1;
+  merge_features_ms1.process(rawDataHandler, params, filenames);
+
+  const auto& feature_map = rawDataHandler.getFeatureMap();
+  ASSERT_EQ(feature_map.size(), 1);
+  const auto& feature_1 = feature_map.at(0);
+  EXPECT_EQ(std::string(feature_1.getMetaValue("PeptideRef")), std::string("HMDB:HMDB0000001"));
+  const auto& sub_features = feature_1.getSubordinates();
+  ASSERT_EQ(sub_features.size(), 1);
+  const auto& sub_feature_1 = feature_map.at(0);
+  EXPECT_EQ(std::string(sub_feature_1.getMetaValue("PeptideRef")), std::string("HMDB:HMDB0000001"));
+}
+
 TEST(RawDataProcessor, consensusFeatures)
 {
   // Pre-requisites: load the parameters and associated raw data
