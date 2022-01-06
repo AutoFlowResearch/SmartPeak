@@ -71,11 +71,17 @@ TEST(CSVWriter, writeDataInRow)
 
   // Write the data to file
   headers = {"Column1", "Column2", "Column3"};
-  csvwriter.writeDataInRow(headers.begin(), headers.end());
+  std::optional<size_t> cnt = csvwriter.writeDataInRow(headers.begin(), headers.end());
+  ASSERT_TRUE(cnt);
+  EXPECT_EQ(*cnt, 3);
   line = {"a", "b", "c" };
-  csvwriter.writeDataInRow(line.begin(), line.end());
+  cnt = csvwriter.writeDataInRow(line.begin(), line.end());
+  ASSERT_TRUE(cnt);
+  EXPECT_EQ(*cnt, 3);
   line = {"1", "2", "3" };
-  csvwriter.writeDataInRow(line.begin(), line.end());
+  cnt = csvwriter.writeDataInRow(line.begin(), line.end());
+  ASSERT_TRUE(cnt);
+  EXPECT_EQ(*cnt, 3);
 
   // Read the data back in
   io::CSVReader<3> test_in(filename);

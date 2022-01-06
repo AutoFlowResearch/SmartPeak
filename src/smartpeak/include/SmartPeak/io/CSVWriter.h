@@ -26,6 +26,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <optional>
 #include <plog/Log.h>
 
 namespace SmartPeak
@@ -66,14 +67,14 @@ public:
       @param last Iterator to the last element
     */
     template<typename T>
-    size_t writeDataInRow(T first, T last)
+    std::optional<size_t> writeDataInRow(T first, T last)
     {
       // Open the file in truncate mode if first line, else in append mode
       std::ofstream ofs(filename_, line_count_ ? std::ios::app : std::ios::trunc);
 
       if (!ofs.is_open()) {
         LOGE << "Cannot open file: " << filename_;
-        return -1;
+        return std::nullopt;
       }
 
       size_t cnt {0};
