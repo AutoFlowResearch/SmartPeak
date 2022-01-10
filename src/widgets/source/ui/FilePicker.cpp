@@ -29,6 +29,7 @@
 #include <imgui_internal.h>
 #include <misc/cpp/imgui_stdlib.h>
 #include <plog/Log.h>
+#include <portable-file-dialogs.h>
 
 namespace SmartPeak
 {
