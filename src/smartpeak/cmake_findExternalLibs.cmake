@@ -39,6 +39,16 @@ find_package(SQLite3 REQUIRED)
 #------------------------------------------------------------------------------
 find_package(OpenMS REQUIRED)
 
+#------------------------------------------------------------------------------
+# Find OpenSSL
+#------------------------------------------------------------------------------
+find_package(OpenSSL REQUIRED) 
+if(OpenSSL_FOUND)
+  include_directories(${OPENSSL_INCLUDE_DIR})
+  link_directories(${OPENSSL_LIBRARIES})
+  message(STATUS "[libSmartPeak] : Using OpenSSL ${OPENSSL_VERSION}")
+endif()
+
 # check whether the OpenMS package was found
 if (OpenMS_FOUND)
   # check if the variable containing the include directories is defined

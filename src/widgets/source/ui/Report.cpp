@@ -42,7 +42,8 @@ namespace SmartPeak
       application_handler->sequenceHandler_,
       filename,
       report_.summaryMetaData_,
-      report_.summarySampleTypes_
+      report_.summarySampleTypes_,
+      report_.result_message_
     );
     return true;
   }
@@ -147,7 +148,36 @@ namespace SmartPeak
       ImGui::CloseCurrentPopup();
     }
 
+    drawResultMessage();
     ImGui::EndPopup();
+  }
+
+  void Report::drawResultMessage()
+  {
+    static const char* report_creation_result_title = "Report creation result";
+    if (result_message_)
+    {
+      if (!ImGui::IsPopupOpen(report_creation_result_title))
+      {
+        ImGui::OpenPopup(report_creation_result_title);
+      }
+
+      if (!ImGui::BeginPopupModal(report_creation_result_title, NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+        return;
+      }
+
+      ImGui::Text(result_message_->c_str());
+
+      ImGui::Separator();
+
+      if (ImGui::Button("OK"))
+      {
+        result_message_ = std::nullopt;
+        ImGui::CloseCurrentPopup();
+      }
+
+      ImGui::EndPopup();
+    }
   }
 
   bool Report::initializeMetadataAndSampleTypes()
@@ -178,9 +208,12 @@ namespace SmartPeak
     const SequenceHandler sequence,
     const std::filesystem::path& pathname,
     const std::vector<FeatureMetadata>& meta_data,
-    const std::set<SampleType>& sample_types
+    const std::set<SampleType>& sample_types,
+    std::optional<std::string>& result_message
   )
   {
+    std::ostringstream result;
+
     std::future<bool> future = std::async(
       std::launch::async,
       data_writer,
@@ -196,14 +229,17 @@ namespace SmartPeak
     try {
       data_was_written = future.get();
     } catch (const std::exception& e) {
-      LOGE << e.what();
+      result << e.what() << std::endl;
     }
 
     if (data_was_written) {
-      LOGN << data_writer_label << " file has been stored at: " << pathname.generic_string();
+      result << data_writer_label << " file has been stored at: " << pathname.generic_string();
+      LOGN << result.str();
     } else {
-      LOGE << "Error during write. " << data_writer_label << " content is invalid.";
+      result << "Error while writing " << data_writer_label;
+      LOGE << result.str();
     }
+    result_message = result.str();
   }
 
   void Report::reportButton(const std::string& title,
@@ -224,7 +260,8 @@ namespace SmartPeak
       }
       else
       {
-        LOGE << "Select at least one Sample Type and at least one Metadata";
+         result_message_ = "Select at least one Sample Type and at least one Metadata";
+         LOGE << *result_message_;
       }
     }
   }

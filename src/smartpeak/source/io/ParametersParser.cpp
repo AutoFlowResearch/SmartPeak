@@ -138,7 +138,7 @@ namespace SmartPeak
     };
 
     CSVWriter writer(filename, ",");
-    const size_t cnt = writer.writeDataInRow(headers.cbegin(), headers.cend());
+    const std::optional<size_t> cnt = writer.writeDataInRow(headers.cbegin(), headers.cend());
 
     std::vector<std::vector<std::string>> rows;
     for (const auto& parameter_function : parameter_set)

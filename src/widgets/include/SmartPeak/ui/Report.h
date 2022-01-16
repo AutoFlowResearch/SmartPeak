@@ -55,7 +55,8 @@ namespace SmartPeak
       const SequenceHandler sequence,
       const std::filesystem::path& pathname,
       const std::vector<FeatureMetadata>& meta_data,
-      const std::set<SampleType>& sample_types
+      const std::set<SampleType>& sample_types,
+      std::optional<std::string>& result_message
     );
 
   public:
@@ -64,20 +65,25 @@ namespace SmartPeak
     void draw() override;
 
   protected:
+
+    void drawResultMessage();
+
+    std::optional<std::string> result_message_;
+
     struct ReportFilePickerHandler : IFilePickerHandler
     {
       typedef  bool (*WriterMethod)(const SequenceHandler&, 
                                        const std::filesystem::path&,
                                        const std::vector<FeatureMetadata>&,
                                        const std::set<SampleType>&);
-      ReportFilePickerHandler(const Report& report, const std::string title, WriterMethod writer_method) :
+      ReportFilePickerHandler(Report& report, const std::string title, WriterMethod writer_method) :
         report_(report), title_(title), writer_method_(writer_method) { };
       /**
       IFilePickerHandler
       */
       bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
     protected:
-      const Report& report_;
+      Report& report_;
       const std::string title_;
       WriterMethod writer_method_;
     };

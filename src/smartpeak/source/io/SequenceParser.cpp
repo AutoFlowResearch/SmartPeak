@@ -376,9 +376,9 @@ namespace SmartPeak
 
     // Write the output file
     CSVWriter writer(filename.generic_string(), delimiter);
-    const size_t cnt = writer.writeDataInRow(headers.cbegin(), headers.cend());
+    const std::optional<size_t> cnt = writer.writeDataInRow(headers.cbegin(), headers.cend());
 
-    if (cnt < headers.size()) {
+    if (!cnt || *cnt < headers.size()) {
       LOGD << "END writeSequenceFileSmartPeak";
     }
 
@@ -449,9 +449,9 @@ namespace SmartPeak
 
     // Write the output file
     CSVWriter writer(filename.generic_string(), delimiter);
-    const size_t cnt = writer.writeDataInRow(headers.cbegin(), headers.cend());
+    const std::optional<size_t> cnt = writer.writeDataInRow(headers.cbegin(), headers.cend());
 
-    if (cnt < headers.size()) {
+    if (!cnt || *cnt < headers.size()) {
       LOGD << "END writeSequenceFileAnalyst";
     }
 
@@ -515,9 +515,9 @@ namespace SmartPeak
 
     // Write the output file
     CSVWriter writer(filename.generic_string(), delimiter);
-    const size_t cnt = writer.writeDataInRow(headers.cbegin(), headers.cend());
+    const std::optional<size_t> cnt = writer.writeDataInRow(headers.cbegin(), headers.cend());
 
-    if (cnt < headers.size()) {
+    if (!cnt || *cnt < headers.size()) {
       LOGD << "END writeSequenceFileMasshunter";
     }
 
@@ -595,10 +595,10 @@ namespace SmartPeak
       if (i == 0) pre_headers.push_back("Bracket Type=4");
       else pre_headers.push_back("");
     }
-    const size_t cnt0 = writer.writeDataInRow(pre_headers.cbegin(), pre_headers.cend());
-    const size_t cnt1 = writer.writeDataInRow(headers.cbegin(), headers.cend());
+    const std::optional<size_t> cnt0 = writer.writeDataInRow(pre_headers.cbegin(), pre_headers.cend());
+    const std::optional<size_t> cnt1 = writer.writeDataInRow(headers.cbegin(), headers.cend());
 
-    if (cnt0 < headers.size() || cnt1 < headers.size()) {
+    if ((!cnt0 || *cnt0 < headers.size()) || (!cnt1 || *cnt1 < headers.size())) {
       LOGD << "END writeSequenceFileXcalibur";
     }
 
@@ -875,9 +875,9 @@ namespace SmartPeak
     makeDataTableFromMetaValue(sequenceHandler, rows, headers, meta_data_strings, sample_types, std::set<std::string>(), std::set<std::string>(), std::set<std::string>());
 
     CSVWriter writer(filename.generic_string(), ",");
-    const size_t cnt = writer.writeDataInRow(headers.cbegin(), headers.cend());
+    const std::optional<size_t> cnt = writer.writeDataInRow(headers.cbegin(), headers.cend());
 
-    if (cnt < headers.size()) {
+    if (!cnt || *cnt < headers.size()) {
       LOGD << "END writeDataTableFromMetaValue";
       return false;
     }
@@ -909,9 +909,9 @@ namespace SmartPeak
     makeGroupDataTableFromMetaValue(sequenceHandler, rows, headers, meta_data_strings, sample_types, std::set<std::string>(), std::set<std::string>(), std::set<std::string>());
 
     CSVWriter writer(filename.generic_string(), ",");
-    const size_t cnt = writer.writeDataInRow(headers.cbegin(), headers.cend());
+    const std::optional<size_t> cnt = writer.writeDataInRow(headers.cbegin(), headers.cend());
 
-    if (cnt < headers.size()) {
+    if (!cnt || *cnt < headers.size()) {
       LOGD << "END writeDataTableFromMetaValue";
       return false;
     }
@@ -1105,9 +1105,9 @@ namespace SmartPeak
     for (int i=0;i<columns.size();++i) headers.push_back(columns(i));
 
     CSVWriter writer(filename.generic_string(), ",");
-    const size_t cnt = writer.writeDataInRow(headers.cbegin(), headers.cend());
+    const std::optional<size_t> cnt = writer.writeDataInRow(headers.cbegin(), headers.cend());
 
-    if (cnt < headers.size()) {
+    if (!cnt || *cnt < headers.size()) {
       LOGD << "END writeDataMatrixFromMetaValue";
       return false;
     }
@@ -1268,9 +1268,9 @@ namespace SmartPeak
     for (int i = 0; i < columns.size(); ++i) headers.push_back(columns(i));
 
     CSVWriter writer(filename.generic_string(), ",");
-    const size_t cnt = writer.writeDataInRow(headers.cbegin(), headers.cend());
+    const std::optional<size_t> cnt = writer.writeDataInRow(headers.cbegin(), headers.cend());
 
-    if (cnt < headers.size()) {
+    if (!cnt || *cnt < headers.size()) {
       LOGD << "END writeDataMatrixFromMetaValue";
       return false;
     }

@@ -17,7 +17,7 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Krzysztof Abram, Douglas McCloskey $
+// $Maintainer: Krzysztof Abram, Douglas McCloskey, Ahmed Khalil $
 // $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
 // --------------------------------------------------------------------------
 #pragma once
@@ -29,6 +29,8 @@
 #include <plog/Log.h>
 #include <plog/Appenders/ConsoleAppender.h>
 #include <plog/Appenders/ColorConsoleAppender.h>
+
+#include <SmartPeak/core/ServerAppender.h>
 
 
 namespace SmartPeak {
@@ -175,6 +177,9 @@ private:
 
     std::shared_ptr<plog::RollingFileAppender<plog::CsvFormatter>> m_file_appender;
     std::shared_ptr<plog::ConsoleAppender<plog::TxtFormatter>> m_console_appender;
+  
+public:
+    ServerAppender server_appender_;
 };
 
 } /* namespace SmartPeak */

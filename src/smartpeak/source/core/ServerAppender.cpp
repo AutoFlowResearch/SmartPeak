@@ -1,7 +1,7 @@
 // --------------------------------------------------------------------------
 //   SmartPeak -- Fast and Accurate CE-, GC- and LC-MS(/MS) Data Processing
 // --------------------------------------------------------------------------
-// Copyright The SmartPeak Team -- Novo Nordisk Foundation 
+// Copyright The SmartPeak Team -- Novo Nordisk Foundation
 // Center for Biosustainability, Technical University of Denmark 2018-2021.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -17,45 +17,41 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Krzysztof Abram, Douglas McCloskey $
-// $Authors: Douglas McCloskey $
+// $Maintainer: Ahmed Khalil $
+// $Authors: Ahmed Khalil $
 // --------------------------------------------------------------------------
 
-#include <gtest/gtest.h>
-#include <gmock/gmock.h>
-#include <SmartPeak/test_config.h>
+#include <SmartPeak/core/ServerAppender.h>
 
-#include <SmartPeak/core/ConsoleHandler.h>
-#include <filesystem>
-
-
-struct ConsoleHandlerFixture : public ::testing::Test
+namespace SmartPeak
 {
-    /* ctor/dtor */
-    ConsoleHandlerFixture() 
+	void ServerAppender::write(const plog::Record& record)
     {
-        m_datapath = std::filesystem::temp_directory_path().string();
+      std::ostringstream ss;
+      ss << PLOG_NSTR("[") << record.getFunc() << PLOG_NSTR("@") << record.getLine() << PLOG_NSTR("] ");
+      ss << record.getMessage() << PLOG_NSTR("\n");
+      
+      #ifdef _WIN32
+      const std::string sss = ss.str();
+      plog::util::nstring str(sss.begin(), sss.end());
+      #else
+      plog::util::nstring str = ss.str();
+      #endif
+      std::lock_guard<std::mutex> g(messages_mutex);
+      messages.emplace_back(record.getSeverity(), str);
     }
-    std::string m_datapath;
-};
 
-/* ---------------------------------------------- */
-
-TEST_F(ConsoleHandlerFixture, ConsoleHandler_initialize)
-{
-  namespace fs = std::filesystem;
-  auto& ch = SmartPeak::ConsoleHandler::get_instance();
-  // Test singleton uniqueness:
-  auto& ch1 = SmartPeak::ConsoleHandler::get_instance();
-  EXPECT_EQ(&ch, &ch1);
-  // Test custom log location:
-  {
-    ch.set_log_directory(m_datapath);
-    ch.initialize("Welcome");
-    // m_filepath = ch.get_log_filepath();
-    EXPECT_TRUE(fs::exists(ch.get_log_filepath()));
-  }
-  // Test inability to initialize instance for the second time:
-  ch.initialize("Welcome");
-  EXPECT_TRUE(ch.is_initialized());
+    std::vector<ServerAppender::ServerAppenderRecord> ServerAppender::getAppenderRecordList(plog::Severity severity)
+    {
+      std::vector<ServerAppender::ServerAppenderRecord> filtered;
+      std::lock_guard<std::mutex> g(messages_mutex);
+      for (const ServerAppender::ServerAppenderRecord& p : messages) {
+        if (p.first <= severity) {
+          filtered.push_back(p);
+        }
+      }
+      messages.clear();
+      return filtered;
+    }
+	
 }

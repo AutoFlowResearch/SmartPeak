@@ -11,3 +11,5 @@ This section covers a breadth of walkthroughs using different datasets and analy
 * :doc:`tutorials/Targeted_flux_analysis_with_LC-MSMS_Agilent_Lipidomics`.
 
 * :doc:`tutorials/Targeted_flux_analysis_with_GC-MS_SIM_Agilent`.
+
+* :doc:`tutorials/Targeted_flux_analysis_with_GC-MS_full-scan_Agilent`.

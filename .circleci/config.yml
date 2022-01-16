@@ -26,7 +26,7 @@ jobs:
             apt-get install -y libglpk-dev seqan-dev libsdl2-dev libhdf5-dev
             apt-get install -y graphviz doxygen python3-pip &&
             apt-get install -y libpango1.0-dev gnuplot
-            apt-get install -y cppcheck &&
+            apt-get install -y cppcheck libssl-dev &&
             apt-get install -y python3-sphinx python3-breathe python3-sphinx-rtd-theme sphinx-doc doxygen-latex doxygen-doc gsfonts graphviz-doc libgd-tools xapian-tools &&
             pip3 install exhale && 
             pip3 install -r tools/smartpeak/requirements.txt
@@ -71,7 +71,7 @@ jobs:
           name: Running SmartPeak Class Tests
           command: |
             cd ~/smartpeak_release_build || exit 1
-            ctest -V
+            ctest -V -E "(example|example|absl|dfa|exhaustive|random|re2)"
             ls -l ~/SmartPeak/src/tests/class_tests/smartpeak/data
             cd ~/SmartPeak
             export PYTHONPATH="${PWD}/tools"
@@ -130,7 +130,7 @@ jobs:
             sed -i '' 's/std::auto_ptr/std::unique_ptr/g' include/seqan/basic/test_system.h
             rm lib/libz.* && rm -rf lib/pkgconfig
             cd ~/OpenMS &&  mkdir openms_debug_build && cd openms_debug_build &&
-            cmake -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_STANDARD=14 -DCMAKE_CXX_EXTENSIONS=OFF -DCMAKE_PREFIX_PATH="$(brew --prefix qt5)" -DOPENMS_CONTRIB_LIBS=~/OpenMS/contrib_build/ -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Release -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF ..
+            cmake -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_STANDARD=14 -DCMAKE_CXX_EXTENSIONS=OFF -DCMAKE_PREFIX_PATH="$(brew --prefix qt5)" -DOPENMS_CONTRIB_LIBS=~/OpenMS/contrib_build/ -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Release -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF -DZLIB_ROOT=$(brew --prefix zlib) ..
             make -j4 OpenMS
       - run:
           name: Building SmartPeak (Including SuperBuild)
@@ -141,7 +141,7 @@ jobs:
             cd superbuild
             cmake -DUSE_SUPERBUILD=ON -DCMAKE_BUILD_TYPE=Release .. && make -j4
             cd ../smartpeak_release_build
-            cmake -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBOOST_USE_STATIC=OFF -DCMAKE_PREFIX_PATH="~/OpenMS/openms_debug_build/;~/OpenMS/contrib_build;$(brew --prefix qt5);(brew --prefix eigen)" -DPLOG_INCLUDE_DIR=~/SmartPeak/superbuild/Dependencies/Source/plog/include   -DIMGUI_DIR=~/SmartPeak/superbuild/Dependencies/Source/imgui  -DIMPLOT_DIR=~/SmartPeak/superbuild/Dependencies/Source/implot -DSQLite3_INCLUDE_DIR=~/SmartPeak/superbuild/Dependencies/Source/sqlite -DSQLite3_LIBRARY=~/SmartPeak/superbuild/Dependencies/Source/sqlite -DCMAKE_BUILD_TYPE=RelWithDebInfo -DOpenMP_CXX_FLAGS="-Xpreprocessor -fopenmp -I/usr/local/opt/libomp/include" -DOpenMP_CXX_LIB_NAMES="omp" -DOpenMP_omp_LIBRARY=/usr/local/opt/libomp/lib/libomp.dylib ~/SmartPeak
+            cmake -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBOOST_USE_STATIC=OFF -DCMAKE_PREFIX_PATH="~/OpenMS/openms_debug_build/;~/OpenMS/contrib_build;$(brew --prefix qt5);(brew --prefix eigen);$(brew --prefix zlib);$(brew --prefix openssl)" -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl -DOPENSSL_LIBRARIES=/usr/local/opt/openssl/lib -DPLOG_INCLUDE_DIR=~/SmartPeak/superbuild/Dependencies/Source/plog/include   -DIMGUI_DIR=~/SmartPeak/superbuild/Dependencies/Source/imgui  -DIMPLOT_DIR=~/SmartPeak/superbuild/Dependencies/Source/implot -DSQLite3_INCLUDE_DIR=~/SmartPeak/superbuild/Dependencies/Source/sqlite -DSQLite3_LIBRARY=~/SmartPeak/superbuild/Dependencies/Source/sqlite -DCMAKE_BUILD_TYPE=RelWithDebInfo -DOpenMP_CXX_FLAGS="-Xpreprocessor -fopenmp -I/usr/local/opt/libomp/include" -DOpenMP_CXX_LIB_NAMES="omp" -DOpenMP_omp_LIBRARY=/usr/local/opt/libomp/lib/libomp.dylib -DgRPC_ZLIB_PROVIDER=package ~/SmartPeak
             make -j4
       - run:
           name: Running SmartPeak Class Tests
@@ -149,7 +149,7 @@ jobs:
           command: |
             set -e -o pipefail
             cd ~/SmartPeak/smartpeak_release_build
-            ctest -VV -F --timeout 1200
+            ctest -VV -F -E "(example|absl|dfa|exhaustive|random|re2|charclass|compile|mimics|parse_possible|regexp|required_prefix|search|set|simplify|string_generator)" --timeout 1200
             cd ~/SmartPeak
             export PYTHONPATH="${PWD}/tools"
             python3 -m unittest discover -s ./tools/smartpeak
@@ -293,7 +293,8 @@ jobs:
             msbuild src/smartpeak/SmartPeak.sln /verbosity:normal /maxcpucount /p:Configuration=Release
             msbuild src/examples/SmartPeak_class_examples_smartpeak.sln /maxcpucount /property:Configuration=Release
             refreshenv
-            & 'C:\Program Files\cmake\bin\ctest.exe' -VV -F
+            @("set(CMAKE_ERROR_ON_ABSOLUTE_INSTALL_DESTINATION FALSE)") +  (Get-Content ".\_deps\grpc-build\third_party\abseil-cpp\absl\base\cmake_install.cmake") | Set-Content ".\_deps\grpc-build\third_party\abseil-cpp\absl\base\cmake_install.cmake"
+            & 'C:\Program Files\cmake\bin\ctest.exe' -VV -F -E "(example|example|absl|dfa|exhaustive|random|re2|charclass|compile|mimics|parse|regexp|required_prefix|search|set|simplify|string_generator|possible)"
             ThrowOnFailure "CTest failed!"
             & 'C:\Program Files\cmake\bin\cpack.exe' -G NSIS64
             ThrowOnFailure "CPack failed!"

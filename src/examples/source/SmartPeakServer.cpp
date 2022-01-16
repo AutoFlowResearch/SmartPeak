@@ -1,7 +1,7 @@
 // --------------------------------------------------------------------------
 //   SmartPeak -- Fast and Accurate CE-, GC- and LC-MS(/MS) Data Processing
 // --------------------------------------------------------------------------
-// Copyright The SmartPeak Team -- Novo Nordisk Foundation 
+// Copyright The SmartPeak Team -- Novo Nordisk Foundation
 // Center for Biosustainability, Technical University of Denmark 2018-2021.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -17,45 +17,17 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Krzysztof Abram, Douglas McCloskey $
-// $Authors: Douglas McCloskey $
+// $Maintainer: Ahmed Khalil, Douglas McCloskey $
+// $Authors: Ahmed Khalil $
 // --------------------------------------------------------------------------
 
-#include <gtest/gtest.h>
-#include <gmock/gmock.h>
-#include <SmartPeak/test_config.h>
+#include "service/services.hpp"
 
-#include <SmartPeak/core/ConsoleHandler.h>
-#include <filesystem>
-
-
-struct ConsoleHandlerFixture : public ::testing::Test
+int main(int argc, char** argv)
 {
-    /* ctor/dtor */
-    ConsoleHandlerFixture() 
-    {
-        m_datapath = std::filesystem::temp_directory_path().string();
-    }
-    std::string m_datapath;
-};
-
-/* ---------------------------------------------- */
-
-TEST_F(ConsoleHandlerFixture, ConsoleHandler_initialize)
-{
-  namespace fs = std::filesystem;
-  auto& ch = SmartPeak::ConsoleHandler::get_instance();
-  // Test singleton uniqueness:
-  auto& ch1 = SmartPeak::ConsoleHandler::get_instance();
-  EXPECT_EQ(&ch, &ch1);
-  // Test custom log location:
-  {
-    ch.set_log_directory(m_datapath);
-    ch.initialize("Welcome");
-    // m_filepath = ch.get_log_filepath();
-    EXPECT_TRUE(fs::exists(ch.get_log_filepath()));
-  }
-  // Test inability to initialize instance for the second time:
-  ch.initialize("Welcome");
-  EXPECT_TRUE(ch.is_initialized());
+  if (argc > 1)
+    runSmartPeakServer(std::string(argv[1]));
+  else
+    runSmartPeakServer("0.0.0.0:50051");
+  return 0;
 }

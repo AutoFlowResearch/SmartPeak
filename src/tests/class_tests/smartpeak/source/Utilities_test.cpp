@@ -263,6 +263,49 @@ TEST(utilities, parseString)
   EXPECT_STREQ(c.sl_[2].c_str(), "third string");
 }
 
+TEST(utilities, parseString_bigString)
+{
+  std::vector<bool> bool_list;
+  std::ostringstream os;
+  os << "[";
+  std::string sep;
+  for (int i = 0; i < 1000; ++i)
+  {
+    os << sep;
+    os << "false";
+    bool_list.push_back(false);
+    sep = ",";
+  }
+  os << "]";
+  std::string big_string = os.str();
+  CastValue c;
+
+  Utilities::parseString(big_string, c);
+  ASSERT_EQ(c.getTag(), CastValue::Type::BOOL_LIST);
+  EXPECT_EQ(c.bl_ , bool_list);
+}
+
+TEST(utilities, isList)
+{
+  std::regex re_integer_number("[+-]?\\d+");
+  EXPECT_TRUE(Utilities::isList("1,2,3", re_integer_number));
+  EXPECT_FALSE(Utilities::isList("1,3.14,3", re_integer_number));
+  EXPECT_FALSE(Utilities::isList("", re_integer_number));
+
+  std::regex re_float_number("[+-]?\\d+(?:\\.\\d+)?"); // can match also integers: check for integer before checking for float
+  EXPECT_TRUE(Utilities::isList("1,2,3", re_float_number));
+  EXPECT_TRUE(Utilities::isList("1,3.14,3", re_float_number));
+  EXPECT_FALSE(Utilities::isList("1,one,two", re_float_number));
+
+  std::regex re_bool("true|false", std::regex::icase);
+  EXPECT_TRUE(Utilities::isList("false,TRUE,fAlse", re_bool));
+  EXPECT_FALSE(Utilities::isList("1,one,two", re_bool));
+
+  std::regex re_s("[\"']([^,]+)[\"']");
+  EXPECT_TRUE(Utilities::isList("\"1\",\"one\",\"two\"", re_s));
+  EXPECT_FALSE(Utilities::isList("false,TRUE,fAlse", re_s));
+}
+
 TEST(utilities, parseList)
 {
   const string floats = "[1.1,-2.1,+3.1,4]";
@@ -704,4 +747,81 @@ TEST(utilities, prepareFileParameterList)
   EXPECT_EQ(parameter_set.findParameter("test", "absolute_path")->getValueAsString(),
     std::string("['") + SMARTPEAK_GET_TEST_DATA_PATH("SequenceParser_sequence_1.csv") + std::string("',")
     + std::string("'") + SMARTPEAK_GET_TEST_DATA_PATH("SequenceParser_sequence_1_semicolon.csv") + std::string("']"));
+}
+
+TEST(utilities, sha256)
+{
+  std::string hashed_string = Utilities::sha256("test-string");
+  std::string correct_hashed_string = "ffe65f1d98fafedea3514adc956c8ada5980c6c5d2552fd61f48401aefd5c00e";
+  EXPECT_STREQ(hashed_string.c_str(), correct_hashed_string.c_str());
+}
+
+TEST(utilities, createServerSessionFile)
+{
+  std::filesystem::path tmp_dir = Utilities::createEmptyTempDirectory();
+  Utilities::createServerSessionFile(tmp_dir);
+  EXPECT_TRUE(std::filesystem::exists(tmp_dir/".serversession.ssi"));
+}
+
+TEST(utilities, writeToServerSessionFile)
+{
+  std::filesystem::path tmp_dir = Utilities::createEmptyTempDirectory();
+  std::string usr_id_1 = "user-1";
+  std::string dataset_name_1 = "dataset-1";
+  std::string workflow_status_1 = "YES";
+  std::string started_at_1 = "12-30-03_30-12-2021";
+  std::string finished_at_1 = "13-30-03_30-12-2021";
+  std::string path_to_exports_1 = "/path/to/exports/1/";
+  std::string log_file_1 = "/path/to/log/file-1";
+  
+  std::string usr_id_2 = "user-2";
+  std::string dataset_name_2 = "dataset-2";
+  std::string workflow_status_2 = "YES";
+  std::string started_at_2 = "12-30-03_25-12-2021";
+  std::string finished_at_2 = "13-30-03_25-12-2021";
+  std::string path_to_exports_2 = "/path/to/exports/2/";
+  std::string log_file_2 = "/path/to/log/file-2";
+  
+  std::vector<std::string> expected = {
+    "usr_id,dataset_name,workflow_status,started_at,finished_at,path_to_exports,log_file",
+    "user-1,dataset-1,YES,12-30-03_30-12-2021,13-30-03_30-12-2021,/path/to/exports/1/,/path/to/log/file-1",
+    "user-2,dataset-2,YES,12-30-03_25-12-2021,13-30-03_25-12-2021,/path/to/exports/2/,/path/to/log/file-2" };
+  
+  Utilities::writeToServerSessionFile(
+    tmp_dir, usr_id_1, dataset_name_1, workflow_status_1,
+    started_at_1, finished_at_1, path_to_exports_1, log_file_1);
+  Utilities::writeToServerSessionFile(
+    tmp_dir, usr_id_2, dataset_name_2, workflow_status_2,
+    started_at_2, finished_at_2, path_to_exports_2, log_file_2);
+  
+  std::vector<std::string> results;
+  if (std::filesystem::exists(tmp_dir/".serversession.ssi")) {
+    std::ifstream serversession_file(tmp_dir/".serversession.ssi");
+    for(std::string line; getline(serversession_file, line);) {
+      results.push_back(line);
+    }
+  }
+  
+  EXPECT_EQ(expected.size(), results.size());
+  for (int i = 0; i < results.size(); ++i) {
+    EXPECT_STREQ(expected[i].c_str(), results[i].c_str());
+  }
+}
+
+TEST(utilities, checkLastServerWorkflowRun)
+{
+  std::filesystem::path tmp_dir = Utilities::createEmptyTempDirectory();
+  std::string usr_id_1 = "user-1";
+  std::string dataset_name_1 = "dataset-1";
+  std::string workflow_status_1 = "YES";
+  std::string started_at_1 = "12-30-03_30-12-2021";
+  std::string finished_at_1 = "13-30-03_30-12-2021";
+  std::string path_to_exports_1 = "/path/to/exports/1/";
+  std::string log_file_1 = "/path/to/log/file-1";
+  
+  Utilities::writeToServerSessionFile(
+    tmp_dir, usr_id_1, dataset_name_1, workflow_status_1,
+    started_at_1, finished_at_1, path_to_exports_1, log_file_1);
+  
+  EXPECT_TRUE(Utilities::checkLastServerWorkflowRun(tmp_dir, usr_id_1));
 }
