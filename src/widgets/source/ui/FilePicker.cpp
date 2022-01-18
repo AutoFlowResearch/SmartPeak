@@ -33,7 +33,7 @@
 
 namespace SmartPeak
 {
-  bool FilePicker::use_native_file_picker = true;
+  bool FilePicker::use_native_file_picker_ = true;
 
   void FilePicker::updateContents(std::vector<ImEntry>& Im_directory_entries)
   {
@@ -56,7 +56,7 @@ namespace SmartPeak
 
   void FilePicker::draw()
   {
-    if (use_native_file_picker)
+    if (use_native_file_picker_)
     {
       return;
     }
@@ -343,7 +343,7 @@ namespace SmartPeak
     selected_filename_ = default_file_name;
     files_scanned_ = false;
     picked_pathname_ = "";
-    if (use_native_file_picker)
+    if (use_native_file_picker_)
     {
       if (mode == FilePicker::Mode::EDirectory)
       {

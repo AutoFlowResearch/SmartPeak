@@ -59,6 +59,8 @@ namespace SmartPeak
     bool fileLoadingIsDone() { return loading_is_done_; };
     bool errorLoadingFile() { return error_loading_file_; };
 
+    static bool use_native_file_picker_;
+
   protected:
     std::array<std::vector<std::string>, 4> pathname_content_;
     std::filesystem::path current_pathname_ = std::filesystem::current_path();
@@ -76,7 +78,6 @@ namespace SmartPeak
     int selected_entry_ = -1;
     ImGuiTextFilter filter_;
     std::string open_button_text_ = "Open";
-    static bool use_native_file_picker;
 
     void run_and_join(
       IFilePickerHandler* file_picker_handler,
