@@ -543,13 +543,12 @@ int main(int argc, char** argv)
               {
                 if (ImGui::MenuItem(filenames.getDescription(file_id).c_str(), NULL, false, workflow_is_done_))
                 {
-                  file_picker_->open(filenames.getDescription(file_id),
+                  file_picker_->open(std::string("Export ") + filenames.getDescription(file_id),
                     file_picker_handler,
                     FilePicker::Mode::EFileCreate,
                     application_handler_,
                     filenames.getFullPath(file_id).filename().generic_string()
                   );
-                  file_picker_->visible_ = true;
                 }
               }
             }

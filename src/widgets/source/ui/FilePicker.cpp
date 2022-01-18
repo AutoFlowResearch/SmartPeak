@@ -33,6 +33,8 @@
 
 namespace SmartPeak
 {
+  bool FilePicker::use_native_file_picker = true;
+
   void FilePicker::updateContents(std::vector<ImEntry>& Im_directory_entries)
   {
     if (!files_scanned_)
@@ -54,6 +56,11 @@ namespace SmartPeak
 
   void FilePicker::draw()
   {
+    if (use_native_file_picker)
+    {
+      return;
+    }
+
     if (!ImGui::BeginPopupModal(title_.c_str(), NULL, ImGuiWindowFlags_NoResize)) {
       return;
     }
@@ -335,22 +342,66 @@ namespace SmartPeak
     visible_ = true;
     selected_filename_ = default_file_name;
     files_scanned_ = false;
-    switch (mode)
+    picked_pathname_ = "";
+    if (use_native_file_picker)
     {
-    case SmartPeak::FilePicker::Mode::EFileRead:
-      open_button_text_ = "Open";
-      break;
-    case SmartPeak::FilePicker::Mode::EFileCreate:
-      open_button_text_ = "Save";
-      break;
-    case SmartPeak::FilePicker::Mode::EDirectory:
-      open_button_text_ = "Select";
-      break;
-    default:
-      open_button_text_ = "Open";
-      break;
+      if (mode == FilePicker::Mode::EDirectory)
+      {
+        auto dir = pfd::select_folder(
+          title,
+          default_file_name
+        ).result();
+        LOGD << "Selected dir: " << dir;
+        picked_pathname_ = dir;
+      }
+      else if (mode == FilePicker::Mode::EFileRead)
+      {
+        auto file_list = pfd::open_file(
+          title,
+          default_file_name,
+          { "All Files", "*" }
+        ).result();
+        for (const auto& f : file_list) // we actually may have only for one file
+        {
+          LOGD << "Selected file: " << f;
+          picked_pathname_ = f;
+        }
+      }
+      else if (mode == FilePicker::Mode::EFileCreate)
+      {
+        auto f = pfd::save_file(
+          title,
+          default_file_name,
+          { "All Files", "*" }
+        ).result();
+        LOGD << "Selected file: " << f;
+        picked_pathname_ = f;
+      }
+      visible_ = false;
+      if (!picked_pathname_.empty())
+      {
+        runProcessor();
+      }
     }
-    ImGui::OpenPopup(title_.c_str());
+    else
+    {
+      switch (mode)
+      {
+      case SmartPeak::FilePicker::Mode::EFileRead:
+        open_button_text_ = "Open";
+        break;
+      case SmartPeak::FilePicker::Mode::EFileCreate:
+        open_button_text_ = "Save";
+        break;
+      case SmartPeak::FilePicker::Mode::EDirectory:
+        open_button_text_ = "Select";
+        break;
+      default:
+        open_button_text_ = "Open";
+        break;
+      }
+      ImGui::OpenPopup(title_.c_str());
+    }
   }
 
   void FilePicker::runProcessor()
