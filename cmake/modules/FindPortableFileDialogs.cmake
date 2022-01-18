@@ -10,11 +10,14 @@
 #
 #  PORTABLEFILEDIALOGS_INCLUDE_DIR          - Include dir 
 #
+# If ``PortableFileDialogs`` is not found, as a fallback it tries to find the C++ sources.
+# You can supply their location via an ``IMGUI_DIR`` variable.
+#
 # The find module tries to find ``PortableFileDialogs`` the C++ sources.
 # You can supply their location via an ``PORTABLEFILEDIALOGS_DIR`` variable.\ ly.
 set(CMAKE_FIND_DEBUG_MODE TRUE)
 find_path(PORTABLEFILEDIALOGS_INCLUDE_DIR 
-	NAMES "portablefiledialogs/portable-file-dialogs.h"
+	NAMES "portable-file-dialogs.h"
 	HINTS ${PORTABLEFILEDIALOGS_DIR}
 	NO_CMAKE_FIND_ROOT_PATH
 )
