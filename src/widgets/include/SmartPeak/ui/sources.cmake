@@ -20,6 +20,7 @@ set(sources_list_h
 	LayoutLoader.h
 	LoadSessionWizard.h
 	LogWidget.h
+	OptionsWidget.h
 	ParameterEditorWidget.h
 	ParametersTableWidget.h
 	Plotter.h

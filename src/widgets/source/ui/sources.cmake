@@ -19,6 +19,7 @@ set(sources_list
 	LayoutLoader.cpp
 	LoadSessionWizard.cpp
 	LogWidget.cpp
+	OptionsWidget.cpp
 	ParameterEditorWidget.cpp
 	ParametersTableWidget.cpp
 	Plotter.cpp
