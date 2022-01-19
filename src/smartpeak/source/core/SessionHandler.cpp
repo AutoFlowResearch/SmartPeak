@@ -2054,7 +2054,7 @@ namespace SmartPeak
                 (double)quant_method.getTransformationModelParams().getValue("slope") != 1.0&&
                 component_names.count(quant_method.getComponentName()) > 0) // TODO: filter out components that have not been fitted
             { 
-              // Make the line of best fit using the `QuantitationMethods
+              // Make the line of best fit using the `QuantitationMethods`
               std::vector<float> y_fit_data;
               for (const auto& ratio : stand_concs_map.at(quant_method.getComponentName()).first) {
                 // TODO: encapsulate in its own method e.g. sequenceSegmentProcessor
