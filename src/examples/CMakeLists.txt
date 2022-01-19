@@ -76,7 +76,7 @@ endif(OpenMS_FOUND)
 #------------------------------------------------------------------------------
 # OpenMS QT5 dependencies
 #------------------------------------------------------------------------------
-find_package(Qt5 COMPONENTS Core Network REQUIRED)
+find_package(Qt5 COMPONENTS Core Network Sql REQUIRED)
 
 if (NOT Qt5Network_FOUND)
   message(STATUS "[examples] : QtNetwork module not found!")
@@ -85,6 +85,11 @@ endif()
 
 if (NOT Qt5Core_FOUND)
   message(STATUS "[examples] : QtCore module not found!")
+  message(FATAL_ERROR "To find a custom Qt installation use: cmake <..more options..> -D QT_QMAKE_EXECUTABLE='<path_to_qmake(.exe)' <src-dir>")
+endif()
+
+if (NOT Qt5Sql_FOUND)
+  message(STATUS "[examples] : QtSql module not found!")
   message(FATAL_ERROR "To find a custom Qt installation use: cmake <..more options..> -D QT_QMAKE_EXECUTABLE='<path_to_qmake(.exe)' <src-dir>")
 endif()
 
