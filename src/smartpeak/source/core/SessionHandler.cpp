@@ -1993,7 +1993,7 @@ namespace SmartPeak
     result.selected_transitions_ = selected_transitions;
     result.selected_transition_groups_ = selected_transition_groups;
   }
-  bool SessionHandler::setCalibratorsScatterLinePlot(const SequenceHandler & sequence_handler)
+  bool SessionHandler::setCalibratorsScatterLinePlot(const SequenceHandler & sequence_handler, CalibrationData& result)
   {
     const int MAX_POINTS = 9000; // Maximum number of points before either performance drops considerable or IMGUI throws an error
     int n_points = 0;
@@ -2008,21 +2008,21 @@ namespace SmartPeak
         if (!selected_transitions(i).empty())
           component_names.insert(selected_transitions(i));
       }
-      if (calibrators_conc_fit_data.size() != component_names.size() && calibrators_conc_raw_data.size() != component_names.size()) 
+      if (result.calibrators_conc_fit_data.size() != component_names.size() && result.calibrators_conc_raw_data.size() != component_names.size())
       {
         LOGD << "Making the calibrators data for plotting";
         // Update the axis titles and clear the data
-        calibrators_x_axis_title = "Concentration (" + sequence_handler.getSequenceSegments().at(0).getQuantitationMethods().at(0).getConcentrationUnits() + ")";
-        calibrators_y_axis_title = sequence_handler.getSequenceSegments().at(0).getQuantitationMethods().at(0).getFeatureName() + " (au)";
-        calibrators_conc_min = 1e6;
-        calibrators_conc_max = 0;
-        calibrators_feature_min = 1e6;
-        calibrators_feature_max = 0;
-        calibrators_conc_fit_data.clear();
-        calibrators_feature_fit_data.clear();
-        calibrators_conc_raw_data.clear();
-        calibrators_feature_raw_data.clear();
-        calibrators_series_names.clear();
+        result.calibrators_x_axis_title = "Concentration (" + sequence_handler.getSequenceSegments().at(0).getQuantitationMethods().at(0).getConcentrationUnits() + ")";
+        result.calibrators_y_axis_title = sequence_handler.getSequenceSegments().at(0).getQuantitationMethods().at(0).getFeatureName() + " (au)";
+        result.calibrators_conc_min = 1e6;
+        result.calibrators_conc_max = 0;
+        result.calibrators_feature_min = 1e6;
+        result.calibrators_feature_max = 0;
+        result.calibrators_conc_fit_data.clear();
+        result.calibrators_feature_fit_data.clear();
+        result.calibrators_conc_raw_data.clear();
+        result.calibrators_feature_raw_data.clear();
+        result.calibrators_series_names.clear();
         for (const auto& sequence_segment : sequence_handler.getSequenceSegments()) {
           // Extract out raw data used to make the calibrators found in `StandardsConcentrations`
           std::map<std::string, std::pair<std::vector<float>, std::vector<std::string>>> stand_concs_map; // map of x_data and sample_name for a component
@@ -2070,15 +2070,15 @@ namespace SmartPeak
                   calculated_feature_ratio = 0.0;
                 }
                 y_fit_data.push_back(calculated_feature_ratio);
-                calibrators_conc_min = std::min(ratio, calibrators_conc_min);
-                calibrators_conc_max = std::max(ratio, calibrators_conc_max);
-                calibrators_feature_min = std::min(calculated_feature_ratio, calibrators_feature_min);
-                calibrators_feature_max = std::max(calculated_feature_ratio, calibrators_feature_max);
+                result.calibrators_conc_min = std::min(ratio, result.calibrators_conc_min);
+                result.calibrators_conc_max = std::max(ratio, result.calibrators_conc_max);
+                result.calibrators_feature_min = std::min(calculated_feature_ratio, result.calibrators_feature_min);
+                result.calibrators_feature_max = std::max(calculated_feature_ratio, result.calibrators_feature_max);
               }
               n_points += y_fit_data.size();
               if (n_points < MAX_POINTS) {
-                calibrators_conc_fit_data.push_back(stand_concs_map.at(quant_method.getComponentName()).first);
-                calibrators_feature_fit_data.push_back(y_fit_data);
+                result.calibrators_conc_fit_data.push_back(stand_concs_map.at(quant_method.getComponentName()).first);
+                result.calibrators_feature_fit_data.push_back(y_fit_data);
               }
               else 
               {
@@ -2088,18 +2088,19 @@ namespace SmartPeak
               // Extract out the points used to make the line of best fit in `ComponentsToConcentrations`
               std::vector<float> x_raw_data, y_raw_data;
               OpenMS::AbsoluteQuantitation absQuant;
+              const auto& test = sequence_segment.getComponentsToConcentrations();
               for (const auto& point : sequence_segment.getComponentsToConcentrations().at(quant_method.getComponentName())) {
                 x_raw_data.push_back(float(point.actual_concentration / point.IS_actual_concentration / point.dilution_factor));
                 float y_datum = absQuant.calculateRatio(point.feature, point.IS_feature, quant_method.getFeatureName());
                 y_raw_data.push_back(y_datum);
-                calibrators_feature_min = std::min(y_datum, calibrators_feature_min);
-                calibrators_feature_max = std::max(y_datum, calibrators_feature_max);
+                result.calibrators_feature_min = std::min(y_datum, result.calibrators_feature_min);
+                result.calibrators_feature_max = std::max(y_datum, result.calibrators_feature_max);
               }
               n_points += x_raw_data.size();
               if (n_points < MAX_POINTS) {
-                calibrators_conc_raw_data.push_back(x_raw_data);
-                calibrators_feature_raw_data.push_back(y_raw_data);
-                calibrators_series_names.push_back(quant_method.getComponentName());
+                result.calibrators_conc_raw_data.push_back(x_raw_data);
+                result.calibrators_feature_raw_data.push_back(y_raw_data);
+                result.calibrators_series_names.push_back(quant_method.getComponentName());
               }
               else 
               {
@@ -2110,10 +2111,10 @@ namespace SmartPeak
           }
         }
         // Sort data
-        for (int j = 0; j < calibrators_conc_fit_data.size(); ++j)
+        for (int j = 0; j < result.calibrators_conc_fit_data.size(); ++j)
         {
-          auto& fit_data_x = calibrators_conc_fit_data[j];
-          auto& fit_data_y = calibrators_feature_fit_data[j];
+          auto& fit_data_x = result.calibrators_conc_fit_data[j];
+          auto& fit_data_y = result.calibrators_feature_fit_data[j];
           std::vector<std::pair<float,float>> sorting_vector;
           for (int i = 0; i < fit_data_x.size(); ++i)
           {

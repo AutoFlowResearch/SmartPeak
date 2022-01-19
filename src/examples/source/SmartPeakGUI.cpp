@@ -874,12 +874,9 @@ int main(int argc, char** argv)
     // calibrators
     if (calibrators_line_plot_->visible_)
     {
-      exceeding_plot_points_ = !session_handler_.setCalibratorsScatterLinePlot(application_handler_.sequenceHandler_);
-      calibrators_line_plot_->setValues(&session_handler_.calibrators_conc_fit_data, &session_handler_.calibrators_feature_fit_data,
-        &session_handler_.calibrators_conc_raw_data, &session_handler_.calibrators_feature_raw_data, &session_handler_.calibrators_series_names,
-        session_handler_.calibrators_x_axis_title, session_handler_.calibrators_y_axis_title, session_handler_.calibrators_conc_min, session_handler_.calibrators_conc_max,
-        session_handler_.calibrators_feature_min, session_handler_.calibrators_feature_max,
-        "CalibratorsMainWindow");
+      SessionHandler::CalibrationData calibration_data;
+      exceeding_plot_points_ = !session_handler_.setCalibratorsScatterLinePlot(application_handler_.sequenceHandler_, calibration_data);
+      calibrators_line_plot_->setValues(calibration_data, "CalibratorsMainWindow");
     }
 
     // ======================================

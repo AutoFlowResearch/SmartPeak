@@ -717,7 +717,8 @@ TEST(SessionHandler, setCalibratorsScatterLinePlot1)
 {
   TestData testData;
   SessionHandler session_handler;
-  session_handler.setCalibratorsScatterLinePlot(testData.application_handler.sequenceHandler_);
+  SessionHandler::CalibrationData calibrator_data;
+  session_handler.setCalibratorsScatterLinePlot(testData.application_handler.sequenceHandler_, calibrator_data);
 }
 TEST(SessionHandler, getHeatMap)
 {
