@@ -1,7 +1,28 @@
 SmartPeak Changelog
 ===================
 
-v1.18.0 (2020-12-16)
+v1.19.0 (2022-01-10)
+--------------------
+
+Features
+~~~~~~~~
+- Walkthrough : Non-targeted FIA-MS analysis with Thermo Orbitrap `(#460) <https://github.com/AutoFlowResearch/SmartPeak/pull/460>`_
+- doc : Targeted flux analysis with LC-MS/MS Agilent Lipidomics `(#473) <https://github.com/AutoFlowResearch/SmartPeak/pull/473>`_
+- Walkthrough: Targeted flux analysis with GC-MS full-scan Agilent `(#476) <https://github.com/AutoFlowResearch/SmartPeak/pull/476>`_
+- Marking highest values in 2D Plots `(#475) <https://github.com/AutoFlowResearch/SmartPeak/pull/475>`_
+- Report Doalog box now confirms success or error once the report is created `(#480) <https://github.com/AutoFlowResearch/SmartPeak/pull/480>`_
+- Distributed Mode `(#437) <https://github.com/AutoFlowResearch/SmartPeak/pull/437>`_
+
+Fix
+~~~
+- Fixed session error due to regex `(#478) <https://github.com/AutoFlowResearch/SmartPeak/pull/478>`_
+- Fix some file picker don't popup when selecting file in the New Session dialog box `(#479) <https://github.com/AutoFlowResearch/SmartPeak/pull/479>`_
+
+Changes
+~~~~~~~
+- upgrade CI macOS build to 13.1 `(#472) <https://github.com/AutoFlowResearch/SmartPeak/pull/472>`_
+
+v1.18.0 (2021-12-16)
 --------------------
 
 Features
@@ -18,7 +39,7 @@ Fix
 - Fixing FIAMS workflow and quantitationMethods.csv override `(#461) <https://github.com/AutoFlowResearch/SmartPeak/pull/461>`_
 - Fixed Cancel button size for directory selection dialog box `(#469) <https://github.com/AutoFlowResearch/SmartPeak/pull/469>`_
 
-v1.17.0 (2020-11-16)
+v1.17.0 (2021-11-16)
 --------------------
 
 Features
@@ -36,7 +57,7 @@ Changes
 ~~~~~~~
 - Modifying start menu title to include SmartPeakGUI version `(#451) <https://github.com/AutoFlowResearch/SmartPeak/pull/451>`_
 
-v1.16.0 (2020-10-25)
+v1.16.0 (2021-10-25)
 --------------------
 
 Features
@@ -54,7 +75,7 @@ Fix
 - Fix export of Pivot Table `(#445) <https://github.com/AutoFlowResearch/SmartPeak/pull/445>`_
 - Fix/select dilution `(#446) <https://github.com/AutoFlowResearch/SmartPeak/pull/446>`_
 
-v1.15.0 (2020-10-11)
+v1.15.0 (2021-10-11)
 --------------------
 
 Features
@@ -80,7 +101,7 @@ Changes
     - --disable-progressbar short form has been replaced from -p to -pg
     - --integrity short form has been replaced from -i to -t
 
-v1.14.0 (2020-09-30)
+v1.14.0 (2021-09-30)
 --------------------
 
 Features
@@ -92,7 +113,7 @@ Fix
 - Fixed some metadata not appearing in PivotTable `(#424) <https://github.com/AutoFlowResearch/SmartPeak/pull/424>`_
 - Fixed failure to load featureQCComponents.csv when featureQCComponentGroups.csv is not provided `(#423) <https://github.com/AutoFlowResearch/SmartPeak/pull/423>`_
 
-v1.13.0 (2020-09-13)
+v1.13.0 (2021-09-13)
 --------------------
 
 Features
@@ -106,7 +127,7 @@ Fix
 - Fixed sorted data for Calibrator plot. `(#413) <https://github.com/AutoFlowResearch/SmartPeak/pull/413>`_
 - Fixed Pivot table header with component name and groups `(#410) <https://github.com/AutoFlowResearch/SmartPeak/pull/410>`_
 
-v1.12.0 (2020-08-13)
+v1.12.0 (2021-08-13)
 --------------------
 
 Features
@@ -126,7 +147,7 @@ Fix
 - Fixed handling of windows separators in CLI. `(#402) <https://github.com/AutoFlowResearch/SmartPeak/pull/402>`_
 - Fixed ProcessSequence Fails with SIGABRT `(#398) <https://github.com/AutoFlowResearch/SmartPeak/pull/398>`_
 
-v1.11.0 (2020-07-16)
+v1.11.0 (2021-07-16)
 --------------------
 
 Features
@@ -134,7 +155,7 @@ Features
 - DDA Workflow and Support for visualization of non-targeted LC-MS/MS data `(#386) <https://github.com/AutoFlowResearch/SmartPeak/pull/386>`_
 - Automatic, accurate selection of data based on dilution and compound `(#394) <https://github.com/AutoFlowResearch/SmartPeak/pull/394>`_
 
-v1.10.0 (2020-07-08)
+v1.10.0 (2021-07-08)
 --------------------
 
 Fix
@@ -143,7 +164,7 @@ Fix
 - Fixed show-back of log and info panel, once previously hidden. `(#389) <https://github.com/AutoFlowResearch/SmartPeak/pull/389>`_
 - Display error if required column is missing in the parameters file. `(#388) <https://github.com/AutoFlowResearch/SmartPeak/pull/388>`_
 
-v1.9.0 (2020-07-07)
+v1.9.0 (2021-07-07)
 -------------------
 
 Features
@@ -154,7 +175,7 @@ Fix
 ~~~
 - Report error for invalid value in parameter.csv. `(#387) <https://github.com/AutoFlowResearch/SmartPeak/pull/387>`_
 
-v1.8.0 (2020-07-01)
+v1.8.0 (2021-07-01)
 -------------------
 
 Features
@@ -171,7 +192,7 @@ Fix
 - Removing trailing zeros in FilePicker `(#377) <https://github.com/AutoFlowResearch/SmartPeak/pull/377>`_
 - Fixed MergeSpectra when spectrum has no peak `(#382) <https://github.com/AutoFlowResearch/SmartPeak/pull/382>`_
 
-v1.7.0 (2020-06-07)
+v1.7.0 (2021-06-07)
 -------------------
 
 Features
@@ -183,7 +204,7 @@ Fix
 - Fixed crash when loading multiple sequences `(#373) <https://github.com/AutoFlowResearch/SmartPeak/pull/373>`_
 - Fixed set path in FilePicker `(#372) <https://github.com/AutoFlowResearch/SmartPeak/pull/372>`_
 
-v1.6.0 (2020-05-25)
+v1.6.0 (2021-05-25)
 -------------------
 
 Features
@@ -204,7 +225,7 @@ Fix
 - Fixing Crashes associated with `getPathnameContent` when starting GUI on macOS `(#279) <https://github.com/AutoFlowResearch/SmartPeak/pull/379>`_
 - Fixed crash when updating parameters list `(#369) <https://github.com/AutoFlowResearch/SmartPeak/pull/368>`_
 
-v1.5.0 (2020-05-07)
+v1.5.0 (2021-05-07)
 -------------------
 
 Features
@@ -220,7 +241,7 @@ Fix
 - Fixed too much points to be displayed on Chromatograms `(#358) <https://github.com/AutoFlowResearch/SmartPeak/pull/358>`_
 - Fixed crash on Linux when opening Transitions Tab `(#364) <https://github.com/AutoFlowResearch/SmartPeak/pull/364>`_
 
-v1.4.0 (2020-04-26)
+v1.4.0 (2021-04-26)
 -------------------
 
 Features
@@ -246,7 +267,7 @@ Fix
 - Fixed compilation with OpenMS, related with Parameters changes `(#357) <https://github.com/AutoFlowResearch/SmartPeak/pull/357>`_
 - FIAMS_FullScan_Unknown_test.exe assertion failure `(#348) <https://github.com/AutoFlowResearch/SmartPeak/pull/348>`_
 
-v1.3.0 (2020-04-09)
+v1.3.0 (2021-04-09)
 -------------------
 
 Features
@@ -286,7 +307,7 @@ Fix
   * Update cmake nsis config to include icon to installer and launch the application when installation complete
   * Configure default CPACK_GENERATOR for windows
 
-v1.2.0 (2020-03-15)
+v1.2.0 (2021-03-15)
 -------------------
 
 Features
