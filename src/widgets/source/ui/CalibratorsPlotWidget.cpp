@@ -26,26 +26,20 @@
 
 namespace SmartPeak
 {
-  void CalibratorsPlotWidget::draw()
+  void CalibratorsPlotWidget::displayParameters()
   {
-    if (!calibration_data_.calibrators_conc_raw_data.size())
-    {
-      return;
-    }
-    showQuickHelpToolTip("CalibratorsPlotWidget");
-
-    // Parameters
+    ImGui::Begin("Calibrator Parameters");
     const auto& quantitation_methods = calibration_data_.quant_method;
-    
+
     ImGui::LabelText("name", quantitation_methods.getISName().c_str());
     ImGui::LabelText("component name", quantitation_methods.getComponentName().c_str());
-    
+
     ImGui::LabelText("llod", "%f", quantitation_methods.getLLOD());
     ImGui::LabelText("ulod", "%f", quantitation_methods.getULOD());
-    
+
     ImGui::LabelText("lloq", "%f", quantitation_methods.getLLOQ());
     ImGui::LabelText("uloq", "%f", quantitation_methods.getULOQ());
-    
+
     ImGui::LabelText("correlation coefficient", "%f", quantitation_methods.getCorrelationCoefficient());
     ImGui::LabelText("nb points", "%d", quantitation_methods.getNPoints());
 
@@ -57,7 +51,12 @@ namespace SmartPeak
       const auto& value = param.value;
       ImGui::LabelText(param.name.c_str(), "%s", value.toString().c_str());
     }
-    
+    ImGui::End();
+  }
+
+  void CalibratorsPlotWidget::displayPlot()
+  {
+    ImGui::Begin("Calibrator Plot");
     // Main graphic
     ImPlot::SetNextPlotLimits(calibration_data_.calibrators_conc_min, calibration_data_.calibrators_conc_max, calibration_data_.calibrators_feature_min, calibration_data_.calibrators_feature_max, ImGuiCond_Always);
     auto window_size = ImGui::GetWindowSize();
@@ -75,5 +74,35 @@ namespace SmartPeak
       }
       ImPlot::EndPlot();
     }
+    ImGui::End();
+  }
+
+  void CalibratorsPlotWidget::draw()
+  {
+    if (!calibration_data_.calibrators_conc_raw_data.size())
+    {
+      return;
+    }
+    showQuickHelpToolTip("CalibratorsPlotWidget");
+
+    // Build default docking
+    ImGuiID dockspace_id = ImGui::GetID("CalibratorsPlotWidgetDockSpace");
+    if (reset_layout_)
+    {
+      ImGuiID left_node;
+      ImGuiID center_node;
+      ImGuiID bottom_node;
+      ImGui::DockBuilderAddNode(dockspace_id, ImGuiDockNodeFlags_DockSpace);
+      ImGui::DockBuilderSetNodeSize(dockspace_id, ImVec2(400,400));
+      ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Left, 0.3, &left_node, &center_node); // The second parameter defines the direction of the split
+      ImGui::DockBuilderDockWindow("Calibrator Parameters", left_node);
+      ImGui::DockBuilderDockWindow("Calibrator Plot", center_node);
+      ImGui::DockBuilderFinish(dockspace_id);
+      reset_layout_ = false;
+    }
+    ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_AutoHideTabBar);
+    
+    displayParameters();
+    displayPlot();
   }
 }
