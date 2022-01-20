@@ -31,25 +31,79 @@ namespace SmartPeak
     ImGui::Begin("Calibrator Parameters");
     const auto& quantitation_methods = calibration_data_.quant_method;
 
-    ImGui::LabelText("name", quantitation_methods.getISName().c_str());
-    ImGui::LabelText("component name", quantitation_methods.getComponentName().c_str());
-
-    ImGui::LabelText("llod", "%f", quantitation_methods.getLLOD());
-    ImGui::LabelText("ulod", "%f", quantitation_methods.getULOD());
-
-    ImGui::LabelText("lloq", "%f", quantitation_methods.getLLOQ());
-    ImGui::LabelText("uloq", "%f", quantitation_methods.getULOQ());
-
-    ImGui::LabelText("correlation coefficient", "%f", quantitation_methods.getCorrelationCoefficient());
-    ImGui::LabelText("nb points", "%d", quantitation_methods.getNPoints());
-
-    ImGui::LabelText("transformation model", quantitation_methods.getTransformationModel().c_str());
-
-    const auto& params = quantitation_methods.getTransformationModelParams();
-    for (const auto& param : params)
+    ImGuiTableFlags table_flags = ImGuiTableFlags_None;
+    if (ImGui::BeginTable("Calibrator Parameters Table", 2, table_flags))
     {
-      const auto& value = param.value;
-      ImGui::LabelText(param.name.c_str(), "%s", value.toString().c_str());
+      /*
+      ImGui::TableSetupColumn("Parameter name");
+      ImGui::TableSetupColumn("Parameter value");
+      ImGui::TableHeadersRow();
+      */
+      ImGui::TableNextRow(); 
+      ImGui::TableSetColumnIndex(0);
+      ImGui::Text("name");
+      ImGui::TableSetColumnIndex(1);
+      ImGui::Text(quantitation_methods.getISName().c_str());
+
+      ImGui::TableNextRow();
+      ImGui::TableSetColumnIndex(0);
+      ImGui::Text("component name");
+      ImGui::TableSetColumnIndex(1);
+      ImGui::Text(quantitation_methods.getComponentName().c_str());
+
+      ImGui::TableNextRow();
+      ImGui::TableSetColumnIndex(0);
+      ImGui::Text("llod");
+      ImGui::TableSetColumnIndex(1);
+      ImGui::Text("%f", quantitation_methods.getLLOD());
+
+      ImGui::TableNextRow();
+      ImGui::TableSetColumnIndex(0);
+      ImGui::Text("ulod");
+      ImGui::TableSetColumnIndex(1);
+      ImGui::Text("%f", quantitation_methods.getULOD());
+
+      ImGui::TableNextRow();
+      ImGui::TableSetColumnIndex(0);
+      ImGui::Text("lloq");
+      ImGui::TableSetColumnIndex(1);
+      ImGui::Text("%f", quantitation_methods.getLLOQ());
+
+      ImGui::TableNextRow();
+      ImGui::TableSetColumnIndex(0);
+      ImGui::Text("uloq");
+      ImGui::TableSetColumnIndex(1);
+      ImGui::Text("%f", quantitation_methods.getULOQ());
+
+      ImGui::TableNextRow();
+      ImGui::TableSetColumnIndex(0);
+      ImGui::Text("correlation coefficient");
+      ImGui::TableSetColumnIndex(1);
+      ImGui::Text("%f", quantitation_methods.getCorrelationCoefficient());
+
+      ImGui::TableNextRow();
+      ImGui::TableSetColumnIndex(0);
+      ImGui::Text("nb points");
+      ImGui::TableSetColumnIndex(1);
+      ImGui::Text("%d", quantitation_methods.getNPoints());
+
+      ImGui::TableNextRow();
+      ImGui::TableSetColumnIndex(0);
+      ImGui::Text("transformation model");
+      ImGui::TableSetColumnIndex(1);
+      ImGui::Text(quantitation_methods.getTransformationModel().c_str());
+
+      const auto& params = quantitation_methods.getTransformationModelParams();
+      for (const auto& param : params)
+      {
+        const auto& value = param.value;
+        ImGui::TableNextRow();
+        ImGui::TableSetColumnIndex(0);
+        ImGui::Text(param.name.c_str());
+        ImGui::TableSetColumnIndex(1);
+        ImGui::Text("%s", value.toString().c_str());
+      }
+      ImGui::EndTable();
     }
     ImGui::End();
   }
@@ -96,13 +150,12 @@ namespace SmartPeak
     if (reset_layout_)
     {
       ImGuiID left_node;
-      ImGuiID center_node;
-      ImGuiID bottom_node;
+      ImGuiID right_node;
       ImGui::DockBuilderAddNode(dockspace_id, ImGuiDockNodeFlags_DockSpace);
-      ImGui::DockBuilderSetNodeSize(dockspace_id, ImVec2(400,400));
-      ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Left, 0.3, &left_node, &center_node); // The second parameter defines the direction of the split
+      ImGui::DockBuilderSetNodeSize(dockspace_id, ImGui::GetCurrentWindow()->Size);
+      ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Left, 0.5f, &left_node, &right_node); // The second parameter defines the direction of the split
       ImGui::DockBuilderDockWindow("Calibrator Parameters", left_node);
-      ImGui::DockBuilderDockWindow("Calibrator Plot", center_node);
+      ImGui::DockBuilderDockWindow("Calibrator Plot", right_node);
       ImGui::DockBuilderFinish(dockspace_id);
       reset_layout_ = false;
     }
