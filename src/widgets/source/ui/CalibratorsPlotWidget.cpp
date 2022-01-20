@@ -57,10 +57,16 @@ namespace SmartPeak
   void CalibratorsPlotWidget::displayPlot()
   {
     ImGui::Begin("Calibrator Plot");
+    ImGui::Checkbox("Legend", &show_legend_);
     // Main graphic
-    ImPlot::SetNextPlotLimits(calibration_data_.calibrators_conc_min, calibration_data_.calibrators_conc_max, calibration_data_.calibrators_feature_min, calibration_data_.calibrators_feature_max, ImGuiCond_Always);
+    ImPlot::SetNextPlotLimits(calibration_data_.calibrators_conc_min, calibration_data_.calibrators_conc_max, calibration_data_.calibrators_feature_min, calibration_data_.calibrators_feature_max);
     auto window_size = ImGui::GetWindowSize();
-    if (ImPlot::BeginPlot(plot_title_.c_str(), calibration_data_.calibrators_x_axis_title.c_str(), calibration_data_.calibrators_y_axis_title.c_str(), ImVec2(window_size.x - 25, window_size.y - 40))) {
+    ImPlotFlags plotFlags = show_legend_ ? ImPlotFlags_Default | ImPlotFlags_Legend : ImPlotFlags_Default & ~ImPlotFlags_Legend;
+    if (ImPlot::BeginPlot(plot_title_.c_str(), 
+                          calibration_data_.calibrators_x_axis_title.c_str(), 
+                          calibration_data_.calibrators_y_axis_title.c_str(), 
+                          ImVec2(window_size.x - 25, window_size.y - 58),
+                          plotFlags)) {
       for (int i = 0; i < calibration_data_.calibrators_conc_fit_data.size(); ++i) {
         assert(calibration_data_.calibrators_conc_fit_data.at(i).size() == calibration_data_.calibrators_feature_fit_data.at(i).size());
         ImPlot::PushStyleVar(ImPlotStyleVar_LineWeight, ImPlot::GetStyle().LineWeight);
