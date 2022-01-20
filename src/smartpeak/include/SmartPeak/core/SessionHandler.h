@@ -342,8 +342,10 @@ namespace SmartPeak
     */
     struct CalibrationData
     {
-      std::vector<std::vector<float>> calibrators_conc_raw_data, calibrators_feature_raw_data;
-      std::vector<std::vector<float>> calibrators_conc_fit_data, calibrators_feature_fit_data;
+      std::vector<std::vector<float>> calibrators_conc_raw_data;
+      std::vector<std::vector<float>> calibrators_feature_raw_data;
+      std::vector<std::vector<float>> calibrators_conc_fit_data;
+      std::vector<std::vector<float>> calibrators_feature_fit_data;
       std::vector<std::string> calibrators_series_names;
       std::string calibrators_x_axis_title;
       std::string calibrators_y_axis_title;
@@ -351,6 +353,7 @@ namespace SmartPeak
       float calibrators_conc_max;
       float calibrators_feature_min;
       float calibrators_feature_max;
+      OpenMS::AbsoluteQuantitationMethod quant_method;
     };
 
     /*

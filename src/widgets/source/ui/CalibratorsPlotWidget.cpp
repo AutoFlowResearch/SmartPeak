@@ -33,6 +33,31 @@ namespace SmartPeak
       return;
     }
     showQuickHelpToolTip("CalibratorsPlotWidget");
+
+    // Parameters
+    const auto& quantitation_methods = calibration_data_.quant_method;
+    
+    ImGui::LabelText("name", quantitation_methods.getISName().c_str());
+    ImGui::LabelText("component name", quantitation_methods.getComponentName().c_str());
+    
+    ImGui::LabelText("llod", "%f", quantitation_methods.getLLOD());
+    ImGui::LabelText("ulod", "%f", quantitation_methods.getULOD());
+    
+    ImGui::LabelText("lloq", "%f", quantitation_methods.getLLOQ());
+    ImGui::LabelText("uloq", "%f", quantitation_methods.getULOQ());
+    
+    ImGui::LabelText("correlation coefficient", "%f", quantitation_methods.getCorrelationCoefficient());
+    ImGui::LabelText("nb points", "%d", quantitation_methods.getNPoints());
+
+    ImGui::LabelText("transformation model", quantitation_methods.getTransformationModel().c_str());
+
+    const auto& params = quantitation_methods.getTransformationModelParams();
+    for (const auto& param : params)
+    {
+      const auto& value = param.value;
+      ImGui::LabelText(param.name.c_str(), "%s", value.toString().c_str());
+    }
+    
     // Main graphic
     ImPlot::SetNextPlotLimits(calibration_data_.calibrators_conc_min, calibration_data_.calibrators_conc_max, calibration_data_.calibrators_feature_min, calibration_data_.calibrators_feature_max, ImGuiCond_Always);
     auto window_size = ImGui::GetWindowSize();
