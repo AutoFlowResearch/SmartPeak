@@ -1455,46 +1455,46 @@ TEST(RawDataProcessor, pickMS2Features)
 
   pickFeatures.process(rawDataHandler, params_1, filenames);
 
-  EXPECT_EQ(rawDataHandler.getFeatureMap().size(), 2258);
-  EXPECT_EQ(rawDataHandler.getExperiment().getChromatograms().size(), 2258);
+  EXPECT_EQ(rawDataHandler.getFeatureMap().size(), 2737);
+  EXPECT_EQ(rawDataHandler.getExperiment().getChromatograms().size(), 2737);
 
   const OpenMS::Feature& feature1 = rawDataHandler.getFeatureMap().at(0); // feature_map_
   EXPECT_EQ(feature1.getMetaValue("num_of_masstraces").toString(), "1");
   EXPECT_EQ(feature1.getMetaValue("scan_polarity"), "positive");
   ASSERT_TRUE(feature1.getConvexHulls().size() == 1);
-  EXPECT_NEAR(feature1.getConvexHull().getBoundingBox().minX(), 381.298f, 1e-3);
+  EXPECT_NEAR(feature1.getConvexHull().getBoundingBox().minX(), 488.3000, 1e-3);
   EXPECT_NEAR(feature1.getConvexHull().getBoundingBox().minY(), 79.021f, 1e-3);
   EXPECT_NEAR(feature1.getConvexHull().getBoundingBox().maxX(), 540.557f, 1e-3);
   EXPECT_NEAR(feature1.getConvexHull().getBoundingBox().maxY(), 79.023f, 1e-3);
-  EXPECT_NEAR(static_cast<double>(feature1.getRT()), 453.462, 1e-6);
-  EXPECT_NEAR(static_cast<double>(feature1.getMZ()), 79.022321098842482, 1e-6);
-  EXPECT_NEAR(static_cast<double>(feature1.getIntensity()), 7978.17578125, 1e-6);
+  EXPECT_NEAR(static_cast<double>(feature1.getRT()), 498.752999, 1e-6);
+  EXPECT_NEAR(static_cast<double>(feature1.getMZ()), 79.0221059, 1e-6);
+  EXPECT_NEAR(static_cast<double>(feature1.getIntensity()), 18283.1621093, 1e-6);
 
   const OpenMS::Feature& feature2 = rawDataHandler.getFeatureMap().back();
   EXPECT_EQ(feature2.getMetaValue("num_of_masstraces").toString(), "1");
   ASSERT_TRUE(feature2.getConvexHulls().size() == 1);
-  EXPECT_NEAR(feature2.getConvexHull().getBoundingBox().minX(), 547.524f, 1e-2);
-  EXPECT_NEAR(feature2.getConvexHull().getBoundingBox().minY(), 848.610f, 1e-3);
-  EXPECT_NEAR(feature2.getConvexHull().getBoundingBox().maxX(), 592.812f, 1e-3);
-  EXPECT_NEAR(feature2.getConvexHull().getBoundingBox().maxY(), 848.641f, 1e-3);
-  EXPECT_NEAR(static_cast<double>(feature2.getRT()), 568.428, 1e-6);
-  EXPECT_NEAR(static_cast<double>(feature2.getMZ()), 848.63375701405562, 1e-6);
-  EXPECT_NEAR(static_cast<double>(feature2.getIntensity()), 46520.29296875, 1e-6);
+  EXPECT_NEAR(feature2.getConvexHull().getBoundingBox().minX(), 631.136999f, 1e-2);
+  EXPECT_NEAR(feature2.getConvexHull().getBoundingBox().minY(), 848.624214f, 1e-3);
+  EXPECT_NEAR(feature2.getConvexHull().getBoundingBox().maxX(), 659.0080000f, 1e-3);
+  EXPECT_NEAR(feature2.getConvexHull().getBoundingBox().maxY(), 848.6381134f, 1e-3);
+  EXPECT_NEAR(static_cast<double>(feature2.getRT()), 648.5560000, 1e-6);
+  EXPECT_NEAR(static_cast<double>(feature2.getMZ()), 848.6336890, 1e-6);
+  EXPECT_NEAR(static_cast<double>(feature2.getIntensity()), 14291.36816406, 1e-6);
 
-  EXPECT_EQ(rawDataHandler.getFeatureMapHistory().size(), 2258);
+  EXPECT_EQ(rawDataHandler.getFeatureMapHistory().size(), 2737);
 
   const OpenMS::Feature& hfeature1 = rawDataHandler.getFeatureMapHistory().at(0); // feature_map_history_
   EXPECT_EQ(hfeature1.getMetaValue("num_of_masstraces").toString(), "1");
   EXPECT_EQ(hfeature1.getMetaValue("scan_polarity"), "positive");
-  EXPECT_NEAR(static_cast<double>(hfeature1.getRT()), 453.462, 1e-6);
-  EXPECT_NEAR(static_cast<double>(hfeature1.getMZ()), 79.022321098842482, 1e-6);
-  EXPECT_NEAR(static_cast<double>(hfeature1.getIntensity()), 7978.17578125, 1e-6);
+  EXPECT_NEAR(static_cast<double>(hfeature1.getRT()), 498.752999, 1e-6);
+  EXPECT_NEAR(static_cast<double>(hfeature1.getMZ()), 79.02210591, 1e-6);
+  EXPECT_NEAR(static_cast<double>(hfeature1.getIntensity()), 18283.16210937, 1e-6);
 
   const OpenMS::Feature& hfeature2 = rawDataHandler.getFeatureMapHistory().back();
   EXPECT_EQ(hfeature2.getMetaValue("num_of_masstraces").toString(), "1");
-  EXPECT_NEAR(static_cast<double>(hfeature2.getRT()), 568.428, 1e-6);
-  EXPECT_NEAR(static_cast<double>(hfeature2.getMZ()), 848.63375701405562, 1e-6);
-  EXPECT_NEAR(static_cast<double>(hfeature2.getIntensity()), 46520.29296875, 1e-6);
+  EXPECT_NEAR(static_cast<double>(hfeature2.getRT()), 648.55600000, 1e-6);
+  EXPECT_NEAR(static_cast<double>(hfeature2.getMZ()), 848.6336890331, 1e-6);
+  EXPECT_NEAR(static_cast<double>(hfeature2.getIntensity()), 14291.36816406, 1e-6);
 }
 
 /**
