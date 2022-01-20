@@ -704,6 +704,7 @@ int main(int argc, char** argv)
         if (ImGui::MenuItem("Reset Window Layout"))
         {
           split_window.reset_layout_ = true;
+          calibrators_line_plot_->reset_layout_ = true;
         }
         ImGui::EndMenu();
       }

@@ -2007,21 +2007,21 @@ namespace SmartPeak
         if (!selected_transitions(i).empty())
           component_names.insert(selected_transitions(i));
       }
-      if (result.calibrators_conc_fit_data.size() != component_names.size() && result.calibrators_conc_raw_data.size() != component_names.size())
+      if (result.conc_fit_data.size() != component_names.size() && result.conc_raw_data.size() != component_names.size())
       {
         LOGD << "Making the calibrators data for plotting";
         // Update the axis titles and clear the data
-        result.calibrators_x_axis_title = "Concentration (" + sequence_handler.getSequenceSegments().at(0).getQuantitationMethods().at(0).getConcentrationUnits() + ")";
-        result.calibrators_y_axis_title = sequence_handler.getSequenceSegments().at(0).getQuantitationMethods().at(0).getFeatureName() + " (au)";
-        result.calibrators_conc_min = 1e6;
-        result.calibrators_conc_max = 0;
-        result.calibrators_feature_min = 1e6;
-        result.calibrators_feature_max = 0;
-        result.calibrators_conc_fit_data.clear();
-        result.calibrators_feature_fit_data.clear();
-        result.calibrators_conc_raw_data.clear();
-        result.calibrators_feature_raw_data.clear();
-        result.calibrators_series_names.clear();
+        result.x_axis_title = "Concentration (" + sequence_handler.getSequenceSegments().at(0).getQuantitationMethods().at(0).getConcentrationUnits() + ")";
+        result.y_axis_title = sequence_handler.getSequenceSegments().at(0).getQuantitationMethods().at(0).getFeatureName() + " (au)";
+        result.conc_min = 1e6;
+        result.conc_max = 0;
+        result.feature_min = 1e6;
+        result.feature_max = 0;
+        result.conc_fit_data.clear();
+        result.feature_fit_data.clear();
+        result.conc_raw_data.clear();
+        result.feature_raw_data.clear();
+        result.series_names.clear();
         for (const auto& sequence_segment : sequence_handler.getSequenceSegments()) {
           // Extract out raw data used to make the calibrators found in `StandardsConcentrations`
           std::map<std::string, std::pair<std::vector<float>, std::vector<std::string>>> stand_concs_map; // map of x_data and sample_name for a component
@@ -2070,15 +2070,15 @@ namespace SmartPeak
                   calculated_feature_ratio = 0.0;
                 }
                 y_fit_data.push_back(calculated_feature_ratio);
-                result.calibrators_conc_min = std::min(ratio, result.calibrators_conc_min);
-                result.calibrators_conc_max = std::max(ratio, result.calibrators_conc_max);
-                result.calibrators_feature_min = std::min(calculated_feature_ratio, result.calibrators_feature_min);
-                result.calibrators_feature_max = std::max(calculated_feature_ratio, result.calibrators_feature_max);
+                result.conc_min = std::min(ratio, result.conc_min);
+                result.conc_max = std::max(ratio, result.conc_max);
+                result.feature_min = std::min(calculated_feature_ratio, result.feature_min);
+                result.feature_max = std::max(calculated_feature_ratio, result.feature_max);
               }
               n_points += y_fit_data.size();
               if (n_points < max_nb_points) {
-                result.calibrators_conc_fit_data.push_back(stand_concs_map.at(quant_method.getComponentName()).first);
-                result.calibrators_feature_fit_data.push_back(y_fit_data);
+                result.conc_fit_data.push_back(stand_concs_map.at(quant_method.getComponentName()).first);
+                result.feature_fit_data.push_back(y_fit_data);
               }
               else 
               {
@@ -2092,14 +2092,14 @@ namespace SmartPeak
                 x_raw_data.push_back(float(point.actual_concentration / point.IS_actual_concentration / point.dilution_factor));
                 float y_datum = absQuant.calculateRatio(point.feature, point.IS_feature, quant_method.getFeatureName());
                 y_raw_data.push_back(y_datum);
-                result.calibrators_feature_min = std::min(y_datum, result.calibrators_feature_min);
-                result.calibrators_feature_max = std::max(y_datum, result.calibrators_feature_max);
+                result.feature_min = std::min(y_datum, result.feature_min);
+                result.feature_max = std::max(y_datum, result.feature_max);
               }
               n_points += x_raw_data.size();
               if (n_points < max_nb_points) {
-                result.calibrators_conc_raw_data.push_back(x_raw_data);
-                result.calibrators_feature_raw_data.push_back(y_raw_data);
-                result.calibrators_series_names.push_back(quant_method.getComponentName());
+                result.conc_raw_data.push_back(x_raw_data);
+                result.feature_raw_data.push_back(y_raw_data);
+                result.series_names.push_back(quant_method.getComponentName());
               }
               else 
               {
@@ -2110,10 +2110,10 @@ namespace SmartPeak
           }
         }
         // Sort data
-        for (int j = 0; j < result.calibrators_conc_fit_data.size(); ++j)
+        for (int j = 0; j < result.conc_fit_data.size(); ++j)
         {
-          auto& fit_data_x = result.calibrators_conc_fit_data[j];
-          auto& fit_data_y = result.calibrators_feature_fit_data[j];
+          auto& fit_data_x = result.conc_fit_data[j];
+          auto& fit_data_y = result.feature_fit_data[j];
           std::vector<std::pair<float,float>> sorting_vector;
           for (int i = 0; i < fit_data_x.size(); ++i)
           {

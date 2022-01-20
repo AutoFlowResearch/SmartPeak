@@ -113,24 +113,24 @@ namespace SmartPeak
     ImGui::Begin("Calibrator Plot");
     ImGui::Checkbox("Legend", &show_legend_);
     // Main graphic
-    ImPlot::SetNextPlotLimits(calibration_data_.calibrators_conc_min, calibration_data_.calibrators_conc_max, calibration_data_.calibrators_feature_min, calibration_data_.calibrators_feature_max);
+    ImPlot::SetNextPlotLimits(calibration_data_.conc_min, calibration_data_.conc_max, calibration_data_.feature_min, calibration_data_.feature_max);
     auto window_size = ImGui::GetWindowSize();
     ImPlotFlags plotFlags = show_legend_ ? ImPlotFlags_Default | ImPlotFlags_Legend : ImPlotFlags_Default & ~ImPlotFlags_Legend;
     if (ImPlot::BeginPlot(plot_title_.c_str(), 
-                          calibration_data_.calibrators_x_axis_title.c_str(), 
-                          calibration_data_.calibrators_y_axis_title.c_str(), 
+                          calibration_data_.x_axis_title.c_str(), 
+                          calibration_data_.y_axis_title.c_str(), 
                           ImVec2(window_size.x - 25, window_size.y - 58),
                           plotFlags)) {
-      for (int i = 0; i < calibration_data_.calibrators_conc_fit_data.size(); ++i) {
-        assert(calibration_data_.calibrators_conc_fit_data.at(i).size() == calibration_data_.calibrators_feature_fit_data.at(i).size());
+      for (int i = 0; i < calibration_data_.conc_fit_data.size(); ++i) {
+        assert(calibration_data_.conc_fit_data.at(i).size() == calibration_data_.feature_fit_data.at(i).size());
         ImPlot::PushStyleVar(ImPlotStyleVar_LineWeight, ImPlot::GetStyle().LineWeight);
         ImPlot::PushStyleVar(ImPlotStyleVar_Marker, ImPlotMarker_Circle);
-        ImPlot::PlotLine((calibration_data_.calibrators_series_names.at(i) + "-fit").c_str(), calibration_data_.calibrators_conc_fit_data.at(i).data(), calibration_data_.calibrators_feature_fit_data.at(i).data(), calibration_data_.calibrators_conc_fit_data.at(i).size());
+        ImPlot::PlotLine((calibration_data_.series_names.at(i) + "-fit").c_str(), calibration_data_.conc_fit_data.at(i).data(), calibration_data_.feature_fit_data.at(i).data(), calibration_data_.conc_fit_data.at(i).size());
       }
-      for (int i = 0; i < calibration_data_.calibrators_conc_raw_data.size(); ++i) {
-        assert(calibration_data_.calibrators_conc_raw_data.at(i).size() == calibration_data_.calibrators_feature_raw_data.at(i).size());
+      for (int i = 0; i < calibration_data_.conc_raw_data.size(); ++i) {
+        assert(calibration_data_.conc_raw_data.at(i).size() == calibration_data_.feature_raw_data.at(i).size());
         ImPlot::PushStyleVar(ImPlotStyleVar_Marker, ImPlotMarker_Circle);
-        ImPlot::PlotScatter((calibration_data_.calibrators_series_names.at(i) + "-pts").c_str(), calibration_data_.calibrators_conc_raw_data.at(i).data(), calibration_data_.calibrators_feature_raw_data.at(i).data(), calibration_data_.calibrators_conc_raw_data.at(i).size());
+        ImPlot::PlotScatter((calibration_data_.series_names.at(i) + "-pts").c_str(), calibration_data_.conc_raw_data.at(i).data(), calibration_data_.feature_raw_data.at(i).data(), calibration_data_.conc_raw_data.at(i).size());
       }
       ImPlot::EndPlot();
     }
@@ -139,7 +139,7 @@ namespace SmartPeak
 
   void CalibratorsPlotWidget::draw()
   {
-    if (!calibration_data_.calibrators_conc_raw_data.size())
+    if (!calibration_data_.conc_raw_data.size())
     {
       return;
     }

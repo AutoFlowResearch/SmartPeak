@@ -48,12 +48,14 @@ namespace SmartPeak
       plot_title_ = plot_title;
     }
     void draw() override;
+
+    bool reset_layout_ = true;
+
   protected:
     void displayParameters();
     void displayPlot();
     SessionHandler::CalibrationData calibration_data_;
     std::string plot_title_; // used as the ID of the plot as well so this should be unique across the different Widgets
-    bool reset_layout_ = true;
     bool show_legend_ = true;
   };
 
