@@ -229,18 +229,6 @@ public:
     return plotLimits();
   }
 
-  void wrapper_setCurrentRange(float range_min, float range_max)
-  {
-    current_range_.first = range_min;
-    current_range_.second = range_max;
-  }
-
-
-  std::tuple<float,float> wrapper_getCurrentRange() const
-  {
-    return current_range_;
-  }
-
   void wrapper_setCompactView(bool enable)
   {
     compact_view_ = enable;
@@ -307,8 +295,8 @@ TEST(GraphicDataVizWidget, plotLimits)
   test_graphic_data_viz.setGraphVizData(graph_viz_data);
 
   const auto [plot_min_x, plot_max_x, plot_min_y, plot_max_y] = test_graphic_data_viz.wrapper_plotLimits();
-  EXPECT_NEAR(plot_min_x, -2.09, 1e-6);
-  EXPECT_NEAR(plot_max_x, 2.09, 1e-6);
+  EXPECT_NEAR(plot_min_x, -1.0899999141, 1e-6);
+  EXPECT_NEAR(plot_max_x, 212.08999633, 1e-6);
   EXPECT_NEAR(plot_min_y, 98.910003662109375, 1e-6);
   EXPECT_NEAR(plot_max_y, 341, 1e-6);
 }
@@ -321,7 +309,6 @@ TEST(GraphicDataVizWidget, WriteAndReadGraphViz)
   std::string title = "GraphicDataVizWidget";
   GraphicDataVizWidget_Test test_graphic_data_viz_write(session_handler, application_handler, id, title);
   test_graphic_data_viz_write.wrapper_setMarkerPosition(42.0f);
-  test_graphic_data_viz_write.wrapper_setCurrentRange(10.0f, 100.0f);
   test_graphic_data_viz_write.wrapper_setShowLegend(false);
   test_graphic_data_viz_write.wrapper_setCompactView(false);
 
@@ -336,9 +323,6 @@ TEST(GraphicDataVizWidget, WriteAndReadGraphViz)
   test_graphic_data_viz_read.wrapper_updateRanges();
   EXPECT_EQ(test_graphic_data_viz_read.wrapper_getShowLegend(), false);
   EXPECT_EQ(test_graphic_data_viz_read.wrapper_getCompactView(), false);
-  const auto [current_range_min, current_range_max] = test_graphic_data_viz_read.wrapper_getCurrentRange();
-  EXPECT_FLOAT_EQ(current_range_min, 10.0f);
-  EXPECT_FLOAT_EQ(current_range_max, 100.0f);
 }
 
 class WorkflowWidget_Test : public WorkflowWidget

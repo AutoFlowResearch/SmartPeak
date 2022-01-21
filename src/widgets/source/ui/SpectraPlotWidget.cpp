@@ -43,11 +43,6 @@ namespace SmartPeak
       input_component_group_names_ = component_group_names;
       refresh_needed_ = false;
     }
-    else if (input_range_ != current_range_) // user zoom in/out
-    {
-      session_handler_.getSpectrumScatterPlot(sequence_handler_, graph_viz_data_, current_range_, sample_names, scan_names,component_group_names);
-      input_range_ = current_range_;
-    }
   };
 
   void SpectraPlotWidget::onSequenceUpdated()

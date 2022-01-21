@@ -67,7 +67,7 @@ namespace SmartPeak
   protected:
     virtual void setMarkerPosition(const std::optional<float>& marker_position);
     virtual std::optional<float> getMarkerPosition() const;
-    virtual void drawSliders();
+    virtual void drawGraphHeader();
     virtual void drawGraph();
     virtual void drawMarkers();
     virtual void updateData() = 0;
@@ -92,12 +92,8 @@ namespace SmartPeak
     bool compact_view_ = true;
     SessionHandler::GraphVizData graph_viz_data_;
     bool refresh_needed_ = false;
-    std::pair<float, float> slider_min_max_ = { 0.0f, 0.0f };
-    std::pair<float, float> current_range_ = { 0.0f, 0.0f };
-    std::pair<float, float> input_range_ = { 0.0f, 0.0f };
     std::optional<std::pair<float, float>> serialized_range_;
     int current_z_ = 0;
-    float sliders_height_ = 0.0f;
     std::optional<float> marker_position_;
     bool use_markers_ = false;
     bool is_spectra_ = false;
@@ -105,6 +101,7 @@ namespace SmartPeak
     bool search_highest_value_ = false;
     std::vector<float> highest_values_x_;
     std::vector<float> highest_values_y_;
+    bool update_plot_range_ = true;
   };
 
 }
