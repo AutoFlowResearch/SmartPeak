@@ -83,6 +83,7 @@ namespace SmartPeak
 
     absoluteQuantitation.setQuantMethods(sequenceSegmentHandler_IO.getQuantitationMethods());
     std::map<std::string, std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>> components_to_concentrations;
+    std::map<std::string, std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>> outer_components_to_concentrations;
     for (const OpenMS::AbsoluteQuantitationMethod& row : sequenceSegmentHandler_IO.getQuantitationMethods()) {
       // map standards to features
       OpenMS::AbsoluteQuantitationStandards absoluteQuantitationStandards;
@@ -107,6 +108,9 @@ namespace SmartPeak
         continue;
       }
 
+      // Keep a copy to compute outer points
+      auto all_feature_concentrations = feature_concentrations_pruned;
+
       try
       {
         absoluteQuantitation.optimizeSingleCalibrationCurve(
@@ -124,13 +128,36 @@ namespace SmartPeak
         LOGW << "Warning: '" << row.getComponentName() << "' cannot be analysed.\n";
         continue;
       }
-      // find the optimal calibration curve for each component
 
+      // Compute outer points
+      std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration> outer_feature_concentrations;
+      for (const auto& feature : all_feature_concentrations)
+      {
+        bool found = false;
+        for (const auto& feature_pruned : feature_concentrations_pruned)
+        {
+          if ((feature.IS_feature == feature_pruned.IS_feature)
+                && (std::abs(feature.actual_concentration - feature_pruned.actual_concentration) < 1e-9)
+                && (std::abs(feature.IS_actual_concentration - feature_pruned.IS_actual_concentration) < 1e-9)
+                && (std::abs(feature.dilution_factor - feature_pruned.dilution_factor) < 1e-9))
+          {
+            found = true;
+            break;
+          }
+        }
+        if (!found)
+        {
+          outer_feature_concentrations.push_back(feature);
+        }
+      }
       components_to_concentrations.erase(row.getComponentName());
-      components_to_concentrations.insert({row.getComponentName(), feature_concentrations_pruned});
+      components_to_concentrations.insert({row.getComponentName(), feature_concentrations_pruned });
+      outer_components_to_concentrations.erase(row.getComponentName());
+      outer_components_to_concentrations.insert({ row.getComponentName(), outer_feature_concentrations });
     }
     // store results
     sequenceSegmentHandler_IO.setComponentsToConcentrations(components_to_concentrations);
+    sequenceSegmentHandler_IO.setOuterComponentsToConcentrations(outer_components_to_concentrations);
     sequenceSegmentHandler_IO.getQuantitationMethods() = absoluteQuantitation.getQuantMethods();
     //sequenceSegmentHandler_IO.setQuantitationMethods(absoluteQuantitation.getQuantMethods());
     LOGD << "END optimizeCalibrationCurves";

@@ -57,6 +57,13 @@ namespace SmartPeak
     SessionHandler::CalibrationData calibration_data_;
     std::string plot_title_; // used as the ID of the plot as well so this should be unique across the different Widgets
     bool show_legend_ = true;
+    bool show_fit_line_ = true;
+    bool show_points_ = true;
+    bool show_outer_points_ = true;
+    std::string current_component_;
+    std::vector<std::string> components_;
+    std::vector<const char*> component_cstr_;
+    int selected_component_ = 0;
   };
 
 }

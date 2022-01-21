@@ -2055,7 +2055,7 @@ namespace SmartPeak
             { 
               // Make the line of best fit using the `QuantitationMethods`
               std::vector<float> y_fit_data;
-              result.quant_method = quant_method;
+              result.quant_methods.push_back(quant_method);
               for (const auto& ratio : stand_concs_map.at(quant_method.getComponentName()).first) {
                 // TODO: encapsulate in its own method e.g. sequenceSegmentProcessor
                 // TODO: check that the calibration actually found a best fit (and set to all 0 if not)
@@ -2096,12 +2096,25 @@ namespace SmartPeak
                 result.feature_max = std::max(y_datum, result.feature_max);
               }
               n_points += x_raw_data.size();
+              // Extract out the points out of the line of best fit in `ComponentsToConcentrations`
+              std::vector<float> outer_x_raw_data, outer_y_raw_data;
+              for (const auto& point : sequence_segment.getOuterComponentsToConcentrations().at(quant_method.getComponentName())) {
+                outer_x_raw_data.push_back(float(point.actual_concentration / point.IS_actual_concentration / point.dilution_factor));
+                float y_datum = absQuant.calculateRatio(point.feature, point.IS_feature, quant_method.getFeatureName());
+                outer_y_raw_data.push_back(y_datum);
+                result.feature_min = std::min(y_datum, result.feature_min);
+                result.feature_max = std::max(y_datum, result.feature_max);
+              }
+              n_points += outer_x_raw_data.size();
+              // add points
               if (n_points < max_nb_points) {
                 result.conc_raw_data.push_back(x_raw_data);
                 result.feature_raw_data.push_back(y_raw_data);
+                result.outer_conc_raw_data.push_back(outer_x_raw_data);
+                result.outer_feature_raw_data.push_back(outer_y_raw_data);
                 result.series_names.push_back(quant_method.getComponentName());
               }
-              else 
+              else
               {
                 LOGD << "Stopped adding points to calibrators plot";
                 return false;

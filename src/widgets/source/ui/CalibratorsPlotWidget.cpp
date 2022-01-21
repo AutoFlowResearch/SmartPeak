@@ -29,27 +29,19 @@ namespace SmartPeak
   void CalibratorsPlotWidget::displayParameters()
   {
     ImGui::Begin("Calibrator Parameters");
-    const auto& quantitation_methods = calibration_data_.quant_method;
+
+    ImGui::Combo("Component", &selected_component_, &component_cstr_[0], component_cstr_.size());
+
+    const auto& quantitation_methods = calibration_data_.quant_methods[selected_component_];
 
     ImGuiTableFlags table_flags = ImGuiTableFlags_None;
     if (ImGui::BeginTable("Calibrator Parameters Table", 2, table_flags))
     {
-      /*
-      ImGui::TableSetupColumn("Parameter name");
-      ImGui::TableSetupColumn("Parameter value");
-      ImGui::TableHeadersRow();
-      */
       ImGui::TableNextRow(); 
       ImGui::TableSetColumnIndex(0);
-      ImGui::Text("name");
+      ImGui::Text("IS name");
       ImGui::TableSetColumnIndex(1);
       ImGui::Text(quantitation_methods.getISName().c_str());
-
-      ImGui::TableNextRow();
-      ImGui::TableSetColumnIndex(0);
-      ImGui::Text("component name");
-      ImGui::TableSetColumnIndex(1);
-      ImGui::Text(quantitation_methods.getComponentName().c_str());
 
       ImGui::TableNextRow();
       ImGui::TableSetColumnIndex(0);
@@ -112,6 +104,13 @@ namespace SmartPeak
   {
     ImGui::Begin("Calibrator Plot");
     ImGui::Checkbox("Legend", &show_legend_);
+    ImGui::SameLine();
+    ImGui::Checkbox("Fit line", &show_fit_line_);
+    ImGui::SameLine();
+    ImGui::Checkbox("Points", &show_points_);
+    ImGui::SameLine();
+    ImGui::Checkbox("Outer points", &show_outer_points_);
+
     // Main graphic
     ImPlot::SetNextPlotLimits(calibration_data_.conc_min, calibration_data_.conc_max, calibration_data_.feature_min, calibration_data_.feature_max);
     auto window_size = ImGui::GetWindowSize();
@@ -121,17 +120,51 @@ namespace SmartPeak
                           calibration_data_.y_axis_title.c_str(), 
                           ImVec2(window_size.x - 25, window_size.y - 58),
                           plotFlags)) {
-      for (int i = 0; i < calibration_data_.conc_fit_data.size(); ++i) {
-        assert(calibration_data_.conc_fit_data.at(i).size() == calibration_data_.feature_fit_data.at(i).size());
-        ImPlot::PushStyleVar(ImPlotStyleVar_LineWeight, ImPlot::GetStyle().LineWeight);
-        ImPlot::PushStyleVar(ImPlotStyleVar_Marker, ImPlotMarker_Circle);
-        ImPlot::PlotLine((calibration_data_.series_names.at(i) + "-fit").c_str(), calibration_data_.conc_fit_data.at(i).data(), calibration_data_.feature_fit_data.at(i).data(), calibration_data_.conc_fit_data.at(i).size());
+      if (show_fit_line_)
+      {
+        for (int i = 0; i < calibration_data_.conc_fit_data.size(); ++i) {
+          assert(calibration_data_.conc_fit_data.at(i).size() == calibration_data_.feature_fit_data.at(i).size());
+          ImPlot::PushStyleVar(ImPlotStyleVar_LineWeight, ImPlot::GetStyle().LineWeight);
+          ImPlot::PushStyleVar(ImPlotStyleVar_Marker, ImPlotMarker_None);
+          ImPlot::PlotLine((calibration_data_.series_names.at(i)).c_str(), 
+                            calibration_data_.conc_fit_data.at(i).data(), 
+                            calibration_data_.feature_fit_data.at(i).data(),
+                            calibration_data_.conc_fit_data.at(i).size());
+        }
       }
-      for (int i = 0; i < calibration_data_.conc_raw_data.size(); ++i) {
-        assert(calibration_data_.conc_raw_data.at(i).size() == calibration_data_.feature_raw_data.at(i).size());
-        ImPlot::PushStyleVar(ImPlotStyleVar_Marker, ImPlotMarker_Circle);
-        ImPlot::PlotScatter((calibration_data_.series_names.at(i) + "-pts").c_str(), calibration_data_.conc_raw_data.at(i).data(), calibration_data_.feature_raw_data.at(i).data(), calibration_data_.conc_raw_data.at(i).size());
+      if (show_points_)
+      {
+        for (int i = 0; i < calibration_data_.conc_raw_data.size(); ++i) {
+          assert(calibration_data_.conc_raw_data.at(i).size() == calibration_data_.feature_raw_data.at(i).size());
+          ImPlot::PushStyleVar(ImPlotStyleVar_Marker, ImPlotMarker_Circle);
+          ImPlot::PlotScatter((calibration_data_.series_names.at(i)).c_str(),
+                               calibration_data_.conc_raw_data.at(i).data(),
+                               calibration_data_.feature_raw_data.at(i).data(),
+                               calibration_data_.conc_raw_data.at(i).size());
+        }
       }
+      if (show_outer_points_)
+      {
+        for (int i = 0; i < calibration_data_.conc_raw_data.size(); ++i) {
+          assert(calibration_data_.outer_conc_raw_data.at(i).size() == calibration_data_.outer_feature_raw_data.at(i).size());
+          ImPlot::PushStyleVar(ImPlotStyleVar_Marker, ImPlotMarker_Cross);
+          ImPlot::PlotScatter((calibration_data_.series_names.at(i)).c_str(),
+                               calibration_data_.outer_conc_raw_data.at(i).data(),
+                               calibration_data_.outer_feature_raw_data.at(i).data(),
+                               calibration_data_.outer_conc_raw_data.at(i).size());
+        }
+      }
+      // legend hover management
+      int i = 0;
+      for (const auto& serie_name : calibration_data_.series_names)
+      {
+        if (ImPlot::IsLegendEntryHovered(serie_name.c_str()))
+        {
+          selected_component_ = i;
+        }
+        ++i;
+      }
+
       ImPlot::EndPlot();
     }
     ImGui::End();
@@ -161,6 +194,16 @@ namespace SmartPeak
     }
     ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_AutoHideTabBar);
     
+    int i = 0;
+    components_.clear();
+    component_cstr_.clear();
+    for (const auto& component : calibration_data_.series_names)
+    {
+      components_.push_back(component);
+      component_cstr_.push_back(components_.at(i).c_str());
+      ++i;
+    }
+
     displayParameters();
     displayPlot();
   }
