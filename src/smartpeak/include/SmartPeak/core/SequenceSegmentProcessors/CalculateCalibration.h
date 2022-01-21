@@ -44,11 +44,6 @@ namespace SmartPeak
       const ParameterSet& params_I,
       Filenames& filenames_I
     ) const override;
-
-    /**
-      Apply the processor only on 1 component
-    */
-    std::optional<std::string> component_name_ = std::nullopt;
   };
 
 }

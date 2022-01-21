@@ -719,6 +719,15 @@ TEST(SessionHandler, setCalibratorsScatterLinePlot1)
   SessionHandler session_handler;
   SessionHandler::CalibrationData calibrator_data;
   session_handler.setCalibratorsScatterLinePlot(testData.application_handler.sequenceHandler_, calibrator_data);
+  EXPECT_EQ(calibrator_data.conc_fit_data.size(), 0);
+  EXPECT_EQ(calibrator_data.conc_raw_data.size(), 0);
+  EXPECT_EQ(calibrator_data.feature_raw_data.size(), 0);
+  EXPECT_EQ(calibrator_data.outer_conc_raw_data.size(), 0);
+  EXPECT_EQ(calibrator_data.outer_feature_raw_data.size(), 0);
+  EXPECT_EQ(calibrator_data.quant_methods.size(), 0);
+  EXPECT_EQ(calibrator_data.series_names.size(), 0);
+  EXPECT_EQ(calibrator_data.x_axis_title, std::string(""));
+  EXPECT_EQ(calibrator_data.y_axis_title, std::string(""));
 }
 TEST(SessionHandler, getHeatMap)
 {

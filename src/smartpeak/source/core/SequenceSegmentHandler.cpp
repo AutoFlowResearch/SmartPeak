@@ -53,6 +53,7 @@ namespace SmartPeak
     if (feature_rsd_estimations_ != nullptr) feature_rsd_estimations_ = std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC());
     if (feature_background_estimations_ != nullptr) feature_background_estimations_ = std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC());
     components_to_concentrations_.clear();
+    outer_components_to_concentrations_.clear();
   }
 
   void SequenceSegmentHandler::setSequenceSegmentName(const std::string& sequence_segment_name)

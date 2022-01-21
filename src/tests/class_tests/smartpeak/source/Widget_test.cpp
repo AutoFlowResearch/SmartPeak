@@ -34,6 +34,7 @@
 #include <SmartPeak/ui/SessionFilesWidget.h>
 #include <SmartPeak/ui/LoadSessionWizard.h>
 #include <SmartPeak/ui/SetInputOutputWidget.h>
+#include <SmartPeak/ui/CalibratorsPlotWidget.h>
 #include <SmartPeak/core/RawDataProcessors/LoadFeatures.h>
 #include <SmartPeak/core/ApplicationProcessors/SaveSession.h>
 
@@ -878,3 +879,52 @@ TEST(SetInputOutputWidget, cancel)
   EXPECT_EQ(set_input_output_widget_test.on_input_output_cancel_counter, 1);
 }
 
+class CalibratorsPlotWidget_Test :
+  public CalibratorsPlotWidget
+{
+public:
+  CalibratorsPlotWidget_Test() :
+    CalibratorsPlotWidget()
+  {};
+
+public:
+
+  bool& get_reset_zoom_()
+  {
+    return reset_zoom_;
+  }
+
+  const std::vector<std::string>& get_components_()
+  {
+    return components_;
+  }
+
+};
+
+TEST(CalibratorsPlotWidget, setValue)
+{
+  CalibratorsPlotWidget_Test calibrator_widget;
+  EXPECT_EQ(calibrator_widget.get_reset_zoom_(), true);
+
+  SessionHandler::CalibrationData calibrator_data;
+  calibrator_data.series_names = { "on", "two", "three" };
+  calibrator_data.x_axis_title = "x_axis_title";
+  calibrator_data.y_axis_title = "y_axis_title";
+  calibrator_data.conc_min = 1.0f;
+  calibrator_data.conc_max = 100.0f;
+  calibrator_data.feature_min = 10.0f;
+  calibrator_data.feature_max = 1000.0f;
+
+  calibrator_widget.setValues(calibrator_data, "test");
+  EXPECT_EQ(calibrator_widget.get_reset_zoom_(), true);
+
+  // a draw operation would unflag the reset_zoom
+  calibrator_widget.get_reset_zoom_() = false;
+
+  // same data should not involve a zoom reset
+  calibrator_widget.setValues(calibrator_data, "test");
+  EXPECT_EQ(calibrator_widget.get_reset_zoom_(), false);
+
+  auto components = calibrator_widget.get_components_();
+  EXPECT_EQ(components, calibrator_data.series_names);
+};

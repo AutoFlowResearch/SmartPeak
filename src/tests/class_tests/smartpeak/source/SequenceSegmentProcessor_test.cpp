@@ -723,6 +723,26 @@ TEST(SequenceSegmentProcessor, processCalculateCalibration)
   EXPECT_NEAR(static_cast<double>(AQMs_rdh[2].getCorrelationCoefficient()), 0.9993200722867581, 1e-6);
   EXPECT_NEAR(static_cast<double>(AQMs_rdh[2].getLLOQ()), 0.04, 1e-6);
   EXPECT_NEAR(static_cast<double>(AQMs_rdh[2].getULOQ()), 200.0, 1e-6);
+
+  const auto& component_to_concentrations = sequenceSegmentHandler.getComponentsToConcentrations();
+  EXPECT_EQ(component_to_concentrations.size(), 3);
+  ASSERT_EQ(component_to_concentrations.count("ser-L.ser-L_1.Light"), 1);
+  const auto& component_to_concentration = component_to_concentrations.at("ser-L.ser-L_1.Light");
+  ASSERT_EQ(component_to_concentration.size(), 11);
+  EXPECT_FLOAT_EQ(component_to_concentration[0].actual_concentration, 0.039999999);
+  EXPECT_EQ(component_to_concentration[0].concentration_units, std::string("uM"));
+  EXPECT_FLOAT_EQ(component_to_concentration[0].dilution_factor, 1);
+  EXPECT_FLOAT_EQ(component_to_concentration[0].IS_actual_concentration, 1);
+
+  const auto& outer_component_to_concentrations = sequenceSegmentHandler.getOuterComponentsToConcentrations();
+  ASSERT_EQ(outer_component_to_concentrations.size(), 3);
+  ASSERT_EQ(outer_component_to_concentrations.count("ser-L.ser-L_1.Light"), 1);
+  const auto& outer_component_to_concentration = outer_component_to_concentrations.at("ser-L.ser-L_1.Light");
+  ASSERT_EQ(outer_component_to_concentration.size(), 3);
+  EXPECT_FLOAT_EQ(outer_component_to_concentration[0].actual_concentration, 0.0099999998);
+  EXPECT_EQ(outer_component_to_concentration[0].concentration_units, std::string("uM"));
+  EXPECT_FLOAT_EQ(outer_component_to_concentration[0].dilution_factor, 1);
+  EXPECT_FLOAT_EQ(outer_component_to_concentration[0].IS_actual_concentration, 1);
 }
 
 /**
