@@ -40,13 +40,7 @@ namespace SmartPeak
   {
   public:
     CalibratorsPlotWidget(const std::string title = ""): GenericGraphicWidget(title) {};
-    void setValues(
-      const SessionHandler::CalibrationData& calibration_data,
-      const std::string& plot_title)
-    {
-      calibration_data_ = calibration_data;
-      plot_title_ = plot_title;
-    }
+    void setValues(const SessionHandler::CalibrationData& calibration_data, const std::string& plot_title);
     void draw() override;
 
     bool reset_layout_ = true;
@@ -64,6 +58,7 @@ namespace SmartPeak
     std::vector<std::string> components_;
     std::vector<const char*> component_cstr_;
     int selected_component_ = 0;
+    bool reset_zoom_ = true;
   };
 
 }

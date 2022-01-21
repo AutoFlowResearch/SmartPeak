@@ -110,9 +110,28 @@ namespace SmartPeak
     ImGui::Checkbox("Points", &show_points_);
     ImGui::SameLine();
     ImGui::Checkbox("Outer points", &show_outer_points_);
+    ImGui::SameLine();
+    if (ImGui::Button("Fit Zoom"))
+    {
+      reset_zoom_ = true;
+    }
 
     // Main graphic
-    ImPlot::SetNextPlotLimits(calibration_data_.conc_min, calibration_data_.conc_max, calibration_data_.feature_min, calibration_data_.feature_max);
+    ImGuiCond cond;
+    if (reset_zoom_)
+    {
+      cond = ImGuiCond_Always;
+      reset_zoom_ = false;
+    }
+    else
+    {
+      cond = ImGuiCond_Once;
+    }
+    ImPlot::SetNextPlotLimits(calibration_data_.conc_min,
+                              calibration_data_.conc_max,
+                              calibration_data_.feature_min,
+                              calibration_data_.feature_max,
+                              cond);
     auto window_size = ImGui::GetWindowSize();
     ImPlotFlags plotFlags = show_legend_ ? ImPlotFlags_Default | ImPlotFlags_Legend : ImPlotFlags_Default & ~ImPlotFlags_Legend;
     if (ImPlot::BeginPlot(plot_title_.c_str(), 
@@ -193,18 +212,36 @@ namespace SmartPeak
       reset_layout_ = false;
     }
     ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_AutoHideTabBar);
-    
-    int i = 0;
-    components_.clear();
-    component_cstr_.clear();
-    for (const auto& component : calibration_data_.series_names)
-    {
-      components_.push_back(component);
-      component_cstr_.push_back(components_.at(i).c_str());
-      ++i;
-    }
 
     displayParameters();
     displayPlot();
+
+  }
+
+  void CalibratorsPlotWidget::setValues(
+    const SessionHandler::CalibrationData& calibration_data,
+    const std::string& plot_title)
+  {
+    if ((calibration_data_.series_names != calibration_data.series_names)
+      || (std::abs(calibration_data_.conc_min - calibration_data.conc_min) > 1e-9)
+      || (std::abs(calibration_data_.conc_max - calibration_data.conc_max) > 1e-9)
+      || (std::abs(calibration_data_.feature_min - calibration_data.feature_min) > 1e-9)
+      || (std::abs(calibration_data_.feature_max - calibration_data.feature_max) > 1e-9)
+      )
+    {
+      reset_zoom_ = true;
+      int i = 0;
+      components_.clear();
+      component_cstr_.clear();
+      for (const auto& component : calibration_data.series_names)
+      {
+        components_.push_back(component);
+        component_cstr_.push_back(components_.at(i).c_str());
+        ++i;
+      }
+      selected_component_ = 0;
+    }
+    calibration_data_ = calibration_data;
+    plot_title_ = plot_title;
   }
 }
