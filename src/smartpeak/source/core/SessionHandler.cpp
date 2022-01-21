@@ -2009,7 +2009,7 @@ namespace SmartPeak
       }
       if (result.conc_fit_data.size() != component_names.size() && result.conc_raw_data.size() != component_names.size())
       {
-        LOGD << "Making the calibrators data for plotting";
+        // LOGD << "Making the calibrators data for plotting";
         // Update the axis titles and clear the data
         result.x_axis_title = "Concentration (" + sequence_handler.getSequenceSegments().at(0).getQuantitationMethods().at(0).getConcentrationUnits() + ")";
         result.y_axis_title = sequence_handler.getSequenceSegments().at(0).getQuantitationMethods().at(0).getFeatureName() + " (au)";
@@ -2027,21 +2027,15 @@ namespace SmartPeak
           std::map<std::string, std::pair<std::vector<float>, std::vector<std::string>>> stand_concs_map; // map of x_data and sample_name for a component
           for (const auto& stand_concs : sequence_segment.getStandardsConcentrations())
           {
-            // Skip components that have not been fitted with a calibration curve
-            if (sequence_segment.getComponentsToConcentrations().count(stand_concs.component_name) > 0 &&
-                sequence_segment.getComponentsToConcentrations().at(stand_concs.component_name).size() > 0 &&
-                component_names.count(stand_concs.component_name) > 0) // TODO: filter out components that have not been fitted
-            { 
-              const float x_datum = float(stand_concs.actual_concentration / stand_concs.IS_actual_concentration / stand_concs.dilution_factor);
-              auto found = stand_concs_map.emplace(stand_concs.component_name,
-                                                   std::make_pair(
-                                                     std::vector<float>({ x_datum }),
-                                                     std::vector<std::string>({ stand_concs.sample_name })));
-              if (!found.second)
-              {
-                stand_concs_map.at(stand_concs.component_name).first.push_back(x_datum);
-                stand_concs_map.at(stand_concs.component_name).second.push_back(stand_concs.sample_name);
-              }
+            const float x_datum = float(stand_concs.actual_concentration / stand_concs.IS_actual_concentration / stand_concs.dilution_factor);
+            auto found = stand_concs_map.emplace(stand_concs.component_name,
+                                                  std::make_pair(
+                                                    std::vector<float>({ x_datum }),
+                                                    std::vector<std::string>({ stand_concs.sample_name })));
+            if (!found.second)
+            {
+              stand_concs_map.at(stand_concs.component_name).first.push_back(x_datum);
+              stand_concs_map.at(stand_concs.component_name).second.push_back(stand_concs.sample_name);
             }
           }
           // Make the line of best fit using the `QuantitationMethods`
@@ -2049,61 +2043,69 @@ namespace SmartPeak
           {
             // Skip components that have not been fitted with a calibration curve
             if (sequence_segment.getComponentsToConcentrations().count(quant_method.getComponentName()) > 0 &&
-                sequence_segment.getComponentsToConcentrations().at(quant_method.getComponentName()).size() > 0 &&
-                (double)quant_method.getTransformationModelParams().getValue("slope") != 1.0&&
-                component_names.count(quant_method.getComponentName()) > 0) // TODO: filter out components that have not been fitted
+                component_names.count(quant_method.getComponentName()) > 0)
             { 
+              bool calibration_curve_found = ((double)quant_method.getTransformationModelParams().getValue("slope") != 1.0);
               // Make the line of best fit using the `QuantitationMethods`
               std::vector<float> y_fit_data;
               result.quant_methods.push_back(quant_method);
-              for (const auto& ratio : stand_concs_map.at(quant_method.getComponentName()).first) {
-                // TODO: encapsulate in its own method e.g. sequenceSegmentProcessor
-                // TODO: check that the calibration actually found a best fit (and set to all 0 if not)
-                // calculate the absolute concentration
-                OpenMS::TransformationModel::DataPoints data;
-                OpenMS::TransformationDescription tmd(data);
-                tmd.fitModel(quant_method.getTransformationModel(), quant_method.getTransformationModelParams());
-                float calculated_feature_ratio = tmd.apply(ratio);
-                // check for less than zero
-                if (calculated_feature_ratio < 0.0)
-                {
-                  calculated_feature_ratio = 0.0;
-                }
-                y_fit_data.push_back(calculated_feature_ratio);
-                result.conc_min = std::min(ratio, result.conc_min);
-                result.conc_max = std::max(ratio, result.conc_max);
-                result.feature_min = std::min(calculated_feature_ratio, result.feature_min);
-                result.feature_max = std::max(calculated_feature_ratio, result.feature_max);
-              }
-              n_points += y_fit_data.size();
-              if (n_points < max_nb_points) {
-                result.conc_fit_data.push_back(stand_concs_map.at(quant_method.getComponentName()).first);
-                result.feature_fit_data.push_back(y_fit_data);
-              }
-              else 
+              if (calibration_curve_found)
               {
-                LOGD << "Stopped adding points to calibrators plot";
-                return false;
+                for (const auto& ratio : stand_concs_map.at(quant_method.getComponentName()).first) {
+                  // TODO: encapsulate in its own method e.g. sequenceSegmentProcessor
+                  // TODO: check that the calibration actually found a best fit (and set to all 0 if not)
+                  // calculate the absolute concentration
+                  OpenMS::TransformationModel::DataPoints data;
+                  OpenMS::TransformationDescription tmd(data);
+                  tmd.fitModel(quant_method.getTransformationModel(), quant_method.getTransformationModelParams());
+                  float calculated_feature_ratio = tmd.apply(ratio);
+                  // check for less than zero
+                  if (calculated_feature_ratio < 0.0)
+                  {
+                    calculated_feature_ratio = 0.0;
+                  }
+                  y_fit_data.push_back(calculated_feature_ratio);
+                  result.conc_min = std::min(ratio, result.conc_min);
+                  result.conc_max = std::max(ratio, result.conc_max);
+                  result.feature_min = std::min(calculated_feature_ratio, result.feature_min);
+                  result.feature_max = std::max(calculated_feature_ratio, result.feature_max);
+                }
+                n_points += y_fit_data.size();
+                if (n_points < max_nb_points) {
+                  result.conc_fit_data.push_back(stand_concs_map.at(quant_method.getComponentName()).first);
+                  result.feature_fit_data.push_back(y_fit_data);
+                }
+                else
+                {
+                  LOGD << "Stopped adding points to calibrators plot";
+                  return false;
+                }
               }
               // Extract out the points used to make the line of best fit in `ComponentsToConcentrations`
               std::vector<float> x_raw_data, y_raw_data;
               OpenMS::AbsoluteQuantitation absQuant;
               for (const auto& point : sequence_segment.getComponentsToConcentrations().at(quant_method.getComponentName())) {
-                x_raw_data.push_back(float(point.actual_concentration / point.IS_actual_concentration / point.dilution_factor));
+                auto ratio = float(point.actual_concentration / point.IS_actual_concentration / point.dilution_factor);
+                x_raw_data.push_back(ratio);
                 float y_datum = absQuant.calculateRatio(point.feature, point.IS_feature, quant_method.getFeatureName());
                 y_raw_data.push_back(y_datum);
                 result.feature_min = std::min(y_datum, result.feature_min);
                 result.feature_max = std::max(y_datum, result.feature_max);
+                result.conc_min = std::min(ratio, result.conc_min);
+                result.conc_max = std::max(ratio, result.conc_max);
               }
               n_points += x_raw_data.size();
               // Extract out the points out of the line of best fit in `ComponentsToConcentrations`
               std::vector<float> outer_x_raw_data, outer_y_raw_data;
               for (const auto& point : sequence_segment.getOuterComponentsToConcentrations().at(quant_method.getComponentName())) {
-                outer_x_raw_data.push_back(float(point.actual_concentration / point.IS_actual_concentration / point.dilution_factor));
+                auto ratio = float(point.actual_concentration / point.IS_actual_concentration / point.dilution_factor);
+                outer_x_raw_data.push_back(ratio);
                 float y_datum = absQuant.calculateRatio(point.feature, point.IS_feature, quant_method.getFeatureName());
                 outer_y_raw_data.push_back(y_datum);
                 result.feature_min = std::min(y_datum, result.feature_min);
                 result.feature_max = std::max(y_datum, result.feature_max);
+                result.conc_min = std::min(ratio, result.conc_min);
+                result.conc_max = std::max(ratio, result.conc_max);
               }
               n_points += outer_x_raw_data.size();
               // add points

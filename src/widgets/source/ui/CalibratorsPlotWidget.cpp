@@ -127,10 +127,13 @@ namespace SmartPeak
     {
       cond = ImGuiCond_Once;
     }
-    ImPlot::SetNextPlotLimits(calibration_data_.conc_min,
-                              calibration_data_.conc_max,
-                              calibration_data_.feature_min,
-                              calibration_data_.feature_max,
+    // add margin around the plot
+    float x_margin = (calibration_data_.conc_max - calibration_data_.conc_min) * 0.05;
+    float y_margin = (calibration_data_.feature_max - calibration_data_.feature_min) * 0.05;
+    ImPlot::SetNextPlotLimits(calibration_data_.conc_min - x_margin,
+                              calibration_data_.conc_max + x_margin,
+                              calibration_data_.feature_min - y_margin,
+                              calibration_data_.feature_max + y_margin,
                               cond);
     auto window_size = ImGui::GetWindowSize();
     ImPlotFlags plotFlags = show_legend_ ? ImPlotFlags_Default | ImPlotFlags_Legend : ImPlotFlags_Default & ~ImPlotFlags_Legend;
