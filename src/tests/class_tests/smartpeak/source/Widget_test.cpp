@@ -254,6 +254,19 @@ public:
     updateRanges();
   }
 
+  void wrapper_set_plot_limits_(float xmin, float xmax, float ymin, float ymax)
+  {
+    plot_limits_.X.Min = xmin;
+    plot_limits_.X.Max = xmax;
+    plot_limits_.Y.Min = ymin;
+    plot_limits_.Y.Max = ymax;
+  }
+
+  ImPlotLimits wrapper_get_plot_limits_()
+  {
+    return plot_limits_;
+  }
+
 public:
   // setters for test
   void setGraphVizData(SessionHandler::GraphVizData& graph_viz_data)
@@ -311,6 +324,7 @@ TEST(GraphicDataVizWidget, WriteAndReadGraphViz)
   test_graphic_data_viz_write.wrapper_setMarkerPosition(42.0f);
   test_graphic_data_viz_write.wrapper_setShowLegend(false);
   test_graphic_data_viz_write.wrapper_setCompactView(false);
+  test_graphic_data_viz_write.wrapper_set_plot_limits_(1, 2, 3, 4);
 
   SessionDB session_db;
   auto path_db = std::tmpnam(nullptr);
@@ -323,6 +337,11 @@ TEST(GraphicDataVizWidget, WriteAndReadGraphViz)
   test_graphic_data_viz_read.wrapper_updateRanges();
   EXPECT_EQ(test_graphic_data_viz_read.wrapper_getShowLegend(), false);
   EXPECT_EQ(test_graphic_data_viz_read.wrapper_getCompactView(), false);
+  auto plot_limit = test_graphic_data_viz_read.wrapper_get_plot_limits_();
+  EXPECT_DOUBLE_EQ(plot_limit.X.Min, 1);
+  EXPECT_DOUBLE_EQ(plot_limit.X.Max, 2);
+  EXPECT_DOUBLE_EQ(plot_limit.Y.Min, 3);
+  EXPECT_DOUBLE_EQ(plot_limit.Y.Max, 4);
 }
 
 class WorkflowWidget_Test : public WorkflowWidget

@@ -35,6 +35,7 @@
 #include <functional>
 #include <optional>
 #include <iomanip>
+#include <implot.h>
 
 namespace SmartPeak
 {
@@ -53,7 +54,13 @@ namespace SmartPeak
       session_handler_(session_handler),
       sequence_handler_(application_handler.sequenceHandler_),
       application_handler_(application_handler),
-      plot_title_(id) {};
+      plot_title_(id) 
+    {
+      plot_limits_.X.Min = 0.0;
+      plot_limits_.X.Max = 1.0;
+      plot_limits_.Y.Min = 0.0;
+      plot_limits_.Y.Max = 1.0;
+    };
 
     void draw() override;
 
@@ -92,7 +99,6 @@ namespace SmartPeak
     bool compact_view_ = true;
     SessionHandler::GraphVizData graph_viz_data_;
     bool refresh_needed_ = false;
-    std::optional<std::pair<float, float>> serialized_range_;
     int current_z_ = 0;
     std::optional<float> marker_position_;
     bool use_markers_ = false;
@@ -102,6 +108,8 @@ namespace SmartPeak
     std::vector<float> highest_values_x_;
     std::vector<float> highest_values_y_;
     bool update_plot_range_ = true;
+    ImPlotLimits plot_limits_;
+    bool restore_plot_limits_ = false;
   };
 
 }

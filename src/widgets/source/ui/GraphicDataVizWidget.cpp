@@ -25,7 +25,6 @@
 #include <SmartPeak/ui/FilePicker.h>
 #include <imgui.h>
 #include <imgui_internal.h>
-#include <implot.h>
 
 namespace SmartPeak
 {
@@ -107,17 +106,22 @@ namespace SmartPeak
     {
       auto window_size = ImGui::GetWindowSize();
       ImGuiCond cond;
+      cond = ImGuiCond_Once;
       if (update_plot_range_)
       {
         cond = ImGuiCond_Always;
         update_plot_range_ = false;
       }
+      if (restore_plot_limits_)
+      {
+        restore_plot_limits_ = false;
+        ImPlot::SetNextPlotLimits(plot_limits_.X.Min, plot_limits_.X.Max, plot_limits_.Y.Min, plot_limits_.Y.Max, ImGuiCond_Always);
+      }
       else
       {
-        cond = ImGuiCond_Once;
+        auto [plot_min_x, plot_max_x, plot_min_y, plot_max_y] = plotLimits();
+        ImPlot::SetNextPlotLimits(plot_min_x, plot_max_x, plot_min_y, plot_max_y, cond);
       }
-      auto [plot_min_x, plot_max_x, plot_min_y, plot_max_y] = plotLimits();
-      ImPlot::SetNextPlotLimits(plot_min_x, plot_max_x, plot_min_y, plot_max_y, cond);
       ImPlotFlags plotFlags = show_legend_ ? ImPlotFlags_Default | ImPlotFlags_Legend : ImPlotFlags_Default & ~ImPlotFlags_Legend;
       plotFlags |= ImPlotFlags_Crosshairs;
       float graphic_height = window_size.y;
@@ -147,7 +151,7 @@ namespace SmartPeak
                                bar_width);
             }
           }
-          
+          plot_limits_ = ImPlot::GetPlotLimits();
           plotHighestValue(i);
           
           ImPlotMarker plot_marker = ImPlotMarker_Circle;
@@ -366,6 +370,10 @@ namespace SmartPeak
   {
     auto properties = Widget::getPropertiesSchema();
     // sliders ranges
+    properties.emplace("plot_limits_.X.Max", CastValue::Type::FLOAT);
+    properties.emplace("plot_limits_.X.Min", CastValue::Type::FLOAT);
+    properties.emplace("plot_limits_.Y.Max", CastValue::Type::FLOAT);
+    properties.emplace("plot_limits_.Y.Min", CastValue::Type::FLOAT);
     properties.emplace("compact_view_", CastValue::Type::BOOL);
     properties.emplace("show_legend_", CastValue::Type::BOOL);
     properties.emplace("marker_position_", CastValue::Type::FLOAT);
@@ -378,6 +386,22 @@ namespace SmartPeak
     if (widget_field)
     {
       return widget_field;
+    }
+    if (property == "plot_limits_.X.Max")
+    {
+      return static_cast<float>(plot_limits_.X.Max);
+    }
+    if (property == "plot_limits_.X.Min")
+    {
+      return static_cast<float>(plot_limits_.X.Min);
+    }
+    if (property == "plot_limits_.Y.Max")
+    {
+      return static_cast<float>(plot_limits_.Y.Max);
+    }
+    if (property == "plot_limits_.Y.Min")
+    {
+      return static_cast<float>(plot_limits_.Y.Min);
     }
     if (property == "compact_view_")
     {
@@ -405,29 +429,25 @@ namespace SmartPeak
     {
       show_legend_ = value.b_;
     }
-    // we need to keep range in a temporary variable to set it when the
-    // plot will be displayed.
-    if (property == "current_range_.first")
+    if (property == "plot_limits_.X.Max")
     {
-      if (!serialized_range_)
-      {
-        serialized_range_ = { value.f_ , 0 };
-      }
-      else
-      {
-        serialized_range_->first = value.f_;
-      }
+      plot_limits_.X.Max = value.f_;
+      restore_plot_limits_ = true;
     }
-    if (property == "current_range_.second")
+    if (property == "plot_limits_.X.Min")
     {
-      if (!serialized_range_)
-      {
-        serialized_range_ = { 0, value.f_ };
-      }
-      else
-      {
-        serialized_range_->second = value.f_;
-      }
+      plot_limits_.X.Min = value.f_;
+      restore_plot_limits_ = true;
+    }
+    if (property == "plot_limits_.Y.Max")
+    {
+      plot_limits_.Y.Max = value.f_;
+      restore_plot_limits_ = true;
+    }
+    if (property == "plot_limits_.Y.Min")
+    {
+      plot_limits_.Y.Min = value.f_;
+      restore_plot_limits_ = true;
     }
     if (property == "marker_position_")
     {
