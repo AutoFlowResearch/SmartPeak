@@ -34,7 +34,7 @@ jobs:
           name: Cloning and building OpenMS
           command: |
             cd ~ &&
-            git clone --branch develop --depth 1 https://github.com/OpenMS/OpenMS.git &&
+            git clone --branch fix/macos_crash --depth 1 https://github.com/bertrandboudaud/OpenMS.git &&
             cd OpenMS
             mkdir contrib_build && cd contrib_build
             curl -C - -O https://abibuilder.informatik.uni-tuebingen.de/archive/openms/contrib/macOS/10.15.4/x64/appleclang-11.0.0/contrib_build.tar.gz

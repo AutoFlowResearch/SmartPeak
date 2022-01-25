@@ -47,6 +47,11 @@ namespace SmartPeak
     return ParameterSet({ oms_params });
   }
 
+  void log_to_smartpeak(const char* message)
+  {
+    LOGD << message;
+  }
+
   void PickMRMFeatures::process(
     RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
@@ -66,7 +71,8 @@ namespace SmartPeak
       featureMap,
       rawDataHandler_IO.getTargetedExperiment(),
       rawDataHandler_IO.getTransformationDescription(),
-      rawDataHandler_IO.getSWATH()
+      rawDataHandler_IO.getSWATH(),
+      &log_to_smartpeak
     );
     LOGD << "START PickMRMFeatures calling finished";
 
