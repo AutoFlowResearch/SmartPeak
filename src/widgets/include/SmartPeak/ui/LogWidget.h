@@ -37,5 +37,6 @@ namespace SmartPeak
     void draw() override;
   protected:
     const GuiAppender& appender_;
+    void displayLogLine(const char*, const ImVec4& color, bool wrap) const;
   };
 }

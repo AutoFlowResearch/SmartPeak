@@ -27,6 +27,7 @@
 
 namespace SmartPeak
 {
+
   void LogWidget::draw()
   {
     showQuickHelpToolTip("Log");
@@ -40,6 +41,14 @@ namespace SmartPeak
       severity = plog::severityFromString(items[selected_severity]);
     }
 
+    static bool wrap = true;
+    ImGui::SameLine();
+    ImGui::Checkbox("wrap", &wrap);
+
+    static bool auto_scroll = true;
+    ImGui::SameLine();
+    ImGui::Checkbox("auto scroll", &auto_scroll);
+
     ImGui::Separator();
     ImGui::BeginChild("Log child");
     const auto record_list = appender_.getAppenderRecordList(severity);
@@ -49,31 +58,37 @@ namespace SmartPeak
       std::string str(record_list.at(i).second.data(), record_list.at(i).second.data() + record_list.at(i).second.size());
       
       if (record_list.at(i).first == plog::Severity::fatal) {
-        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f,  0.0f, 0.0f, 1.0f));
-        ImGui::Text("%s", str.c_str());
-        ImGui::PopStyleColor();
+        displayLogLine(str.c_str(), ImVec4(1.0f, 0.0f, 0.0f, 1.0f), wrap);
       } else if (record_list.at(i).first == plog::Severity::error) {
-        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(8.0f,  0.15f, 0.15f, 1.0f));
-        ImGui::Text("%s", str.c_str());
-        ImGui::PopStyleColor();
+        displayLogLine(str.c_str(), ImVec4(8.0f, 0.15f, 0.15f, 1.0f), wrap);
       } else if (record_list.at(i).first == plog::Severity::warning) {
-        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(8.0f,  0.5f, 0.5f, 1.0f));
-        ImGui::Text("%s", str.c_str());
-        ImGui::PopStyleColor();
+        displayLogLine(str.c_str(), ImVec4(8.0f, 0.5f, 0.5f, 1.0f), wrap);
       } else if (record_list.at(i).first == plog::Severity::info) {
-        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
-        ImGui::Text("%s", str.c_str());
-        ImGui::PopStyleColor();
+        displayLogLine(str.c_str(), ImVec4(1.0f, 1.0f, 1.0f, 1.0f), wrap);
       } else if (record_list.at(i).first == plog::Severity::debug) {
-        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.6f, 0.0f, 1.0f));
-        ImGui::Text("%s", str.c_str());
-        ImGui::PopStyleColor();
+        displayLogLine(str.c_str(), ImVec4(1.0f, 0.6f, 0.0f, 1.0f), wrap);
       } else if (record_list.at(i).first == plog::Severity::verbose) {
-        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f,  0.0f, 0.0f, 1.0f));
-        ImGui::Text("%s", str.c_str());
-        ImGui::PopStyleColor();
+        displayLogLine(str.c_str(), ImVec4(0.0f, 0.0f, 0.0f, 1.0f), wrap);
       }
     }
+    if (auto_scroll && ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
+    {
+      ImGui::SetScrollHereY(1.0f);
+    }
     ImGui::EndChild();
+  }
+
+  void LogWidget::displayLogLine(const char* str, const ImVec4& color, bool wrap) const
+  {
+    ImGui::PushStyleColor(ImGuiCol_Text, color);
+    if (wrap)
+    {
+      ImGui::TextWrapped("%s", str);
+    }
+    else
+    {
+      ImGui::Text("%s", str);
+    }
+    ImGui::PopStyleColor();
   }
 }
