@@ -41,6 +41,7 @@
 #include <SmartPeak/ui/ChromatogramTICPlotWidget.h>
 #include <SmartPeak/ui/ChromatogramXICPlotWidget.h>
 #include <SmartPeak/ui/SpectraPlotWidget.h>
+#include <SmartPeak/ui/OptionsWidget.h>
 #include <SmartPeak/ui/SpectraMSMSPlotWidget.h>
 #include <SmartPeak/ui/ParametersTableWidget.h>
 #include <SmartPeak/ui/Report.h>
@@ -145,6 +146,7 @@ int main(int argc, char** argv)
     event_dispatcher,
     event_dispatcher);
   auto about_widget_ = std::make_shared<AboutWidget>();
+  auto options_widget_ = std::make_shared<OptionsWidget>();
   auto report_ = std::make_shared<Report>(application_handler_);
 
   auto load_session_wizard_ = std::make_shared<LoadSessionWizard>(
@@ -307,6 +309,7 @@ int main(int argc, char** argv)
       session_files_widget_modify_,
       create_session_widget_,
       run_workflow_widget_,
+      options_widget_,
       about_widget_,
       report_,
       load_session_wizard_->set_input_output_widget
@@ -543,13 +546,12 @@ int main(int argc, char** argv)
               {
                 if (ImGui::MenuItem(filenames.getDescription(file_id).c_str(), NULL, false, workflow_is_done_))
                 {
-                  file_picker_->open(filenames.getDescription(file_id),
+                  file_picker_->open(std::string("Export ") + filenames.getDescription(file_id),
                     file_picker_handler,
                     FilePicker::Mode::EFileCreate,
                     application_handler_,
                     filenames.getFullPath(file_id).filename().generic_string()
                   );
-                  file_picker_->visible_ = true;
                 }
               }
             }
@@ -705,6 +707,12 @@ int main(int argc, char** argv)
         {
           split_window.reset_layout_ = true;
         }
+        ImGui::EndMenu();
+      }
+
+      if (ImGui::BeginMenu("Tools"))
+      {
+        ImGui::MenuItem("Options", NULL, &options_widget_->visible_);
         ImGui::EndMenu();
       }
 
