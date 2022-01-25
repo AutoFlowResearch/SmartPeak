@@ -4,94 +4,6 @@ orbs:
   win: circleci/windows@2.4.0
 
 jobs:
-  build_ubuntu:
-    docker:
-      - image: ubuntu:20.04
-    working_directory: ~/SmartPeak
-    resource_class: large
-    steps:
-      - checkout
-      - run: |
-          apt-get update
-      - run:
-          name: Installing required libraries
-          command: |
-            export DEBIAN_FRONTEND=noninteractive && apt-get install -y tzdata &&  
-            ln -fs /usr/share/zoneinfo/UTC /etc/localtime &&
-            dpkg-reconfigure --frontend noninteractive tzdata &&
-            apt-get install -y git cmake qt5-default libeigen3-dev &&
-            apt-get install -y libboost-all-dev &&
-            apt-get install -y libxerces-c-dev coinor-libcbc-dev libsvm-dev &&
-            apt-get install -y libwildmagic-dev libsqlite3-dev &&
-            apt-get install -y libglpk-dev seqan-dev libsdl2-dev libhdf5-dev
-            apt-get install -y graphviz doxygen python3-pip &&
-            apt-get install -y libpango1.0-dev gnuplot
-            apt-get install -y cppcheck libssl-dev &&
-            apt-get install -y python3-sphinx python3-breathe python3-sphinx-rtd-theme sphinx-doc doxygen-latex doxygen-doc gsfonts graphviz-doc libgd-tools xapian-tools &&
-            pip3 install exhale && 
-            pip3 install -r tools/smartpeak/requirements.txt
-      - run:
-          # CircleCI doesn't support regex for conditional steps unfortunately...
-          # During the release workflow, the previous job will push version update commit to release branch.
-          # Because workflow run against fixed commit, the built-in checkout command won't fetch version update.
-          # This step has an effect only when running on release.
-          name: "Pull latest (only release)"
-          command: |
-            if [[ << pipeline.git.branch >> =~ ^release\/.* ]]; then
-                git checkout << pipeline.git.branch >>
-                git pull origin << pipeline.git.branch >>
-            else
-              echo "Skip this run step"
-            fi
-      - run:
-          name: Cloning and building OpenMS
-          command: |
-            cd ~ &&
-            git clone --branch develop --depth 1 https://github.com/OpenMS/OpenMS.git &&
-            cd OpenMS && git submodule update --init THIRDPARTY &&
-            cmake -DBOOST_USE_STATIC=OFF -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Release -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF ~/OpenMS &&
-            make -j4 OpenMS
-      - run:
-          name: Installing SmartPeak SuperBuild
-          command: |
-            cd ~/SmartPeak
-            mkdir -p superbuild
-            cd superbuild
-            cmake -DUSE_SUPERBUILD=ON -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release ~/SmartPeak
-            make -j4
-      - run:
-          name: Building SmartPeak's All Targets
-          command: |
-            mkdir ~/smartpeak_release_build
-            cd ~/smartpeak_release_build
-            ls -l $HOME/SmartPeak/superbuild/Dependencies/Source/sqlite
-            cmake -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -G "Unix Makefiles" -DCMAKE_PREFIX_PATH=$HOME/OpenMS-build/ -DPLOG_INCLUDE_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/plog/include -DIMGUI_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/imgui -DIMPLOT_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/implot -DPORTABLEFILEDIALOGS_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/portablefiledialogs -DSQLite3_INCLUDE_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/sqlite -DSQLite3_LIBRARY=$HOME/SmartPeak/superbuild/Dependencies/Source/sqlite -DCMAKE_BUILD_TYPE=Release ~/SmartPeak
-            make -j4
-      - run:
-          name: Running SmartPeak Class Tests
-          command: |
-            cd ~/smartpeak_release_build || exit 1
-            ctest -V -E "(example|example|absl|dfa|exhaustive|random|re2)"
-            ls -l ~/SmartPeak/src/tests/class_tests/smartpeak/data
-            cd ~/SmartPeak
-            export PYTHONPATH="${PWD}/tools"
-            python3 -m unittest discover -s ./tools/smartpeak
-      - run:
-          name: Running SmartPeak Examples
-          command: |
-            ~/SmartPeak/.circleci/run_examples.sh ~/smartpeak_release_build/bin
-      - run:
-          name: Packing SmartPeak
-          command: |
-            set -o xtrace
-            cd ~/smartpeak_release_build
-            cpack -V
-            ls -lh ~/smartpeak_release_build | grep -a .deb
-            dpkg -c ~/smartpeak_release_build/*.deb
-            mkdir -p /tmp/packages
-            cp ~/smartpeak_release_build/*.deb /tmp/packages
-      - store_artifacts:
-          path: /tmp/packages
 
   build_macos:
     macos:
@@ -130,7 +42,7 @@ jobs:
             sed -i '' 's/std::auto_ptr/std::unique_ptr/g' include/seqan/basic/test_system.h
             rm lib/libz.* && rm -rf lib/pkgconfig
             cd ~/OpenMS &&  mkdir openms_debug_build && cd openms_debug_build &&
-            cmake -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_STANDARD=14 -DCMAKE_CXX_EXTENSIONS=OFF -DCMAKE_PREFIX_PATH="$(brew --prefix qt5)" -DOPENMS_CONTRIB_LIBS=~/OpenMS/contrib_build/ -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Release -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF -DZLIB_ROOT=$(brew --prefix zlib) ..
+            cmake -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_STANDARD=14 -DCMAKE_CXX_EXTENSIONS=OFF -DCMAKE_PREFIX_PATH="$(brew --prefix qt5)" -DOPENMS_CONTRIB_LIBS=~/OpenMS/contrib_build/ -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Debug -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF -DZLIB_ROOT=$(brew --prefix zlib) ..
             make -j4 OpenMS
       - run:
           name: Building SmartPeak (Including SuperBuild)
@@ -139,20 +51,10 @@ jobs:
             mkdir superbuild
             mkdir smartpeak_release_build
             cd superbuild
-            cmake -DUSE_SUPERBUILD=ON -DCMAKE_BUILD_TYPE=Release .. && make -j4
+            cmake -DUSE_SUPERBUILD=ON -DCMAKE_BUILD_TYPE=Debug .. && make -j4
             cd ../smartpeak_release_build
-            cmake -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBOOST_USE_STATIC=OFF -DCMAKE_PREFIX_PATH="~/OpenMS/openms_debug_build/;~/OpenMS/contrib_build;$(brew --prefix qt5);(brew --prefix eigen);$(brew --prefix zlib);$(brew --prefix openssl)" -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl -DOPENSSL_LIBRARIES=/usr/local/opt/openssl/lib -DPLOG_INCLUDE_DIR=~/SmartPeak/superbuild/Dependencies/Source/plog/include   -DIMGUI_DIR=~/SmartPeak/superbuild/Dependencies/Source/imgui  -DIMPLOT_DIR=~/SmartPeak/superbuild/Dependencies/Source/implot -DPORTABLEFILEDIALOGS_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/portablefiledialogs -DSQLite3_INCLUDE_DIR=~/SmartPeak/superbuild/Dependencies/Source/sqlite -DSQLite3_LIBRARY=~/SmartPeak/superbuild/Dependencies/Source/sqlite -DCMAKE_BUILD_TYPE=RelWithDebInfo -DOpenMP_CXX_FLAGS="-Xpreprocessor -fopenmp -I/usr/local/opt/libomp/include" -DOpenMP_CXX_LIB_NAMES="omp" -DOpenMP_omp_LIBRARY=/usr/local/opt/libomp/lib/libomp.dylib -DgRPC_ZLIB_PROVIDER=package ~/SmartPeak
+            cmake -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBOOST_USE_STATIC=OFF -DCMAKE_PREFIX_PATH="~/OpenMS/openms_debug_build/;~/OpenMS/contrib_build;$(brew --prefix qt5);(brew --prefix eigen);$(brew --prefix zlib);$(brew --prefix openssl)" -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl -DOPENSSL_LIBRARIES=/usr/local/opt/openssl/lib -DPLOG_INCLUDE_DIR=~/SmartPeak/superbuild/Dependencies/Source/plog/include   -DIMGUI_DIR=~/SmartPeak/superbuild/Dependencies/Source/imgui  -DIMPLOT_DIR=~/SmartPeak/superbuild/Dependencies/Source/implot -DPORTABLEFILEDIALOGS_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/portablefiledialogs -DSQLite3_INCLUDE_DIR=~/SmartPeak/superbuild/Dependencies/Source/sqlite -DSQLite3_LIBRARY=~/SmartPeak/superbuild/Dependencies/Source/sqlite -DCMAKE_BUILD_TYPE=Debug -DOpenMP_CXX_FLAGS="-Xpreprocessor -fopenmp -I/usr/local/opt/libomp/include" -DOpenMP_CXX_LIB_NAMES="omp" -DOpenMP_omp_LIBRARY=/usr/local/opt/libomp/lib/libomp.dylib -DgRPC_ZLIB_PROVIDER=package ~/SmartPeak
             make -j4
-      - run:
-          name: Running SmartPeak Class Tests
-          no_output_timeout: 15m
-          command: |
-            set -e -o pipefail
-            cd ~/SmartPeak/smartpeak_release_build
-            ctest -VV -F -E "(example|absl|dfa|exhaustive|random|re2|charclass|compile|mimics|parse_possible|regexp|required_prefix|search|set|simplify|string_generator)" --timeout 1200
-            cd ~/SmartPeak
-            export PYTHONPATH="${PWD}/tools"
-            python3 -m unittest discover -s ./tools/smartpeak
       - run:
           name: Running SmartPeak Examples
           command: |
@@ -178,8 +80,6 @@ jobs:
       - store_artifacts:
           path: /tmp/artifacts
 
-
-  build_windows:
     working_directory: ~/SmartPeak
     executor: win/default
     steps:
@@ -510,15 +410,7 @@ workflows:
   version: 2.1
   ci:
     jobs:
-      - build_ubuntu:
-          filters:
-            branches:
-              ignore: /^release\/.*$/
       - build_macos:
-          filters:
-            branches:
-              ignore: /^release\/.*$/
-      - build_windows:
           filters:
             branches:
               ignore: /^release\/.*$/
