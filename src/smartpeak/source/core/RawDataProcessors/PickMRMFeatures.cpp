@@ -53,13 +53,14 @@ namespace SmartPeak
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START PickMRMFeatures";
+    LOGD << "START PickMRMFeatures -";
     getFilenames(filenames_I);
     OpenMS::MRMFeatureFinderScoring featureFinder;
     Utilities::setUserParameters(featureFinder, params_I);
 
     OpenMS::FeatureMap featureMap;
 
+    LOGD << "START PickMRMFeatures calling featureFinder.pickExperiment";
     featureFinder.pickExperiment(
       rawDataHandler_IO.getChromatogramMap(),
       featureMap,
@@ -67,6 +68,7 @@ namespace SmartPeak
       rawDataHandler_IO.getTransformationDescription(),
       rawDataHandler_IO.getSWATH()
     );
+    LOGD << "START PickMRMFeatures calling finished";
 
     // NOTE: setPrimaryMSRunPath() is needed for calculate_calibration
     featureMap.setPrimaryMSRunPath({rawDataHandler_IO.getMetaData().getFilename()});
