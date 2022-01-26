@@ -112,15 +112,15 @@ public:
     const std::map<std::string, std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>>&
     getComponentsToConcentrations() const;
 
-    void setOuterComponentsToConcentrations(
+    void setOutlierComponentsToConcentrations(
       const std::map<std::string, std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>> components_to_concentrations
     );
 
     std::map<std::string, std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>>&
-      getOuterComponentsToConcentrations();
+      getOutlierComponentsToConcentrations();
 
     const std::map<std::string, std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>>&
-      getOuterComponentsToConcentrations() const;
+      getOutlierComponentsToConcentrations() const;
   
   private:
     std::string sequence_segment_name_;
@@ -136,6 +136,6 @@ public:
     std::shared_ptr<OpenMS::MRMFeatureQC> feature_rsd_estimations_ = nullptr;  ///< Percent RSD estimations; shared between all raw data handlers in the sequence segment
     std::shared_ptr<OpenMS::MRMFeatureQC> feature_background_estimations_ = nullptr;  ///< Background interference estimations; shared between all raw data handlers in the sequence segment
     std::map<std::string, std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>> components_to_concentrations_;
-    std::map<std::string, std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>> outer_components_to_concentrations_;
+    std::map<std::string, std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>> outlier_components_to_concentrations_;
   };
 }

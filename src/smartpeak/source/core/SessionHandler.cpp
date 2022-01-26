@@ -2096,24 +2096,24 @@ namespace SmartPeak
               }
               n_points += x_raw_data.size();
               // Extract out the points out of the line of best fit in `ComponentsToConcentrations`
-              std::vector<float> outer_x_raw_data, outer_y_raw_data;
-              for (const auto& point : sequence_segment.getOuterComponentsToConcentrations().at(quant_method.getComponentName())) {
+              std::vector<float> outlier_x_raw_data, outlier_y_raw_data;
+              for (const auto& point : sequence_segment.getOutlierComponentsToConcentrations().at(quant_method.getComponentName())) {
                 auto ratio = float(point.actual_concentration / point.IS_actual_concentration / point.dilution_factor);
-                outer_x_raw_data.push_back(ratio);
+                outlier_x_raw_data.push_back(ratio);
                 float y_datum = absQuant.calculateRatio(point.feature, point.IS_feature, quant_method.getFeatureName());
-                outer_y_raw_data.push_back(y_datum);
+                outlier_y_raw_data.push_back(y_datum);
                 result.feature_min = std::min(y_datum, result.feature_min);
                 result.feature_max = std::max(y_datum, result.feature_max);
                 result.conc_min = std::min(ratio, result.conc_min);
                 result.conc_max = std::max(ratio, result.conc_max);
               }
-              n_points += outer_x_raw_data.size();
+              n_points += outlier_x_raw_data.size();
               // add points
               if (n_points < max_nb_points) {
                 result.conc_raw_data.push_back(x_raw_data);
                 result.feature_raw_data.push_back(y_raw_data);
-                result.outer_conc_raw_data.push_back(outer_x_raw_data);
-                result.outer_feature_raw_data.push_back(outer_y_raw_data);
+                result.outlier_conc_raw_data.push_back(outlier_x_raw_data);
+                result.outlier_feature_raw_data.push_back(outlier_y_raw_data);
                 result.series_names.push_back(quant_method.getComponentName());
               }
               else

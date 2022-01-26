@@ -53,7 +53,7 @@ namespace SmartPeak
     if (feature_rsd_estimations_ != nullptr) feature_rsd_estimations_ = std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC());
     if (feature_background_estimations_ != nullptr) feature_background_estimations_ = std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC());
     components_to_concentrations_.clear();
-    outer_components_to_concentrations_.clear();
+    outlier_components_to_concentrations_.clear();
   }
 
   void SequenceSegmentHandler::setSequenceSegmentName(const std::string& sequence_segment_name)
@@ -345,22 +345,22 @@ namespace SmartPeak
     return components_to_concentrations_;
   }
 
-  void SequenceSegmentHandler::setOuterComponentsToConcentrations(
+  void SequenceSegmentHandler::setOutlierComponentsToConcentrations(
     const std::map<std::string, std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>> components_to_concentrations
   )
   {
-    outer_components_to_concentrations_ = components_to_concentrations;
+    outlier_components_to_concentrations_ = components_to_concentrations;
   }
 
   std::map<std::string, std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>>&
-    SequenceSegmentHandler::getOuterComponentsToConcentrations()
+    SequenceSegmentHandler::getOutlierComponentsToConcentrations()
   {
-    return outer_components_to_concentrations_;
+    return outlier_components_to_concentrations_;
   }
 
   const std::map<std::string, std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>>&
-    SequenceSegmentHandler::getOuterComponentsToConcentrations() const
+    SequenceSegmentHandler::getOutlierComponentsToConcentrations() const
   {
-    return outer_components_to_concentrations_;
+    return outlier_components_to_concentrations_;
   }
 }

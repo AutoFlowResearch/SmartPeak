@@ -83,7 +83,7 @@ namespace SmartPeak
 
     absoluteQuantitation.setQuantMethods(sequenceSegmentHandler_IO.getQuantitationMethods());
     std::map<std::string, std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>> components_to_concentrations;
-    std::map<std::string, std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>> outer_components_to_concentrations;
+    std::map<std::string, std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>> outlier_components_to_concentrations;
     for (const OpenMS::AbsoluteQuantitationMethod& row : sequenceSegmentHandler_IO.getQuantitationMethods()) {
       // map standards to features
       OpenMS::AbsoluteQuantitationStandards absoluteQuantitationStandards;
@@ -130,7 +130,7 @@ namespace SmartPeak
       }
 
       // Compute outer points
-      std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration> outer_feature_concentrations;
+      std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration> outlier_feature_concentrations;
       for (const auto& feature : all_feature_concentrations)
       {
         bool found = false;
@@ -147,17 +147,17 @@ namespace SmartPeak
         }
         if (!found)
         {
-          outer_feature_concentrations.push_back(feature);
+          outlier_feature_concentrations.push_back(feature);
         }
       }
       components_to_concentrations.erase(row.getComponentName());
       components_to_concentrations.insert({row.getComponentName(), feature_concentrations_pruned });
-      outer_components_to_concentrations.erase(row.getComponentName());
-      outer_components_to_concentrations.insert({ row.getComponentName(), outer_feature_concentrations });
+      outlier_components_to_concentrations.erase(row.getComponentName());
+      outlier_components_to_concentrations.insert({ row.getComponentName(), outlier_feature_concentrations });
     }
     // store results
     sequenceSegmentHandler_IO.setComponentsToConcentrations(components_to_concentrations);
-    sequenceSegmentHandler_IO.setOuterComponentsToConcentrations(outer_components_to_concentrations);
+    sequenceSegmentHandler_IO.setOutlierComponentsToConcentrations(outlier_components_to_concentrations);
     sequenceSegmentHandler_IO.getQuantitationMethods() = absoluteQuantitation.getQuantMethods();
     //sequenceSegmentHandler_IO.setQuantitationMethods(absoluteQuantitation.getQuantMethods());
     LOGD << "END optimizeCalibrationCurves";

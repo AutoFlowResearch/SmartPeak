@@ -109,7 +109,7 @@ namespace SmartPeak
     ImGui::SameLine();
     ImGui::Checkbox("Points", &show_points_);
     ImGui::SameLine();
-    ImGui::Checkbox("Outer points", &show_outer_points_);
+    ImGui::Checkbox("Outlier points", &show_outlier_points_);
     ImGui::SameLine();
     if (ImGui::Button("Fit Zoom"))
     {
@@ -165,15 +165,15 @@ namespace SmartPeak
                                calibration_data_.conc_raw_data.at(i).size());
         }
       }
-      if (show_outer_points_)
+      if (show_outlier_points_)
       {
         for (int i = 0; i < calibration_data_.conc_raw_data.size(); ++i) {
-          assert(calibration_data_.outer_conc_raw_data.at(i).size() == calibration_data_.outer_feature_raw_data.at(i).size());
+          assert(calibration_data_.outlier_conc_raw_data.at(i).size() == calibration_data_.outlier_feature_raw_data.at(i).size());
           ImPlot::PushStyleVar(ImPlotStyleVar_Marker, ImPlotMarker_Cross);
           ImPlot::PlotScatter((calibration_data_.series_names.at(i)).c_str(),
-                               calibration_data_.outer_conc_raw_data.at(i).data(),
-                               calibration_data_.outer_feature_raw_data.at(i).data(),
-                               calibration_data_.outer_conc_raw_data.at(i).size());
+                               calibration_data_.outlier_conc_raw_data.at(i).data(),
+                               calibration_data_.outlier_feature_raw_data.at(i).data(),
+                               calibration_data_.outlier_conc_raw_data.at(i).size());
         }
       }
       // legend hover management

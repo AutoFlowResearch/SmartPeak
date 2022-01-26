@@ -53,7 +53,7 @@ namespace SmartPeak
     bool show_legend_ = true;
     bool show_fit_line_ = true;
     bool show_points_ = true;
-    bool show_outer_points_ = true;
+    bool show_outlier_points_ = true;
     std::string current_component_;
     std::vector<std::string> components_;
     std::vector<const char*> component_cstr_;

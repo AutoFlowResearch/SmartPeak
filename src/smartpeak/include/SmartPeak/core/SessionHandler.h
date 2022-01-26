@@ -336,7 +336,6 @@ namespace SmartPeak
     */
     void getHeatMap(const SequenceHandler& sequence_handler, HeatMapData& result, const std::string& feature_name);
     
-
     /*
     @brief Calibration data structure, result of call to setCalibratorsScatterLinePlot
     */
@@ -344,8 +343,8 @@ namespace SmartPeak
     {
       std::vector<std::vector<float>> conc_raw_data;
       std::vector<std::vector<float>> feature_raw_data;
-      std::vector<std::vector<float>> outer_conc_raw_data;
-      std::vector<std::vector<float>> outer_feature_raw_data;
+      std::vector<std::vector<float>> outlier_conc_raw_data;
+      std::vector<std::vector<float>> outlier_feature_raw_data;
       std::vector<std::vector<float>> conc_fit_data;
       std::vector<std::vector<float>> feature_fit_data;
       std::vector<std::string> series_names;
