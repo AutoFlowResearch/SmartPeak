@@ -65,15 +65,20 @@ namespace SmartPeak
 
     OpenMS::FeatureMap featureMap;
 
-    LOGD << "START PickMRMFeatures calling featureFinder.pickExperiment";
-    featureFinder.pickExperiment(
-      rawDataHandler_IO.getChromatogramMap(),
-      featureMap,
-      rawDataHandler_IO.getTargetedExperiment(),
-      rawDataHandler_IO.getTransformationDescription(),
-      rawDataHandler_IO.getSWATH(),
-      &log_to_smartpeak
-    );
+    LOGD << "START PickMRMFeatures calling featureFinder.pickExperiment - with try/catch";
+    try {
+      featureFinder.pickExperiment(
+        rawDataHandler_IO.getChromatogramMap(),
+        featureMap,
+        rawDataHandler_IO.getTargetedExperiment(),
+        rawDataHandler_IO.getTransformationDescription(),
+        rawDataHandler_IO.getSWATH(),
+        &log_to_smartpeak
+      );
+    }
+    catch (...) {
+      LOGD << "SOMETHING HAS BEEN CATCH";
+    }
     LOGD << "START PickMRMFeatures calling finished";
 
     // NOTE: setPrimaryMSRunPath() is needed for calculate_calibration
