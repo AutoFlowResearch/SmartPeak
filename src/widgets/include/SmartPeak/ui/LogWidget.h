@@ -37,6 +37,9 @@ namespace SmartPeak
     void draw() override;
   protected:
     const GuiAppender& appender_;
-    void displayLogLine(const char*, const ImVec4& color, bool wrap) const;
+    void displayLogLine(const char*, const ImVec4& color, bool wrap);
+    int displayed_log_line_counter_ = 0;
+    int hovered_log_line_ = -1;
+    bool one_log_line_is_hovered_ = false;
   };
 }
