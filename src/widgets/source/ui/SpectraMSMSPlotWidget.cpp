@@ -60,11 +60,6 @@ namespace SmartPeak
       input_z_ = current_z_;
       refresh_needed_ = false;
     }
-    else if (input_range_ != current_range_) // user zoom in / out
-    {
-      session_handler_.getSpectrumMSMSPlot(sequence_handler_, graph_viz_data_, current_range_, sample_names, scan_names, component_group_names, current_rt_, ms_level_);
-      input_range_ = current_range_;
-    }
     graph_viz_data_.y_min_ = 0.0f; // bottom line will start from 0.0
   };
 

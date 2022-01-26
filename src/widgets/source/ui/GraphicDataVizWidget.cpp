@@ -25,7 +25,6 @@
 #include <SmartPeak/ui/FilePicker.h>
 #include <imgui.h>
 #include <imgui_internal.h>
-#include <implot.h>
 
 namespace SmartPeak
 {
@@ -33,37 +32,22 @@ namespace SmartPeak
   void GraphicDataVizWidget::draw()
   {
     updateData();
-    drawSliders();
+    drawGraphHeader();
     drawGraph();
   }
 
-  void GraphicDataVizWidget::drawSliders()
+  void GraphicDataVizWidget::drawGraphHeader()
   {
-    if (ImGui::DragFloatRange2("Time-Range",
-                           &current_range_.first, &current_range_.second, 0.25f,
-                           slider_min_max_.first, slider_min_max_.second,
-                           std::string("min: %.4f "+graph_viz_data_.x_axis_title_).c_str(),
-                           std::string("max: %.4f "+graph_viz_data_.x_axis_title_).c_str(),
-                               ImGuiSliderFlags_AlwaysClamp)) {
-    
-      if (current_range_.first < 0.0f) current_range_.first = 0.0f;
-      search_highest_value_ = true;
-    }
-    
     float controls_pos_start_y = ImGui::GetCursorPosY();
     ImGui::Checkbox("Compact View", &compact_view_);
     ImGui::SameLine();
     ImGui::Checkbox("Legend", &show_legend_);
-    
-    if (graph_viz_data_.z_axis_title_)
+    ImGui::SameLine();
+    if (ImGui::Button("Fit Zoom"))
     {
-      std::ostringstream os;
-      os << graph_viz_data_.z_data_area_[current_z_];
-      ImGui::SliderInt(graph_viz_data_.z_axis_title_->c_str(), &current_z_, 0, graph_viz_data_.z_data_area_.size() - 1, os.str().c_str(), ImGuiSliderFlags_NoInput);
+      update_plot_range_ = true;
     }
-    float controls_pos_end_y = ImGui::GetCursorPosY();
-    sliders_height_ = (controls_pos_end_y - controls_pos_start_y);
-    
+
     static FilePicker file_picker_;
     
     if (ImGui::Button("Choose folder"))
@@ -93,8 +77,8 @@ namespace SmartPeak
     // compute plot limit by adding padding
     float border_padding_x = (graph_viz_data_.x_max_ - graph_viz_data_.x_min_) * 0.01f;
     float border_padding_y = (graph_viz_data_.y_max_ - graph_viz_data_.y_min_) * 0.01f;
-    auto plot_min_x = current_range_.first - border_padding_x;
-    auto plot_max_x = current_range_.second + border_padding_x;
+    auto plot_min_x = graph_viz_data_.x_min_ - border_padding_x;
+    auto plot_max_x = graph_viz_data_.x_max_ + border_padding_x;
     auto plot_min_y = graph_viz_data_.y_min_ - border_padding_y;
     auto plot_max_y = graph_viz_data_.y_max_ * 1.1f;
     return std::make_tuple(plot_min_x, plot_max_x, plot_min_y, plot_max_y);
@@ -103,19 +87,8 @@ namespace SmartPeak
   // update ranges after having refreshed the graph
   void GraphicDataVizWidget::updateRanges()
   {
-    if ((std::abs(slider_min_max_.first - graph_viz_data_.x_min_) > std::numeric_limits<double>::epsilon()) ||
-        (std::abs(slider_min_max_.second - graph_viz_data_.x_max_) > std::numeric_limits<double>::epsilon()))
-    {
-      // min max changed, reset the sliders and current range
-      current_range_ = slider_min_max_ = std::make_pair(graph_viz_data_.x_min_, graph_viz_data_.x_max_);
-    }
-    input_range_ = std::make_pair(graph_viz_data_.x_min_, graph_viz_data_.x_max_);
-    if (serialized_range_)
-    {
-      current_range_ = *serialized_range_;
-      serialized_range_ = std::nullopt;
-    }
     search_highest_value_ = true;
+    update_plot_range_ = true;
   }
 
   void GraphicDataVizWidget::drawGraph()
@@ -132,11 +105,26 @@ namespace SmartPeak
     else
     {
       auto window_size = ImGui::GetWindowSize();
-      auto [plot_min_x, plot_max_x, plot_min_y, plot_max_y] = plotLimits();
-      ImPlot::SetNextPlotLimits(plot_min_x, plot_max_x, plot_min_y, plot_max_y, ImGuiCond_Always);
+      ImGuiCond cond;
+      cond = ImGuiCond_Once;
+      if (update_plot_range_)
+      {
+        cond = ImGuiCond_Always;
+        update_plot_range_ = false;
+      }
+      if (restore_plot_limits_)
+      {
+        restore_plot_limits_ = false;
+        ImPlot::SetNextPlotLimits(plot_limits_.X.Min, plot_limits_.X.Max, plot_limits_.Y.Min, plot_limits_.Y.Max, ImGuiCond_Always);
+      }
+      else
+      {
+        auto [plot_min_x, plot_max_x, plot_min_y, plot_max_y] = plotLimits();
+        ImPlot::SetNextPlotLimits(plot_min_x, plot_max_x, plot_min_y, plot_max_y, cond);
+      }
       ImPlotFlags plotFlags = show_legend_ ? ImPlotFlags_Default | ImPlotFlags_Legend : ImPlotFlags_Default & ~ImPlotFlags_Legend;
       plotFlags |= ImPlotFlags_Crosshairs;
-      float graphic_height = window_size.y - sliders_height_;
+      float graphic_height = window_size.y;
       if (ImPlot::BeginPlot(plot_title_.c_str(), graph_viz_data_.x_axis_title_.c_str(), graph_viz_data_.y_axis_title_.c_str(), ImVec2(window_size.x - 25, graphic_height - 85), plotFlags)) {
         int i = 0;
         for (const auto& serie_name_scatter : graph_viz_data_.series_names_area_)
@@ -163,7 +151,7 @@ namespace SmartPeak
                                bar_width);
             }
           }
-          
+          plot_limits_ = ImPlot::GetPlotLimits();
           plotHighestValue(i);
           
           ImPlotMarker plot_marker = ImPlotMarker_Circle;
@@ -382,8 +370,10 @@ namespace SmartPeak
   {
     auto properties = Widget::getPropertiesSchema();
     // sliders ranges
-    properties.emplace("current_range_.first", CastValue::Type::FLOAT);
-    properties.emplace("current_range_.second", CastValue::Type::FLOAT);
+    properties.emplace("plot_limits_.X.Max", CastValue::Type::FLOAT);
+    properties.emplace("plot_limits_.X.Min", CastValue::Type::FLOAT);
+    properties.emplace("plot_limits_.Y.Max", CastValue::Type::FLOAT);
+    properties.emplace("plot_limits_.Y.Min", CastValue::Type::FLOAT);
     properties.emplace("compact_view_", CastValue::Type::BOOL);
     properties.emplace("show_legend_", CastValue::Type::BOOL);
     properties.emplace("marker_position_", CastValue::Type::FLOAT);
@@ -397,27 +387,21 @@ namespace SmartPeak
     {
       return widget_field;
     }
-    if (property == "current_range_.first")
+    if (property == "plot_limits_.X.Max")
     {
-      if (serialized_range_)
-      {
-        return serialized_range_->first;
-      }
-      else
-      {
-        return current_range_.first;
-      }
+      return static_cast<float>(plot_limits_.X.Max);
     }
-    if (property == "current_range_.second")
+    if (property == "plot_limits_.X.Min")
     {
-      if (serialized_range_)
-      {
-        return serialized_range_->second;
-      }
-      else
-      {
-        return current_range_.second;
-      }
+      return static_cast<float>(plot_limits_.X.Min);
+    }
+    if (property == "plot_limits_.Y.Max")
+    {
+      return static_cast<float>(plot_limits_.Y.Max);
+    }
+    if (property == "plot_limits_.Y.Min")
+    {
+      return static_cast<float>(plot_limits_.Y.Min);
     }
     if (property == "compact_view_")
     {
@@ -445,29 +429,25 @@ namespace SmartPeak
     {
       show_legend_ = value.b_;
     }
-    // we need to keep range in a temporary variable to set it when the
-    // plot will be displayed.
-    if (property == "current_range_.first")
+    if (property == "plot_limits_.X.Max")
     {
-      if (!serialized_range_)
-      {
-        serialized_range_ = { value.f_ , 0 };
-      }
-      else
-      {
-        serialized_range_->first = value.f_;
-      }
+      plot_limits_.X.Max = value.f_;
+      restore_plot_limits_ = true;
     }
-    if (property == "current_range_.second")
+    if (property == "plot_limits_.X.Min")
     {
-      if (!serialized_range_)
-      {
-        serialized_range_ = { 0, value.f_ };
-      }
-      else
-      {
-        serialized_range_->second = value.f_;
-      }
+      plot_limits_.X.Min = value.f_;
+      restore_plot_limits_ = true;
+    }
+    if (property == "plot_limits_.Y.Max")
+    {
+      plot_limits_.Y.Max = value.f_;
+      restore_plot_limits_ = true;
+    }
+    if (property == "plot_limits_.Y.Min")
+    {
+      plot_limits_.Y.Min = value.f_;
+      restore_plot_limits_ = true;
     }
     if (property == "marker_position_")
     {
