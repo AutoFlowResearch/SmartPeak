@@ -158,7 +158,7 @@ if (WIN32)
     COMPONENT applications)
   
   install(CODE "
-    execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory ${OpenMS_SHARE_DIR} \"\${BUNDLE_OUTPUT_PATH}/share/OpenMS\")
+    execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory ${OpenMS_SHARE_DIR} \"\${CMAKE_INSTALL_PREFIX}/SmartPeakGUI.app/share/OpenMS\")
     " 
     COMPONENT share)
 
