@@ -51,6 +51,8 @@ namespace SmartPeak
 
     ImGui::Separator();
     ImGui::BeginChild("Log child");
+    displayed_log_line_counter_ = 0;
+    one_log_line_is_hovered_ = false;
     const auto record_list = appender_.getAppenderRecordList(severity);
     int message_list_start = (record_list.size() > 500) ? record_list.size() - 500 : 0;
     for (int i = message_list_start; i < record_list.size(); ++i)
@@ -75,12 +77,23 @@ namespace SmartPeak
     {
       ImGui::SetScrollHereY(1.0f);
     }
+    if (!one_log_line_is_hovered_)
+    {
+      hovered_log_line_ = -1;
+    }
     ImGui::EndChild();
   }
 
-  void LogWidget::displayLogLine(const char* str, const ImVec4& color, bool wrap) const
+  void LogWidget::displayLogLine(const char* str, const ImVec4& color, bool wrap)
   {
-    ImGui::PushStyleColor(ImGuiCol_Text, color);
+    if (hovered_log_line_ == displayed_log_line_counter_)
+    {
+      ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+    }
+    else
+    {
+      ImGui::PushStyleColor(ImGuiCol_Text, color);
+    }
     if (wrap)
     {
       ImGui::TextWrapped("%s", str);
@@ -90,5 +103,11 @@ namespace SmartPeak
       ImGui::Text("%s", str);
     }
     ImGui::PopStyleColor();
+    if (ImGui::IsItemHovered())
+    {
+      hovered_log_line_ = displayed_log_line_counter_;
+      one_log_line_is_hovered_ = true;
+    }
+    displayed_log_line_counter_++;
   }
 }
