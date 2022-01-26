@@ -88,12 +88,15 @@ namespace SmartPeak
   {
     if (hovered_log_line_ == displayed_log_line_counter_)
     {
-      ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+      ImVec2 text_size = ImGui::CalcTextSize(str, 0, false, ImGui::GetWindowWidth());
+      const ImVec2 posR = ImGui::GetCursorScreenPos();
+      ImDrawList* draw_list = ImGui::GetWindowDrawList();
+      draw_list->AddRectFilled(
+        ImVec2(posR.x, posR.y),
+        ImVec2(posR.x + ImGui::GetWindowWidth(), posR.y + text_size.y),
+        IM_COL32(200, 200, 200, 30));
     }
-    else
-    {
-      ImGui::PushStyleColor(ImGuiCol_Text, color);
-    }
+    ImGui::PushStyleColor(ImGuiCol_Text, color);
     if (wrap)
     {
       ImGui::TextWrapped("%s", str);
