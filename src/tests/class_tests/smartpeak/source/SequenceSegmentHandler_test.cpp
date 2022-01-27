@@ -422,6 +422,39 @@ TEST(SequenceSegmentHandler, set_get_ComponentsToConcentrations)
   EXPECT_EQ(m3.at(foo)[0].IS_actual_concentration, ac2);
 }
 
+TEST(SequenceSegmentHandler, set_get_OutlierComponentsToConcentrations)
+{
+  SequenceSegmentHandler ssh;
+  OpenMS::AbsoluteQuantitationStandards::featureConcentration fc;
+  const string foo{ "foo" };
+  const double ac1{ 4.5 };
+  fc.actual_concentration = ac1;
+  vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration> fc1;
+  fc1.push_back(fc);
+  map<string, vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>> m1;
+  m1.insert({ foo, fc1 });
+
+  ssh.setOutlierComponentsToConcentrations(m1);
+
+  const map<string, vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>>&
+    m2 = ssh.getOutlierComponentsToConcentrations();
+  EXPECT_EQ(m2.size(), 1);
+  EXPECT_EQ(m2.count(foo), 1);
+  EXPECT_EQ(m2.at(foo)[0].actual_concentration, ac1);
+
+  const double ac2{ 7.3 };
+  fc1[0].IS_actual_concentration = ac2;
+  ssh.getOutlierComponentsToConcentrations().erase(foo);
+  ssh.getOutlierComponentsToConcentrations().insert({ foo, fc1 });
+
+  map<string, vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>>&
+    m3 = ssh.getOutlierComponentsToConcentrations();
+  EXPECT_EQ(m3.size(), 1);
+  EXPECT_EQ(m3.count(foo), 1);
+  EXPECT_EQ(m3.at(foo)[0].actual_concentration, ac1);
+  EXPECT_EQ(m3.at(foo)[0].IS_actual_concentration, ac2);
+}
+
 TEST(SequenceSegmentHandler, clear)
 {
   SequenceSegmentHandler ssh;
@@ -454,12 +487,14 @@ TEST(SequenceSegmentHandler, clear)
   map<string, vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>> m1;
   m1.insert({"foo", fc1});
   ssh.setComponentsToConcentrations(m1);
+  ssh.setOutlierComponentsToConcentrations(m1);
 
   EXPECT_FALSE(ssh.getSequenceSegmentName().empty());
   EXPECT_FALSE(ssh.getSampleIndices().empty());
   EXPECT_FALSE(ssh.getStandardsConcentrations().empty());
   EXPECT_FALSE(ssh.getQuantitationMethods().empty());
   EXPECT_FALSE(ssh.getComponentsToConcentrations().empty());
+  EXPECT_FALSE(ssh.getOutlierComponentsToConcentrations().empty());
   EXPECT_FALSE(ssh.getFeatureFilter().component_qcs.empty());
   EXPECT_FALSE(ssh.getFeatureQC().component_qcs.empty());
   EXPECT_FALSE(ssh.getFeatureRSDFilter().component_qcs.empty());
@@ -476,6 +511,7 @@ TEST(SequenceSegmentHandler, clear)
   EXPECT_TRUE(ssh.getStandardsConcentrations().empty());
   EXPECT_TRUE(ssh.getQuantitationMethods().empty());
   EXPECT_TRUE(ssh.getComponentsToConcentrations().empty());
+  EXPECT_TRUE(ssh.getOutlierComponentsToConcentrations().empty());
   EXPECT_TRUE(ssh.getFeatureFilter().component_qcs.empty());
   EXPECT_TRUE(ssh.getFeatureQC().component_qcs.empty());
   EXPECT_TRUE(ssh.getFeatureRSDFilter().component_qcs.empty());

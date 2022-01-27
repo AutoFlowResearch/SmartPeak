@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <SmartPeak/core/SessionHandler.h>
 #include <SmartPeak/ui/Widget.h>
 #include <string>
 #include <utility>
@@ -39,39 +40,25 @@ namespace SmartPeak
   {
   public:
     CalibratorsPlotWidget(const std::string title = ""): GenericGraphicWidget(title) {};
-    void setValues(
-      const std::vector<std::vector<float>>* x_fit_data, const std::vector<std::vector<float>>* y_fit_data,
-      const std::vector<std::vector<float>>* x_raw_data, const std::vector<std::vector<float>>* y_raw_data, const std::vector<std::string>* series_names,
-      const std::string& x_axis_title, const std::string& y_axis_title, const float& x_min, const float& x_max, const float& y_min, const float& y_max,
-      const std::string& plot_title)
-    {
-      x_fit_data_ = x_fit_data;
-      y_fit_data_ = y_fit_data;
-      x_raw_data_ = x_raw_data;
-      y_raw_data_ = y_raw_data;
-      series_names_ = series_names;
-      x_axis_title_ = x_axis_title;
-      y_axis_title_ = y_axis_title;
-      x_min_ = x_min;
-      x_max_ = x_max;
-      y_min_ = y_min;
-      y_max_ = y_max;
-      plot_title_ = plot_title;
-    }
+    void setValues(const SessionHandler::CalibrationData& calibration_data, const std::string& plot_title);
     void draw() override;
+
+    bool reset_layout_ = true;
+
   protected:
-    const std::vector<std::vector<float>>* x_fit_data_ = nullptr;
-    const std::vector<std::vector<float>>* y_fit_data_ = nullptr;
-    const std::vector<std::vector<float>>* x_raw_data_ = nullptr;
-    const std::vector<std::vector<float>>* y_raw_data_ = nullptr;
-    const std::vector<std::string>* series_names_ = nullptr;
-    std::string x_axis_title_;
-    std::string y_axis_title_;
-    float x_min_;
-    float x_max_;
-    float y_min_;
-    float y_max_;
+    void displayParameters();
+    void displayPlot();
+    SessionHandler::CalibrationData calibration_data_;
     std::string plot_title_; // used as the ID of the plot as well so this should be unique across the different Widgets
+    bool show_legend_ = true;
+    bool show_fit_line_ = true;
+    bool show_points_ = true;
+    bool show_outlier_points_ = true;
+    std::string current_component_;
+    std::vector<std::string> components_;
+    std::vector<const char*> component_cstr_;
+    int selected_component_ = 0;
+    bool reset_zoom_ = true;
   };
 
 }

@@ -337,13 +337,34 @@ namespace SmartPeak
     void getHeatMap(const SequenceHandler& sequence_handler, HeatMapData& result, const std::string& feature_name);
     
     /*
+    @brief Calibration data structure, result of call to setCalibratorsScatterLinePlot
+    */
+    struct CalibrationData
+    {
+      std::vector<std::vector<float>> conc_raw_data;
+      std::vector<std::vector<float>> feature_raw_data;
+      std::vector<std::vector<float>> outlier_conc_raw_data;
+      std::vector<std::vector<float>> outlier_feature_raw_data;
+      std::vector<std::vector<float>> conc_fit_data;
+      std::vector<std::vector<float>> feature_fit_data;
+      std::vector<std::string> series_names;
+      std::string x_axis_title;
+      std::string y_axis_title;
+      float conc_min;
+      float conc_max;
+      float feature_min;
+      float feature_max;
+      std::vector<OpenMS::AbsoluteQuantitationMethod> quant_methods;
+    };
+
+    /*
     @brief Sets the data used for rendering the calibrators
 
     @param[in] sequence_handler
 
     @returns true if all points were added and false if points were omitted due to performance
     */
-    bool setCalibratorsScatterLinePlot(const SequenceHandler& sequence_handler);
+    bool setCalibratorsScatterLinePlot(const SequenceHandler& sequence_handler, CalibrationData& result);
 
     Eigen::Tensor<std::string, 1> getInjectionExplorerHeader();
     Eigen::Tensor<std::string, 2> getInjectionExplorerBody();
@@ -403,13 +424,6 @@ namespace SmartPeak
     std::string feat_line_y_axis_title;
     float feat_line_sample_min, feat_line_sample_max, feat_value_min, feat_value_max;
     Eigen::Tensor<std::string, 1> feat_row_labels, feat_col_labels;
-    // data for the calibrators scatter/line plot
-    std::vector<std::vector<float>> calibrators_conc_raw_data, calibrators_feature_raw_data;
-    std::vector<std::vector<float>> calibrators_conc_fit_data, calibrators_feature_fit_data;
-    std::vector<std::string> calibrators_series_names;
-    std::string calibrators_x_axis_title;
-    std::string calibrators_y_axis_title;
-    float calibrators_conc_min , calibrators_conc_max, calibrators_feature_min, calibrators_feature_max;
   private:
     int feature_table_unique_samples_transitions_ = 0; // used to decide when to update the feature table data
     int feature_matrix_unique_transitions_ = 0; // used to decide when to update the feature matrix data
