@@ -1,6 +1,17 @@
 SmartPeak Changelog
 ===================
 
+v1.20.0 (2022-01-27)
+--------------------
+
+Features
+~~~~~~~~
+- Improving Calibration curve display: show parameters, zooming, outlier points `(#507) <https://github.com/AutoFlowResearch/SmartPeak/pull/507>`_
+- Improving logs: wrapping, auto scroll and line hovering `(#509) <https://github.com/AutoFlowResearch/SmartPeak/pull/509>`_
+- Improving zooming on plots `(#508) <https://github.com/AutoFlowResearch/SmartPeak/pull/508>`_
+- Using native system file picker (ImGui flavor still available as an option) `(#505) <https://github.com/AutoFlowResearch/SmartPeak/pull/505>`_
+- Adding server building files `(#496) <https://github.com/AutoFlowResearch/SmartPeak/pull/496>`_
+
 v1.19.0 (2022-01-10)
 --------------------
 
