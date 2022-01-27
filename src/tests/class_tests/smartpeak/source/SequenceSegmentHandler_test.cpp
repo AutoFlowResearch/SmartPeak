@@ -434,7 +434,7 @@ TEST(SequenceSegmentHandler, set_get_OutlierComponentsToConcentrations)
   map<string, vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>> m1;
   m1.insert({ foo, fc1 });
 
-  ssh.setOuterComponentsToConcentrations(m1);
+  ssh.setOutlierComponentsToConcentrations(m1);
 
   const map<string, vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>>&
     m2 = ssh.getOutlierComponentsToConcentrations();
