@@ -187,7 +187,12 @@ namespace SmartPeak
       }
       else
       {
-        io::CSVReader<17, io::trim_chars<>, io::no_quote_escape<','>> in(filenames_I.getFullPath("referenceData").generic_string());
+        auto filename = filenames_I.getFullPath("referenceData").generic_string();
+        if (Utilities::hasBOMMarker(filename))
+        {
+          throw std::invalid_argument("File has wrong encoding. only plain ASCII file is supported");
+        }
+        io::CSVReader<17, io::trim_chars<>, io::no_quote_escape<','>> in(filename);
         in.read_header(
           io::ignore_extra_column,
           s_sample_index,

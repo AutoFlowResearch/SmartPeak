@@ -99,6 +99,10 @@ namespace SmartPeak
     const std::string s_scan_mass_low{ "scan_mass_low" };
     const std::string s_scan_mass_high{ "scan_mass_high" };
 
+    if (Utilities::hasBOMMarker(pathname.generic_string()))
+    {
+      throw std::invalid_argument("File has wrong encoding. only plain ASCII file is supported");
+    }
     io::CSVReader<21, io::trim_chars<>, DELIMITER> reader(pathname.generic_string());
 
     reader.read_header(
