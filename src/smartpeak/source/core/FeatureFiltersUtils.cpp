@@ -219,7 +219,7 @@ namespace SmartPeak
     std::function<void()> notification_group,
     int feature_filter_mode)
   {
-    if (!InputDataValidation::prepareToLoadOneOfTwo(filenames, file_id, file_group_id))
+    if (!InputDataValidation::prepareToLoadOneOfTwo(filenames, file_id, file_group_id, true))
     {
       return;
     }

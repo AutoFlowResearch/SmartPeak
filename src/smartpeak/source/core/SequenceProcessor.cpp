@@ -565,7 +565,7 @@ namespace SmartPeak
   {
     LOGD << "START LoadSequence";
     getFilenames(filenames_I);
-    if (!InputDataValidation::prepareToLoad(filenames_I, "sequence"))
+    if (!InputDataValidation::prepareToLoad(filenames_I, "sequence", true))
     {
       LOGD << "END " << getName();
       return;
@@ -772,7 +772,7 @@ namespace SmartPeak
   {
     LOGD << "START LoadWorkflow";
     getFilenames(filenames_I);
-    if (!InputDataValidation::prepareToLoad(filenames_I, "workflow"))
+    if (!InputDataValidation::prepareToLoad(filenames_I, "workflow", true))
     {
       LOGD << "END " << getName();
       return;

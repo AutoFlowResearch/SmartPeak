@@ -66,7 +66,7 @@ namespace SmartPeak
   {
     LOGD << "START loadValidationData";
     getFilenames(filenames_I);
-    if (!InputDataValidation::prepareToLoad(filenames_I, "referenceData"))
+    if (!InputDataValidation::prepareToLoad(filenames_I, "referenceData", true))
     {
       throw std::invalid_argument("Failed to load input file");
     }
