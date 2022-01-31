@@ -35,6 +35,8 @@
 
 #include <plog/Log.h>
 
+#include <sstream>
+
 namespace SmartPeak
 {
 
@@ -120,7 +122,24 @@ namespace SmartPeak
       else
       {
         OpenMS::AbsoluteQuantitationStandardsFile AQSf;
-        AQSf.load(filenames_I.getFullPath("standardsConcentrations").generic_string(), sequenceSegmentHandler_IO.getStandardsConcentrations());
+        auto standards_concentrations_file = filenames_I.getFullPath("standardsConcentrations");
+        // Sanity checks - OpenMS will not check for missing columns
+        if (!Utilities::checkCSVHeader(
+          standards_concentrations_file, 
+          "sample_name",
+          "component_name",
+          "IS_component_name",
+          "actual_concentration",
+          "IS_actual_concentration",
+          "concentration_units",
+          "dilution_factor"))
+        {
+          std::ostringstream os;
+          os << "Missing headers in file " << standards_concentrations_file;
+          throw std::invalid_argument(os.str());
+        }
+        // load file
+        AQSf.load(standards_concentrations_file.generic_string(), sequenceSegmentHandler_IO.getStandardsConcentrations());
       }
     }
     catch (const std::exception& e) {

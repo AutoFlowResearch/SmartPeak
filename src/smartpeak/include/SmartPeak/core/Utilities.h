@@ -31,6 +31,12 @@
 #include <SmartPeak/core/WorkflowManager.h>
 #include <SmartPeak/core/SessionHandler.h>
 #include <SmartPeak/core/ApplicationProcessors/BuildCommandsFromNames.h>
+
+#ifndef CSV_IO_NO_THREAD
+#define CSV_IO_NO_THREAD
+#endif
+#include <SmartPeak/io/csv.h>
+
 #include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureSelector.h>
 #include <OpenMS/DATASTRUCTURES/Param.h>
 #include <OpenMS/FORMAT/MRMFeatureQCFile.h>
@@ -475,5 +481,30 @@ public:
      @brief returns true if the string is a list of items matching the regex.
      */
     static bool isList(const std::string& str, const std::regex& re);
+
+    /**
+     @brief Check if a csv file has required headers
+    */
+    template<typename ...Columns>
+    static bool checkCSVHeader(const std::filesystem::path& filename, const Columns& ...columns);
   };
+
+  template<typename ...Columns>
+  bool Utilities::checkCSVHeader(const std::filesystem::path& filename, const Columns& ...columns)
+  {
+    try
+    {
+      io::CSVReader<sizeof...(Columns), io::trim_chars<>, io::no_quote_escape<','>> in(filename.generic_string());
+      in.read_header(
+        io::ignore_extra_column,
+        columns...
+      );
+    }
+    catch (const io::error::missing_column_in_header&)
+    {
+      return false;
+    }
+    return true;
+  }
 }
+

@@ -804,6 +804,29 @@ TEST(SequenceSegmentProcessor, processLoadStandardsConcentrations)
   EXPECT_NEAR(rc[7].dilution_factor, 1.0, 1e-6);
 }
 
+TEST(SequenceSegmentProcessor, processLoadStandardsConcentrationsWrongHeaders)
+{
+  Filenames filenames;
+  filenames.setFullPath("standardsConcentrations", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_standardsConcentrations_wrong.csv"));
+  SequenceSegmentHandler ssh;
+  LoadStandardsConcentrations loadStandardsConcentrations;
+  try
+  {
+    loadStandardsConcentrations.process(ssh, SequenceHandler(), {}, filenames);
+    FAIL() << "loadStandardsConcentrations() should throw an error\n";
+  }
+  catch (const std::exception& exception)
+  {
+    std::ostringstream expected_message;
+    expected_message << "Missing headers in file \"" << SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_standardsConcentrations_wrong.csv") << "\"";
+    EXPECT_EQ(std::string(exception.what()), expected_message.str());
+  }
+  catch (...)
+  {
+    FAIL() << "ERROR: Unexpected exception thrown: " << std::current_exception << std::endl;
+  }
+}
+
 /**
   LoadQuantitationMethods Tests
 */
