@@ -29,6 +29,7 @@
 #include <SmartPeak/io/InputDataValidation.h>
 #include <SmartPeak/core/Parameters.h>
 #include <SmartPeak/io/CSVWriter.h>
+#include <SmartPeak/core/Utilities.h>
 
 namespace SmartPeak
 {
@@ -48,6 +49,10 @@ namespace SmartPeak
   {
     parameters.clear();
 
+    if (Utilities::hasBOMMarker(filename))
+    {
+      throw std::invalid_argument("File has wrong encoding. only plain ASCII file is supported");
+    }
     io::CSVReader<
       8,
       io::trim_chars<' ', '\t'>,

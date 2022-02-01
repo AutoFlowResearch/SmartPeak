@@ -32,7 +32,7 @@ using namespace SmartPeak;
 using namespace std;
 namespace fs = std::filesystem;
 
-const unsigned int nb_files_in_data_directory = 68;
+const unsigned int nb_files_in_data_directory = 73;
 
 TEST(utilities, castString)
 {
@@ -824,4 +824,25 @@ TEST(utilities, checkLastServerWorkflowRun)
     started_at_1, finished_at_1, path_to_exports_1, log_file_1);
   
   EXPECT_TRUE(Utilities::checkLastServerWorkflowRun(tmp_dir, usr_id_1));
+}
+
+TEST(ParametersParser, hasBOMMarker)
+{
+  const string pathname_no_bom = SMARTPEAK_GET_TEST_DATA_PATH("FileReader_parameters.csv");
+  EXPECT_FALSE(Utilities::hasBOMMarker(pathname_no_bom));
+
+  const string pathname_utf8_bom = SMARTPEAK_GET_TEST_DATA_PATH("FileReader_parameters_bom_utf8.csv");
+  EXPECT_TRUE(Utilities::hasBOMMarker(pathname_utf8_bom));
+
+  const string pathname_16be_bom = SMARTPEAK_GET_TEST_DATA_PATH("FileReader_parameters_bom_16be.csv");
+  EXPECT_TRUE(Utilities::hasBOMMarker(pathname_16be_bom));
+
+  const string pathname_16le_bom = SMARTPEAK_GET_TEST_DATA_PATH("FileReader_parameters_bom_16le.csv");
+  EXPECT_TRUE(Utilities::hasBOMMarker(pathname_16le_bom));
+
+  const string pathname_32le_bom = SMARTPEAK_GET_TEST_DATA_PATH("FileReader_parameters_bom_32le.csv");
+  EXPECT_TRUE(Utilities::hasBOMMarker(pathname_32le_bom));
+
+  const string pathname_32be_bom = SMARTPEAK_GET_TEST_DATA_PATH("FileReader_parameters_bom_32be.csv");
+  EXPECT_TRUE(Utilities::hasBOMMarker(pathname_32be_bom));
 }

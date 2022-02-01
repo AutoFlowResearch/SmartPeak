@@ -475,5 +475,10 @@ public:
      @brief returns true if the string is a list of items matching the regex.
      */
     static bool isList(const std::string& str, const std::regex& re);
+
+    /**
+     @brief returns true if file has BOM marker
+    */
+    static bool hasBOMMarker(const std::filesystem::path& filename);
   };
 }

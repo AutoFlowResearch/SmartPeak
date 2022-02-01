@@ -50,7 +50,7 @@ namespace SmartPeak
     LOGD << "START LoadFeatures";
     getFilenames(filenames_I);
 
-    if (!InputDataValidation::prepareToLoad(filenames_I, "featureXML_i"))
+    if (!InputDataValidation::prepareToLoad(filenames_I, "featureXML_i", false))
     {
       throw std::invalid_argument("Failed to load input file");
     }

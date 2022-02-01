@@ -79,7 +79,7 @@ namespace SmartPeak
     LOGD << "START loadQuantitationMethods";
     getFilenames(filenames_I);
 
-    if (!InputDataValidation::prepareToLoad(filenames_I, "quantitationMethods"))
+    if (!InputDataValidation::prepareToLoad(filenames_I, "quantitationMethods", true))
     {
       throw std::invalid_argument("Failed to load input file");
     }

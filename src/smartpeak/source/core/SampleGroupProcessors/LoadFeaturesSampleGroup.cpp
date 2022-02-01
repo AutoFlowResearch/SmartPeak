@@ -47,7 +47,7 @@ namespace SmartPeak
     LOGD << "START LoadFeaturesSampleGroup";
     getFilenames(filenames_I);
 
-    if (!InputDataValidation::prepareToLoad(filenames_I, "featureXMLSampleGroup_i"))
+    if (!InputDataValidation::prepareToLoad(filenames_I, "featureXMLSampleGroup_i", false))
     {
       throw std::invalid_argument("Failed to load input file");
     }
