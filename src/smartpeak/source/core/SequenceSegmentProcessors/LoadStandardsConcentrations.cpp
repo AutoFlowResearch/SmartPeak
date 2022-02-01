@@ -124,7 +124,7 @@ namespace SmartPeak
         OpenMS::AbsoluteQuantitationStandardsFile AQSf;
         auto standards_concentrations_file = filenames_I.getFullPath("standardsConcentrations");
         // Sanity checks - OpenMS will not check for missing columns
-        if (!Utilities::checkCSVHeader(
+        if (!Utilities::checkCSVHeader<','>(
           standards_concentrations_file, 
           "sample_name",
           "component_name",

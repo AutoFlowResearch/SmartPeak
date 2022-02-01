@@ -485,16 +485,16 @@ public:
     /**
      @brief Check if a csv file has required headers
     */
-    template<typename ...Columns>
+    template<char Separator, typename ...Columns>
     static bool checkCSVHeader(const std::filesystem::path& filename, const Columns& ...columns);
   };
 
-  template<typename ...Columns>
+  template<char Separator, typename ...Columns>
   bool Utilities::checkCSVHeader(const std::filesystem::path& filename, const Columns& ...columns)
   {
     try
     {
-      io::CSVReader<sizeof...(Columns), io::trim_chars<>, io::no_quote_escape<','>> in(filename.generic_string());
+      io::CSVReader<sizeof...(Columns), io::trim_chars<>, io::no_quote_escape<Separator>> in(filename.generic_string());
       in.read_header(
         io::ignore_extra_column,
         columns...
