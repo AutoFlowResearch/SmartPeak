@@ -129,8 +129,8 @@ include_directories(${IMPLOT_INCLUDE_DIR})
 #------------------------------------------------------------------------------
 # gRPC
 #------------------------------------------------------------------------------
-include(../../cmake/fetch_grpc.cmake)
-#------------------------------------------------------------------------------
+find_package(gRPC CONFIG REQUIRED)
+include_directories(${GRPC_INCLUDE_DIR})
 
 find_package(OpenSSL REQUIRED) 
 if(OpenSSL_FOUND)
