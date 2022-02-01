@@ -815,7 +815,7 @@ TEST(SequenceSegmentProcessor, processLoadStandardsConcentrationsWrongHeaders)
     loadStandardsConcentrations.process(ssh, SequenceHandler(), {}, filenames);
     FAIL() << "loadStandardsConcentrations() should throw an error\n";
   }
-  catch (const std::exception& exception)
+  catch (const std::invalid_argument& exception)
   {
     std::ostringstream expected_message;
     expected_message << "Missing headers in file \"" << SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_standardsConcentrations_wrong.csv") << "\"";

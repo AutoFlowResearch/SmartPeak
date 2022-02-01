@@ -134,9 +134,7 @@ namespace SmartPeak
           "concentration_units",
           "dilution_factor"))
         {
-          std::ostringstream os;
-          os << "Missing headers in file " << standards_concentrations_file;
-          throw std::invalid_argument(os.str());
+          throw std::invalid_argument(std::string("Missing headers in file \"") + standards_concentrations_file.generic_string() + std::string("\""));
         }
         // load file
         AQSf.load(standards_concentrations_file.generic_string(), sequenceSegmentHandler_IO.getStandardsConcentrations());
@@ -145,7 +143,7 @@ namespace SmartPeak
     catch (const std::exception& e) {
       sequenceSegmentHandler_IO.getStandardsConcentrations().clear();
       LOGI << "Standards concentrations clear";
-      throw e;
+      throw;
     }
 
     LOGD << "END loadStandardsConcentrations";
