@@ -31,10 +31,15 @@
 #include <SmartPeak/core/SequenceSegmentProcessors/LoadQuantitationMethods.h>
 #include <SmartPeak/core/ApplicationProcessors/LoadSession.h>
 
+#include <plog/Log.h>
+#include <plog/Appenders/ConsoleAppender.h>
+
 using namespace SmartPeak;
 using namespace std;
 
 const std::string main_dir = SMARTPEAK_GET_TEST_DATA_PATH("workflow_csv_files");
+
+plog::ConsoleAppender<plog::TxtFormatter> consoleAppender;
 
 TEST(InputDataValidation, fileExists)
 {
@@ -236,6 +241,7 @@ TEST(InputDataValidation, prepareToLoad)
 
 TEST(InputDataValidation, prepareToLoadWithBOM)
 {
+  plog::init(plog::debug, &consoleAppender);
   Filenames filenames;
   filenames.setFullPath("quantitationMethods", main_dir + "/quantitationMethods_bom.csv");
   EXPECT_FALSE(InputDataValidation::prepareToLoad(filenames, "quantitationMethods", true));
