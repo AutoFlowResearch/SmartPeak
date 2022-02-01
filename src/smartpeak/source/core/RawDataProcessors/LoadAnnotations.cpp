@@ -64,7 +64,7 @@ namespace SmartPeak
       LOGE << e.what();
       rawDataHandler_IO.setMzTab(OpenMS::MzTab());
       LOGE << "feature map clear";
-      throw e;
+      throw;
     }
 
     LOGD << "END LoadAnnotations";

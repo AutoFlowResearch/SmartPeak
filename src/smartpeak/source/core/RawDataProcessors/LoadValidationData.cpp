@@ -263,7 +263,7 @@ namespace SmartPeak
       LOGE << e.what();
       rawDataHandler_IO.getReferenceData().clear();
       LOGI << "RefereceData clear";
-      throw e;
+      throw;
     }
     LOGD << "END loadValidationData";
   }

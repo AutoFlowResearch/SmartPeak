@@ -93,6 +93,7 @@ namespace SmartPeak
       LOGE << e.what();
       sequenceSegmentHandler_IO.getQuantitationMethods().clear();
       LOGI << "quantitation methods clear";
+      throw;
     }
     LOGD << "END loadQuantitationMethods";
   }

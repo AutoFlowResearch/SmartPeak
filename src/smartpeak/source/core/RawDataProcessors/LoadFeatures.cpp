@@ -68,7 +68,7 @@ namespace SmartPeak
       rawDataHandler_IO.getFeatureMapHistory().clear();
       rawDataHandler_IO.getFeatureMap().clear();
       LOGE << "feature map clear";
-      throw e;
+      throw;
     }
 
     LOGD << "END LoadFeatures";
