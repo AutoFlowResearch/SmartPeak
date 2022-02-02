@@ -826,13 +826,13 @@ TEST(utilities, checkLastServerWorkflowRun)
   EXPECT_TRUE(Utilities::checkLastServerWorkflowRun(tmp_dir, usr_id_1));
 }
 
-<<<<<<< HEAD
 TEST(utilities, checkCSVHeader)
 {
   std::string filename = SMARTPEAK_GET_TEST_DATA_PATH("SequenceParser_sequence_1_semicolon.csv");
   EXPECT_TRUE(Utilities::checkCSVHeader<';'>(filename, "sample_name", "sample_type", "sample_group_name"));
   EXPECT_FALSE(Utilities::checkCSVHeader<';'>(filename, "sample_name", "non_existing_column", "sample_group_name"));
-=======
+}
+
 TEST(ParametersParser, hasBOMMarker)
 {
   const string pathname_no_bom = SMARTPEAK_GET_TEST_DATA_PATH("FileReader_parameters.csv");
@@ -852,5 +852,4 @@ TEST(ParametersParser, hasBOMMarker)
 
   const string pathname_32be_bom = SMARTPEAK_GET_TEST_DATA_PATH("FileReader_parameters_bom_32be.csv");
   EXPECT_TRUE(Utilities::hasBOMMarker(pathname_32be_bom));
->>>>>>> develop
 }
