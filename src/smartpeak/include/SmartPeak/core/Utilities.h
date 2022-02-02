@@ -487,6 +487,11 @@ public:
     */
     template<char Separator, typename ...Columns>
     static bool checkCSVHeader(const std::filesystem::path& filename, const Columns& ...columns);
+
+    /**
+     @brief returns true if file has BOM marker
+    */
+    static bool hasBOMMarker(const std::filesystem::path& filename);
   };
 
   template<char Separator, typename ...Columns>

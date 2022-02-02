@@ -50,7 +50,7 @@ namespace SmartPeak
     LOGD << "START LoadAnnotations";
     getFilenames(filenames_I);
 
-    if (!InputDataValidation::prepareToLoad(filenames_I, "mzTab_i"))
+    if (!InputDataValidation::prepareToLoad(filenames_I, "mzTab_i", false))
     {
       throw std::invalid_argument("Failed to load input file");
     }

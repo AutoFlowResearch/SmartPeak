@@ -26,6 +26,7 @@
 #define CSV_IO_NO_THREAD
 #endif
 #include <SmartPeak/io/csv.h>
+#include <SmartPeak/core/Utilities.h>
 #include <plog/Log.h>
 
 namespace SmartPeak
@@ -38,6 +39,10 @@ namespace SmartPeak
     std::map<std::string,int>& dilution_map
   )
   {
+    if (Utilities::hasBOMMarker(filename))
+    {
+      throw std::invalid_argument("File has wrong encoding. only plain ASCII file is supported");
+    }
     io::CSVReader<
       2,
       io::trim_chars<' ', '\t'>,

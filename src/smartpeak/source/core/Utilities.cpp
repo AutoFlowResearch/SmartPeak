@@ -41,6 +41,7 @@
 #include <unordered_set>
 #include <chrono>
 #include <plog/Log.h>
+#include <fstream>
 
 namespace SmartPeak
 {
@@ -990,5 +991,36 @@ namespace SmartPeak
                                    &event_dispatcher, &event_dispatcher, &event_dispatcher);
     }
   }
+
+  bool Utilities::hasBOMMarker(const std::filesystem::path& filename)
+  {
+    char buffer[4] = {0};
+    std::ifstream myFile(filename.generic_string().c_str(), std::ios::in | std::ios::binary);
+    if (!myFile || !myFile.read(buffer, 4)) {
+      return false;
+    }
+    if ((buffer[0] == '\xFF') && (buffer[1] == '\xFE'))
+    {
+      // UTF-16 LE or UTF-32 LE
+      return true;
+    }
+    else if ((buffer[0] == '\xFE') && (buffer[1] == '\xFF'))
+    {
+      // UTF-16 BE
+      return true;
+    }
+    else if ((buffer[0] == '\xEF') && (buffer[1] == '\xBB') && (buffer[2] == '\xBF'))
+    {
+      // UTF-8 
+      return true;
+    }
+    else if ((buffer[0] == '\x00') && (buffer[1] == '\x00') && (buffer[2] == '\xFE') && (buffer[3] == '\xFF'))
+    {
+      // UTF-32 BE
+      return true;
+    }
+    return false;
+  }
+
 }
 

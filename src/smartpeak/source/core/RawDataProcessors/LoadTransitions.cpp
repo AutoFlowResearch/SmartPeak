@@ -84,7 +84,7 @@ namespace SmartPeak
     ParameterSet params(params_I);
     params.merge(getParameterSchema());
 
-    if (!InputDataValidation::prepareToLoad(filenames_I, "traML"))
+    if (!InputDataValidation::prepareToLoad(filenames_I, "traML", true))
     {
       throw std::invalid_argument("Failed to load input file");
     }

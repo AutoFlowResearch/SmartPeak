@@ -598,7 +598,7 @@ namespace SmartPeak
     return oss.str();
   }
 
-  bool InputDataValidation::prepareToLoad(const Filenames& filenames, const std::string& file_id)
+  bool InputDataValidation::prepareToLoad(const Filenames& filenames, const std::string& file_id, bool check_bom)
   {
     if (filenames.isEmbedded(file_id))
     {
@@ -622,13 +622,18 @@ namespace SmartPeak
           LOGE << "File not found " << full_path.generic_string();
           return false;
         }
+
+        if (check_bom && Utilities::hasBOMMarker(full_path)) {
+          LOGE << "File " << full_path.generic_string() << " has incorrect encoding, only plain ASCII is supported.";
+          return false;
+        }
       }
     }
 
     return true;
   }
 
-  bool InputDataValidation::prepareToLoadOneOfTwo(const Filenames& filenames, const std::string& id1, const std::string& id2)
+  bool InputDataValidation::prepareToLoadOneOfTwo(const Filenames& filenames, const std::string& id1, const std::string& id2, bool check_bom)
   {
     const auto& full_path_1 = filenames.getFullPath(id1);
     const auto& full_path_2 = filenames.getFullPath(id2);
@@ -657,7 +662,14 @@ namespace SmartPeak
       }
       else if (!full_path_1.empty())
       {
-        LOGI << "Loading: " << full_path_1.generic_string();
+        if (check_bom && Utilities::hasBOMMarker(full_path_1)) {
+          LOGE << "File " << full_path_1.generic_string() << " has incorrect encoding, only plain ASCII is supported.";
+          file_1_is_valid = false;
+        }
+        else
+        {
+          LOGI << "Loading: " << full_path_1.generic_string();
+        }
       }
     }
     
@@ -675,7 +687,14 @@ namespace SmartPeak
       }
       else if (!full_path_2.empty())
       {
-        LOGI << "Loading: " << full_path_2.generic_string();
+        if (check_bom && Utilities::hasBOMMarker(full_path_2)) {
+          LOGE << "File " << full_path_2.generic_string() << " has incorrect encoding, only plain ASCII is supported.";
+          file_2_is_valid = false;
+        }
+        else
+        {
+          LOGI << "Loading: " << full_path_2.generic_string();
+        }
       }
     }
     return (file_1_is_valid || file_2_is_valid);

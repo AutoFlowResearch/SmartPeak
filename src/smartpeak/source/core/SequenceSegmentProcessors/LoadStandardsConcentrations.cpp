@@ -80,7 +80,7 @@ namespace SmartPeak
     LOGD << "START loadStandardsConcentrations";
     getFilenames(filenames_I);
 
-    if (!InputDataValidation::prepareToLoad(filenames_I, "standardsConcentrations"))
+    if (!InputDataValidation::prepareToLoad(filenames_I, "standardsConcentrations", true))
     {
       throw std::invalid_argument("Failed to load input file");
     }

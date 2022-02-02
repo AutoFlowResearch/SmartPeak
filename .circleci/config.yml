@@ -10,16 +10,17 @@ jobs:
     working_directory: ~/SmartPeak
     resource_class: large
     steps:
-      - checkout
       - run: |
-          apt-get update
+          apt-get update &&
+          apt-get install -y git
+      - checkout
       - run:
           name: Installing required libraries
           command: |
             export DEBIAN_FRONTEND=noninteractive && apt-get install -y tzdata &&  
             ln -fs /usr/share/zoneinfo/UTC /etc/localtime &&
             dpkg-reconfigure --frontend noninteractive tzdata &&
-            apt-get install -y git cmake qt5-default libeigen3-dev &&
+            apt-get install -y cmake qt5-default libeigen3-dev &&
             apt-get install -y libboost-all-dev &&
             apt-get install -y libxerces-c-dev coinor-libcbc-dev libsvm-dev &&
             apt-get install -y libwildmagic-dev libsqlite3-dev &&

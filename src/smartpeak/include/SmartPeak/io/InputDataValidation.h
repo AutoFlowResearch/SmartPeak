@@ -50,13 +50,15 @@ public:
 
     static bool prepareToLoad(
       const Filenames& filenames,
-      const std::string& id
+      const std::string& id,
+      bool check_bom
     );
 
     static bool prepareToLoadOneOfTwo(
       const Filenames& filenames,
       const std::string& id1,
-      const std::string& id2
+      const std::string& id2,
+      bool check_bom
     );
 
     static bool prepareToStore(

@@ -31,10 +31,15 @@
 #include <SmartPeak/core/SequenceSegmentProcessors/LoadQuantitationMethods.h>
 #include <SmartPeak/core/ApplicationProcessors/LoadSession.h>
 
+#include <plog/Log.h>
+#include <plog/Appenders/ConsoleAppender.h>
+
 using namespace SmartPeak;
 using namespace std;
 
 const std::string main_dir = SMARTPEAK_GET_TEST_DATA_PATH("workflow_csv_files");
+
+plog::ConsoleAppender<plog::TxtFormatter> consoleAppender;
 
 TEST(InputDataValidation, fileExists)
 {
@@ -230,8 +235,17 @@ TEST(InputDataValidation, prepareToLoad)
   Filenames filenames;
   filenames.setFullPath("quantitationMethods", main_dir + "/quantitationMethods_missing.csv");
   filenames.setFullPath("non_existing_file", main_dir + "/non_existing_file.csv");
-  EXPECT_TRUE(InputDataValidation::prepareToLoad(filenames, "quantitationMethods"));
-  EXPECT_FALSE(InputDataValidation::prepareToLoad(filenames, "non_existing_file"));
+  EXPECT_TRUE(InputDataValidation::prepareToLoad(filenames, "quantitationMethods", true));
+  EXPECT_FALSE(InputDataValidation::prepareToLoad(filenames, "non_existing_file", true));
+}
+
+TEST(InputDataValidation, prepareToLoadWithBOM)
+{
+  plog::init(plog::debug, &consoleAppender);
+  Filenames filenames;
+  filenames.setFullPath("quantitationMethods", main_dir + "/quantitationMethods_bom.csv");
+  EXPECT_FALSE(InputDataValidation::prepareToLoad(filenames, "quantitationMethods", true));
+  EXPECT_TRUE(InputDataValidation::prepareToLoad(filenames, "quantitationMethods", false));
 }
 
 TEST(InputDataValidation, prepareToLoadOneOfTwo)
@@ -241,11 +255,22 @@ TEST(InputDataValidation, prepareToLoadOneOfTwo)
   filenames.setFullPath("non_existing_file", main_dir + "/non_existing_file.csv");
   filenames.setFullPath("empty_file", "");
   filenames.setFullPath("another_empty_file", "");
-  EXPECT_TRUE(InputDataValidation::prepareToLoadOneOfTwo(filenames, "existing_file", "empty_file"));
-  EXPECT_TRUE(InputDataValidation::prepareToLoadOneOfTwo(filenames, "empty_file", "existing_file"));
-  EXPECT_FALSE(InputDataValidation::prepareToLoadOneOfTwo(filenames, "empty_file", "another_empty_file"));
-  EXPECT_TRUE(InputDataValidation::prepareToLoadOneOfTwo(filenames, "non_existing_file", "existing_file"));
-  EXPECT_TRUE(InputDataValidation::prepareToLoadOneOfTwo(filenames, "existing_file", "non_existing_file"));
+  EXPECT_TRUE(InputDataValidation::prepareToLoadOneOfTwo(filenames, "existing_file", "empty_file", true));
+  EXPECT_TRUE(InputDataValidation::prepareToLoadOneOfTwo(filenames, "empty_file", "existing_file", true));
+  EXPECT_FALSE(InputDataValidation::prepareToLoadOneOfTwo(filenames, "empty_file", "another_empty_file", true));
+  EXPECT_TRUE(InputDataValidation::prepareToLoadOneOfTwo(filenames, "non_existing_file", "existing_file", true));
+  EXPECT_TRUE(InputDataValidation::prepareToLoadOneOfTwo(filenames, "existing_file", "non_existing_file", true));
+}
+
+TEST(InputDataValidation, prepareToLoadOneOfTwoWithBOM)
+{
+  Filenames filenames;
+  filenames.setFullPath("existing_file_bom", main_dir + "/quantitationMethods_bom.csv");
+  filenames.setFullPath("non_existing_file", main_dir + "/non_existing_file.csv");
+  EXPECT_FALSE(InputDataValidation::prepareToLoadOneOfTwo(filenames, "existing_file_bom", "non_existing_file", true));
+  EXPECT_FALSE(InputDataValidation::prepareToLoadOneOfTwo(filenames, "non_existing_file", "existing_file_bom", true));
+  EXPECT_TRUE(InputDataValidation::prepareToLoadOneOfTwo(filenames, "existing_file_bom", "non_existing_file", false));
+  EXPECT_TRUE(InputDataValidation::prepareToLoadOneOfTwo(filenames, "non_existing_file", "existing_file_bom", false));
 }
 
 TEST(InputDataValidation, prepareToStore)
