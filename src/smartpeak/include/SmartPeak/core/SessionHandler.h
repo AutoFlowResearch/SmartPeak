@@ -354,7 +354,7 @@ namespace SmartPeak
       float conc_max;
       float feature_min;
       float feature_max;
-      std::vector<OpenMS::AbsoluteQuantitationMethod> quant_methods;
+//      std::vector<OpenMS::AbsoluteQuantitationMethod> quant_methods;
     };
 
     /*

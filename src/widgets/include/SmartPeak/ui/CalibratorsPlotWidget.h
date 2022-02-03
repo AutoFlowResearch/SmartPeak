@@ -25,6 +25,8 @@
 
 #include <SmartPeak/core/SessionHandler.h>
 #include <SmartPeak/ui/Widget.h>
+#include <SmartPeak/ui/ParameterEditorWidget2.h>
+
 #include <string>
 #include <utility>
 #include <vector>
@@ -36,16 +38,27 @@ namespace SmartPeak
   /**
     @brief Class for Calibrators
   */
-  class CalibratorsPlotWidget : public GenericGraphicWidget
+  class CalibratorsPlotWidget : 
+    public GenericGraphicWidget,
+    public IParameterEditorWidgetObserver
   {
   public:
-    CalibratorsPlotWidget(const std::string title = ""): GenericGraphicWidget(title) {};
+    CalibratorsPlotWidget(SessionHandler& session_handler, SequenceHandler& sequence_handler, const std::string title = "") :
+      GenericGraphicWidget(title),
+      session_handler_(session_handler),
+      sequence_handler_(sequence_handler),
+      parameter_editor_widget_(*this)
+    {};
     void setValues(const SessionHandler::CalibrationData& calibration_data, const std::string& plot_title);
     void draw() override;
 
     bool reset_layout_ = true;
 
+    /* IParameterEditorWidgetObserver */
+    virtual void onParameterSet(const Parameter& parameter);
+
   protected:
+    OpenMS::AbsoluteQuantitationMethod* getQuantitationMethod(const std::string& component_name);
     void displayParameters();
     void displayPlot();
     SessionHandler::CalibrationData calibration_data_;
@@ -59,6 +72,9 @@ namespace SmartPeak
     std::vector<const char*> component_cstr_;
     int selected_component_ = 0;
     bool reset_zoom_ = true;
+    SessionHandler& session_handler_;
+    SequenceHandler& sequence_handler_;
+    ParameterEditorWidget2 parameter_editor_widget_;
   };
 
 }

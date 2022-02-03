@@ -153,6 +153,60 @@ namespace SmartPeak
     }
   }
 
+  Parameter::Parameter(const OpenMS::Param::ParamEntry& param_entry)
+  {
+    description_ = param_entry.description;
+    name_ = param_entry.name;
+    switch (param_entry.value.valueType())
+    {
+    case OpenMS::ParamValue::DOUBLE_LIST:
+    {
+      std::vector<float> value;
+      for (const auto& v : param_entry.value.toDoubleVector())
+      {
+        value.push_back(static_cast<float>(v));
+      }
+      value_ = value;
+      break;
+    }
+    case OpenMS::ParamValue::INT_LIST:
+    {
+      std::vector<int> value;
+      for (const auto& v : param_entry.value.toIntVector())
+      {
+        value.push_back(v);
+      }
+      value_ = value;
+      break;
+    }
+    case OpenMS::ParamValue::STRING_LIST:
+    {
+      std::vector<std::string> value;
+      for (const auto& v : param_entry.value.toStringVector())
+      {
+        value.push_back(v);
+      }
+      value_ = value;
+      break;
+    }
+    case OpenMS::ParamValue::INT_VALUE:
+    {
+      value_ = static_cast<int>(param_entry.value);
+      break;
+    }
+    case OpenMS::ParamValue::STRING_VALUE:
+    {
+      value_ = static_cast<std::string>(param_entry.value);
+      break;
+    }
+    case OpenMS::ParamValue::DOUBLE_VALUE:
+    {
+      value_ = static_cast<float>(param_entry.value);
+      break;
+    }
+    }
+  }
+
   std::string Parameter::getType() const
   {
     switch (value_.getTag()) {

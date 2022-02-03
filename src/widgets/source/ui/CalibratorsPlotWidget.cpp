@@ -22,82 +22,157 @@
 // --------------------------------------------------------------------------
 
 #include <SmartPeak/ui/CalibratorsPlotWidget.h>
+#include <SmartPeak/core/Utilities.h>
 #include <implot.h>
 
 namespace SmartPeak
 {
+
+  OpenMS::AbsoluteQuantitationMethod* CalibratorsPlotWidget::getQuantitationMethod(const std::string& component_name)
+  {
+    for (auto& sequence_segment : sequence_handler_.getSequenceSegments())
+    {
+      for (auto& quantitation_method : sequence_segment.getQuantitationMethods())
+      {
+        if (quantitation_method.getComponentName() == component_name)
+        {
+          return &quantitation_method;
+        }
+      }
+    }
+    return nullptr;
+  }
+
   void CalibratorsPlotWidget::displayParameters()
   {
     ImGui::Begin("Calibrator Parameters");
 
+    parameter_editor_widget_.draw();
+
     ImGui::Combo("Component", &selected_component_, &component_cstr_[0], component_cstr_.size());
 
-    const auto& quantitation_methods = calibration_data_.quant_methods[selected_component_];
+    auto quantitation_methods = getQuantitationMethod(calibration_data_.series_names[selected_component_]);
 
     ImGuiTableFlags table_flags = ImGuiTableFlags_None;
     if (ImGui::BeginTable("Calibrator Parameters Table", 2, table_flags))
     {
+      // Edit Parameter widget needs to be open outside the table construction.
+      std::shared_ptr<Parameter> param_to_edit;
+      std::string parameter_to_edit_function;
+
       ImGui::TableNextRow(); 
       ImGui::TableSetColumnIndex(0);
       ImGui::Text("IS name");
       ImGui::TableSetColumnIndex(1);
-      ImGui::Text(quantitation_methods.getISName().c_str());
+      ImGui::Text(quantitation_methods->getISName().c_str());
 
       ImGui::TableNextRow();
       ImGui::TableSetColumnIndex(0);
       ImGui::Text("llod");
       ImGui::TableSetColumnIndex(1);
-      ImGui::Text("%f", quantitation_methods.getLLOD());
+      ImGui::Text("%f", quantitation_methods->getLLOD());
 
       ImGui::TableNextRow();
       ImGui::TableSetColumnIndex(0);
       ImGui::Text("ulod");
       ImGui::TableSetColumnIndex(1);
-      ImGui::Text("%f", quantitation_methods.getULOD());
+      ImGui::Text("%f", quantitation_methods->getULOD());
 
       ImGui::TableNextRow();
       ImGui::TableSetColumnIndex(0);
       ImGui::Text("lloq");
       ImGui::TableSetColumnIndex(1);
-      ImGui::Text("%f", quantitation_methods.getLLOQ());
+      ImGui::Text("%f", quantitation_methods->getLLOQ());
 
       ImGui::TableNextRow();
       ImGui::TableSetColumnIndex(0);
       ImGui::Text("uloq");
       ImGui::TableSetColumnIndex(1);
-      ImGui::Text("%f", quantitation_methods.getULOQ());
+      ImGui::Text("%f", quantitation_methods->getULOQ());
 
       ImGui::TableNextRow();
       ImGui::TableSetColumnIndex(0);
       ImGui::Text("correlation coefficient");
       ImGui::TableSetColumnIndex(1);
-      ImGui::Text("%f", quantitation_methods.getCorrelationCoefficient());
+      ImGui::Text("%f", quantitation_methods->getCorrelationCoefficient());
 
       ImGui::TableNextRow();
       ImGui::TableSetColumnIndex(0);
       ImGui::Text("nb points");
       ImGui::TableSetColumnIndex(1);
-      ImGui::Text("%d", quantitation_methods.getNPoints());
+      ImGui::Text("%d", quantitation_methods->getNPoints());
 
       ImGui::TableNextRow();
       ImGui::TableSetColumnIndex(0);
       ImGui::Text("transformation model");
       ImGui::TableSetColumnIndex(1);
-      ImGui::Text(quantitation_methods.getTransformationModel().c_str());
+      ImGui::Text(quantitation_methods->getTransformationModel().c_str());
 
-      const auto& params = quantitation_methods.getTransformationModelParams();
+      const auto& params = quantitation_methods->getTransformationModelParams();
       for (const auto& param : params)
       {
+        //==============================================
+        if (param.name == std::string("y_weight"))
+        {
+          int break_here = 42;
+        }
+        //==============================================
         const auto& value = param.value;
         ImGui::TableNextRow();
         ImGui::TableSetColumnIndex(0);
         ImGui::Text(param.name.c_str());
         ImGui::TableSetColumnIndex(1);
         ImGui::Text("%s", value.toString().c_str());
+        if (ImGui::IsItemHovered())
+        {
+          ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
+        }
+        if (ImGui::IsItemClicked())
+        {
+          param_to_edit = std::make_shared<Parameter>(param);
+          parameter_to_edit_function = param_to_edit->getName();
+        }
       }
       ImGui::EndTable();
+
+      if (param_to_edit)
+      {
+        parameter_editor_widget_.setParameter(parameter_to_edit_function, *(param_to_edit.get()));
+        ImGui::OpenPopup("Edit Parameter");
+      }
+
     }
     ImGui::End();
+  }
+
+  void CalibratorsPlotWidget::onParameterSet(const Parameter& parameter)
+  {
+    // find back the parameter and set it
+    auto quantitation_methods = getQuantitationMethod(calibration_data_.series_names[selected_component_]);
+    auto& params = quantitation_methods->getTransformationModelParams();
+    OpenMS::Param new_params; // params iterator returns const parameters. so we need to reconstruct and set the whole list
+    for (auto & param_entry : params)
+    {
+      OpenMS::Param::ParamEntry new_param_entry = param_entry;
+      if (param_entry.name == parameter.getName())
+      {
+        CastValue c;
+        auto value_as_string = parameter.getValueAsString();
+        Utilities::parseString(value_as_string, c);
+        // try some cast
+        if ((c.getTag() == CastValue::Type::INT) && (parameter.getType() == std::string("float")))
+        {
+          new_param_entry.value = static_cast<float>(c.i_);
+        }
+        else
+        {
+          new_param_entry.value = value_as_string;
+        }
+        LOGD << "Set " << new_param_entry.name << " value to " << new_param_entry.value;
+      }
+      new_params.setValue(new_param_entry.name, new_param_entry.value);
+    }
+    quantitation_methods->setTransformationModelParams(new_params);
   }
 
   void CalibratorsPlotWidget::displayPlot()
@@ -194,6 +269,11 @@ namespace SmartPeak
 
   void CalibratorsPlotWidget::draw()
   {
+    // update data
+    SessionHandler::CalibrationData calibration_data;
+    session_handler_.setCalibratorsScatterLinePlot(sequence_handler_, calibration_data);
+    setValues(calibration_data, "CalibratorsMainWindow");
+
     if (!calibration_data_.conc_raw_data.size())
     {
       return;

@@ -21,6 +21,7 @@ set(sources_list
 	LogWidget.cpp
 	OptionsWidget.cpp
 	ParameterEditorWidget.cpp
+	ParameterEditorWidget2.cpp
 	ParametersTableWidget.cpp
 	Plotter.cpp
 	Report.cpp

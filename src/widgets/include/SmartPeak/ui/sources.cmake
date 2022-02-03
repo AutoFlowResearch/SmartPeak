@@ -22,6 +22,7 @@ set(sources_list_h
 	LogWidget.h
 	OptionsWidget.h
 	ParameterEditorWidget.h
+	ParameterEditorWidget2.h
 	ParametersTableWidget.h
 	Plotter.h
 	Report.h

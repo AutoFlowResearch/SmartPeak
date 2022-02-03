@@ -72,6 +72,11 @@ namespace SmartPeak
     Parameter(const std::map<std::string, std::string>& properties);
 
     /**
+      @brief constructor from ParamEntry
+    */
+    Parameter(const OpenMS::Param::ParamEntry& param_entry);
+
+    /**
       @brief returns the type of parameter as string
     */
     std::string getType() const;
