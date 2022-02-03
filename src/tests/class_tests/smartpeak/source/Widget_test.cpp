@@ -880,6 +880,7 @@ TEST(SetInputOutputWidget, cancel)
   EXPECT_EQ(set_input_output_widget_test.on_input_output_cancel_counter, 1);
 }
 
+/*
 class CalibratorsPlotWidget_Test :
   public CalibratorsPlotWidget
 {
@@ -929,3 +930,5 @@ TEST(CalibratorsPlotWidget, setValue)
   auto components = calibrator_widget.get_components_();
   EXPECT_EQ(components, calibrator_data.series_names);
 };
+
+*/

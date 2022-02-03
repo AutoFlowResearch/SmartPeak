@@ -2048,7 +2048,7 @@ namespace SmartPeak
               bool calibration_curve_found = ((double)quant_method.getTransformationModelParams().getValue("slope") != 1.0);
               // Make the line of best fit using the `QuantitationMethods`
               std::vector<float> y_fit_data;
-              result.quant_methods.push_back(quant_method);
+              //result.quant_methods.push_back(quant_method);
               if (calibration_curve_found)
               {
                 for (const auto& ratio : stand_concs_map.at(quant_method.getComponentName()).first) {
