@@ -131,7 +131,7 @@ namespace SmartPeak
       LOGE << e.what();
       rawDataHandler_IO.getTargetedExperiment().clear(true);
       LOGI << "targeted experiment clear";
-      throw e;
+      throw;
     }
 
     LOGD << "END loadTraML";

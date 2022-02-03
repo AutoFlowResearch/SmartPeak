@@ -22,28 +22,7 @@
 // --------------------------------------------------------------------------
 
 #include <SmartPeak/core/ApplicationProcessor.h>
-//#include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/SequenceProcessor.h>
-//#include <SmartPeak/io/InputDataValidation.h>
-//#include <SmartPeak/io/SequenceParser.h>
-/*
-#include <algorithm>
-#include <cctype>
-#include <cstdlib>
-#include <ctime>
-#include <fstream>
-#include <iostream>
-#include <regex>
-#include <string>
-#include <unordered_map>
-#include <unordered_set>
-#include <vector>
-#include <plog/Log.h>
-#include <plog/Appenders/ConsoleAppender.h>
-#include <SmartPeak/core/SharedProcessors.h>
-#include <SmartPeak/io/CSVWriter.h>
-#include <SmartPeak/io/csv.h>
-*/
 
 namespace SmartPeak
 {

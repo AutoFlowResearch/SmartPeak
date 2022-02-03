@@ -60,7 +60,7 @@ namespace SmartPeak
       LOGE << e.what();
       sampleGroupHandler_IO.getFeatureMap().clear();
       LOGE << "feature map clear";
-      throw e;
+      throw;
     }
 
     LOGD << "END LoadFeaturesSampleGroup";

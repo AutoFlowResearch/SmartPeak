@@ -804,6 +804,29 @@ TEST(SequenceSegmentProcessor, processLoadStandardsConcentrations)
   EXPECT_NEAR(rc[7].dilution_factor, 1.0, 1e-6);
 }
 
+TEST(SequenceSegmentProcessor, processLoadStandardsConcentrationsWrongHeaders)
+{
+  Filenames filenames;
+  filenames.setFullPath("standardsConcentrations", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_standardsConcentrations_wrong.csv"));
+  SequenceSegmentHandler ssh;
+  LoadStandardsConcentrations loadStandardsConcentrations;
+  try
+  {
+    loadStandardsConcentrations.process(ssh, SequenceHandler(), {}, filenames);
+    FAIL() << "loadStandardsConcentrations() should throw an error\n";
+  }
+  catch (const std::invalid_argument& exception)
+  {
+    std::ostringstream expected_message;
+    expected_message << "Missing headers in file \"" << SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_standardsConcentrations_wrong.csv") << "\"";
+    EXPECT_EQ(std::string(exception.what()), expected_message.str());
+  }
+  catch (...)
+  {
+    FAIL() << "ERROR: Unexpected exception thrown: " << std::current_exception << std::endl;
+  }
+}
+
 /**
   LoadQuantitationMethods Tests
 */
@@ -867,6 +890,29 @@ TEST(SequenceSegmentProcessor, processLoadQuantitationMethods)
   const OpenMS::Param params2 = aqm[106].getTransformationModelParams();
   EXPECT_NEAR(static_cast<double>(params2.getValue("slope")), 1.084995619, 1e-6);
   EXPECT_NEAR(static_cast<double>(params2.getValue("intercept")), -0.00224781, 1e-6);
+}
+
+TEST(SequenceSegmentProcessor, processLoadQuantitationMethodsWrongHeaders)
+{
+  Filenames filenames;
+  filenames.setFullPath("quantitationMethods", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_quantitationMethods_wrong.csv"));
+  SequenceSegmentHandler ssh;
+  LoadQuantitationMethods loadQuantitationMethods;
+  try
+  {
+    loadQuantitationMethods.process(ssh, SequenceHandler(), {}, filenames);
+    FAIL() << "loadQuantitationMethods() should throw an error\n";
+  }
+  catch (const std::invalid_argument& exception)
+  {
+    std::ostringstream expected_message;
+    expected_message << "Missing headers in file \"" << SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_quantitationMethods_wrong.csv") << "\"";
+    EXPECT_EQ(std::string(exception.what()), expected_message.str());
+  }
+  catch (...)
+  {
+    FAIL() << "ERROR: Unexpected exception thrown: " << std::current_exception << std::endl;
+  }
 }
 
 /**

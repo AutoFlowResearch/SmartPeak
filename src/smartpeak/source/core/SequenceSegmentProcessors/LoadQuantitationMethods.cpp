@@ -85,14 +85,34 @@ namespace SmartPeak
     }
 
     try {
+      auto quantitation_methods_file = filenames_I.getFullPath("quantitationMethods");
+      // Sanity checks - OpenMS will not check for missing columns
+      if (!Utilities::checkCSVHeader<','>(
+        quantitation_methods_file,
+        "IS_name",
+        "component_name",
+        "feature_name",
+        "concentration_units",
+        "llod",
+        "ulod",
+        "lloq",
+        "uloq",
+        "correlation_coefficient",
+        "n_points",
+        "transformation_model"))
+      {
+        throw std::invalid_argument(std::string("Missing headers in file \"") + quantitation_methods_file.generic_string() + std::string("\""));
+      }
+      // load file
       OpenMS::AbsoluteQuantitationMethodFile AQMf;
-      AQMf.load(filenames_I.getFullPath("quantitationMethods").generic_string(), sequenceSegmentHandler_IO.getQuantitationMethods());
+      AQMf.load(quantitation_methods_file.generic_string(), sequenceSegmentHandler_IO.getQuantitationMethods());
       if (sequence_segment_observable_) sequence_segment_observable_->notifyQuantitationMethodsUpdated();
     }
     catch (const std::exception& e) {
       LOGE << e.what();
       sequenceSegmentHandler_IO.getQuantitationMethods().clear();
       LOGI << "quantitation methods clear";
+      throw;
     }
     LOGD << "END loadQuantitationMethods";
   }

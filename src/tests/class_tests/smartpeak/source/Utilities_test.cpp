@@ -32,7 +32,7 @@ using namespace SmartPeak;
 using namespace std;
 namespace fs = std::filesystem;
 
-const unsigned int nb_files_in_data_directory = 73;
+const unsigned int nb_files_in_data_directory = 75;
 
 TEST(utilities, castString)
 {
@@ -824,6 +824,13 @@ TEST(utilities, checkLastServerWorkflowRun)
     started_at_1, finished_at_1, path_to_exports_1, log_file_1);
   
   EXPECT_TRUE(Utilities::checkLastServerWorkflowRun(tmp_dir, usr_id_1));
+}
+
+TEST(utilities, checkCSVHeader)
+{
+  std::string filename = SMARTPEAK_GET_TEST_DATA_PATH("SequenceParser_sequence_1_semicolon.csv");
+  EXPECT_TRUE(Utilities::checkCSVHeader<';'>(filename, "sample_name", "sample_type", "sample_group_name"));
+  EXPECT_FALSE(Utilities::checkCSVHeader<';'>(filename, "sample_name", "non_existing_column", "sample_group_name"));
 }
 
 TEST(ParametersParser, hasBOMMarker)
