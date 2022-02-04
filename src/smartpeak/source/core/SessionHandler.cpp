@@ -23,11 +23,11 @@
 
 #include <SmartPeak/core/SessionHandler.h>
 #include <SmartPeak/core/FeatureMetadata.h>
-#include <OpenMS/ANALYSIS/QUANTITATION/AbsoluteQuantitation.h>
 #include <SmartPeak/io/SequenceParser.h>
+
+#include <OpenMS/ANALYSIS/QUANTITATION/AbsoluteQuantitation.h>
+
 #include <plog/Log.h>
-#include <SmartPeak/core/RawDataProcessor.h>
-#include <SmartPeak/core/Parameters.h>
 
 namespace SmartPeak
 {

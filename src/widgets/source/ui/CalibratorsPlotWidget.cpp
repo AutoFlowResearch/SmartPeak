@@ -22,11 +22,19 @@
 // --------------------------------------------------------------------------
 
 #include <SmartPeak/ui/CalibratorsPlotWidget.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/CalculateCalibration.h>
 #include <SmartPeak/core/Utilities.h>
 #include <implot.h>
 
 namespace SmartPeak
 {
+
+  void CalibratorsPlotWidget::recomputeCalibration()
+  {
+    CalculateCalibration calculate_calibration;
+    Filenames filenames; // calculate_calibration actually does not use it
+    calculate_calibration.process(sequence_handler_.getSequenceSegments()[0], sequence_handler_, user_params_, filenames);
+  }
 
   OpenMS::AbsoluteQuantitationMethod* CalibratorsPlotWidget::getQuantitationMethod(const std::string& component_name)
   {
@@ -43,6 +51,31 @@ namespace SmartPeak
     return nullptr;
   }
 
+  void CalibratorsPlotWidget::addParameterRow(std::shared_ptr<Parameter> param)
+  {
+    ImGui::TableNextRow();
+    ImGui::TableSetColumnIndex(0);
+    ImGui::Text(param->getName().c_str());
+    ImGui::TableSetColumnIndex(1);
+    auto value_as_string = param->getValueAsString();
+    if (value_as_string.empty())
+    {
+      ImGui::Text("<empty>");
+    }
+    else
+    {
+      ImGui::Text("%s", value_as_string.c_str());
+    }
+    if (ImGui::IsItemHovered())
+    {
+      ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
+    }
+    if (ImGui::IsItemClicked())
+    {
+      param_to_edit_ = param;
+    }
+  }
+
   void CalibratorsPlotWidget::displayParameters()
   {
     ImGui::Begin("Calibrator Parameters");
@@ -57,7 +90,6 @@ namespace SmartPeak
     if (ImGui::BeginTable("Calibrator Parameters Table", 2, table_flags))
     {
       // Edit Parameter widget needs to be open outside the table construction.
-      std::shared_ptr<Parameter> param_to_edit;
       std::string parameter_to_edit_function;
 
       ImGui::TableNextRow(); 
@@ -65,6 +97,20 @@ namespace SmartPeak
       ImGui::Text("IS name");
       ImGui::TableSetColumnIndex(1);
       ImGui::Text(quantitation_methods->getISName().c_str());
+
+      // CalculateCalibration params
+      CalculateCalibration calculate_calibration;
+      auto calculate_calibration_params_schema = calculate_calibration.getParameterSchema();
+      user_params_ = sequence_handler_.getSequence().at(0).getRawData().getParameters();
+      calculate_calibration_params_schema.setAsSchema(true);
+      user_params_.merge(calculate_calibration_params_schema);
+      for (auto& calculate_calibration_fct : calculate_calibration_params_schema)
+      {
+        for (auto& calculate_calibration_param : calculate_calibration_fct.second)
+        {
+          addParameterRow(std::make_shared<Parameter>(calculate_calibration_param));
+        }
+      }
 
       ImGui::TableNextRow();
       ImGui::TableSetColumnIndex(0);
@@ -108,36 +154,17 @@ namespace SmartPeak
       ImGui::TableSetColumnIndex(1);
       ImGui::Text(quantitation_methods->getTransformationModel().c_str());
 
+      // Transformation model Params
       const auto& params = quantitation_methods->getTransformationModelParams();
       for (const auto& param : params)
       {
-        //==============================================
-        if (param.name == std::string("y_weight"))
-        {
-          int break_here = 42;
-        }
-        //==============================================
-        const auto& value = param.value;
-        ImGui::TableNextRow();
-        ImGui::TableSetColumnIndex(0);
-        ImGui::Text(param.name.c_str());
-        ImGui::TableSetColumnIndex(1);
-        ImGui::Text("%s", value.toString().c_str());
-        if (ImGui::IsItemHovered())
-        {
-          ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
-        }
-        if (ImGui::IsItemClicked())
-        {
-          param_to_edit = std::make_shared<Parameter>(param);
-          parameter_to_edit_function = param_to_edit->getName();
-        }
+        addParameterRow(std::make_shared<Parameter>(param));
       }
       ImGui::EndTable();
 
-      if (param_to_edit)
+      if (param_to_edit_)
       {
-        parameter_editor_widget_.setParameter(parameter_to_edit_function, *(param_to_edit.get()));
+        parameter_editor_widget_.setParameter(param_to_edit_->getName(), (*param_to_edit_));
         ImGui::OpenPopup("Edit Parameter");
       }
 
@@ -148,6 +175,8 @@ namespace SmartPeak
   void CalibratorsPlotWidget::onParameterSet(const Parameter& parameter)
   {
     // find back the parameter and set it
+    
+    // try to find in the quantitation methods parameters
     auto quantitation_methods = getQuantitationMethod(calibration_data_.series_names[selected_component_]);
     auto& params = quantitation_methods->getTransformationModelParams();
     OpenMS::Param new_params; // params iterator returns const parameters. so we need to reconstruct and set the whole list
@@ -173,6 +202,20 @@ namespace SmartPeak
       new_params.setValue(new_param_entry.name, new_param_entry.value);
     }
     quantitation_methods->setTransformationModelParams(new_params);
+
+    // try to find in the user parameters
+    for (auto& user_param_functions : user_params_)
+    {
+      for (auto& user_param : user_param_functions.second)
+      {
+        if (user_param.getName() == parameter.getName())
+        {
+          user_param.setValueFromString(parameter.getValueAsString(), false);
+        }
+      }
+    }
+
+    recomputeCalibration();
   }
 
   void CalibratorsPlotWidget::displayPlot()
@@ -273,6 +316,8 @@ namespace SmartPeak
     SessionHandler::CalibrationData calibration_data;
     session_handler_.setCalibratorsScatterLinePlot(sequence_handler_, calibration_data);
     setValues(calibration_data, "CalibratorsMainWindow");
+
+    param_to_edit_ = nullptr;
 
     if (!calibration_data_.conc_raw_data.size())
     {
