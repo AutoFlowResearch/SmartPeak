@@ -63,6 +63,7 @@ namespace SmartPeak
     void displayPlot();
     void recomputeCalibration();
     void addParameterRow(std::shared_ptr<Parameter> param);
+    std::shared_ptr<Parameter> CalibratorParameterToSmartPeakParameter(const OpenMS::Param::ParamEntry& param);
     SessionHandler::CalibrationData calibration_data_;
     std::string plot_title_; // used as the ID of the plot as well so this should be unique across the different Widgets
     bool show_legend_ = true;

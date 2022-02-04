@@ -76,8 +76,44 @@ namespace SmartPeak
     }
   }
 
+  std::shared_ptr<Parameter> CalibratorsPlotWidget::CalibratorParameterToSmartPeakParameter(const OpenMS::Param::ParamEntry& param)
+  {
+    auto result = std::make_shared<Parameter>(param);
+    if (param.name == "y_weight")
+    {
+      const auto valid_strings = std::make_shared<std::vector<CastValue>>();
+      valid_strings->push_back("1/y");
+      valid_strings->push_back("1/y2");
+      valid_strings->push_back("ln(y)");
+      valid_strings->push_back("no weight");
+      result->setConstraintsList(valid_strings);
+    }
+    else if (param.name == "x_weight")
+    {
+      const auto valid_strings = std::make_shared<std::vector<CastValue>>();
+      valid_strings->push_back("1/x");
+      valid_strings->push_back("1/x2");
+      valid_strings->push_back("ln(x)");
+      valid_strings->push_back("no weight");
+      result->setConstraintsList(valid_strings);
+    }
+    return result;
+  }
+
   void CalibratorsPlotWidget::displayParameters()
   {
+    static const std::vector<std::string> output_parameters = 
+    {
+      "llod",
+      "ulod",
+      "lloq",
+      "uloq",
+      "correlation_coefficient",
+      "n_points",
+      "intercept",
+      "slope"
+    };
+
     ImGui::Begin("Calibrator Parameters");
 
     parameter_editor_widget_.draw();
@@ -92,82 +128,113 @@ namespace SmartPeak
       // Edit Parameter widget needs to be open outside the table construction.
       std::string parameter_to_edit_function;
 
-      ImGui::TableNextRow(); 
+      ImGui::TableNextRow();
       ImGui::TableSetColumnIndex(0);
       ImGui::Text("IS name");
       ImGui::TableSetColumnIndex(1);
       ImGui::Text(quantitation_methods->getISName().c_str());
 
-      // CalculateCalibration params
-      CalculateCalibration calculate_calibration;
-      auto calculate_calibration_params_schema = calculate_calibration.getParameterSchema();
-      user_params_ = sequence_handler_.getSequence().at(0).getRawData().getParameters();
-      calculate_calibration_params_schema.setAsSchema(true);
-      user_params_.merge(calculate_calibration_params_schema);
-      for (auto& calculate_calibration_fct : calculate_calibration_params_schema)
-      {
-        for (auto& calculate_calibration_param : calculate_calibration_fct.second)
-        {
-          addParameterRow(std::make_shared<Parameter>(calculate_calibration_param));
-        }
-      }
-
-      ImGui::TableNextRow();
-      ImGui::TableSetColumnIndex(0);
-      ImGui::Text("llod");
-      ImGui::TableSetColumnIndex(1);
-      ImGui::Text("%f", quantitation_methods->getLLOD());
-
-      ImGui::TableNextRow();
-      ImGui::TableSetColumnIndex(0);
-      ImGui::Text("ulod");
-      ImGui::TableSetColumnIndex(1);
-      ImGui::Text("%f", quantitation_methods->getULOD());
-
-      ImGui::TableNextRow();
-      ImGui::TableSetColumnIndex(0);
-      ImGui::Text("lloq");
-      ImGui::TableSetColumnIndex(1);
-      ImGui::Text("%f", quantitation_methods->getLLOQ());
-
-      ImGui::TableNextRow();
-      ImGui::TableSetColumnIndex(0);
-      ImGui::Text("uloq");
-      ImGui::TableSetColumnIndex(1);
-      ImGui::Text("%f", quantitation_methods->getULOQ());
-
-      ImGui::TableNextRow();
-      ImGui::TableSetColumnIndex(0);
-      ImGui::Text("correlation coefficient");
-      ImGui::TableSetColumnIndex(1);
-      ImGui::Text("%f", quantitation_methods->getCorrelationCoefficient());
-
-      ImGui::TableNextRow();
-      ImGui::TableSetColumnIndex(0);
-      ImGui::Text("nb points");
-      ImGui::TableSetColumnIndex(1);
-      ImGui::Text("%d", quantitation_methods->getNPoints());
-
-      ImGui::TableNextRow();
-      ImGui::TableSetColumnIndex(0);
-      ImGui::Text("transformation model");
-      ImGui::TableSetColumnIndex(1);
-      ImGui::Text(quantitation_methods->getTransformationModel().c_str());
-
-      // Transformation model Params
-      const auto& params = quantitation_methods->getTransformationModelParams();
-      for (const auto& param : params)
-      {
-        addParameterRow(std::make_shared<Parameter>(param));
-      }
       ImGui::EndTable();
+    }
 
-      if (param_to_edit_)
+    if (ImGui::TreeNode("Input parameters"))
+    {
+      if (ImGui::BeginTable("Calibrator input parameters", 2, table_flags))
       {
-        parameter_editor_widget_.setParameter(param_to_edit_->getName(), (*param_to_edit_));
-        ImGui::OpenPopup("Edit Parameter");
-      }
+        // CalculateCalibration params
+        CalculateCalibration calculate_calibration;
+        auto calculate_calibration_params_schema = calculate_calibration.getParameterSchema();
+        user_params_ = sequence_handler_.getSequence().at(0).getRawData().getParameters();
+        calculate_calibration_params_schema.setAsSchema(true);
+        user_params_.merge(calculate_calibration_params_schema);
 
+        for (auto& calculate_calibration_fct : calculate_calibration_params_schema)
+        {
+          for (auto& calculate_calibration_param : calculate_calibration_fct.second)
+          {
+            addParameterRow(std::make_shared<Parameter>(calculate_calibration_param));
+          }
+        }
+
+        // Transformation model Params (inputs)
+        const auto& params = quantitation_methods->getTransformationModelParams();
+        for (const auto& param : params)
+        {
+          if (std::find(output_parameters.begin(), output_parameters.end(), param.name) == output_parameters.end())
+          {
+            addParameterRow(CalibratorParameterToSmartPeakParameter(param));
+          }
+        }
+
+        ImGui::TableNextRow();
+        ImGui::TableSetColumnIndex(0);
+        ImGui::Text("transformation model");
+        ImGui::TableSetColumnIndex(1);
+        ImGui::Text(quantitation_methods->getTransformationModel().c_str());
+
+        ImGui::EndTable();
+      }
+      ImGui::TreePop();
+    }
+
+    if (ImGui::TreeNode("Output parameters"))
+    {
+      if (ImGui::BeginTable("Calibrator output parameters", 2, table_flags))
+      {
+        ImGui::TableNextRow();
+        ImGui::TableSetColumnIndex(0);
+        ImGui::Text("llod");
+        ImGui::TableSetColumnIndex(1);
+        ImGui::Text("%f", quantitation_methods->getLLOD());
+
+        ImGui::TableNextRow();
+        ImGui::TableSetColumnIndex(0);
+        ImGui::Text("ulod");
+        ImGui::TableSetColumnIndex(1);
+        ImGui::Text("%f", quantitation_methods->getULOD());
+
+        ImGui::TableNextRow();
+        ImGui::TableSetColumnIndex(0);
+        ImGui::Text("lloq");
+        ImGui::TableSetColumnIndex(1);
+        ImGui::Text("%f", quantitation_methods->getLLOQ());
+
+        ImGui::TableNextRow();
+        ImGui::TableSetColumnIndex(0);
+        ImGui::Text("uloq");
+        ImGui::TableSetColumnIndex(1);
+        ImGui::Text("%f", quantitation_methods->getULOQ());
+
+        ImGui::TableNextRow();
+        ImGui::TableSetColumnIndex(0);
+        ImGui::Text("correlation coefficient");
+        ImGui::TableSetColumnIndex(1);
+        ImGui::Text("%f", quantitation_methods->getCorrelationCoefficient());
+
+        ImGui::TableNextRow();
+        ImGui::TableSetColumnIndex(0);
+        ImGui::Text("nb points");
+        ImGui::TableSetColumnIndex(1);
+        ImGui::Text("%d", quantitation_methods->getNPoints());
+
+        // Transformation model Params (outputs)
+        const auto& params = quantitation_methods->getTransformationModelParams();
+        for (const auto& param : params)
+        {
+          if (std::find(output_parameters.begin(), output_parameters.end(), param.name) != output_parameters.end())
+          {
+            addParameterRow(std::make_shared<Parameter>(param));
+          }
+        }
+        ImGui::EndTable();
+      }
+      ImGui::TreePop();
+    }
+
+    if (param_to_edit_)
+    {
+      parameter_editor_widget_.setParameter(param_to_edit_->getName(), (*param_to_edit_));
+      ImGui::OpenPopup("Edit Parameter");
     }
     ImGui::End();
   }
@@ -187,6 +254,11 @@ namespace SmartPeak
       {
         CastValue c;
         auto value_as_string = parameter.getValueAsString();
+        // special case for x_weight and y_weight
+        if (value_as_string == "no weight")
+        {
+          value_as_string = "";
+        }
         Utilities::parseString(value_as_string, c);
         // try some cast
         if ((c.getTag() == CastValue::Type::INT) && (parameter.getType() == std::string("float")))
