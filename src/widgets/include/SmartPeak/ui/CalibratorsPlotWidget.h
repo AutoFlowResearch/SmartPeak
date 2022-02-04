@@ -61,6 +61,8 @@ namespace SmartPeak
     OpenMS::AbsoluteQuantitationMethod* getQuantitationMethod(const std::string& component_name);
     void displayParameters();
     void displayPlot();
+    void recomputeCalibration();
+    void addParameterRow(std::shared_ptr<Parameter> param);
     SessionHandler::CalibrationData calibration_data_;
     std::string plot_title_; // used as the ID of the plot as well so this should be unique across the different Widgets
     bool show_legend_ = true;
@@ -75,6 +77,8 @@ namespace SmartPeak
     SessionHandler& session_handler_;
     SequenceHandler& sequence_handler_;
     ParameterEditorWidget2 parameter_editor_widget_;
+    ParameterSet user_params_;
+    std::shared_ptr<Parameter> param_to_edit_;
   };
 
 }
