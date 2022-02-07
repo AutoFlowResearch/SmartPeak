@@ -327,6 +327,7 @@ namespace SmartPeak
                               cond);
     auto window_size = ImGui::GetWindowSize();
     ImPlotFlags plotFlags = show_legend_ ? ImPlotFlags_Default | ImPlotFlags_Legend : ImPlotFlags_Default & ~ImPlotFlags_Legend;
+    plotFlags |= ImPlotFlags_Crosshairs;
     if (ImPlot::BeginPlot(plot_title_.c_str(), 
                           calibration_data_.x_axis_title.c_str(), 
                           calibration_data_.y_axis_title.c_str(), 
@@ -342,6 +343,8 @@ namespace SmartPeak
                             calibration_data_.conc_fit_data.at(i).data(), 
                             calibration_data_.feature_fit_data.at(i).data(),
                             calibration_data_.conc_fit_data.at(i).size());
+          ImPlot::PopStyleVar();
+          ImPlot::PopStyleVar();
         }
       }
       if (show_points_)
@@ -353,6 +356,7 @@ namespace SmartPeak
                                calibration_data_.conc_raw_data.at(i).data(),
                                calibration_data_.feature_raw_data.at(i).data(),
                                calibration_data_.conc_raw_data.at(i).size());
+          ImPlot::PopStyleVar();
         }
       }
       if (show_outlier_points_)
@@ -364,7 +368,30 @@ namespace SmartPeak
                                calibration_data_.outlier_conc_raw_data.at(i).data(),
                                calibration_data_.outlier_feature_raw_data.at(i).data(),
                                calibration_data_.outlier_conc_raw_data.at(i).size());
+          ImPlot::PopStyleVar();
         }
+      }
+      if (selected_point_)
+      {
+        auto [i, j] = *selected_point_;
+        ImPlot::PushStyleColor(0, ImVec4(ImColor(255, 255, 255)));
+        ImPlot::PlotScatter("", // do not appear in legend
+          calibration_data_.conc_raw_data.at(i).data() + j,
+          calibration_data_.feature_raw_data.at(i).data() + j,
+          1);
+        ImPlot::PopStyleColor();
+      }
+      if (selected_outlier_point_)
+      {
+        auto [i, j] = *selected_outlier_point_;
+        ImPlot::PushStyleColor(0, ImVec4(ImColor(255, 255, 255)));
+        ImPlot::PushStyleVar(ImPlotStyleVar_Marker, ImPlotMarker_Cross);
+        ImPlot::PlotScatter("", // do not appear in legend
+          calibration_data_.outlier_conc_raw_data.at(i).data() + j,
+          calibration_data_.outlier_feature_raw_data.at(i).data() + j,
+          1);
+        ImPlot::PopStyleVar();
+        ImPlot::PopStyleColor();
       }
       // legend hover management
       int i = 0;
@@ -377,6 +404,22 @@ namespace SmartPeak
         ++i;
       }
 
+      // Hovered points
+      selected_point_ = std::nullopt;
+      selected_outlier_point_ = std::nullopt;
+      if (ImPlot::IsPlotHovered())
+      {
+//        if (ImGui::IsMouseClicked(0))
+        {
+          auto mouse_plot_point = ImPlot::GetPlotMousePos();
+          ImVec2 mouse_point(mouse_plot_point.x, mouse_plot_point.y);
+          // Pixels zone around which the point will be considered hovered
+          auto zero_plot_point = ImPlot::PixelsToPlot(ImVec2(0, 0));
+          auto threshold_plot_point = ImPlot::PixelsToPlot(ImVec2(5, 5));
+          ImVec2 threshold_point(threshold_plot_point.x - zero_plot_point.x, zero_plot_point.y - threshold_plot_point.y);
+          getSelectedPoint(mouse_point, threshold_point);
+        }
+      }
       ImPlot::EndPlot();
     }
     ImGui::End();
@@ -444,4 +487,39 @@ namespace SmartPeak
     calibration_data_ = calibration_data;
     plot_title_ = plot_title;
   }
+
+  void CalibratorsPlotWidget::getSelectedPoint(ImVec2 point, ImVec2 threshold_point)
+  {
+    selected_point_ = getSelectedPoint(point, threshold_point, calibration_data_.conc_raw_data, calibration_data_.feature_raw_data);
+    if (!selected_point_)
+    {
+      selected_outlier_point_ = getSelectedPoint(point, threshold_point, calibration_data_.outlier_conc_raw_data, calibration_data_.outlier_feature_raw_data);
+    }
+  }
+
+  std::optional<std::tuple<int, int>> CalibratorsPlotWidget::getSelectedPoint(ImVec2 point,
+                                              ImVec2 threshold_point,
+                                              std::vector<std::vector<float>> concentrations_serie,
+                                              std::vector<std::vector<float>> feature_serie)
+  {
+    for (int i = 0; i < concentrations_serie.size(); ++i)
+    {
+      const auto& concentrations = concentrations_serie[i];
+      const auto& features = feature_serie[i];
+      for (int j = 0; j < concentrations.size(); ++j)
+      {
+        const auto& concentration = concentrations[j];
+        const auto& feature = features[j];
+        if ((concentration > (point.x - threshold_point.x))
+          && (concentration < (point.x + threshold_point.x))
+          && (feature > (point.y - threshold_point.y))
+          && (feature < (point.y + threshold_point.y)))
+        {
+          return std::make_tuple(i,j);
+        }
+      }
+    }
+    return std::nullopt;
+  }
+
 }

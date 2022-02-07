@@ -347,7 +347,7 @@ namespace SmartPeak
     if (highest_values_x_.size() == highest_values_y_.size())
     {
       ImPlot::PushStyleColor(0, ImVec4(ImColor(255,255,255)));
-      ImPlot::PlotScatter("HIGHEST VALUE(S)",
+      ImPlot::PlotScatter("", // do not appear in legend
         highest_values_x_.data(),
         highest_values_y_.data(),
         highest_values_x_.size());
