@@ -63,6 +63,12 @@ namespace SmartPeak
     void displayPlot();
     void recomputeCalibration();
     void addParameterRow(std::shared_ptr<Parameter> param);
+    void getSelectedPoint(ImVec2 point, ImVec2 threshold_point);
+    std::optional<std::tuple<int, int>> getSelectedPoint(
+      ImVec2 point,
+      ImVec2 threshold_point,
+      std::vector<std::vector<float>> concentrations_serie,
+      std::vector<std::vector<float>> feature_serie);
     std::shared_ptr<Parameter> CalibratorParameterToSmartPeakParameter(const OpenMS::Param::ParamEntry& param);
     SessionHandler::CalibrationData calibration_data_;
     std::string plot_title_; // used as the ID of the plot as well so this should be unique across the different Widgets
@@ -80,6 +86,8 @@ namespace SmartPeak
     ParameterEditorWidget2 parameter_editor_widget_;
     ParameterSet user_params_;
     std::shared_ptr<Parameter> param_to_edit_;
+    std::optional<std::tuple<int, int>> selected_point_;
+    std::optional<std::tuple<int, int>> selected_outlier_point_;
   };
 
 }
