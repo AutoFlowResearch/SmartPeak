@@ -409,15 +409,39 @@ namespace SmartPeak
       selected_outlier_point_ = std::nullopt;
       if (ImPlot::IsPlotHovered())
       {
-//        if (ImGui::IsMouseClicked(0))
+        auto mouse_plot_point = ImPlot::GetPlotMousePos();
+        ImVec2 mouse_point(mouse_plot_point.x, mouse_plot_point.y);
+        // Pixels zone around which the point will be considered hovered
+        auto zero_plot_point = ImPlot::PixelsToPlot(ImVec2(0, 0));
+        auto threshold_plot_point = ImPlot::PixelsToPlot(ImVec2(5, 5));
+        ImVec2 threshold_point(threshold_plot_point.x - zero_plot_point.x, zero_plot_point.y - threshold_plot_point.y);
+        getSelectedPoint(mouse_point, threshold_point);
+        if ((selected_outlier_point_ || selected_point_) && ImGui::IsMouseClicked(0))
         {
-          auto mouse_plot_point = ImPlot::GetPlotMousePos();
-          ImVec2 mouse_point(mouse_plot_point.x, mouse_plot_point.y);
-          // Pixels zone around which the point will be considered hovered
-          auto zero_plot_point = ImPlot::PixelsToPlot(ImVec2(0, 0));
-          auto threshold_plot_point = ImPlot::PixelsToPlot(ImVec2(5, 5));
-          ImVec2 threshold_point(threshold_plot_point.x - zero_plot_point.x, zero_plot_point.y - threshold_plot_point.y);
-          getSelectedPoint(mouse_point, threshold_point);
+          clicked_point_ = selected_point_;
+          clicked_outlier_point_ = selected_outlier_point_;
+          ImGui::OpenPopup("Point Actions");
+        }
+        if (ImGui::BeginPopup("Point Actions"))
+        {
+          if (ImGui::Selectable("See chromatogram"))
+          {
+            if (clicked_point_)
+            {
+              const auto [serie, index] = *clicked_point_;
+              auto insjection = calibration_data_.injections[serie][index];
+              LOGE << insjection;
+            }
+          }
+          if (ImGui::Selectable("Exclude from calibration"))
+          {
+          }
+          ImGui::EndPopup();
+        }
+        else
+        {
+          clicked_point_ = std::nullopt;
+          clicked_outlier_point_ = std::nullopt;
         }
       }
       ImPlot::EndPlot();
