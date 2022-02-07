@@ -88,6 +88,8 @@ namespace SmartPeak
     std::shared_ptr<Parameter> param_to_edit_;
     std::optional<std::tuple<int, int>> selected_point_;
     std::optional<std::tuple<int, int>> selected_outlier_point_;
+    std::optional<std::tuple<int, int>> clicked_point_;
+    std::optional<std::tuple<int, int>> clicked_outlier_point_;
   };
 
 }

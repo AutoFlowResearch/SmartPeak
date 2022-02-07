@@ -2021,6 +2021,10 @@ namespace SmartPeak
         result.feature_fit_data.clear();
         result.conc_raw_data.clear();
         result.feature_raw_data.clear();
+        result.injections.clear();
+        result.outlier_conc_raw_data.clear();
+        result.outlier_feature_raw_data.clear();
+        result.outlier_injections.clear();
         result.series_names.clear();
         for (const auto& sequence_segment : sequence_handler.getSequenceSegments()) {
           // Extract out raw data used to make the calibrators found in `StandardsConcentrations`
@@ -2083,12 +2087,31 @@ namespace SmartPeak
               }
               // Extract out the points used to make the line of best fit in `ComponentsToConcentrations`
               std::vector<float> x_raw_data, y_raw_data;
+              std::vector<std::string> injections;
               OpenMS::AbsoluteQuantitation absQuant;
-              for (const auto& point : sequence_segment.getComponentsToConcentrations().at(quant_method.getComponentName())) {
+              for (const auto& point : sequence_segment.getComponentsToConcentrations().at(quant_method.getComponentName()))
+              {
                 auto ratio = float(point.actual_concentration / point.IS_actual_concentration / point.dilution_factor);
                 x_raw_data.push_back(ratio);
                 float y_datum = absQuant.calculateRatio(point.feature, point.IS_feature, quant_method.getFeatureName());
                 y_raw_data.push_back(y_datum);
+                
+                // =================================================
+                // find sample_name from standard concentration values
+                // =================================================
+                std::string sample_name;
+                for (const auto& stand_concs : sequence_segment.getStandardsConcentrations())
+                {
+                  if ((stand_concs.component_name == quant_method.getComponentName())
+                    && (std::abs(stand_concs.actual_concentration - point.actual_concentration) < 1e-9)
+                    && (std::abs(stand_concs.IS_actual_concentration - point.IS_actual_concentration) < 1e-9)
+                    && (std::abs(stand_concs.dilution_factor - point.dilution_factor) < 1e-9))
+                  {
+                    sample_name = stand_concs.sample_name;
+                  }
+                }
+                injections.push_back(sample_name);
+
                 result.feature_min = std::min(y_datum, result.feature_min);
                 result.feature_max = std::max(y_datum, result.feature_max);
                 result.conc_min = std::min(ratio, result.conc_min);
@@ -2112,6 +2135,7 @@ namespace SmartPeak
               if (n_points < max_nb_points) {
                 result.conc_raw_data.push_back(x_raw_data);
                 result.feature_raw_data.push_back(y_raw_data);
+                result.injections.push_back(injections);
                 result.outlier_conc_raw_data.push_back(outlier_x_raw_data);
                 result.outlier_feature_raw_data.push_back(outlier_y_raw_data);
                 result.series_names.push_back(quant_method.getComponentName());

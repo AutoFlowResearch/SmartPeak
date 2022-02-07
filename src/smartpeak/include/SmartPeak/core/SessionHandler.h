@@ -343,8 +343,12 @@ namespace SmartPeak
     {
       std::vector<std::vector<float>> conc_raw_data;
       std::vector<std::vector<float>> feature_raw_data;
+      std::vector<std::vector<std::string>> injections;
+
       std::vector<std::vector<float>> outlier_conc_raw_data;
       std::vector<std::vector<float>> outlier_feature_raw_data;
+      std::vector<std::vector<std::string>> outlier_injections;
+
       std::vector<std::vector<float>> conc_fit_data;
       std::vector<std::vector<float>> feature_fit_data;
       std::vector<std::string> series_names;
@@ -354,7 +358,6 @@ namespace SmartPeak
       float conc_max;
       float feature_min;
       float feature_max;
-//      std::vector<OpenMS::AbsoluteQuantitationMethod> quant_methods;
     };
 
     /*
