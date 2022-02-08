@@ -36,6 +36,23 @@ namespace SmartPeak
     calculate_calibration.process(sequence_handler_.getSequenceSegments()[0], sequence_handler_, user_params_, filenames);
   }
 
+  std::string CalibratorsPlotWidget::getSampleNameFromSelectedPoint(
+    const std::optional<std::tuple<int, int>>& point,
+    const std::optional<std::tuple<int, int>>& outlier_point) const
+  {
+    if (point)
+    {
+      const auto [serie, index] = *point;
+      return calibration_data_.injections[serie][index];
+    }
+    else if (outlier_point)
+    {
+      const auto [serie, index] = *outlier_point;
+      return calibration_data_.outlier_injections[serie][index];
+    }
+    return "";
+  }
+
   OpenMS::AbsoluteQuantitationMethod* CalibratorsPlotWidget::getQuantitationMethod(const std::string& component_name)
   {
     for (auto& sequence_segment : sequence_handler_.getSequenceSegments())
@@ -371,9 +388,9 @@ namespace SmartPeak
           ImPlot::PopStyleVar();
         }
       }
-      if (selected_point_)
+      if (hovered_point_)
       {
-        auto [i, j] = *selected_point_;
+        auto [i, j] = *hovered_point_;
         ImPlot::PushStyleColor(0, ImVec4(ImColor(255, 255, 255)));
         ImPlot::PlotScatter("", // do not appear in legend
           calibration_data_.conc_raw_data.at(i).data() + j,
@@ -381,9 +398,9 @@ namespace SmartPeak
           1);
         ImPlot::PopStyleColor();
       }
-      if (selected_outlier_point_)
+      if (hovered_outlier_point_)
       {
-        auto [i, j] = *selected_outlier_point_;
+        auto [i, j] = *hovered_outlier_point_;
         ImPlot::PushStyleColor(0, ImVec4(ImColor(255, 255, 255)));
         ImPlot::PushStyleVar(ImPlotStyleVar_Marker, ImPlotMarker_Cross);
         ImPlot::PlotScatter("", // do not appear in legend
@@ -405,8 +422,8 @@ namespace SmartPeak
       }
 
       // Hovered points
-      selected_point_ = std::nullopt;
-      selected_outlier_point_ = std::nullopt;
+      hovered_point_ = std::nullopt;
+      hovered_outlier_point_ = std::nullopt;
       if (ImPlot::IsPlotHovered())
       {
         auto mouse_plot_point = ImPlot::GetPlotMousePos();
@@ -416,27 +433,30 @@ namespace SmartPeak
         auto threshold_plot_point = ImPlot::PixelsToPlot(ImVec2(5, 5));
         ImVec2 threshold_point(threshold_plot_point.x - zero_plot_point.x, zero_plot_point.y - threshold_plot_point.y);
         getSelectedPoint(mouse_point, threshold_point);
-        if ((selected_outlier_point_ || selected_point_) && ImGui::IsMouseClicked(0))
+        if (hovered_outlier_point_ || hovered_point_)
         {
-          clicked_point_ = selected_point_;
-          clicked_outlier_point_ = selected_outlier_point_;
-          ImGui::OpenPopup("Point Actions");
+          if (ImGui::IsMouseClicked(1))
+          {
+            clicked_point_ = hovered_point_;
+            clicked_outlier_point_ = hovered_outlier_point_;
+            ImGui::OpenPopup("Point Actions");
+          }
+          else if (!ImGui::IsPopupOpen("Point Actions")) // just hovered
+          {
+            ImGui::BeginTooltip();
+            auto sample_name = getSampleNameFromSelectedPoint(hovered_point_, hovered_outlier_point_);
+            ImGui::Text("%s", sample_name.c_str());
+            ImGui::EndTooltip();
+          }
         }
         if (ImGui::BeginPopup("Point Actions"))
         {
           if (ImGui::Selectable("Show chromatogram"))
           {
-            if (clicked_point_)
+            auto sample_name = getSampleNameFromSelectedPoint(clicked_point_, clicked_outlier_point_);
+            if (!sample_name.empty())
             {
-              const auto [serie, index] = *clicked_point_;
-              auto injection_name = calibration_data_.injections[serie][index];
-              showChromatogram(injection_name);
-            }
-            else if (clicked_outlier_point_)
-            {
-              const auto [serie, index] = *clicked_outlier_point_;
-              auto injection_name = calibration_data_.outlier_injections[serie][index];
-              showChromatogram(injection_name);
+              showChromatogram(sample_name);
             }
           }
           if (ImGui::Selectable("Exclude from calibration"))
@@ -520,10 +540,10 @@ namespace SmartPeak
 
   void CalibratorsPlotWidget::getSelectedPoint(ImVec2 point, ImVec2 threshold_point)
   {
-    selected_point_ = getSelectedPoint(point, threshold_point, calibration_data_.conc_raw_data, calibration_data_.feature_raw_data);
-    if (!selected_point_)
+    hovered_point_ = getSelectedPoint(point, threshold_point, calibration_data_.conc_raw_data, calibration_data_.feature_raw_data);
+    if (!hovered_point_)
     {
-      selected_outlier_point_ = getSelectedPoint(point, threshold_point, calibration_data_.outlier_conc_raw_data, calibration_data_.outlier_feature_raw_data);
+      hovered_outlier_point_ = getSelectedPoint(point, threshold_point, calibration_data_.outlier_conc_raw_data, calibration_data_.outlier_feature_raw_data);
     }
   }
 

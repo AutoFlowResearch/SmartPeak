@@ -2033,7 +2033,7 @@ namespace SmartPeak
         // LOGD << "Making the calibrators data for plotting";
         // Update the axis titles and clear the data
         result.x_axis_title = "Concentration (" + sequence_handler.getSequenceSegments().at(0).getQuantitationMethods().at(0).getConcentrationUnits() + ")";
-        result.y_axis_title = sequence_handler.getSequenceSegments().at(0).getQuantitationMethods().at(0).getFeatureName() + " (au)";
+        result.y_axis_title = sequence_handler.getSequenceSegments().at(0).getQuantitationMethods().at(0).getFeatureName() + " response (au)";
         result.conc_min = 1e6;
         result.conc_max = 0;
         result.feature_min = 1e6;
