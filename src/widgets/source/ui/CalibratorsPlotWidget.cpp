@@ -567,6 +567,7 @@ namespace SmartPeak
       {
         session_handler_.injection_explorer_data.checkbox_body(i, 1) = true;
         explorer_widget_->onCheckboxesChanged();
+        chromatogram_widget_->visible_ = true;
         break;
       }
     }

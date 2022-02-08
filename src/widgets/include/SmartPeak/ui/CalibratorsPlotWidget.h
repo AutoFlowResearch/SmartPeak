@@ -27,6 +27,7 @@
 #include <SmartPeak/ui/Widget.h>
 #include <SmartPeak/ui/ParameterEditorWidget2.h>
 #include <SmartPeak/ui/ExplorerWidget.h>
+#include <SmartPeak/ui/ChromatogramPlotWidget.h>
 
 #include <string>
 #include <utility>
@@ -47,12 +48,14 @@ namespace SmartPeak
     CalibratorsPlotWidget(SessionHandler& session_handler,
                           SequenceHandler& sequence_handler,
                           std::shared_ptr<ExplorerWidget> explorer_widget,
+                          std::shared_ptr<ChromatogramPlotWidget> chromatogram_widget,
                           const std::string title = "") :
       GenericGraphicWidget(title),
       session_handler_(session_handler),
       sequence_handler_(sequence_handler),
       parameter_editor_widget_(*this),
-      explorer_widget_(explorer_widget)
+      explorer_widget_(explorer_widget),
+      chromatogram_widget_(chromatogram_widget)
     {};
     void setValues(const SessionHandler::CalibrationData& calibration_data, const std::string& plot_title);
     void draw() override;
@@ -97,6 +100,7 @@ namespace SmartPeak
     std::optional<std::tuple<int, int>> clicked_point_;
     std::optional<std::tuple<int, int>> clicked_outlier_point_;
     std::shared_ptr<ExplorerWidget> explorer_widget_;
+    std::shared_ptr<ChromatogramPlotWidget> chromatogram_widget_;
   };
 
 }
