@@ -69,6 +69,7 @@ namespace SmartPeak
     void recomputeCalibration();
     void addParameterRow(std::shared_ptr<Parameter> param);
     void getSelectedPoint(ImVec2 point, ImVec2 threshold_point);
+    void showChromatogram(const std::string& sample_name);
     std::optional<std::tuple<int, int>> getSelectedPoint(
       ImVec2 point,
       ImVec2 threshold_point,
