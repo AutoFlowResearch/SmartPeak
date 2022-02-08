@@ -446,6 +446,56 @@ namespace SmartPeak
             ImGui::BeginTooltip();
             auto sample_name = getSampleNameFromSelectedPoint(hovered_point_, hovered_outlier_point_);
             ImGui::Text("%s", sample_name.c_str());
+            OpenMS::AbsoluteQuantitationStandards::featureConcentration* feature_concentration = nullptr;
+            OpenMS::AbsoluteQuantitationMethod* quantitation_methods = nullptr;
+            if (hovered_point_)
+            {
+              const auto [serie, index] = *hovered_point_;
+              feature_concentration = &calibration_data_.feature_concentrations[serie][index];
+              quantitation_methods = getQuantitationMethod(calibration_data_.series_names[serie]);
+            }
+            else if (hovered_outlier_point_)
+            {
+              const auto [serie, index] = *hovered_outlier_point_;
+              feature_concentration = &calibration_data_.outlier_feature_concentrations[serie][index];
+              quantitation_methods = getQuantitationMethod(calibration_data_.series_names[serie]);
+            }
+            if (feature_concentration && quantitation_methods)
+            {
+              ImGui::Text("actual concentration: %f (%s)", feature_concentration->actual_concentration, feature_concentration->concentration_units.c_str());
+              ImGui::Text("dilution factor: %f", feature_concentration->dilution_factor);
+              ImGui::Text("IS name: %s", quantitation_methods->getISName().c_str());
+              ImGui::Text("IS actual concentration: %f (%s)", feature_concentration->IS_actual_concentration, feature_concentration->concentration_units.c_str());
+              const auto& feature_name = quantitation_methods->getFeatureName();
+              if (feature_name == "intensity")
+              {
+                ImGui::Text("Intensity: %f", feature_concentration->feature.getIntensity());
+                ImGui::Text("IS Intensity: %f", feature_concentration->IS_feature.getIntensity());
+              }
+              else
+              {
+                if (feature_concentration->feature.metaValueExists(feature_name))
+                {
+                  ImGui::Text("feature %s: %f", 
+                    feature_name.c_str(), 
+                    static_cast<double>(feature_concentration->feature.getMetaValue(feature_name)));
+                }
+                else
+                {
+                  ImGui::Text("feature %s: Metadata does not exists!", feature_name.c_str());
+                }
+                if (feature_concentration->IS_feature.metaValueExists(feature_name))
+                {
+                  ImGui::Text("IS feature %s: %f", 
+                    feature_name.c_str(), 
+                    static_cast<double>(feature_concentration->IS_feature.getMetaValue(feature_name)));
+                }
+                else
+                {
+                  ImGui::Text("IS feature %s: Metadata does not exists!", feature_name.c_str());
+                }
+              }
+            }
             ImGui::EndTooltip();
           }
         }

@@ -344,10 +344,12 @@ namespace SmartPeak
       std::vector<std::vector<float>> conc_raw_data;
       std::vector<std::vector<float>> feature_raw_data;
       std::vector<std::vector<std::string>> injections;
+      std::vector<std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>> feature_concentrations;
 
       std::vector<std::vector<float>> outlier_conc_raw_data;
       std::vector<std::vector<float>> outlier_feature_raw_data;
       std::vector<std::vector<std::string>> outlier_injections;
+      std::vector<std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>> outlier_feature_concentrations;
 
       std::vector<std::vector<float>> conc_fit_data;
       std::vector<std::vector<float>> feature_fit_data;
