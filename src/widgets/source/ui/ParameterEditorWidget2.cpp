@@ -84,6 +84,10 @@ namespace SmartPeak
       // force conversion.
       validity_test_cast = static_cast<float>(validity_test_cast.i_);
     }
+    else if ((validity_test_cast.getTag() == CastValue::Type::BOOL) && (parameter_.getType() == "string"))
+    {
+      validity_test_cast = input_text_field_.data();
+    }
     bool valid = parameter_.isValid(validity_test_cast);
 
     if (!valid) ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
