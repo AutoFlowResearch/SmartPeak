@@ -178,8 +178,8 @@ int main(int argc, char** argv)
   auto heatmap_plot_widget_ = std::make_shared<Heatmap2DWidget>(session_handler_, application_handler_, "Heatmap Main Window", "Features (heatmap)", event_dispatcher);
   auto spectra_plot_widget_ = std::make_shared<SpectraPlotWidget>(session_handler_, application_handler_, "Spectra Main Window", "Spectra", event_dispatcher);
   auto feature_line_plot_ = std::make_shared<LinePlot2DWidget>("Features (line)");
-  auto calibrators_line_plot_ = std::make_shared<CalibratorsPlotWidget>(session_handler_, application_handler_.sequenceHandler_, "Calibrators");
   auto injections_explorer_window_ = std::make_shared<ExplorerWidget>("InjectionsExplorerWindow", "Injections", &event_dispatcher);
+  auto calibrators_line_plot_ = std::make_shared<CalibratorsPlotWidget>(session_handler_, application_handler_.sequenceHandler_, injections_explorer_window_, "Calibrators");
   auto transitions_explorer_window_ = std::make_shared<ExplorerWidget>("TransitionsExplorerWindow", "Transitions", &event_dispatcher);
   auto features_explorer_window_ = std::make_shared<ExplorerWidget>("FeaturesExplorerWindow", "Features", &event_dispatcher);
   auto spectrum_explorer_window_ = std::make_shared<ExplorerWidget>("SpectrumExplorerWindow", "Scans", &event_dispatcher);

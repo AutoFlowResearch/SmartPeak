@@ -26,6 +26,7 @@
 #include <SmartPeak/core/SessionHandler.h>
 #include <SmartPeak/ui/Widget.h>
 #include <SmartPeak/ui/ParameterEditorWidget2.h>
+#include <SmartPeak/ui/ExplorerWidget.h>
 
 #include <string>
 #include <utility>
@@ -43,11 +44,15 @@ namespace SmartPeak
     public IParameterEditorWidgetObserver
   {
   public:
-    CalibratorsPlotWidget(SessionHandler& session_handler, SequenceHandler& sequence_handler, const std::string title = "") :
+    CalibratorsPlotWidget(SessionHandler& session_handler,
+                          SequenceHandler& sequence_handler,
+                          std::shared_ptr<ExplorerWidget> explorer_widget,
+                          const std::string title = "") :
       GenericGraphicWidget(title),
       session_handler_(session_handler),
       sequence_handler_(sequence_handler),
-      parameter_editor_widget_(*this)
+      parameter_editor_widget_(*this),
+      explorer_widget_(explorer_widget)
     {};
     void setValues(const SessionHandler::CalibrationData& calibration_data, const std::string& plot_title);
     void draw() override;
@@ -90,6 +95,7 @@ namespace SmartPeak
     std::optional<std::tuple<int, int>> selected_outlier_point_;
     std::optional<std::tuple<int, int>> clicked_point_;
     std::optional<std::tuple<int, int>> clicked_outlier_point_;
+    std::shared_ptr<ExplorerWidget> explorer_widget_;
   };
 
 }

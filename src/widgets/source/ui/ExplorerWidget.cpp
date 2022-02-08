@@ -40,7 +40,7 @@ namespace SmartPeak
     static ImGuiTableColumnFlags column_any_flags = { ImGuiTableColumnFlags_NoHide };
 
     filter_.Draw("Find");
-
+    
     if (table_data_.body_.dimensions().TotalSize() > 0) {
       updateTableContents(table_entries_, table_scanned_,
         table_data_.body_, *checkbox_columns_);
@@ -244,6 +244,12 @@ namespace SmartPeak
       }
       ImGui::EndTable();
     }
+  }
+
+  void ExplorerWidget::onCheckboxesChanged()
+  {
+    table_scanned_ = false;
+    plot_unplot_all_deactivated_ = true;
   }
 
   std::map<std::string, CastValue::Type> ExplorerWidget::getPropertiesSchema() const

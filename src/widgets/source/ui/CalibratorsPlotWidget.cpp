@@ -429,8 +429,23 @@ namespace SmartPeak
             if (clicked_point_)
             {
               const auto [serie, index] = *clicked_point_;
-              auto insjection = calibration_data_.injections[serie][index];
-              LOGE << insjection;
+              auto injection_name = calibration_data_.injections[serie][index];
+              LOGD << "Selected " << injection_name;
+              // clear selection
+              for (int i = 0; i < session_handler_.injection_explorer_data.checkbox_body.dimension(0); ++i)
+              {
+                session_handler_.injection_explorer_data.checkbox_body(i, 1) = false;
+              }
+              // check plot for this sample
+              for (int i = 0; i < session_handler_.injection_explorer_data.checked_rows.dimension(0); ++i)
+              {
+                if (std::string(session_handler_.getInjectionExplorerBody()(i, 1)) == injection_name)
+                {
+                  session_handler_.injection_explorer_data.checkbox_body(i, 1) = true;
+                  explorer_widget_->onCheckboxesChanged();
+                  break;
+                }
+              }
             }
           }
           if (ImGui::Selectable("Exclude from calibration"))
