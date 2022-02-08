@@ -424,28 +424,19 @@ namespace SmartPeak
         }
         if (ImGui::BeginPopup("Point Actions"))
         {
-          if (ImGui::Selectable("See chromatogram"))
+          if (ImGui::Selectable("Show chromatogram"))
           {
             if (clicked_point_)
             {
               const auto [serie, index] = *clicked_point_;
               auto injection_name = calibration_data_.injections[serie][index];
-              LOGD << "Selected " << injection_name;
-              // clear selection
-              for (int i = 0; i < session_handler_.injection_explorer_data.checkbox_body.dimension(0); ++i)
-              {
-                session_handler_.injection_explorer_data.checkbox_body(i, 1) = false;
-              }
-              // check plot for this sample
-              for (int i = 0; i < session_handler_.injection_explorer_data.checked_rows.dimension(0); ++i)
-              {
-                if (std::string(session_handler_.getInjectionExplorerBody()(i, 1)) == injection_name)
-                {
-                  session_handler_.injection_explorer_data.checkbox_body(i, 1) = true;
-                  explorer_widget_->onCheckboxesChanged();
-                  break;
-                }
-              }
+              showChromatogram(injection_name);
+            }
+            else if (clicked_outlier_point_)
+            {
+              const auto [serie, index] = *clicked_outlier_point_;
+              auto injection_name = calibration_data_.outlier_injections[serie][index];
+              showChromatogram(injection_name);
             }
           }
           if (ImGui::Selectable("Exclude from calibration"))
@@ -559,6 +550,26 @@ namespace SmartPeak
       }
     }
     return std::nullopt;
+  }
+
+  void CalibratorsPlotWidget::showChromatogram(const std::string& sample_name)
+  {
+    LOGD << "Show chromatogram for " << sample_name;
+    // clear selection
+    for (int i = 0; i < session_handler_.injection_explorer_data.checkbox_body.dimension(0); ++i)
+    {
+      session_handler_.injection_explorer_data.checkbox_body(i, 1) = false;
+    }
+    // check plot for this sample
+    for (int i = 0; i < session_handler_.injection_explorer_data.checked_rows.dimension(0); ++i)
+    {
+      if (std::string(session_handler_.getInjectionExplorerBody()(i, 1)) == sample_name)
+      {
+        session_handler_.injection_explorer_data.checkbox_body(i, 1) = true;
+        explorer_widget_->onCheckboxesChanged();
+        break;
+      }
+    }
   }
 
 }
