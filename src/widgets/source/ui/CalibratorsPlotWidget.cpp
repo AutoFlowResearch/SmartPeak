@@ -538,6 +538,20 @@ namespace SmartPeak
           clicked_outlier_point_ = std::nullopt;
         }
       }
+      // try to detect label hovered.
+      if (ImGui::IsItemHovered() && !ImPlot::IsPlotHovered())
+      {
+        auto mouse_pos = ImGui::GetMousePos();
+        auto plot_pos = ImPlot::GetPlotPos();
+        auto plot_size = ImPlot::GetPlotSize();
+        if ((mouse_pos.x < plot_pos.x)
+          && (mouse_pos.y < plot_pos.y + plot_size.y)
+          && (mouse_pos.y > plot_pos.y))
+        {
+          // we are in the left label part
+          LOGD << "coucou";
+        }
+      }
       ImPlot::EndPlot();
     }
     ImGui::End();
