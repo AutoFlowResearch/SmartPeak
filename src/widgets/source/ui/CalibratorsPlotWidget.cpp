@@ -68,7 +68,7 @@ namespace SmartPeak
     return nullptr;
   }
 
-  void CalibratorsPlotWidget::addParameterRow(std::shared_ptr<Parameter> param)
+  void CalibratorsPlotWidget::addParameterRow(std::shared_ptr<Parameter> param, bool editable)
   {
     ImGui::TableNextRow();
     ImGui::TableSetColumnIndex(0);
@@ -83,11 +83,11 @@ namespace SmartPeak
     {
       ImGui::Text("%s", value_as_string.c_str());
     }
-    if (ImGui::IsItemHovered())
+    if (editable && ImGui::IsItemHovered())
     {
       ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
     }
-    if (ImGui::IsItemClicked())
+    if (editable && ImGui::IsItemClicked())
     {
       param_to_edit_ = param;
     }
@@ -96,7 +96,15 @@ namespace SmartPeak
   std::shared_ptr<Parameter> CalibratorsPlotWidget::CalibratorParameterToSmartPeakParameter(const OpenMS::Param::ParamEntry& param)
   {
     auto result = std::make_shared<Parameter>(param);
-    if (param.name == "y_weight")
+    if (param.name == "symmetric_regression")
+    {
+      // this parameter is a string type, but accepts FALSE/TRUE which is a little bit annoying.
+      const auto valid_strings = std::make_shared<std::vector<CastValue>>();
+      valid_strings->push_back("FALSE");
+      valid_strings->push_back("TRUE");
+      result->setConstraintsList(valid_strings);
+    }
+    else if (param.name == "y_weight")
     {
       const auto valid_strings = std::make_shared<std::vector<CastValue>>();
       valid_strings->push_back("1/y");
@@ -151,10 +159,19 @@ namespace SmartPeak
       ImGui::TableSetColumnIndex(1);
       ImGui::Text(quantitation_methods->getISName().c_str());
 
+      ImGui::TableNextRow();
+      ImGui::TableSetColumnIndex(0);
+      ImGui::Text("Feature name");
+      ImGui::TableSetColumnIndex(1);
+      ImGui::Text(quantitation_methods->getFeatureName().c_str());
+
       ImGui::EndTable();
     }
 
-    if (ImGui::TreeNode("Input parameters"))
+    ImGui::Separator();
+    ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyle().Colors[ImGuiCol_TextDisabled]);
+    ImGui::Text("Input parameters");
+    ImGui::PopStyleColor();
     {
       if (ImGui::BeginTable("Calibrator input parameters", 2, table_flags))
       {
@@ -169,7 +186,7 @@ namespace SmartPeak
         {
           for (auto& calculate_calibration_param : calculate_calibration_fct.second)
           {
-            addParameterRow(std::make_shared<Parameter>(calculate_calibration_param));
+            addParameterRow(std::make_shared<Parameter>(calculate_calibration_param), true);
           }
         }
 
@@ -179,7 +196,7 @@ namespace SmartPeak
         {
           if (std::find(output_parameters.begin(), output_parameters.end(), param.name) == output_parameters.end())
           {
-            addParameterRow(CalibratorParameterToSmartPeakParameter(param));
+            addParameterRow(CalibratorParameterToSmartPeakParameter(param), true);
           }
         }
 
@@ -191,10 +208,12 @@ namespace SmartPeak
 
         ImGui::EndTable();
       }
-      ImGui::TreePop();
     }
 
-    if (ImGui::TreeNode("Output parameters"))
+    ImGui::Separator();
+    ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyle().Colors[ImGuiCol_TextDisabled]);
+    ImGui::Text("Output parameters");
+    ImGui::PopStyleColor();
     {
       if (ImGui::BeginTable("Calibrator output parameters", 2, table_flags))
       {
@@ -240,12 +259,11 @@ namespace SmartPeak
         {
           if (std::find(output_parameters.begin(), output_parameters.end(), param.name) != output_parameters.end())
           {
-            addParameterRow(std::make_shared<Parameter>(param));
+            addParameterRow(std::make_shared<Parameter>(param), false);
           }
         }
         ImGui::EndTable();
       }
-      ImGui::TreePop();
     }
 
     if (param_to_edit_)
