@@ -549,7 +549,23 @@ namespace SmartPeak
           && (mouse_pos.y > plot_pos.y))
         {
           // we are in the left label part
-          LOGD << "coucou";
+          if (!calibration_data_.series_names.empty())
+          {
+            ImGui::BeginTooltip();
+            auto quantitation_methods = getQuantitationMethod(calibration_data_.series_names[0]);
+            const auto& feature_name = quantitation_methods->getFeatureName();
+            ImGui::Text("%s / IS %s", feature_name.c_str(), feature_name.c_str());
+            ImGui::EndTooltip();
+          }
+        }
+        if ((mouse_pos.x > plot_pos.x)
+          && (mouse_pos.y > plot_pos.y + plot_size.y)
+          && (mouse_pos.x < plot_pos.x + plot_size.x))
+        {
+          // we are in the bottom label part
+          ImGui::BeginTooltip();
+          ImGui::Text("actual concentration / IS actual concentration / dilution_factor");
+          ImGui::EndTooltip();
         }
       }
       ImPlot::EndPlot();
