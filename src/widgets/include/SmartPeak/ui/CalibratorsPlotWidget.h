@@ -73,6 +73,9 @@ namespace SmartPeak
     void addParameterRow(std::shared_ptr<Parameter> param);
     void getSelectedPoint(ImVec2 point, ImVec2 threshold_point);
     void showChromatogram(const std::string& sample_name);
+    std::string getSampleNameFromSelectedPoint(
+      const std::optional<std::tuple<int, int>>& point, 
+      const std::optional<std::tuple<int, int>>& outlier_point) const;
     std::optional<std::tuple<int, int>> getSelectedPoint(
       ImVec2 point,
       ImVec2 threshold_point,
@@ -95,8 +98,8 @@ namespace SmartPeak
     ParameterEditorWidget2 parameter_editor_widget_;
     ParameterSet user_params_;
     std::shared_ptr<Parameter> param_to_edit_;
-    std::optional<std::tuple<int, int>> selected_point_;
-    std::optional<std::tuple<int, int>> selected_outlier_point_;
+    std::optional<std::tuple<int, int>> hovered_point_;
+    std::optional<std::tuple<int, int>> hovered_outlier_point_;
     std::optional<std::tuple<int, int>> clicked_point_;
     std::optional<std::tuple<int, int>> clicked_outlier_point_;
     std::shared_ptr<ExplorerWidget> explorer_widget_;
