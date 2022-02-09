@@ -2150,7 +2150,7 @@ namespace SmartPeak
                 result.feature_concentrations.push_back(feature_concentrations);
                 result.outlier_conc_raw_data.push_back(outlier_x_raw_data);
                 result.outlier_feature_raw_data.push_back(outlier_y_raw_data);
-                result.outlier_injections.push_back(injections);
+                result.outlier_injections.push_back(outlier_injections);
                 result.outlier_feature_concentrations.push_back(outlier_feature_concentrations);
                 result.series_names.push_back(quant_method.getComponentName());
               }
