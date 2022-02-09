@@ -547,13 +547,7 @@ namespace SmartPeak
               {
                 if (existing_parameter)
                 {
-                  if (!existing_parameter->isInList(os.str()))
-                  {
-                    CastValue excluded_points;
-                    Utilities::castString(existing_parameter->getValueAsString(), "list", excluded_points);
-                    excluded_points.sl_.push_back(os.str());
-                    existing_parameter->setValueFromString(static_cast<std::string>(excluded_points));
-                  }
+                  existing_parameter->addToList(os.str());
                 }
                 else
                 {
@@ -571,7 +565,7 @@ namespace SmartPeak
             {
               if (ImGui::Selectable("Include to calibration"))
               {
-
+                existing_parameter->removeFromList(os.str());
               }
             }
           }
