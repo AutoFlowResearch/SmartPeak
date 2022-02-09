@@ -45,7 +45,20 @@ namespace SmartPeak
   ParameterSet CalculateCalibration::getParameterSchema() const
   {
     OpenMS::AbsoluteQuantitation oms_params;
-    return ParameterSet({ oms_params });
+    ParameterSet parameters({ oms_params });
+
+    std::map<std::string, std::vector<std::map<std::string, std::string>>> param_struct({
+    {"CalculateCalibration", {
+    {
+      {"name", "excluded_points"},
+      {"type", "list"},
+      {"value", "[]"},
+      {"description", "List of point to exclude from calibration. Each item of the list is composed of sample_name;component_name"},
+    }
+    }} });
+    ParameterSet calculate_calibration_params(param_struct);
+    parameters.merge(calculate_calibration_params);
+    return parameters;
   }
 
   void CalculateCalibration::process(
@@ -58,8 +71,16 @@ namespace SmartPeak
     LOGD << "START optimizeCalibrationCurves";
     getFilenames(filenames_I);
 
-    std::vector<size_t> standards_indices;
+    // Complete user parameters with schema
+    ParameterSet params(params_I);
+    params.merge(getParameterSchema());
+
+    for (const auto& pms1f_params : params.at("CalculateCalibration"))
+    {
+    }
+      
     // get all standards
+    std::vector<size_t> standards_indices;
     this->getSampleIndicesBySampleType(
       sequenceSegmentHandler_IO,
       sequenceHandler_I,

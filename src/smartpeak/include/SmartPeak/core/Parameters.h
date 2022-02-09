@@ -197,6 +197,27 @@ namespace SmartPeak
     */
     const std::vector<CastValue> getValidStrings(bool use_scheme = true) const;
 
+    /**
+     @brief for parameter of type list, return true if the element exists in the list
+
+     @param[in] value the value tu check existence.
+    */
+    bool isInList(const CastValue& value) const;
+
+    /**
+     @brief for parameter of type list, adds an element to the list
+
+     @param[in] value to add to the list.
+    */
+    void addToList(const CastValue& value);
+
+    /**
+     @brief for parameter of type list, removes an element from the list
+
+     @param[in] value to add to the list.
+    */
+    void removeFromList(const CastValue& value);
+
     bool operator==(const Parameter & other) const;
     inline bool operator!=(const Parameter& other) const { return !operator==(other); };
 

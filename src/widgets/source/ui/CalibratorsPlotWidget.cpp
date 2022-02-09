@@ -533,8 +533,47 @@ namespace SmartPeak
               showChromatogram(sample_name);
             }
           }
-          if (ImGui::Selectable("Exclude from calibration"))
+          // Exlude/Include point
+          auto sample_name = getSampleNameFromSelectedPoint(clicked_point_, clicked_outlier_point_);
+          if (!sample_name.empty())
           {
+            std::ostringstream os;
+            os << sample_name << ";" << calibration_data_.series_names[selected_component_];
+            ParameterSet& user_parameters = sequence_handler_.getSequence().at(0).getRawData().getParameters();
+            Parameter* existing_parameter = user_parameters.findParameter("CalculateCalibration", "excluded_points");
+            if ((!existing_parameter) || (!existing_parameter->isInList(os.str())))
+            {
+              if (ImGui::Selectable("Exclude from calibration"))
+              {
+                if (existing_parameter)
+                {
+                  if (!existing_parameter->isInList(os.str()))
+                  {
+                    CastValue excluded_points;
+                    Utilities::castString(existing_parameter->getValueAsString(), "list", excluded_points);
+                    excluded_points.sl_.push_back(os.str());
+                    existing_parameter->setValueFromString(static_cast<std::string>(excluded_points));
+                  }
+                }
+                else
+                {
+                  std::ostringstream os;
+                  os << "[\'" << sample_name << ";" << calibration_data_.series_names[selected_component_] << "\']";
+                  Parameter new_param(
+                    { { "name", "excluded_points" },
+                      { "type", "list" },
+                      { "value", os.str() } });
+                  user_parameters.addParameter("CalculateCalibration", new_param);
+                }
+              }
+            }
+            else if (existing_parameter && existing_parameter->isInList(os.str()))
+            {
+              if (ImGui::Selectable("Include to calibration"))
+              {
+
+              }
+            }
           }
           ImGui::EndPopup();
         }
