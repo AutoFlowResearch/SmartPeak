@@ -49,7 +49,7 @@ namespace SmartPeak
 
   std::vector<std::string> CalculateCalibration::getRequirements() const
   {
-return { "sequence", "traML" };
+    return { "sequence", "traML" };
   }
 
   ParameterSet CalculateCalibration::getParameterSchema() const
