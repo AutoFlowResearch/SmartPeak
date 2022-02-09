@@ -1178,3 +1178,67 @@ TEST(ParameterSet, Parameter_equal)
   EXPECT_TRUE(param_list_int_1 == param_list_int_3);
 
 }
+
+TEST(ParameterSet, Parameter_isInList)
+{
+  Parameter param("param_int", 10);
+  EXPECT_FALSE(param.isInList(42));
+  EXPECT_FALSE(param.isInList("one"));
+
+  param.setValueFromString("[1, 2, 3]");
+  EXPECT_STREQ(param.getValueAsString().c_str(), "[1,2,3]");
+  EXPECT_TRUE(param.isInList(2));
+  EXPECT_FALSE(param.isInList(42));
+
+  param.setValueFromString("[FAlSe, FALSE, false]");
+  EXPECT_TRUE(param.isInList(false));
+  EXPECT_FALSE(param.isInList(true));
+
+  param.setValueFromString(" ['one','two', 'three']  ");
+  EXPECT_STREQ(param.getValueAsString().c_str(), "['one','two','three']");
+  EXPECT_STREQ(param.getType().c_str(), "string_list");
+  EXPECT_TRUE(param.isInList("three"));
+  EXPECT_FALSE(param.isInList("four"));
+}
+
+TEST(ParameterSet, Parameter_addToList)
+{
+  Parameter param("param_int", 10);
+  param.addToList(42);
+  EXPECT_STREQ(param.getValueAsString().c_str(), "10");
+
+  param.setValueFromString("[1, 2, 3]");
+  param.addToList(4);
+  EXPECT_STREQ(param.getValueAsString().c_str(), "[1,2,3,4]");
+
+  param.setValueFromString("[1.1, 2.2, 3.3]");
+  param.addToList(4.4f);
+  EXPECT_STREQ(param.getValueAsString().c_str(), "[1.1,2.2,3.3,4.4]");
+
+  param.setValueFromString("[true, FALSE, True]");
+  param.addToList(false);
+  EXPECT_STREQ(param.getValueAsString().c_str(), "[true,false,true,false]");
+
+  param.setValueFromString(" ['one','two', 'three']  ");
+  param.addToList("four");
+  EXPECT_STREQ(param.getValueAsString().c_str(), "['one','two','three','four']");
+}
+
+TEST(ParameterSet, Parameter_removeFromList)
+{
+  Parameter param("param_int", 10);
+  param.removeFromList(42);
+  EXPECT_STREQ(param.getValueAsString().c_str(), "10");
+
+  param.setValueFromString("[1, 2, 3]");
+  param.removeFromList(2);
+  EXPECT_STREQ(param.getValueAsString().c_str(), "[1,3]");
+
+  param.setValueFromString("[true, FALSE, True]");
+  param.removeFromList(true);
+  EXPECT_STREQ(param.getValueAsString().c_str(), "[false]");
+
+  param.setValueFromString(" ['one','two', 'three']  ");
+  param.removeFromList("one");
+  EXPECT_STREQ(param.getValueAsString().c_str(), "['two','three']");
+}

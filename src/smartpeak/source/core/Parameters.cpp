@@ -401,6 +401,141 @@ namespace SmartPeak
     }
   }
 
+  bool Parameter::isInList(const CastValue& value) const
+  {
+    switch (value_.getTag())
+    {
+    case CastValue::Type::FLOAT:
+    case CastValue::Type::INT:
+    case CastValue::Type::BOOL:
+    case CastValue::Type::UNKNOWN:
+    case CastValue::Type::STRING:
+    case CastValue::Type::UNINITIALIZED:
+    case CastValue::Type::LONG_INT:
+      return false;
+    case CastValue::Type::FLOAT_LIST:
+      return false; // not supported
+    case CastValue::Type::INT_LIST:
+    {
+      if (value.getTag() != CastValue::Type::INT)
+      {
+        return false;
+      }
+      return (std::find(value_.il_.begin(), value_.il_.end(), value.i_) != value_.il_.end());
+    }
+    case CastValue::Type::BOOL_LIST:
+    {
+      if (value.getTag() != CastValue::Type::BOOL)
+      {
+        return false;
+      }
+      return (std::find(value_.bl_.begin(), value_.bl_.end(), value.b_) != value_.bl_.end());
+    }
+    case CastValue::Type::STRING_LIST:
+      if (value.getTag() != CastValue::Type::STRING)
+      {
+        return false;
+      }
+      return (std::find(value_.sl_.begin(), value_.sl_.end(), value.s_) != value_.sl_.end());
+    default:
+      throw "Tag type not managed in getFloatValue(). Implement it.";
+    }
+    return false; // we should not get here
+  }
+
+  void Parameter::addToList(const CastValue& value)
+  {
+    switch (value_.getTag())
+    {
+    case CastValue::Type::FLOAT:
+    case CastValue::Type::INT:
+    case CastValue::Type::BOOL:
+    case CastValue::Type::UNKNOWN:
+    case CastValue::Type::STRING:
+    case CastValue::Type::UNINITIALIZED:
+    case CastValue::Type::LONG_INT:
+      return;
+    case CastValue::Type::FLOAT_LIST:
+      if (value.getTag() != CastValue::Type::FLOAT)
+      {
+        return;
+      }
+      value_.fl_.push_back(value.f_);
+      break;
+    case CastValue::Type::INT_LIST:
+    {
+      if (value.getTag() != CastValue::Type::INT)
+      {
+        return;
+      }
+      value_.il_.push_back(value.i_);
+      break;
+    }
+    case CastValue::Type::BOOL_LIST:
+    {
+      if (value.getTag() != CastValue::Type::BOOL)
+      {
+        return;
+      }
+      value_.bl_.push_back(value.b_);
+      break;
+    }
+    case CastValue::Type::STRING_LIST:
+      if (value.getTag() != CastValue::Type::STRING)
+      {
+        return;
+      }
+      value_.sl_.push_back(value.s_);
+      break;
+    default:
+      throw "Tag type not managed in addToList(). Implement it.";
+    }
+  }
+
+  void Parameter::removeFromList(const CastValue& value)
+  {
+    switch (value_.getTag())
+    {
+    case CastValue::Type::FLOAT:
+    case CastValue::Type::INT:
+    case CastValue::Type::BOOL:
+    case CastValue::Type::UNKNOWN:
+    case CastValue::Type::STRING:
+    case CastValue::Type::UNINITIALIZED:
+    case CastValue::Type::LONG_INT:
+      return;
+    case CastValue::Type::FLOAT_LIST:
+      throw "Tag type not managed in removeFromList(). Implement it.";
+    case CastValue::Type::INT_LIST:
+    {
+      if (value.getTag() != CastValue::Type::INT)
+      {
+        return;
+      }
+      value_.il_.erase(std::remove(value_.il_.begin(), value_.il_.end(), value.i_), value_.il_.end());
+      break;
+    }
+    case CastValue::Type::BOOL_LIST:
+    {
+      if (value.getTag() != CastValue::Type::BOOL)
+      {
+        return;
+      }
+      value_.bl_.erase(std::remove(value_.bl_.begin(), value_.bl_.end(), value.b_), value_.bl_.end());
+      break;
+    }
+    case CastValue::Type::STRING_LIST:
+      if (value.getTag() != CastValue::Type::STRING)
+      {
+        return;
+      }
+      value_.sl_.erase(std::remove(value_.sl_.begin(), value_.sl_.end(), value.s_), value_.sl_.end());
+      break;
+    default:
+      throw "Tag type not managed in removeFromList(). Implement it.";
+    }
+  }
+
   bool Parameter::isValid(bool use_scheme) const
   {
     return isValid(value_, use_scheme);
