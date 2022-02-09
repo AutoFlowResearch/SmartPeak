@@ -114,7 +114,7 @@ namespace SmartPeak
     }
 
     ImGui::SameLine();
-    if (ImGui::Button("Remove"))
+    if (enable_remove_ && ImGui::Button("Remove"))
     {
       ImGui::CloseCurrentPopup();
     }

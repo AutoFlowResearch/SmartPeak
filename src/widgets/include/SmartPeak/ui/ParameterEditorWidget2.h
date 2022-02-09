@@ -37,10 +37,11 @@ namespace SmartPeak
   class ParameterEditorWidget2 final : public Widget
   {
   public:
-    ParameterEditorWidget2(IParameterEditorWidgetObserver& observer) :
+    ParameterEditorWidget2(IParameterEditorWidgetObserver& observer, bool enable_remove = false) :
       parameter_("parameter"), // dummy name
       input_text_field_(),
-      observer_(observer)
+      observer_(observer),
+      enable_remove_(enable_remove)
     {
     };
     void draw() override;
@@ -66,5 +67,6 @@ namespace SmartPeak
     void setInputTextField(const std::string& value);
     bool table_scan_required_ = false;
     IParameterEditorWidgetObserver& observer_;
+    bool enable_remove_;
   };
 }

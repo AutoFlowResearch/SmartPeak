@@ -2072,11 +2072,9 @@ namespace SmartPeak
             if (sequence_segment.getComponentsToConcentrations().count(quant_method.getComponentName()) > 0 &&
                 component_names.count(quant_method.getComponentName()) > 0)
             { 
-              bool calibration_curve_found = ((double)quant_method.getTransformationModelParams().getValue("slope") != 1.0);
               // Make the line of best fit using the `QuantitationMethods`
               std::vector<float> y_fit_data;
-              //result.quant_methods.push_back(quant_method);
-              if (calibration_curve_found)
+              if (quant_method.getNPoints() > 0)
               {
                 for (const auto& ratio : stand_concs_map.at(quant_method.getComponentName()).first) {
                   // TODO: encapsulate in its own method e.g. sequenceSegmentProcessor

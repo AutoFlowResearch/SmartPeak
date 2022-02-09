@@ -53,7 +53,7 @@ namespace SmartPeak
       GenericGraphicWidget(title),
       session_handler_(session_handler),
       sequence_handler_(sequence_handler),
-      parameter_editor_widget_(*this),
+      parameter_editor_widget_(*this, false),
       explorer_widget_(explorer_widget),
       chromatogram_widget_(chromatogram_widget)
     {};
@@ -96,7 +96,6 @@ namespace SmartPeak
     SessionHandler& session_handler_;
     SequenceHandler& sequence_handler_;
     ParameterEditorWidget2 parameter_editor_widget_;
-    ParameterSet user_params_;
     std::shared_ptr<Parameter> param_to_edit_;
     std::optional<std::tuple<int, int>> hovered_point_;
     std::optional<std::tuple<int, int>> hovered_outlier_point_;
