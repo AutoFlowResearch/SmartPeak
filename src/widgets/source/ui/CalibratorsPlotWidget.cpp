@@ -33,7 +33,8 @@ namespace SmartPeak
   {
     CalculateCalibration calculate_calibration;
     Filenames filenames; // calculate_calibration actually does not use it
-    calculate_calibration.process(sequence_handler_.getSequenceSegments()[0], sequence_handler_, user_params_, filenames);
+    ParameterSet& user_parameters = sequence_handler_.getSequence().at(0).getRawData().getParameters();
+    calculate_calibration.process(sequence_handler_.getSequenceSegments()[0], sequence_handler_, user_parameters, filenames);
   }
 
   std::string CalibratorsPlotWidget::getSampleNameFromSelectedPoint(
@@ -178,15 +179,19 @@ namespace SmartPeak
         // CalculateCalibration params
         CalculateCalibration calculate_calibration;
         auto calculate_calibration_params_schema = calculate_calibration.getParameterSchema();
-        user_params_ = sequence_handler_.getSequence().at(0).getRawData().getParameters();
+        auto user_params = sequence_handler_.getSequence().at(0).getRawData().getParameters();
         calculate_calibration_params_schema.setAsSchema(true);
-        user_params_.merge(calculate_calibration_params_schema);
+        user_params.merge(calculate_calibration_params_schema);
 
         for (auto& calculate_calibration_fct : calculate_calibration_params_schema)
         {
           for (auto& calculate_calibration_param : calculate_calibration_fct.second)
           {
-            addParameterRow(std::make_shared<Parameter>(calculate_calibration_param), true);
+            auto user_param = user_params.findParameter(calculate_calibration_fct.first, calculate_calibration_param.getName());
+            if (user_param)
+            {
+              addParameterRow(std::make_shared<Parameter>(*user_param), true);
+            }
           }
         }
 
@@ -311,7 +316,8 @@ namespace SmartPeak
     quantitation_methods->setTransformationModelParams(new_params);
 
     // try to find in the user parameters
-    for (auto& user_param_functions : user_params_)
+    ParameterSet& user_parameters = sequence_handler_.getSequence().at(0).getRawData().getParameters();
+    for (auto& user_param_functions : user_parameters)
     {
       for (auto& user_param : user_param_functions.second)
       {
