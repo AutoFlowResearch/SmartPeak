@@ -49,7 +49,7 @@ namespace SmartPeak
 
   std::vector<std::string> CalculateCalibration::getRequirements() const
   {
-    return { "sequence", "traML" };
+return { "sequence", "traML" };
   }
 
   ParameterSet CalculateCalibration::getParameterSchema() const
@@ -128,7 +128,7 @@ namespace SmartPeak
           feature_concentrations_pruned
         );
       }
-      catch (OpenMS::Exception::DivisionByZero& )
+      catch (OpenMS::Exception::DivisionByZero&)
       {
         LOGW << "Warning: '" << row.getComponentName() << "' cannot be analysed - division by zero\n";
         continue;
@@ -141,27 +141,47 @@ namespace SmartPeak
 
       // Compute outer points
       std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration> outlier_feature_concentrations;
-      for (const auto& feature : all_feature_concentrations)
+
+      // Calibration not found: all the points will stay untouched by absoluteQuantitation.optimizeSingleCalibrationCurve
+      // but we would like to have them in the outlier point list instead.
+      bool optimize_single_calibration_curve_succeed = false;
+      for (const auto& result_quant_method : absoluteQuantitation.getQuantMethods())
       {
-        bool found = false;
-        for (const auto& feature_pruned : feature_concentrations_pruned)
+        if (result_quant_method.getComponentName() == row.getComponentName())
         {
-          if ((feature.IS_feature == feature_pruned.IS_feature)
-                && (std::abs(feature.actual_concentration - feature_pruned.actual_concentration) < 1e-9)
-                && (std::abs(feature.IS_actual_concentration - feature_pruned.IS_actual_concentration) < 1e-9)
-                && (std::abs(feature.dilution_factor - feature_pruned.dilution_factor) < 1e-9))
-          {
-            found = true;
-            break;
-          }
+          optimize_single_calibration_curve_succeed = (result_quant_method.getNPoints() > 0);
+          break;
         }
-        if (!found)
+      }
+      if (!optimize_single_calibration_curve_succeed)
+      {
+        outlier_feature_concentrations = feature_concentrations_pruned;
+        feature_concentrations_pruned.clear();
+      }
+      else // Calibration curve has succeed
+      {
+        for (const auto& feature : all_feature_concentrations)
         {
-          outlier_feature_concentrations.push_back(feature);
+          bool found = false;
+          for (const auto& feature_pruned : feature_concentrations_pruned)
+          {
+            if ((feature.IS_feature == feature_pruned.IS_feature)
+              && (std::abs(feature.actual_concentration - feature_pruned.actual_concentration) < 1e-9)
+              && (std::abs(feature.IS_actual_concentration - feature_pruned.IS_actual_concentration) < 1e-9)
+              && (std::abs(feature.dilution_factor - feature_pruned.dilution_factor) < 1e-9))
+            {
+              found = true;
+              break;
+            }
+          }
+          if (!found)
+          {
+            outlier_feature_concentrations.push_back(feature);
+          }
         }
       }
       components_to_concentrations.erase(row.getComponentName());
-      components_to_concentrations.insert({row.getComponentName(), feature_concentrations_pruned });
+      components_to_concentrations.insert({ row.getComponentName(), feature_concentrations_pruned });
       outlier_components_to_concentrations.erase(row.getComponentName());
       outlier_components_to_concentrations.insert({ row.getComponentName(), outlier_feature_concentrations });
     }
