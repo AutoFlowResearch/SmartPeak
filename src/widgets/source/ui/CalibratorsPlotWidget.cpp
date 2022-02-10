@@ -548,6 +548,7 @@ namespace SmartPeak
                 if (existing_parameter)
                 {
                   existing_parameter->addToList(os.str());
+                  recomputeCalibration();
                 }
                 else
                 {
@@ -558,6 +559,7 @@ namespace SmartPeak
                       { "type", "list" },
                       { "value", os.str() } });
                   user_parameters.addParameter("CalculateCalibration", new_param);
+                  recomputeCalibration();
                 }
               }
             }
@@ -566,6 +568,7 @@ namespace SmartPeak
               if (ImGui::Selectable("Include to calibration"))
               {
                 existing_parameter->removeFromList(os.str());
+                recomputeCalibration();
               }
             }
           }
