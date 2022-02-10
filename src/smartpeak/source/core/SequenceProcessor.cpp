@@ -180,6 +180,7 @@ namespace SmartPeak
     int n_threads = nbThreads(sequenceHandler_IO->getSequence());
     manager.spawn_workers(n_threads);
     sequenceHandler_IO->setSequenceSegments(sequence_segments);
+    sequenceHandler_IO->notifySequenceUpdated();
     notifySequenceSegmentProcessorEnd();
   }
 

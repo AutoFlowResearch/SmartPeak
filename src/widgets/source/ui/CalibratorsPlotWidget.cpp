@@ -35,6 +35,7 @@ namespace SmartPeak
     Filenames filenames; // calculate_calibration actually does not use it
     ParameterSet& user_parameters = sequence_handler_.getSequence().at(0).getRawData().getParameters();
     calculate_calibration.process(sequence_handler_.getSequenceSegments()[0], sequence_handler_, user_parameters, filenames);
+    onSequenceUpdated();
   }
 
   std::string CalibratorsPlotWidget::getSampleNameFromSelectedPoint(
@@ -618,9 +619,24 @@ namespace SmartPeak
   void CalibratorsPlotWidget::draw()
   {
     // update data
-    SessionHandler::CalibrationData calibration_data;
-    session_handler_.setCalibratorsScatterLinePlot(sequence_handler_, calibration_data);
-    setValues(calibration_data, "CalibratorsMainWindow");
+    std::vector<bool> selected_transitions;
+    int test_i = session_handler_.transition_explorer_data.checkbox_body.dimension(0);
+    for (int i = 0; i < session_handler_.transition_explorer_data.checkbox_body.dimension(0); ++i)
+    {
+      selected_transitions.push_back(session_handler_.transition_explorer_data.checkbox_body(i, 0));
+    }
+    if (previous_transition_selection_ != selected_transitions)
+    {
+      refresh_needed_ = true;
+      previous_transition_selection_ = selected_transitions;
+    }
+    if (refresh_needed_)
+    {
+      SessionHandler::CalibrationData calibration_data;
+      session_handler_.setCalibratorsScatterLinePlot(sequence_handler_, calibration_data);
+      setValues(calibration_data, "CalibratorsMainWindow");
+      refresh_needed_ = false;
+    }
 
     param_to_edit_ = nullptr;
 
@@ -655,12 +671,14 @@ namespace SmartPeak
     const SessionHandler::CalibrationData& calibration_data,
     const std::string& plot_title)
   {
+    /*
     if ((calibration_data_.series_names != calibration_data.series_names)
       || (std::abs(calibration_data_.conc_min - calibration_data.conc_min) > 1e-9)
       || (std::abs(calibration_data_.conc_max - calibration_data.conc_max) > 1e-9)
       || (std::abs(calibration_data_.feature_min - calibration_data.feature_min) > 1e-9)
       || (std::abs(calibration_data_.feature_max - calibration_data.feature_max) > 1e-9)
       )
+    */
     {
       reset_zoom_ = true;
       int i = 0;
@@ -733,4 +751,8 @@ namespace SmartPeak
     }
   }
 
+  void CalibratorsPlotWidget::onSequenceUpdated()
+  {
+    refresh_needed_ = true;
+  }
 }
