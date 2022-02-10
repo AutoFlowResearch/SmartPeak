@@ -42,13 +42,15 @@ namespace SmartPeak
   */
   class CalibratorsPlotWidget : 
     public GenericGraphicWidget,
-    public IParameterEditorWidgetObserver
+    public IParameterEditorWidgetObserver,
+    public ISequenceObserver
   {
   public:
     CalibratorsPlotWidget(SessionHandler& session_handler,
                           SequenceHandler& sequence_handler,
                           std::shared_ptr<ExplorerWidget> explorer_widget,
                           std::shared_ptr<ChromatogramPlotWidget> chromatogram_widget,
+                          SequenceObservable& sequence_observable,
                           const std::string title = "") :
       GenericGraphicWidget(title),
       session_handler_(session_handler),
@@ -56,7 +58,10 @@ namespace SmartPeak
       parameter_editor_widget_(*this, false),
       explorer_widget_(explorer_widget),
       chromatogram_widget_(chromatogram_widget)
-    {};
+    {
+      sequence_observable.addSequenceObserver(this);
+    };
+
     void setValues(const SessionHandler::CalibrationData& calibration_data, const std::string& plot_title);
     void draw() override;
 
@@ -64,6 +69,9 @@ namespace SmartPeak
 
     /* IParameterEditorWidgetObserver */
     virtual void onParameterSet(const Parameter& parameter);
+
+    /* ISequenceObserver */
+    virtual void onSequenceUpdated() override;
 
   protected:
     OpenMS::AbsoluteQuantitationMethod* getQuantitationMethod(const std::string& component_name);
@@ -103,6 +111,8 @@ namespace SmartPeak
     std::optional<std::tuple<int, int>> clicked_outlier_point_;
     std::shared_ptr<ExplorerWidget> explorer_widget_;
     std::shared_ptr<ChromatogramPlotWidget> chromatogram_widget_;
+    bool refresh_needed_ = true;
+    std::vector<bool> previous_transition_selection_;
   };
 
 }

@@ -184,6 +184,7 @@ int main(int argc, char** argv)
     application_handler_.sequenceHandler_, 
     injections_explorer_window_, 
     chromatogram_plot_widget_,
+    event_dispatcher,
     "Calibrators");
   auto transitions_explorer_window_ = std::make_shared<ExplorerWidget>("TransitionsExplorerWindow", "Transitions", &event_dispatcher);
   auto features_explorer_window_ = std::make_shared<ExplorerWidget>("FeaturesExplorerWindow", "Features", &event_dispatcher);
