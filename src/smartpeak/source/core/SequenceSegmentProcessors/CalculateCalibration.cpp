@@ -75,8 +75,23 @@ namespace SmartPeak
     ParameterSet params(params_I);
     params.merge(getParameterSchema());
 
-    for (const auto& pms1f_params : params.at("CalculateCalibration"))
+    std::vector<std::tuple<std::string, std::string>> excluded_points;
+    auto excluded_points_param = params.findParameter("CalculateCalibration", "excluded_points");
+    if ((!excluded_points_param) || (excluded_points_param->getType() != "string_list"))
     {
+      throw std::invalid_argument("CalculateCalibration::excluded_points not found or wrong type");
+    }
+    CastValue excluded_points_value;
+    Utilities::parseString(excluded_points_param->getValueAsString(), excluded_points_value);
+    for (const std::string excluded_point_value : excluded_points_value.sl_)
+    {
+      auto sep_pos = excluded_point_value.find(";");
+      if (sep_pos != std::string::npos)
+      {
+        auto sample_name = excluded_point_value.substr(0, sep_pos);
+        auto component_name = excluded_point_value.substr(sep_pos+1, excluded_point_value.size()-sep_pos);
+        excluded_points.push_back(std::make_tuple(sample_name, component_name));
+      }
     }
       
     // get all standards
@@ -91,6 +106,18 @@ namespace SmartPeak
     // check if there are any standards to calculate the calibrators from
     if (standards_indices.empty()) {
       throw std::invalid_argument("standards_indices argument is empty.");
+    }
+
+    // TODO: this is incorrect: exclude samples from excluded points
+    for (const auto [sample_name, component] : excluded_points)
+    {
+      for (const size_t index : sequenceSegmentHandler_IO.getSampleIndices())
+      {
+        if (sequenceHandler_I.getSequence().at(index).getMetaData().getSampleName() == sample_name)
+        {
+          standards_indices.erase(std::remove(standards_indices.begin(), standards_indices.end(), index), standards_indices.end());
+        }
+      }
     }
 
     std::vector<OpenMS::FeatureMap> standards_featureMaps;
@@ -116,6 +143,7 @@ namespace SmartPeak
         row.getComponentName(),
         feature_concentrations
       );
+
       // remove features with an actual concentration of 0.0 or less
       std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration> feature_concentrations_pruned;
       for (const OpenMS::AbsoluteQuantitationStandards::featureConcentration& feature : feature_concentrations) {
