@@ -118,7 +118,8 @@ namespace SmartPeak
       throw std::invalid_argument("standards_indices argument is empty.");
     }
 
-    // TODO: this is incorrect: exclude samples from excluded points
+    // construct excluded points
+    std::vector<size_t> excluded_standards_indices;
     for (const auto [sample_name, component] : excluded_points)
     {
       for (const size_t index : sequenceSegmentHandler_IO.getSampleIndices())
@@ -126,6 +127,7 @@ namespace SmartPeak
         if (sequenceHandler_I.getSequence().at(index).getMetaData().getSampleName() == sample_name)
         {
           standards_indices.erase(std::remove(standards_indices.begin(), standards_indices.end(), index), standards_indices.end());
+          excluded_standards_indices.push_back(index);
         }
       }
     }
@@ -135,6 +137,11 @@ namespace SmartPeak
       standards_featureMaps.push_back(sequenceHandler_I.getSequence().at(index).getRawData().getFeatureMap());
     }
 
+    std::vector<OpenMS::FeatureMap> excluded_standards_featureMaps;
+    for (const size_t index : excluded_standards_indices) {
+      excluded_standards_featureMaps.push_back(sequenceHandler_I.getSequence().at(index).getRawData().getFeatureMap());
+    }
+
     // add in the method parameters
     OpenMS::AbsoluteQuantitation absoluteQuantitation;
     Utilities::setUserParameters(absoluteQuantitation, params_I);
@@ -142,7 +149,9 @@ namespace SmartPeak
     absoluteQuantitation.setQuantMethods(sequenceSegmentHandler_IO.getQuantitationMethods());
     std::map<std::string, std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>> components_to_concentrations;
     std::map<std::string, std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>> outlier_components_to_concentrations;
-    for (const OpenMS::AbsoluteQuantitationMethod& row : sequenceSegmentHandler_IO.getQuantitationMethods()) {
+    std::map<std::string, std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>> excluded_components_to_concentrations;
+    for (const OpenMS::AbsoluteQuantitationMethod& row : sequenceSegmentHandler_IO.getQuantitationMethods())
+    {
       // map standards to features
       OpenMS::AbsoluteQuantitationStandards absoluteQuantitationStandards;
       std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration> feature_concentrations;
@@ -152,6 +161,14 @@ namespace SmartPeak
         standards_featureMaps,
         row.getComponentName(),
         feature_concentrations
+      );
+
+      std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration> excluded_feature_concentrations;
+      absoluteQuantitationStandards.getComponentFeatureConcentrations(
+        sequenceSegmentHandler_IO.getStandardsConcentrations(),
+        excluded_standards_featureMaps,
+        row.getComponentName(),
+        excluded_feature_concentrations
       );
 
       // remove features with an actual concentration of 0.0 or less
@@ -233,10 +250,13 @@ namespace SmartPeak
       components_to_concentrations.insert({ row.getComponentName(), feature_concentrations_pruned });
       outlier_components_to_concentrations.erase(row.getComponentName());
       outlier_components_to_concentrations.insert({ row.getComponentName(), outlier_feature_concentrations });
+      excluded_components_to_concentrations.erase(row.getComponentName());
+      excluded_components_to_concentrations.insert({ row.getComponentName(), excluded_feature_concentrations });
     }
     // store results
     sequenceSegmentHandler_IO.setComponentsToConcentrations(components_to_concentrations);
     sequenceSegmentHandler_IO.setOutlierComponentsToConcentrations(outlier_components_to_concentrations);
+    sequenceSegmentHandler_IO.setExcludedComponentsToConcentrations(outlier_components_to_concentrations);
     sequenceSegmentHandler_IO.getQuantitationMethods() = absoluteQuantitation.getQuantMethods();
     //sequenceSegmentHandler_IO.setQuantitationMethods(absoluteQuantitation.getQuantMethods());
     LOGD << "END optimizeCalibrationCurves";
