@@ -45,12 +45,12 @@ namespace SmartPeak
     if (point)
     {
       const auto [serie, index] = *point;
-      return calibration_data_.injections[serie][index];
+      return calibration_data_.matching_points_.injections_[serie][index];
     }
     else if (outlier_point)
     {
       const auto [serie, index] = *outlier_point;
-      return calibration_data_.outlier_injections[serie][index];
+      return calibration_data_.outlier_points_.injections_[serie][index];
     }
     return "";
   }
@@ -391,25 +391,25 @@ namespace SmartPeak
       }
       if (show_points_)
       {
-        for (int i = 0; i < calibration_data_.conc_raw_data.size(); ++i) {
-          assert(calibration_data_.conc_raw_data.at(i).size() == calibration_data_.feature_raw_data.at(i).size());
+        for (int i = 0; i < calibration_data_.matching_points_.concentrations_.size(); ++i) {
+          assert(calibration_data_.matching_points_.concentrations_.at(i).size() == calibration_data_.matching_points_.features_.at(i).size());
           ImPlot::PushStyleVar(ImPlotStyleVar_Marker, ImPlotMarker_Circle);
           ImPlot::PlotScatter((calibration_data_.series_names.at(i)).c_str(),
-                               calibration_data_.conc_raw_data.at(i).data(),
-                               calibration_data_.feature_raw_data.at(i).data(),
-                               calibration_data_.conc_raw_data.at(i).size());
+                               calibration_data_.matching_points_.concentrations_.at(i).data(),
+                               calibration_data_.matching_points_.features_.at(i).data(),
+                               calibration_data_.matching_points_.concentrations_.at(i).size());
           ImPlot::PopStyleVar();
         }
       }
       if (show_outlier_points_)
       {
-        for (int i = 0; i < calibration_data_.conc_raw_data.size(); ++i) {
-          assert(calibration_data_.outlier_conc_raw_data.at(i).size() == calibration_data_.outlier_feature_raw_data.at(i).size());
+        for (int i = 0; i < calibration_data_.outlier_points_.concentrations_.size(); ++i) {
+          assert(calibration_data_.outlier_points_.concentrations_.at(i).size() == calibration_data_.outlier_points_.features_.at(i).size());
           ImPlot::PushStyleVar(ImPlotStyleVar_Marker, ImPlotMarker_Cross);
           ImPlot::PlotScatter((calibration_data_.series_names.at(i)).c_str(),
-                               calibration_data_.outlier_conc_raw_data.at(i).data(),
-                               calibration_data_.outlier_feature_raw_data.at(i).data(),
-                               calibration_data_.outlier_conc_raw_data.at(i).size());
+                               calibration_data_.outlier_points_.concentrations_.at(i).data(),
+                               calibration_data_.outlier_points_.features_.at(i).data(),
+                               calibration_data_.outlier_points_.concentrations_.at(i).size());
           ImPlot::PopStyleVar();
         }
       }
@@ -418,8 +418,8 @@ namespace SmartPeak
         auto [i, j] = *hovered_point_;
         ImPlot::PushStyleColor(0, ImVec4(ImColor(255, 255, 255)));
         ImPlot::PlotScatter("", // do not appear in legend
-          calibration_data_.conc_raw_data.at(i).data() + j,
-          calibration_data_.feature_raw_data.at(i).data() + j,
+          calibration_data_.matching_points_.concentrations_.at(i).data() + j,
+          calibration_data_.matching_points_.features_.at(i).data() + j,
           1);
         ImPlot::PopStyleColor();
       }
@@ -429,8 +429,8 @@ namespace SmartPeak
         ImPlot::PushStyleColor(0, ImVec4(ImColor(255, 255, 255)));
         ImPlot::PushStyleVar(ImPlotStyleVar_Marker, ImPlotMarker_Cross);
         ImPlot::PlotScatter("", // do not appear in legend
-          calibration_data_.outlier_conc_raw_data.at(i).data() + j,
-          calibration_data_.outlier_feature_raw_data.at(i).data() + j,
+          calibration_data_.outlier_points_.concentrations_.at(i).data() + j,
+          calibration_data_.outlier_points_.features_.at(i).data() + j,
           1);
         ImPlot::PopStyleVar();
         ImPlot::PopStyleColor();
@@ -476,13 +476,13 @@ namespace SmartPeak
             if (hovered_point_)
             {
               const auto [serie, index] = *hovered_point_;
-              feature_concentration = &calibration_data_.feature_concentrations[serie][index];
+              feature_concentration = &calibration_data_.matching_points_.feature_concentrations_[serie][index];
               quantitation_methods = getQuantitationMethod(calibration_data_.series_names[serie]);
             }
             else if (hovered_outlier_point_)
             {
               const auto [serie, index] = *hovered_outlier_point_;
-              feature_concentration = &calibration_data_.outlier_feature_concentrations[serie][index];
+              feature_concentration = &calibration_data_.outlier_points_.feature_concentrations_[serie][index];
               quantitation_methods = getQuantitationMethod(calibration_data_.series_names[serie]);
             }
             if (feature_concentration && quantitation_methods)
@@ -640,10 +640,6 @@ namespace SmartPeak
 
     param_to_edit_ = nullptr;
 
-    if (!calibration_data_.conc_raw_data.size())
-    {
-      return;
-    }
     showQuickHelpToolTip("CalibratorsPlotWidget");
 
     // Build default docking
@@ -698,10 +694,10 @@ namespace SmartPeak
 
   void CalibratorsPlotWidget::getSelectedPoint(ImVec2 point, ImVec2 threshold_point)
   {
-    hovered_point_ = getSelectedPoint(point, threshold_point, calibration_data_.conc_raw_data, calibration_data_.feature_raw_data);
+    hovered_point_ = getSelectedPoint(point, threshold_point, calibration_data_.matching_points_.concentrations_, calibration_data_.matching_points_.features_);
     if (!hovered_point_)
     {
-      hovered_outlier_point_ = getSelectedPoint(point, threshold_point, calibration_data_.outlier_conc_raw_data, calibration_data_.outlier_feature_raw_data);
+      hovered_outlier_point_ = getSelectedPoint(point, threshold_point, calibration_data_.outlier_points_.concentrations_, calibration_data_.outlier_points_.features_);
     }
   }
 

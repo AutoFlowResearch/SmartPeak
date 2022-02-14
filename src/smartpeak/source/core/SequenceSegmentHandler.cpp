@@ -363,4 +363,23 @@ namespace SmartPeak
   {
     return outlier_components_to_concentrations_;
   }
+
+  void SequenceSegmentHandler::setExcludedComponentsToConcentrations(
+    const std::map<std::string, std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>> components_to_concentrations
+  )
+  {
+    excluded_components_to_concentrations_ = components_to_concentrations;
+  }
+
+  std::map<std::string, std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>>&
+    SequenceSegmentHandler::getExcludedComponentsToConcentrations()
+  {
+    return excluded_components_to_concentrations_;
+  }
+
+  const std::map<std::string, std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>>&
+    SequenceSegmentHandler::getExcludedComponentsToConcentrations() const
+  {
+    return excluded_components_to_concentrations_;
+  }
 }

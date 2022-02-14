@@ -341,6 +341,28 @@ namespace SmartPeak
     */
     struct CalibrationData
     {
+
+      struct Points
+      {
+        std::vector<std::vector<float>> concentrations_;
+        std::vector<std::vector<float>> features_;
+        std::vector<std::vector<std::string>> injections_;
+        std::vector<std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>> feature_concentrations_;
+
+        void clear()
+        {
+          concentrations_.clear();
+          features_.clear();
+          injections_.clear();
+          feature_concentrations_.clear();
+        }
+      };
+
+      Points matching_points_;
+      Points outlier_points_;
+      Points excluded_points_;
+
+      /*
       std::vector<std::vector<float>> conc_raw_data;
       std::vector<std::vector<float>> feature_raw_data;
       std::vector<std::vector<std::string>> injections;
@@ -350,7 +372,7 @@ namespace SmartPeak
       std::vector<std::vector<float>> outlier_feature_raw_data;
       std::vector<std::vector<std::string>> outlier_injections;
       std::vector<std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>> outlier_feature_concentrations;
-
+      */
       std::vector<std::vector<float>> conc_fit_data;
       std::vector<std::vector<float>> feature_fit_data;
       std::vector<std::string> series_names;
