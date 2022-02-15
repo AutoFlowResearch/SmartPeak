@@ -325,11 +325,6 @@ namespace SmartPeak
           sorts_specs->SpecsDirty = false;
         }
       }
-      
-      if (is_scanned_ && parameter_editor_widget_.isTableScanRequired()) {
-        is_scanned_ = false;
-        parameter_editor_widget_.setTableScanNotRequired();
-      }
     }
     
     ImGui::EndTable();
