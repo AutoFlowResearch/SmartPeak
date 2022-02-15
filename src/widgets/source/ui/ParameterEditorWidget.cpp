@@ -84,6 +84,10 @@ namespace SmartPeak
       // force conversion.
       validity_test_cast = static_cast<float>(validity_test_cast.i_);
     }
+    else if ((validity_test_cast.getTag() == CastValue::Type::BOOL) && (parameter_.getType() == "string"))
+    {
+      validity_test_cast = input_text_field_.data();
+    }
     bool valid = parameter_.isValid(validity_test_cast);
 
     if (!valid) ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
@@ -91,20 +95,8 @@ namespace SmartPeak
     {
       if (valid)
       {
-        ParameterSet& user_parameters = application_handler_.sequenceHandler_.getSequence().at(0).getRawData().getParameters();
-        Parameter* existing_parameter = user_parameters.findParameter(function_parameter_, parameter_.getName());
-        if (existing_parameter)
-        {
-          existing_parameter->setValueFromString(std::string(input_text_field_.data()), false);
-          table_scan_required_ = true;
-        }
-        else
-        {
-          parameter_.setValueFromString(std::string(input_text_field_.data()), false);
-          parameter_.setAsSchema(false);
-          user_parameters.addParameter(function_parameter_, parameter_);
-        }
-        application_handler_.sequenceHandler_.notifyParametersUpdated();
+        parameter_.setValueFromString(std::string(input_text_field_.data()), false);
+        observer_.onParameterSet(function_parameter_, parameter_);
         ImGui::CloseCurrentPopup();
       }
       else
@@ -122,14 +114,9 @@ namespace SmartPeak
     }
 
     ImGui::SameLine();
-    if (ImGui::Button("Remove"))
+    if (enable_remove_ && ImGui::Button("Remove"))
     {
-      ParameterSet& user_parameters = application_handler_.sequenceHandler_.getSequence().at(0).getRawData().getParameters();
-      if (user_parameters.count(function_parameter_) == 1)
-      {
-        user_parameters[function_parameter_].removeParameter(parameter_.getName());
-        application_handler_.sequenceHandler_.notifyParametersUpdated();
-      }
+        observer_.onParameterRemoved(function_parameter_, parameter_);
       ImGui::CloseCurrentPopup();
     }
 

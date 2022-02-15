@@ -37,7 +37,7 @@ namespace SmartPeak
     session_handler_(session_handler),
     application_handler_(application_handler),
     table_id_(table_id),
-    parameter_editor_widget_(application_handler)
+    parameter_editor_widget_(*this)
   {
     application_handler_.sequenceHandler_.addParametersObserver(this);
     application_handler_.sequenceHandler_.addWorkflowObserver(this);
@@ -57,6 +57,33 @@ namespace SmartPeak
   void ParametersTableWidget::onWorkflowUpdated()
   {
     refresh_needed_ = true;
+  }
+
+  void ParametersTableWidget::onParameterSet(const std::string& function_parameter, const Parameter& parameter)
+  {
+    ParameterSet& user_parameters = application_handler_.sequenceHandler_.getSequence().at(0).getRawData().getParameters();
+    Parameter* existing_parameter = user_parameters.findParameter(function_parameter, parameter.getName());
+    if (existing_parameter)
+    {
+      existing_parameter->setValueFromString(parameter.getValueAsString(), false);
+    }
+    else
+    {
+      Parameter new_param = parameter;
+      new_param.setAsSchema(false);
+      user_parameters.addParameter(function_parameter, new_param);
+    }
+    application_handler_.sequenceHandler_.notifyParametersUpdated();
+  }
+
+  void ParametersTableWidget::onParameterRemoved(const std::string& function_parameter, const Parameter& parameter)
+  {
+    ParameterSet& user_parameters = application_handler_.sequenceHandler_.getSequence().at(0).getRawData().getParameters();
+    if (user_parameters.count(function_parameter) == 1)
+    {
+      user_parameters[function_parameter].removeParameter(parameter.getName());
+      application_handler_.sequenceHandler_.notifyParametersUpdated();
+    }
   }
 
   void ParametersTableWidget::updateParametersTable()

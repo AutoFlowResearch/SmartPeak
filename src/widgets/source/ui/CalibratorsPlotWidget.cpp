@@ -292,7 +292,7 @@ namespace SmartPeak
     ImGui::End();
   }
 
-  void CalibratorsPlotWidget::onParameterSet(const Parameter& parameter)
+  void CalibratorsPlotWidget::onParameterSet(const std::string& function_parameter, const Parameter& parameter)
   {
     // find back the parameter and set it
     
