@@ -129,6 +129,11 @@ namespace SmartPeak
 
   void CalibratorsPlotWidget::displayParameters()
   {
+    if (component_cstr_.empty())
+    {
+      return;
+    }
+
     static const std::vector<std::string> output_parameters = 
     {
       "llod",

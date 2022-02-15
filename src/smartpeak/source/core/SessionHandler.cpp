@@ -2014,6 +2014,38 @@ namespace SmartPeak
     result.selected_transitions_ = selected_transitions;
     result.selected_transition_groups_ = selected_transition_groups;
   }
+
+  std::tuple<
+    std::vector<float>,
+    std::vector<float>,
+    std::vector<std::string>,
+    std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>
+  >
+  setCalibratorsPoints(const std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>& component_to_concentration,
+                       const OpenMS::AbsoluteQuantitationMethod& quant_method,
+                       SessionHandler::CalibrationData& calibration_data,
+                       const SequenceSegmentHandler& sequence_segment
+                       )
+  {
+    OpenMS::AbsoluteQuantitation absQuant;
+    std::vector<float> concentrations, feature_response;
+    std::vector<std::string> injections;
+    std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration> feature_concentrations;
+    for (const auto& point : component_to_concentration) {
+      auto ratio = float(point.actual_concentration / point.IS_actual_concentration / point.dilution_factor);
+      concentrations.push_back(ratio);
+      float y_datum = absQuant.calculateRatio(point.feature, point.IS_feature, quant_method.getFeatureName());
+      feature_response.push_back(y_datum);
+      injections.push_back(findSampleNameFromStandardConcentration(sequence_segment, quant_method.getComponentName(), point));
+      feature_concentrations.push_back(point);
+      calibration_data.feature_min = std::min(y_datum, calibration_data.feature_min);
+      calibration_data.feature_max = std::max(y_datum, calibration_data.feature_max);
+      calibration_data.conc_min = std::min(ratio, calibration_data.conc_min);
+      calibration_data.conc_max = std::max(ratio, calibration_data.conc_max);
+    }
+    return std::make_tuple(concentrations, feature_response, injections, feature_concentrations);
+  }
+
   bool SessionHandler::setCalibratorsScatterLinePlot(const SequenceHandler & sequence_handler, CalibrationData& result)
   {
     int n_points = 0;
@@ -2100,40 +2132,28 @@ namespace SmartPeak
               }
             }
             // Extract out the points used to make the line of best fit in `ComponentsToConcentrations`
-            std::vector<float> x_raw_data, y_raw_data;
-            std::vector<std::string> injections;
-            std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration> feature_concentrations;
-            OpenMS::AbsoluteQuantitation absQuant;
-            for (const auto& point : sequence_segment.getComponentsToConcentrations().at(quant_method.getComponentName()))
-            {
-              auto ratio = float(point.actual_concentration / point.IS_actual_concentration / point.dilution_factor);
-              x_raw_data.push_back(ratio);
-              float y_datum = absQuant.calculateRatio(point.feature, point.IS_feature, quant_method.getFeatureName());
-              y_raw_data.push_back(y_datum);
-              injections.push_back(findSampleNameFromStandardConcentration(sequence_segment, quant_method.getComponentName(), point));
-              feature_concentrations.push_back(point);
-              result.feature_min = std::min(y_datum, result.feature_min);
-              result.feature_max = std::max(y_datum, result.feature_max);
-              result.conc_min = std::min(ratio, result.conc_min);
-              result.conc_max = std::max(ratio, result.conc_max);
-            }
+            auto [x_raw_data, y_raw_data, injections, feature_concentrations] =
+              setCalibratorsPoints(
+                sequence_segment.getComponentsToConcentrations().at(quant_method.getComponentName()), 
+                quant_method, 
+                result, 
+                sequence_segment);
             n_points += x_raw_data.size();
             // Extract out the points out of the line of best fit in `ComponentsToConcentrations`
-            std::vector<float> outlier_x_raw_data, outlier_y_raw_data;
-            std::vector<std::string> outlier_injections;
-            std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration> outlier_feature_concentrations;
-            for (const auto& point : sequence_segment.getOutlierComponentsToConcentrations().at(quant_method.getComponentName())) {
-              auto ratio = float(point.actual_concentration / point.IS_actual_concentration / point.dilution_factor);
-              outlier_x_raw_data.push_back(ratio);
-              float y_datum = absQuant.calculateRatio(point.feature, point.IS_feature, quant_method.getFeatureName());
-              outlier_y_raw_data.push_back(y_datum);
-              outlier_injections.push_back(findSampleNameFromStandardConcentration(sequence_segment, quant_method.getComponentName(), point));
-              outlier_feature_concentrations.push_back(point);
-              result.feature_min = std::min(y_datum, result.feature_min);
-              result.feature_max = std::max(y_datum, result.feature_max);
-              result.conc_min = std::min(ratio, result.conc_min);
-              result.conc_max = std::max(ratio, result.conc_max);
-            }
+            auto [outlier_x_raw_data, outlier_y_raw_data, outlier_injections, outlier_feature_concentrations] = 
+              setCalibratorsPoints(
+                sequence_segment.getOutlierComponentsToConcentrations().at(quant_method.getComponentName()),
+                quant_method,
+                result,
+                sequence_segment);
+            n_points += outlier_x_raw_data.size();
+            // Excluded points
+            auto [excluded_x_raw_data, excluded_y_raw_data, excluded_injections, excluded_feature_concentrations] =
+              setCalibratorsPoints(
+                sequence_segment.getExcludedComponentsToConcentrations().at(quant_method.getComponentName()),
+                quant_method,
+                result,
+                sequence_segment);
             n_points += outlier_x_raw_data.size();
             // add points
             if (n_points < max_nb_points) {
@@ -2145,6 +2165,10 @@ namespace SmartPeak
               result.outlier_points_.features_.push_back(outlier_y_raw_data);
               result.outlier_points_.injections_.push_back(outlier_injections);
               result.outlier_points_.feature_concentrations_.push_back(outlier_feature_concentrations);
+              result.excluded_points_.concentrations_.push_back(excluded_x_raw_data);
+              result.excluded_points_.features_.push_back(excluded_y_raw_data);
+              result.excluded_points_.injections_.push_back(excluded_injections);
+              result.excluded_points_.feature_concentrations_.push_back(excluded_feature_concentrations);
               result.series_names.push_back(quant_method.getComponentName());
             }
             else
