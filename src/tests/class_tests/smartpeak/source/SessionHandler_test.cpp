@@ -724,7 +724,8 @@ TEST(SessionHandler, setCalibratorsScatterLinePlot1)
   EXPECT_EQ(calibrator_data.matching_points_.features_.size(), 0);
   EXPECT_EQ(calibrator_data.outlier_points_.concentrations_.size(), 0);
   EXPECT_EQ(calibrator_data.outlier_points_.features_.size(), 0);
-  EXPECT_EQ(calibrator_data.series_names.size(), 0);
+  EXPECT_EQ(calibrator_data.excluded_points_.concentrations_.size(), 0);
+  EXPECT_EQ(calibrator_data.excluded_points_.features_.size(), 0);  EXPECT_EQ(calibrator_data.series_names.size(), 0);
   EXPECT_EQ(calibrator_data.x_axis_title, std::string(""));
   EXPECT_EQ(calibrator_data.y_axis_title, std::string(""));
 }

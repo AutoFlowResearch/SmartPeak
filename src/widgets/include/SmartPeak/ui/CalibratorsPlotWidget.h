@@ -25,7 +25,7 @@
 
 #include <SmartPeak/core/SessionHandler.h>
 #include <SmartPeak/ui/Widget.h>
-#include <SmartPeak/ui/ParameterEditorWidget2.h>
+#include <SmartPeak/ui/ParameterEditorWidget.h>
 #include <SmartPeak/ui/ExplorerWidget.h>
 #include <SmartPeak/ui/ChromatogramPlotWidget.h>
 
@@ -68,7 +68,8 @@ namespace SmartPeak
     bool reset_layout_ = true;
 
     /* IParameterEditorWidgetObserver */
-    virtual void onParameterSet(const Parameter& parameter);
+    virtual void onParameterSet(const std::string& function_parameter, const Parameter& parameter);
+    virtual void onParameterRemoved(const std::string& function_parameter, const Parameter& parameter) {};
 
     /* ISequenceObserver */
     virtual void onSequenceUpdated() override;
@@ -110,7 +111,7 @@ namespace SmartPeak
     bool reset_zoom_ = true;
     SessionHandler& session_handler_;
     SequenceHandler& sequence_handler_;
-    ParameterEditorWidget2 parameter_editor_widget_;
+    ParameterEditorWidget parameter_editor_widget_;
     std::shared_ptr<Parameter> param_to_edit_;
     std::optional<std::tuple<int, int>> hovered_matching_point_;
     std::optional<std::tuple<int, int>> hovered_outlier_point_;
