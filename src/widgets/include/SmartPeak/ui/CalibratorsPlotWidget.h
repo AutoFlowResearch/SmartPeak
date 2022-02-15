@@ -81,21 +81,28 @@ namespace SmartPeak
     void addParameterRow(std::shared_ptr<Parameter> param, bool editable);
     void getSelectedPoint(ImVec2 point, ImVec2 threshold_point);
     void showChromatogram(const std::string& sample_name);
+    void plotPoints(bool show_flag, const SessionHandler::CalibrationData::Points& points, int marker_style);
+    void plotHoveredPoint(
+      const std::optional<std::tuple<int, int>>& hovered_point,
+      const SessionHandler::CalibrationData::Points& points);
     std::string getSampleNameFromSelectedPoint(
-      const std::optional<std::tuple<int, int>>& point, 
-      const std::optional<std::tuple<int, int>>& outlier_point) const;
+      const std::optional<std::tuple<int, int>>& matching_point, 
+      const std::optional<std::tuple<int, int>>& outlier_point,
+      const std::optional<std::tuple<int, int>>& excluded_point) const;
     std::optional<std::tuple<int, int>> getSelectedPoint(
       ImVec2 point,
       ImVec2 threshold_point,
-      std::vector<std::vector<float>> concentrations_serie,
-      std::vector<std::vector<float>> feature_serie);
+      const SessionHandler::CalibrationData::Points& points);
     std::shared_ptr<Parameter> CalibratorParameterToSmartPeakParameter(const OpenMS::Param::ParamEntry& param);
+
+  protected:
     SessionHandler::CalibrationData calibration_data_;
     std::string plot_title_; // used as the ID of the plot as well so this should be unique across the different Widgets
     bool show_legend_ = true;
     bool show_fit_line_ = true;
-    bool show_points_ = true;
+    bool show_matching_points_ = true;
     bool show_outlier_points_ = true;
+    bool show_excluded_points_ = true;
     std::string current_component_;
     std::vector<std::string> components_;
     std::vector<const char*> component_cstr_;
@@ -105,10 +112,12 @@ namespace SmartPeak
     SequenceHandler& sequence_handler_;
     ParameterEditorWidget2 parameter_editor_widget_;
     std::shared_ptr<Parameter> param_to_edit_;
-    std::optional<std::tuple<int, int>> hovered_point_;
+    std::optional<std::tuple<int, int>> hovered_matching_point_;
     std::optional<std::tuple<int, int>> hovered_outlier_point_;
-    std::optional<std::tuple<int, int>> clicked_point_;
+    std::optional<std::tuple<int, int>> hovered_excluded_point_;
+    std::optional<std::tuple<int, int>> clicked_matching_point_;
     std::optional<std::tuple<int, int>> clicked_outlier_point_;
+    std::optional<std::tuple<int, int>> clicked_excluded_point_;
     std::shared_ptr<ExplorerWidget> explorer_widget_;
     std::shared_ptr<ChromatogramPlotWidget> chromatogram_widget_;
     bool refresh_needed_ = true;
