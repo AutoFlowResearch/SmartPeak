@@ -62,7 +62,6 @@ namespace SmartPeak
       sequence_observable.addSequenceObserver(this);
     };
 
-    void setValues(const SessionHandler::CalibrationData& calibration_data, const std::string& plot_title);
     void draw() override;
 
     bool reset_layout_ = true;
@@ -75,6 +74,7 @@ namespace SmartPeak
     virtual void onSequenceUpdated() override;
 
   protected:
+    void setCalibrationData(const SessionHandler::CalibrationData& calibration_data, const std::string& plot_title);
     OpenMS::AbsoluteQuantitationMethod* getQuantitationMethod(const std::string& component_name);
     void displayParameters();
     void displayPlot();
