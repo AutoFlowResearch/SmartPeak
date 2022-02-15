@@ -651,7 +651,7 @@ namespace SmartPeak
     {
       SessionHandler::CalibrationData calibration_data;
       session_handler_.setCalibratorsScatterLinePlot(sequence_handler_, calibration_data);
-      setValues(calibration_data, "CalibratorsMainWindow");
+      setCalibrationData(calibration_data, "CalibratorsMainWindow");
       refresh_needed_ = false;
     }
 
@@ -680,7 +680,7 @@ namespace SmartPeak
 
   }
 
-  void CalibratorsPlotWidget::setValues(
+  void CalibratorsPlotWidget::setCalibrationData(
     const SessionHandler::CalibrationData& calibration_data,
     const std::string& plot_title)
   {
