@@ -246,7 +246,7 @@ namespace SmartPeak
     // store results
     sequenceSegmentHandler_IO.setComponentsToConcentrations(components_to_concentrations);
     sequenceSegmentHandler_IO.setOutlierComponentsToConcentrations(outlier_components_to_concentrations);
-    sequenceSegmentHandler_IO.setExcludedComponentsToConcentrations(outlier_components_to_concentrations);
+    sequenceSegmentHandler_IO.setExcludedComponentsToConcentrations(excluded_components_to_concentrations);
     sequenceSegmentHandler_IO.getQuantitationMethods() = absoluteQuantitation.getQuantMethods();
     //sequenceSegmentHandler_IO.setQuantitationMethods(absoluteQuantitation.getQuantMethods());
     LOGD << "END optimizeCalibrationCurves";

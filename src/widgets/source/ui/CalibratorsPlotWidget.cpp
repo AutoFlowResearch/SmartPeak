@@ -39,18 +39,25 @@ namespace SmartPeak
   }
 
   std::string CalibratorsPlotWidget::getSampleNameFromSelectedPoint(
-    const std::optional<std::tuple<int, int>>& point,
-    const std::optional<std::tuple<int, int>>& outlier_point) const
+    const std::optional<std::tuple<int, int>>& matching_point,
+    const std::optional<std::tuple<int, int>>& outlier_point,
+    const std::optional<std::tuple<int, int>>& excluded_point
+  ) const
   {
-    if (point)
+    if (matching_point)
     {
-      const auto [serie, index] = *point;
+      const auto [serie, index] = *matching_point;
       return calibration_data_.matching_points_.injections_[serie][index];
     }
     else if (outlier_point)
     {
       const auto [serie, index] = *outlier_point;
       return calibration_data_.outlier_points_.injections_[serie][index];
+    }
+    else if (excluded_point)
+    {
+      const auto [serie, index] = *excluded_point;
+      return calibration_data_.excluded_points_.injections_[serie][index];
     }
     return "";
   }
@@ -337,6 +344,38 @@ namespace SmartPeak
     recomputeCalibration();
   }
 
+  void CalibratorsPlotWidget::plotPoints(bool show_flag, const SessionHandler::CalibrationData::Points& points, int marker_style)
+  {
+    if (show_flag)
+    {
+      for (int i = 0; i < points.concentrations_.size(); ++i) {
+        assert(points.concentrations_.at(i).size() == points.features_.at(i).size());
+        ImPlot::PushStyleVar(ImPlotStyleVar_Marker, marker_style);
+        ImPlot::PlotScatter((calibration_data_.series_names.at(i)).c_str(),
+          points.concentrations_.at(i).data(),
+          points.features_.at(i).data(),
+          points.concentrations_.at(i).size());
+        ImPlot::PopStyleVar();
+      }
+    }
+  }
+    
+  void CalibratorsPlotWidget::plotHoveredPoint(
+    const std::optional<std::tuple<int, int>>& hovered_point,
+    const SessionHandler::CalibrationData::Points& points)
+  {
+    if (hovered_point)
+    {
+      auto [i, j] = *hovered_point;
+      ImPlot::PushStyleColor(0, ImVec4(ImColor(255, 255, 255)));
+      ImPlot::PlotScatter("", // do not appear in legend
+        points.concentrations_.at(i).data() + j,
+        points.features_.at(i).data() + j,
+        1);
+      ImPlot::PopStyleColor();
+    }
+  }
+
   void CalibratorsPlotWidget::displayPlot()
   {
     ImGui::Begin("Calibrator Plot");
@@ -344,9 +383,11 @@ namespace SmartPeak
     ImGui::SameLine();
     ImGui::Checkbox("Fit line", &show_fit_line_);
     ImGui::SameLine();
-    ImGui::Checkbox("Points", &show_points_);
+    ImGui::Checkbox("Points", &show_matching_points_);
     ImGui::SameLine();
-    ImGui::Checkbox("Outlier points", &show_outlier_points_);
+    ImGui::Checkbox("Outlier", &show_outlier_points_);
+    ImGui::SameLine();
+    ImGui::Checkbox("Excluded", &show_excluded_points_);
     ImGui::SameLine();
     if (ImGui::Button("Fit Zoom"))
     {
@@ -394,52 +435,15 @@ namespace SmartPeak
           ImPlot::PopStyleVar();
         }
       }
-      if (show_points_)
-      {
-        for (int i = 0; i < calibration_data_.matching_points_.concentrations_.size(); ++i) {
-          assert(calibration_data_.matching_points_.concentrations_.at(i).size() == calibration_data_.matching_points_.features_.at(i).size());
-          ImPlot::PushStyleVar(ImPlotStyleVar_Marker, ImPlotMarker_Circle);
-          ImPlot::PlotScatter((calibration_data_.series_names.at(i)).c_str(),
-                               calibration_data_.matching_points_.concentrations_.at(i).data(),
-                               calibration_data_.matching_points_.features_.at(i).data(),
-                               calibration_data_.matching_points_.concentrations_.at(i).size());
-          ImPlot::PopStyleVar();
-        }
-      }
-      if (show_outlier_points_)
-      {
-        for (int i = 0; i < calibration_data_.outlier_points_.concentrations_.size(); ++i) {
-          assert(calibration_data_.outlier_points_.concentrations_.at(i).size() == calibration_data_.outlier_points_.features_.at(i).size());
-          ImPlot::PushStyleVar(ImPlotStyleVar_Marker, ImPlotMarker_Cross);
-          ImPlot::PlotScatter((calibration_data_.series_names.at(i)).c_str(),
-                               calibration_data_.outlier_points_.concentrations_.at(i).data(),
-                               calibration_data_.outlier_points_.features_.at(i).data(),
-                               calibration_data_.outlier_points_.concentrations_.at(i).size());
-          ImPlot::PopStyleVar();
-        }
-      }
-      if (hovered_point_)
-      {
-        auto [i, j] = *hovered_point_;
-        ImPlot::PushStyleColor(0, ImVec4(ImColor(255, 255, 255)));
-        ImPlot::PlotScatter("", // do not appear in legend
-          calibration_data_.matching_points_.concentrations_.at(i).data() + j,
-          calibration_data_.matching_points_.features_.at(i).data() + j,
-          1);
-        ImPlot::PopStyleColor();
-      }
-      if (hovered_outlier_point_)
-      {
-        auto [i, j] = *hovered_outlier_point_;
-        ImPlot::PushStyleColor(0, ImVec4(ImColor(255, 255, 255)));
-        ImPlot::PushStyleVar(ImPlotStyleVar_Marker, ImPlotMarker_Cross);
-        ImPlot::PlotScatter("", // do not appear in legend
-          calibration_data_.outlier_points_.concentrations_.at(i).data() + j,
-          calibration_data_.outlier_points_.features_.at(i).data() + j,
-          1);
-        ImPlot::PopStyleVar();
-        ImPlot::PopStyleColor();
-      }
+
+      plotPoints(show_matching_points_, calibration_data_.matching_points_, ImPlotMarker_Circle);
+      plotPoints(show_outlier_points_, calibration_data_.outlier_points_, ImPlotMarker_Square);
+      plotPoints(show_excluded_points_, calibration_data_.excluded_points_, ImPlotMarker_Cross);
+
+      plotHoveredPoint(hovered_matching_point_, calibration_data_.matching_points_);
+      plotHoveredPoint(hovered_outlier_point_, calibration_data_.outlier_points_);
+      plotHoveredPoint(hovered_excluded_point_, calibration_data_.excluded_points_);
+
       // legend hover management
       int i = 0;
       for (const auto& serie_name : calibration_data_.series_names)
@@ -451,8 +455,8 @@ namespace SmartPeak
         ++i;
       }
 
-      // Hovered points
-      hovered_point_ = std::nullopt;
+      // Compute hovered points and tooltips
+      hovered_matching_point_ = std::nullopt;
       hovered_outlier_point_ = std::nullopt;
       if (ImPlot::IsPlotHovered())
       {
@@ -463,24 +467,25 @@ namespace SmartPeak
         auto threshold_plot_point = ImPlot::PixelsToPlot(ImVec2(5, 5));
         ImVec2 threshold_point(threshold_plot_point.x - zero_plot_point.x, zero_plot_point.y - threshold_plot_point.y);
         getSelectedPoint(mouse_point, threshold_point);
-        if (hovered_outlier_point_ || hovered_point_)
+        if (hovered_outlier_point_ || hovered_matching_point_ || hovered_excluded_point_)
         {
           if (ImGui::IsMouseClicked(1))
           {
-            clicked_point_ = hovered_point_;
+            clicked_matching_point_ = hovered_matching_point_;
             clicked_outlier_point_ = hovered_outlier_point_;
+            clicked_excluded_point_ = hovered_excluded_point_;
             ImGui::OpenPopup("Point Actions");
           }
           else if (!ImGui::IsPopupOpen("Point Actions")) // just hovered
           {
             ImGui::BeginTooltip();
-            auto sample_name = getSampleNameFromSelectedPoint(hovered_point_, hovered_outlier_point_);
+            auto sample_name = getSampleNameFromSelectedPoint(hovered_matching_point_, hovered_outlier_point_, hovered_excluded_point_);
             ImGui::Text("%s", sample_name.c_str());
             OpenMS::AbsoluteQuantitationStandards::featureConcentration* feature_concentration = nullptr;
             OpenMS::AbsoluteQuantitationMethod* quantitation_methods = nullptr;
-            if (hovered_point_)
+            if (hovered_matching_point_)
             {
-              const auto [serie, index] = *hovered_point_;
+              const auto [serie, index] = *hovered_matching_point_;
               feature_concentration = &calibration_data_.matching_points_.feature_concentrations_[serie][index];
               quantitation_methods = getQuantitationMethod(calibration_data_.series_names[serie]);
             }
@@ -488,6 +493,12 @@ namespace SmartPeak
             {
               const auto [serie, index] = *hovered_outlier_point_;
               feature_concentration = &calibration_data_.outlier_points_.feature_concentrations_[serie][index];
+              quantitation_methods = getQuantitationMethod(calibration_data_.series_names[serie]);
+            }
+            else if (hovered_excluded_point_)
+            {
+              const auto [serie, index] = *hovered_excluded_point_;
+              feature_concentration = &calibration_data_.excluded_points_.feature_concentrations_[serie][index];
               quantitation_methods = getQuantitationMethod(calibration_data_.series_names[serie]);
             }
             if (feature_concentration && quantitation_methods)
@@ -533,14 +544,14 @@ namespace SmartPeak
         {
           if (ImGui::Selectable("Show chromatogram"))
           {
-            auto sample_name = getSampleNameFromSelectedPoint(clicked_point_, clicked_outlier_point_);
+            auto sample_name = getSampleNameFromSelectedPoint(clicked_matching_point_, clicked_outlier_point_, clicked_excluded_point_);
             if (!sample_name.empty())
             {
               showChromatogram(sample_name);
             }
           }
           // Exlude/Include point
-          auto sample_name = getSampleNameFromSelectedPoint(clicked_point_, clicked_outlier_point_);
+          auto sample_name = getSampleNameFromSelectedPoint(clicked_matching_point_, clicked_outlier_point_, clicked_excluded_point_);
           if (!sample_name.empty())
           {
             std::ostringstream os;
@@ -582,8 +593,9 @@ namespace SmartPeak
         }
         else
         {
-          clicked_point_ = std::nullopt;
+          clicked_matching_point_ = std::nullopt;
           clicked_outlier_point_ = std::nullopt;
+          clicked_excluded_point_ = std::nullopt;
         }
       }
       // try to detect label hovered.
@@ -672,49 +684,43 @@ namespace SmartPeak
     const SessionHandler::CalibrationData& calibration_data,
     const std::string& plot_title)
   {
-    /*
-    if ((calibration_data_.series_names != calibration_data.series_names)
-      || (std::abs(calibration_data_.conc_min - calibration_data.conc_min) > 1e-9)
-      || (std::abs(calibration_data_.conc_max - calibration_data.conc_max) > 1e-9)
-      || (std::abs(calibration_data_.feature_min - calibration_data.feature_min) > 1e-9)
-      || (std::abs(calibration_data_.feature_max - calibration_data.feature_max) > 1e-9)
-      )
-    */
+    reset_zoom_ = true;
+    int i = 0;
+    components_.clear();
+    component_cstr_.clear();
+    for (const auto& component : calibration_data.series_names)
     {
-      reset_zoom_ = true;
-      int i = 0;
-      components_.clear();
-      component_cstr_.clear();
-      for (const auto& component : calibration_data.series_names)
-      {
-        components_.push_back(component);
-        component_cstr_.push_back(components_.at(i).c_str());
-        ++i;
-      }
-      selected_component_ = 0;
+      components_.push_back(component);
+      component_cstr_.push_back(components_.at(i).c_str());
+      ++i;
     }
+    selected_component_ = 0;
     calibration_data_ = calibration_data;
     plot_title_ = plot_title;
   }
 
   void CalibratorsPlotWidget::getSelectedPoint(ImVec2 point, ImVec2 threshold_point)
   {
-    hovered_point_ = getSelectedPoint(point, threshold_point, calibration_data_.matching_points_.concentrations_, calibration_data_.matching_points_.features_);
-    if (!hovered_point_)
+    hovered_matching_point_ = getSelectedPoint(point, threshold_point, calibration_data_.matching_points_);
+    if (!hovered_matching_point_)
     {
-      hovered_outlier_point_ = getSelectedPoint(point, threshold_point, calibration_data_.outlier_points_.concentrations_, calibration_data_.outlier_points_.features_);
+      hovered_outlier_point_ = getSelectedPoint(point, threshold_point, calibration_data_.outlier_points_);
+    }
+    if (!hovered_outlier_point_)
+    {
+      hovered_excluded_point_ = getSelectedPoint(point, threshold_point, calibration_data_.excluded_points_);
     }
   }
 
-  std::optional<std::tuple<int, int>> CalibratorsPlotWidget::getSelectedPoint(ImVec2 point,
-                                              ImVec2 threshold_point,
-                                              std::vector<std::vector<float>> concentrations_serie,
-                                              std::vector<std::vector<float>> feature_serie)
+  std::optional<std::tuple<int, int>> CalibratorsPlotWidget::getSelectedPoint(
+    ImVec2 point,
+    ImVec2 threshold_point,
+    const SessionHandler::CalibrationData::Points& points)
   {
-    for (int i = 0; i < concentrations_serie.size(); ++i)
+    for (int i = 0; i < points.concentrations_.size(); ++i)
     {
-      const auto& concentrations = concentrations_serie[i];
-      const auto& features = feature_serie[i];
+      const auto& concentrations = points.concentrations_[i];
+      const auto& features = points.features_[i];
       for (int j = 0; j < concentrations.size(); ++j)
       {
         const auto& concentration = concentrations[j];
