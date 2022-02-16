@@ -361,19 +361,22 @@ namespace SmartPeak
     }
   }
     
-  void CalibratorsPlotWidget::plotHoveredPoint(
+  void CalibratorsPlotWidget::plotSelectedPoint(
     const std::optional<std::tuple<int, int>>& hovered_point,
-    const SessionHandler::CalibrationData::Points& points)
+    const SessionHandler::CalibrationData::Points& points,
+    int marker_style)
   {
     if (hovered_point)
     {
       auto [i, j] = *hovered_point;
       ImPlot::PushStyleColor(0, ImVec4(ImColor(255, 255, 255)));
+      ImPlot::PushStyleVar(ImPlotStyleVar_Marker, marker_style);
       ImPlot::PlotScatter("", // do not appear in legend
         points.concentrations_.at(i).data() + j,
         points.features_.at(i).data() + j,
         1);
       ImPlot::PopStyleColor();
+      ImPlot::PopStyleVar();
     }
   }
 
@@ -441,9 +444,13 @@ namespace SmartPeak
       plotPoints(show_outlier_points_, calibration_data_.outlier_points_, ImPlotMarker_Square);
       plotPoints(show_excluded_points_, calibration_data_.excluded_points_, ImPlotMarker_Cross);
 
-      plotHoveredPoint(hovered_matching_point_, calibration_data_.matching_points_);
-      plotHoveredPoint(hovered_outlier_point_, calibration_data_.outlier_points_);
-      plotHoveredPoint(hovered_excluded_point_, calibration_data_.excluded_points_);
+      plotSelectedPoint(hovered_matching_point_, calibration_data_.matching_points_, ImPlotMarker_Circle);
+      plotSelectedPoint(hovered_outlier_point_, calibration_data_.outlier_points_, ImPlotMarker_Square);
+      plotSelectedPoint(hovered_excluded_point_, calibration_data_.excluded_points_, ImPlotMarker_Cross);
+
+      plotSelectedPoint(clicked_matching_point_, calibration_data_.matching_points_, ImPlotMarker_Circle);
+      plotSelectedPoint(clicked_outlier_point_, calibration_data_.outlier_points_, ImPlotMarker_Square);
+      plotSelectedPoint(clicked_excluded_point_, calibration_data_.excluded_points_, ImPlotMarker_Cross);
 
       // legend hover management
       int i = 0;
