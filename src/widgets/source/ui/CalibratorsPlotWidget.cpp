@@ -464,6 +464,7 @@ namespace SmartPeak
       }
 
       // Compute hovered points and tooltips
+      bool open_context_menu = false;
       hovered_matching_point_ = std::nullopt;
       hovered_outlier_point_ = std::nullopt;
       if (ImPlot::IsPlotHovered())
@@ -482,7 +483,7 @@ namespace SmartPeak
             clicked_matching_point_ = hovered_matching_point_;
             clicked_outlier_point_ = hovered_outlier_point_;
             clicked_excluded_point_ = hovered_excluded_point_;
-            ImGui::OpenPopup("Point Actions");
+            open_context_menu = true;
           }
           else if (!ImGui::IsPopupOpen("Point Actions")) // just hovered
           {
@@ -549,63 +550,6 @@ namespace SmartPeak
             ImGui::EndTooltip();
           }
         }
-        if (ImGui::BeginPopup("Point Actions"))
-        {
-          if (ImGui::Selectable("Show chromatogram"))
-          {
-            auto [sample_name, serie_name] = getSampleNameAndSerieFromSelectedPoint(clicked_matching_point_, clicked_outlier_point_, clicked_excluded_point_);
-            if (!sample_name.empty())
-            {
-              showChromatogram(sample_name);
-            }
-          }
-          // Exlude/Include point
-          auto [sample_name, serie_name] = getSampleNameAndSerieFromSelectedPoint(clicked_matching_point_, clicked_outlier_point_, clicked_excluded_point_);
-          if (!sample_name.empty())
-          {
-            std::ostringstream os;
-            os << sample_name << ";" << serie_name;
-            ParameterSet& user_parameters = sequence_handler_.getSequence().at(0).getRawData().getParameters();
-            Parameter* existing_parameter = user_parameters.findParameter("CalculateCalibration", "excluded_points");
-            if ((!existing_parameter) || (!existing_parameter->isInList(os.str())))
-            {
-              if (ImGui::Selectable("Exclude from calibration"))
-              {
-                if (existing_parameter)
-                {
-                  existing_parameter->addToList(os.str());
-                  recomputeCalibration();
-                }
-                else
-                {
-                  std::ostringstream os;
-                  os << "[\'" << sample_name << ";" << calibration_data_.series_names[selected_component_] << "\']";
-                  Parameter new_param(
-                    { { "name", "excluded_points" },
-                      { "type", "list" },
-                      { "value", os.str() } });
-                  user_parameters.addParameter("CalculateCalibration", new_param);
-                  recomputeCalibration();
-                }
-              }
-            }
-            else if (existing_parameter && existing_parameter->isInList(os.str()))
-            {
-              if (ImGui::Selectable("Include to calibration"))
-              {
-                existing_parameter->removeFromList(os.str());
-                recomputeCalibration();
-              }
-            }
-          }
-          ImGui::EndPopup();
-        }
-        else
-        {
-          clicked_matching_point_ = std::nullopt;
-          clicked_outlier_point_ = std::nullopt;
-          clicked_excluded_point_ = std::nullopt;
-        }
       }
       // try to detect label hovered.
       if (ImGui::IsItemHovered() && !ImPlot::IsPlotHovered())
@@ -638,6 +582,67 @@ namespace SmartPeak
         }
       }
       ImPlot::EndPlot();
+      if (open_context_menu)
+      {
+        ImGui::OpenPopup("Point Actions");
+      }
+      if (ImGui::BeginPopup("Point Actions"))
+      {
+        if (ImGui::Selectable("Show chromatogram"))
+        {
+          auto [sample_name, serie_name] = getSampleNameAndSerieFromSelectedPoint(clicked_matching_point_, clicked_outlier_point_, clicked_excluded_point_);
+          if (!sample_name.empty())
+          {
+            showChromatogram(sample_name);
+          }
+        }
+        // Exlude/Include point
+        auto [sample_name, serie_name] = getSampleNameAndSerieFromSelectedPoint(clicked_matching_point_, clicked_outlier_point_, clicked_excluded_point_);
+        if (!sample_name.empty())
+        {
+          std::ostringstream os;
+          os << sample_name << ";" << serie_name;
+          ParameterSet& user_parameters = sequence_handler_.getSequence().at(0).getRawData().getParameters();
+          Parameter* existing_parameter = user_parameters.findParameter("CalculateCalibration", "excluded_points");
+          if ((!existing_parameter) || (!existing_parameter->isInList(os.str())))
+          {
+            if (ImGui::Selectable("Exclude from calibration"))
+            {
+              if (existing_parameter)
+              {
+                existing_parameter->addToList(os.str());
+                recomputeCalibration();
+              }
+              else
+              {
+                std::ostringstream os;
+                os << "[\'" << sample_name << ";" << calibration_data_.series_names[selected_component_] << "\']";
+                Parameter new_param(
+                  { { "name", "excluded_points" },
+                    { "type", "list" },
+                    { "value", os.str() } });
+                user_parameters.addParameter("CalculateCalibration", new_param);
+                recomputeCalibration();
+              }
+            }
+          }
+          else if (existing_parameter && existing_parameter->isInList(os.str()))
+          {
+            if (ImGui::Selectable("Include to calibration"))
+            {
+              existing_parameter->removeFromList(os.str());
+              recomputeCalibration();
+            }
+          }
+        }
+        ImGui::EndPopup();
+      }
+      else
+      {
+        clicked_matching_point_ = std::nullopt;
+        clicked_outlier_point_ = std::nullopt;
+        clicked_excluded_point_ = std::nullopt;
+      }
     }
     ImGui::End();
   }
