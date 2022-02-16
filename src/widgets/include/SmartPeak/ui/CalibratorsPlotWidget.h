@@ -83,9 +83,10 @@ namespace SmartPeak
     void getSelectedPoint(ImVec2 point, ImVec2 threshold_point);
     void showChromatogram(const std::string& sample_name);
     void plotPoints(bool show_flag, const SessionHandler::CalibrationData::Points& points, int marker_style);
-    void plotHoveredPoint(
+    void plotSelectedPoint(
       const std::optional<std::tuple<int, int>>& hovered_point,
-      const SessionHandler::CalibrationData::Points& points);
+      const SessionHandler::CalibrationData::Points& points,
+      int marker_style);
     std::tuple<std::string, std::string> getSampleNameAndSerieFromSelectedPoint(
       const std::optional<std::tuple<int, int>>& matching_point, 
       const std::optional<std::tuple<int, int>>& outlier_point,
