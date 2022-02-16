@@ -38,7 +38,8 @@ namespace SmartPeak
     onSequenceUpdated();
   }
 
-  std::string CalibratorsPlotWidget::getSampleNameFromSelectedPoint(
+  std::tuple<std::string, std::string> 
+  CalibratorsPlotWidget::getSampleNameAndSerieFromSelectedPoint(
     const std::optional<std::tuple<int, int>>& matching_point,
     const std::optional<std::tuple<int, int>>& outlier_point,
     const std::optional<std::tuple<int, int>>& excluded_point
@@ -47,19 +48,19 @@ namespace SmartPeak
     if (matching_point)
     {
       const auto [serie, index] = *matching_point;
-      return calibration_data_.matching_points_.injections_[serie][index];
+      return std::make_tuple(calibration_data_.matching_points_.injections_[serie][index], calibration_data_.series_names[serie]);
     }
     else if (outlier_point)
     {
       const auto [serie, index] = *outlier_point;
-      return calibration_data_.outlier_points_.injections_[serie][index];
+      return std::make_tuple(calibration_data_.outlier_points_.injections_[serie][index], calibration_data_.series_names[serie]);
     }
     else if (excluded_point)
     {
       const auto [serie, index] = *excluded_point;
-      return calibration_data_.excluded_points_.injections_[serie][index];
+      return std::make_tuple(calibration_data_.excluded_points_.injections_[serie][index], calibration_data_.series_names[serie]);
     }
-    return "";
+    return std::make_tuple("","");
   }
 
   OpenMS::AbsoluteQuantitationMethod* CalibratorsPlotWidget::getQuantitationMethod(const std::string& component_name)
@@ -479,8 +480,9 @@ namespace SmartPeak
           else if (!ImGui::IsPopupOpen("Point Actions")) // just hovered
           {
             ImGui::BeginTooltip();
-            auto sample_name = getSampleNameFromSelectedPoint(hovered_matching_point_, hovered_outlier_point_, hovered_excluded_point_);
+            auto [sample_name, serie_name] = getSampleNameAndSerieFromSelectedPoint(hovered_matching_point_, hovered_outlier_point_, hovered_excluded_point_);
             ImGui::Text("%s", sample_name.c_str());
+            ImGui::Text("%s", serie_name.c_str());
             OpenMS::AbsoluteQuantitationStandards::featureConcentration* feature_concentration = nullptr;
             OpenMS::AbsoluteQuantitationMethod* quantitation_methods = nullptr;
             if (hovered_matching_point_)
@@ -544,18 +546,18 @@ namespace SmartPeak
         {
           if (ImGui::Selectable("Show chromatogram"))
           {
-            auto sample_name = getSampleNameFromSelectedPoint(clicked_matching_point_, clicked_outlier_point_, clicked_excluded_point_);
+            auto [sample_name, serie_name] = getSampleNameAndSerieFromSelectedPoint(clicked_matching_point_, clicked_outlier_point_, clicked_excluded_point_);
             if (!sample_name.empty())
             {
               showChromatogram(sample_name);
             }
           }
           // Exlude/Include point
-          auto sample_name = getSampleNameFromSelectedPoint(clicked_matching_point_, clicked_outlier_point_, clicked_excluded_point_);
+          auto [sample_name, serie_name] = getSampleNameAndSerieFromSelectedPoint(clicked_matching_point_, clicked_outlier_point_, clicked_excluded_point_);
           if (!sample_name.empty())
           {
             std::ostringstream os;
-            os << sample_name << ";" << calibration_data_.series_names[selected_component_];
+            os << sample_name << ";" << serie_name;
             ParameterSet& user_parameters = sequence_handler_.getSequence().at(0).getRawData().getParameters();
             Parameter* existing_parameter = user_parameters.findParameter("CalculateCalibration", "excluded_points");
             if ((!existing_parameter) || (!existing_parameter->isInList(os.str())))

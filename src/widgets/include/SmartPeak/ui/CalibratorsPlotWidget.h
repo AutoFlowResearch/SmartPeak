@@ -86,7 +86,7 @@ namespace SmartPeak
     void plotHoveredPoint(
       const std::optional<std::tuple<int, int>>& hovered_point,
       const SessionHandler::CalibrationData::Points& points);
-    std::string getSampleNameFromSelectedPoint(
+    std::tuple<std::string, std::string> getSampleNameAndSerieFromSelectedPoint(
       const std::optional<std::tuple<int, int>>& matching_point, 
       const std::optional<std::tuple<int, int>>& outlier_point,
       const std::optional<std::tuple<int, int>>& excluded_point) const;

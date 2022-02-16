@@ -95,41 +95,17 @@ namespace SmartPeak
     }
       
     // get all standards
-    std::vector<size_t> standards_indices;
+    std::vector<size_t> all_standards_indices;
     this->getSampleIndicesBySampleType(
       sequenceSegmentHandler_IO,
       sequenceHandler_I,
       SampleType::Standard,
-      standards_indices
+      all_standards_indices
     );
 
     // check if there are any standards to calculate the calibrators from
-    if (standards_indices.empty()) {
+    if (all_standards_indices.empty()) {
       throw std::invalid_argument("standards_indices argument is empty.");
-    }
-
-    // construct excluded points
-    std::vector<size_t> excluded_standards_indices;
-    for (const auto [sample_name, component] : excluded_points)
-    {
-      for (const size_t index : sequenceSegmentHandler_IO.getSampleIndices())
-      {
-        if (sequenceHandler_I.getSequence().at(index).getMetaData().getSampleName() == sample_name)
-        {
-          standards_indices.erase(std::remove(standards_indices.begin(), standards_indices.end(), index), standards_indices.end());
-          excluded_standards_indices.push_back(index);
-        }
-      }
-    }
-
-    std::vector<OpenMS::FeatureMap> standards_featureMaps;
-    for (const size_t index : standards_indices) {
-      standards_featureMaps.push_back(sequenceHandler_I.getSequence().at(index).getRawData().getFeatureMap());
-    }
-
-    std::vector<OpenMS::FeatureMap> excluded_standards_featureMaps;
-    for (const size_t index : excluded_standards_indices) {
-      excluded_standards_featureMaps.push_back(sequenceHandler_I.getSequence().at(index).getRawData().getFeatureMap());
     }
 
     // add in the method parameters
@@ -142,6 +118,35 @@ namespace SmartPeak
     std::map<std::string, std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>> excluded_components_to_concentrations;
     for (const OpenMS::AbsoluteQuantitationMethod& row : sequenceSegmentHandler_IO.getQuantitationMethods())
     {
+      std::vector<size_t> standards_indices = all_standards_indices;
+
+      // construct excluded points
+      std::vector<size_t> excluded_standards_indices;
+      for (const auto [sample_name, component] : excluded_points)
+      {
+        if (component == row.getComponentName())
+        {
+          for (const size_t index : sequenceSegmentHandler_IO.getSampleIndices())
+          {
+            if (sequenceHandler_I.getSequence().at(index).getMetaData().getSampleName() == sample_name)
+            {
+              standards_indices.erase(std::remove(standards_indices.begin(), standards_indices.end(), index), standards_indices.end());
+              excluded_standards_indices.push_back(index);
+            }
+          }
+        }
+      }
+
+      std::vector<OpenMS::FeatureMap> standards_featureMaps;
+      for (const size_t index : standards_indices) {
+        standards_featureMaps.push_back(sequenceHandler_I.getSequence().at(index).getRawData().getFeatureMap());
+      }
+
+      std::vector<OpenMS::FeatureMap> excluded_standards_featureMaps;
+      for (const size_t index : excluded_standards_indices) {
+        excluded_standards_featureMaps.push_back(sequenceHandler_I.getSequence().at(index).getRawData().getFeatureMap());
+      }
+
       // map standards to features
       OpenMS::AbsoluteQuantitationStandards absoluteQuantitationStandards;
       std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration> feature_concentrations;
