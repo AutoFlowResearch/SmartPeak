@@ -239,8 +239,8 @@ jobs:
           command: |
             cd ~
             git clone https://github.com/OpenMS/OpenMS.git
-            git checkout 7f5009cfbabe74c126eece86f86cb9b7a5e4af62
             cd ~/OpenMS
+            git checkout 7f5009cfbabe74c126eece86f86cb9b7a5e4af62
       - run:
           name: Building OpenMS
           command: |
