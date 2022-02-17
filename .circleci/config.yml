@@ -48,7 +48,7 @@ jobs:
           name: Cloning and building OpenMS
           command: |
             cd ~ &&
-            git clone --branch develop --depth 1 https://github.com/OpenMS/OpenMS.git &&
+            git clone https://github.com/OpenMS/OpenMS.git &&
             cd OpenMS &&
             git checkout 7f5009cfbabe74c126eece86f86cb9b7a5e4af62 &&
             git submodule update --init THIRDPARTY &&
@@ -125,7 +125,7 @@ jobs:
           name: Cloning and building OpenMS
           command: |
             cd ~ &&
-            git clone --branch develop --depth 1 https://github.com/OpenMS/OpenMS.git &&
+            git clone https://github.com/OpenMS/OpenMS.git &&
             cd OpenMS
             git checkout 7f5009cfbabe74c126eece86f86cb9b7a5e4af62
             mkdir contrib_build && cd contrib_build
