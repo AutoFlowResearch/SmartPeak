@@ -21,9 +21,6 @@ find_package(OpenMS PATHS "$ENV{OPENMS_BUILD_TREE}" NO_CMAKE_PACKAGE_REGISTRY)
 # check whether the OpenMS package was found
 if (OpenMS_FOUND)
 
-  ## include directories for OpenMS headers (and contrib)
-  include_directories(${OpenMS_INCLUDE_DIRECTORIES})
-
   ## append precompiler macros specific to OpenMS
   ## Warning: this could be harmful to your project. Check this
   ## if problems occur

@@ -61,7 +61,7 @@ include (${PROJECT_SOURCE_DIR}/includes.cmake)
 
 #------------------------------------------------------------------------------
 # all the dependency libraries are linked into libSmartPeak.so
-set(SMARTPEAK_DEP_LIBRARIES ${OpenMS_LIBRARIES} OpenSSL::SSL OpenSSL::Crypto)
+set(SMARTPEAK_DEP_LIBRARIES OpenMS OpenSSL::SSL OpenSSL::Crypto)
 include_directories(${OPENSSL_INCLUDE_DIR})
 
 # xerces requires linking against CoreFoundation&CoreServices
@@ -87,7 +87,6 @@ smartpeak_add_library(TARGET_NAME  SmartPeakWidgets
                    INTERNAL_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/include
                                      ${CMAKE_CURRENT_BINARY_DIR}/include
                    EXTERNAL_INCLUDES ${SmartPeak_INCLUDE_DIRECTORIES}
-                                     ${OpenMS_INCLUDE_DIRECTORIES}
                                      ${ImGui_INCLUDE_DIR}
                                      ${IMPLOT_INCLUDE_DIR}
                                      ${EIGEN3_INCLUDE_DIR}
