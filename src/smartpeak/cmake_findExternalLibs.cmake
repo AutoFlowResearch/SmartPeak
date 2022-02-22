@@ -30,9 +30,10 @@ find_package(Eigen3 3.1.0 REQUIRED)
 find_package(Plog REQUIRED)
 
 #------------------------------------------------------------------------------
-# Find SQLite
+# SQLITE
 #------------------------------------------------------------------------------
-find_package(SQLite3 REQUIRED)
+find_path(SQLite3_INCLUDE_DIR NAMES sqlite3.h PATH_SUFFIXES "sqlite")
+find_package(SQLite3 3.15.0 REQUIRED)
 
 #------------------------------------------------------------------------------
 # Find OpenMS
@@ -47,6 +48,15 @@ if(OpenSSL_FOUND)
   include_directories(${OPENSSL_INCLUDE_DIR})
   link_directories(${OPENSSL_LIBRARIES})
   message(STATUS "[libSmartPeak] : Using OpenSSL ${OPENSSL_VERSION}")
+endif()
+
+#------------------------------------------------------------------------------
+# Find Boost
+#------------------------------------------------------------------------------
+find_package(Boost REQUIRED) 
+if(Boost_FOUND)
+  include_directories(${BOOST_INCLUDE_DIR})
+  link_directories(${BOOST_LIBRARYDIR})
 endif()
 
 #------------------------------------------------------------------------------

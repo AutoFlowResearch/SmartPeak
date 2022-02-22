@@ -112,14 +112,25 @@ include_directories(${IMPLOT_INCLUDE_DIR})
 # gRPC
 #------------------------------------------------------------------------------
 include(../../cmake/fetch_grpc.cmake)
-#------------------------------------------------------------------------------
 
+#------------------------------------------------------------------------------
+# Find OpenSSL
+#------------------------------------------------------------------------------
 find_package(OpenSSL REQUIRED) 
 if(OpenSSL_FOUND)
   include_directories(${OPENSSL_INCLUDE_DIR})
   message(">> OPENSSL_INCLUDE_DIR : ${OPENSSL_INCLUDE_DIR}")
   link_directories(${OPENSSL_LIBRARIES})
   message(STATUS "[examples] : Using OpenSSL ${OPENSSL_VERSION}")
+endif()
+
+#------------------------------------------------------------------------------
+# Find Boost
+#------------------------------------------------------------------------------
+find_package(Boost REQUIRED) 
+if(Boost_FOUND)
+  include_directories(${BOOST_INCLUDE_DIR})
+  link_directories(${BOOST_LIBRARYDIR})
 endif()
 
 # pipeline examples

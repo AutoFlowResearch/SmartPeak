@@ -101,6 +101,12 @@ if(OpenSSL_FOUND)
 endif()
 
 #------------------------------------------------------------------------------
+# SQLITE
+#------------------------------------------------------------------------------
+find_path(SQLite3_INCLUDE_DIR NAMES sqlite3.h PATH_SUFFIXES "sqlite")
+find_package(SQLite3 3.15.0 REQUIRED)
+
+#------------------------------------------------------------------------------
 # Find Boost
 #------------------------------------------------------------------------------
 find_package(Boost REQUIRED) 
@@ -139,10 +145,10 @@ foreach(_class_test ${TEST_executables})
       OR ${_class_test} STREQUAL "PlotExporter_test"
       OR ${_class_test} STREQUAL "WindowSizesAndPositions_test"
       OR ${_class_test} STREQUAL "UIUtilities_test" ))
-      target_link_libraries(${_class_test} PUBLIC ${SmartPeakWidgets_LIBRARIES} ${SmartPeak_LIBRARIES} OpenMS  ${OPENGL_LIBRARIES} ImGui::ImGui ImPlot::ImPlot 
+      target_link_libraries(${_class_test} PUBLIC ${SmartPeakWidgets_LIBRARIES} ${SmartPeak_LIBRARIES} OpenMS ${SQLite3_LIBRARY} ${OPENGL_LIBRARIES} ImGui::ImGui ImPlot::ImPlot 
       PRIVATE gtest_main gmock_main ImGui::Sources ImPlot::Sources ImGui::SourcesMiscCpp)
   else()
-    target_link_libraries(${_class_test} PUBLIC ${SmartPeak_LIBRARIES} OpenMS PRIVATE gtest_main gmock_main)
+    target_link_libraries(${_class_test} PUBLIC ${SmartPeak_LIBRARIES} OpenMS ${SQLite3_LIBRARY} PRIVATE gtest_main gmock_main)
   endif()
   add_test(${_class_test} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${_class_test})
   # only add OPENMP flags to gcc linker (execpt Mac OS X, due to compiler bug

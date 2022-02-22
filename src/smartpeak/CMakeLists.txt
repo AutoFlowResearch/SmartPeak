@@ -61,7 +61,7 @@ include (${PROJECT_SOURCE_DIR}/includes.cmake)
 
 #------------------------------------------------------------------------------
 # all the dependency libraries are linked into libSmartPeak.so
-set(SMARTPEAK_DEP_LIBRARIES OpenMS)
+set(SMARTPEAK_DEP_LIBRARIES OpenMS ${SQLite3_LIBRARY})
 include_directories(${OPENSSL_INCLUDE_DIR})
 
 # xerces requires linking against CoreFoundation&CoreServices
