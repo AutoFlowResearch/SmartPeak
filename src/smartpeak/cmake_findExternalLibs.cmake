@@ -42,12 +42,12 @@ find_package(OpenMS REQUIRED)
 #------------------------------------------------------------------------------
 # Find OpenSSL
 #------------------------------------------------------------------------------
-#find_package(OpenSSL REQUIRED) 
-#if(OpenSSL_FOUND)
-#  include_directories(${OPENSSL_INCLUDE_DIR})
-#  link_directories(${OPENSSL_LIBRARIES})
-#  message(STATUS "[libSmartPeak] : Using OpenSSL ${OPENSSL_VERSION}")
-#endif()
+find_package(OpenSSL REQUIRED) 
+if(OpenSSL_FOUND)
+  include_directories(${OPENSSL_INCLUDE_DIR})
+  link_directories(${OPENSSL_LIBRARIES})
+  message(STATUS "[libSmartPeak] : Using OpenSSL ${OPENSSL_VERSION}")
+endif()
 
 #------------------------------------------------------------------------------
 # Done finding contrib libraries

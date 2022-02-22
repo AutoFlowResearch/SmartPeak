@@ -50,6 +50,15 @@ if(OpenSSL_FOUND)
 endif()
 
 #------------------------------------------------------------------------------
+# Find Boost
+#------------------------------------------------------------------------------
+find_package(Boost REQUIRED) 
+if(Boost_FOUND)
+  include_directories(${BOOST_INCLUDE_DIR})
+  link_directories(${BOOST_LIBRARYDIR})
+endif()
+
+#------------------------------------------------------------------------------
 # Find PortableFileDialogs
 #------------------------------------------------------------------------------
 find_package(PortableFileDialogs REQUIRED)

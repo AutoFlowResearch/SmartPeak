@@ -89,6 +89,7 @@ endif()
 #------------------------------------------------------------------------------
 find_package(ImPlot COMPONENTS Sources REQUIRED)
 include_directories(${IMPLOT_INCLUDE_DIR})
+
 #------------------------------------------------------------------------------
 # OpenSSL
 #------------------------------------------------------------------------------
@@ -98,6 +99,16 @@ if(OpenSSL_FOUND)
   link_directories(${OPENSSL_LIBRARIES})
   message(STATUS "[class_tests] : Using OpenSSL ${OPENSSL_VERSION}")
 endif()
+
+#------------------------------------------------------------------------------
+# Find Boost
+#------------------------------------------------------------------------------
+find_package(Boost REQUIRED) 
+if(Boost_FOUND)
+  include_directories(${BOOST_INCLUDE_DIR})
+  link_directories(${BOOST_LIBRARYDIR})
+endif()
+
 #------------------------------------------------------------------------------
 # core
 add_custom_target(CORE_TEST)
