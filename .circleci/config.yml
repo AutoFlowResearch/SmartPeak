@@ -65,7 +65,7 @@ jobs:
           command: |
             mkdir ~/smartpeak_release_build
             cd ~/smartpeak_release_build
-            cmake -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -G "Unix Makefiles" -DCMAKE_PREFIX_PATH=$HOME/OpenMS-build/ -DPLOG_INCLUDE_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/plog/include -DIMGUI_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/imgui -DIMPLOT_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/implot -DPORTABLEFILEDIALOGS_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/portablefiledialogs -DSQLite3_INCLUDE_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/sqlite -DSQLite3_LIBRARY=$HOME/SmartPeak/superbuild/Dependencies/Source/sqlite -DCMAKE_BUILD_TYPE=Release ~/SmartPeak
+            cmake -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -G "Unix Makefiles" -DCMAKE_PREFIX_PATH=$HOME/OpenMS-build/ -DPLOG_INCLUDE_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/plog/include -DIMGUI_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/imgui -DIMPLOT_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/implot -DPORTABLEFILEDIALOGS_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/portablefiledialogs  -DCMAKE_BUILD_TYPE=Release ~/SmartPeak
             make -j4
       - run:
           name: Running SmartPeak Class Tests
@@ -142,7 +142,7 @@ jobs:
             cd superbuild
             cmake -DUSE_SUPERBUILD=ON -DCMAKE_BUILD_TYPE=Release .. && make -j4
             cd ../smartpeak_release_build
-            cmake -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBOOST_USE_STATIC=OFF -DCMAKE_PREFIX_PATH="~/OpenMS/openms_debug_build/;~/OpenMS/contrib_build;$(brew --prefix qt5);(brew --prefix eigen);$(brew --prefix zlib);$(brew --prefix openssl)" -DEIGEN3_INCLUDE_DIR=~/OpenMS/contrib_build/include/eigen3 -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl -DOPENSSL_LIBRARIES=/usr/local/opt/openssl/lib -DPLOG_INCLUDE_DIR=~/SmartPeak/superbuild/Dependencies/Source/plog/include   -DIMGUI_DIR=~/SmartPeak/superbuild/Dependencies/Source/imgui  -DIMPLOT_DIR=~/SmartPeak/superbuild/Dependencies/Source/implot -DPORTABLEFILEDIALOGS_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/portablefiledialogs -DSQLite3_INCLUDE_DIR=~/SmartPeak/superbuild/Dependencies/Source/sqlite -DSQLite3_LIBRARY=~/SmartPeak/superbuild/Dependencies/Source/sqlite -DCMAKE_BUILD_TYPE=RelWithDebInfo -DOpenMP_CXX_FLAGS="-Xpreprocessor -fopenmp -I/usr/local/opt/libomp/include" -DOpenMP_CXX_LIB_NAMES="omp" -DOpenMP_omp_LIBRARY=/usr/local/opt/libomp/lib/libomp.dylib -DgRPC_ZLIB_PROVIDER=package ~/SmartPeak
+            cmake -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBOOST_USE_STATIC=OFF -DCMAKE_PREFIX_PATH="~/OpenMS/openms_debug_build/;~/OpenMS/contrib_build;$(brew --prefix qt5);(brew --prefix eigen);$(brew --prefix zlib);$(brew --prefix openssl)" -DEIGEN3_INCLUDE_DIR=~/OpenMS/contrib_build/include/eigen3 -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl -DOPENSSL_LIBRARIES=/usr/local/opt/openssl/lib -DPLOG_INCLUDE_DIR=~/SmartPeak/superbuild/Dependencies/Source/plog/include   -DIMGUI_DIR=~/SmartPeak/superbuild/Dependencies/Source/imgui  -DIMPLOT_DIR=~/SmartPeak/superbuild/Dependencies/Source/implot -DPORTABLEFILEDIALOGS_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/portablefiledialogs -DCMAKE_BUILD_TYPE=RelWithDebInfo -DOpenMP_CXX_FLAGS="-Xpreprocessor -fopenmp -I/usr/local/opt/libomp/include" -DOpenMP_CXX_LIB_NAMES="omp" -DOpenMP_omp_LIBRARY=/usr/local/opt/libomp/lib/libomp.dylib -DgRPC_ZLIB_PROVIDER=package ~/SmartPeak
             make -j4
       - run:
           name: Running SmartPeak Class Tests
