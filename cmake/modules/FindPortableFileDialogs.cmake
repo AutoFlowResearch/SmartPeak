@@ -15,7 +15,6 @@
 #
 # The find module tries to find ``PortableFileDialogs`` the C++ sources.
 # You can supply their location via an ``PORTABLEFILEDIALOGS_DIR`` variable.\ ly.
-set(CMAKE_FIND_DEBUG_MODE TRUE)
 find_path(PORTABLEFILEDIALOGS_INCLUDE_DIR 
 	NAMES "portable-file-dialogs.h"
 	HINTS ${PORTABLEFILEDIALOGS_DIR}
