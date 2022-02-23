@@ -34,7 +34,11 @@ namespace SmartPeak
     CalculateCalibration calculate_calibration;
     Filenames filenames; // calculate_calibration actually does not use it
     ParameterSet& user_parameters = sequence_handler_.getSequence().at(0).getRawData().getParameters();
-    calculate_calibration.process(sequence_handler_.getSequenceSegments()[0], sequence_handler_, user_parameters, filenames);
+    calculate_calibration.process(
+      sequence_handler_.getSequenceSegments().at(selected_sequence_segment_),
+      sequence_handler_,
+      user_parameters,
+      filenames);
     onSequenceUpdated();
   }
 
@@ -65,14 +69,17 @@ namespace SmartPeak
 
   OpenMS::AbsoluteQuantitationMethod* CalibratorsPlotWidget::getQuantitationMethod(const std::string& component_name)
   {
-    for (auto& sequence_segment : sequence_handler_.getSequenceSegments())
+    auto& sequence_segments = sequence_handler_.getSequenceSegments();
+    if (selected_sequence_segment_ >= sequence_segments_.size())
     {
-      for (auto& quantitation_method : sequence_segment.getQuantitationMethods())
+      return nullptr;
+    }
+    auto& sequence_segment = sequence_segments.at(selected_sequence_segment_);
+    for (auto& quantitation_method : sequence_segment.getQuantitationMethods())
+    {
+      if (quantitation_method.getComponentName() == component_name)
       {
-        if (quantitation_method.getComponentName() == component_name)
-        {
-          return &quantitation_method;
-        }
+        return &quantitation_method;
       }
     }
     return nullptr;
@@ -142,7 +149,12 @@ namespace SmartPeak
       return;
     }
 
-    static const std::vector<std::string> output_parameters = 
+    if (sequence_segments_cstr_.empty())
+    {
+      return;
+    }
+
+    static const std::vector<std::string> output_parameters =
     {
       "llod",
       "ulod",
@@ -159,6 +171,7 @@ namespace SmartPeak
     parameter_editor_widget_.draw();
 
     ImGui::Combo("Component", &selected_component_, &component_cstr_[0], component_cstr_.size());
+    ImGui::Combo("Seq. Segment", &selected_sequence_segment_, &sequence_segments_cstr_[0], sequence_segments_cstr_.size());
 
     auto quantitation_methods = getQuantitationMethod(calibration_data_.series_names[selected_component_]);
 
@@ -699,9 +712,9 @@ namespace SmartPeak
     const std::string& plot_title)
   {
     reset_zoom_ = true;
-    int i = 0;
     components_.clear();
     component_cstr_.clear();
+    int i = 0;
     for (const auto& component : calibration_data.series_names)
     {
       components_.push_back(component);
@@ -709,6 +722,18 @@ namespace SmartPeak
       ++i;
     }
     selected_component_ = 0;
+
+    sequence_segments_.clear();
+    sequence_segments_cstr_.clear();
+    i = 0;
+    for (const auto& sequence_segment : sequence_handler_.getSequenceSegments())
+    {
+      sequence_segments_.push_back(sequence_segment.getSequenceSegmentName());
+      sequence_segments_cstr_.push_back(sequence_segments_.at(i).c_str());
+      ++i;
+    }
+    selected_sequence_segment_ = 0;
+
     calibration_data_ = calibration_data;
     plot_title_ = plot_title;
   }

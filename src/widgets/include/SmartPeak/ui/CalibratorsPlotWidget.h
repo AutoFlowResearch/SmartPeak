@@ -109,6 +109,9 @@ namespace SmartPeak
     std::vector<std::string> components_;
     std::vector<const char*> component_cstr_;
     int selected_component_ = 0;
+    std::vector<std::string> sequence_segments_;
+    std::vector<const char*> sequence_segments_cstr_;
+    int selected_sequence_segment_ = 0;
     bool reset_zoom_ = true;
     SessionHandler& session_handler_;
     SequenceHandler& sequence_handler_;
