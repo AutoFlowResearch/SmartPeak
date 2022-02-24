@@ -74,6 +74,7 @@
 #include <SmartPeak/core/SequenceSegmentProcessors/LoadFeatureRSDQCs.h>
 #include <SmartPeak/core/SequenceSegmentProcessors/LoadQuantitationMethods.h>
 #include <SmartPeak/core/SequenceSegmentProcessors/LoadStandardsConcentrations.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/OptimizeCalibration.h>
 #include <SmartPeak/core/SequenceSegmentProcessors/StoreFeatureBackgroundEstimations.h>
 #include <SmartPeak/core/SequenceSegmentProcessors/StoreFeatureBackgroundFilters.h>
 #include <SmartPeak/core/SequenceSegmentProcessors/StoreFeatureBackgroundQCs.h>
@@ -135,6 +136,7 @@ namespace SmartPeak {
   };
   const std::map<std::string, std::shared_ptr<SequenceSegmentProcessor>> n_to_seq_seg_method_ {
     {"CALCULATE_CALIBRATION",                     std::make_shared<CalculateCalibration>()},
+    {"OPTIMIZE_CALIBRATION",                      std::make_shared<OptimizeCalibration>()},
     {"STORE_QUANTITATION_METHODS",                std::make_shared<StoreQuantitationMethods>()},
     {"LOAD_QUANTITATION_METHODS",                 std::make_shared<LoadQuantitationMethods>()},
     {"ESTIMATE_FEATURE_FILTER_VALUES",            std::make_shared<EstimateFeatureFilterValues>()},

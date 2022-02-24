@@ -78,7 +78,7 @@ namespace SmartPeak
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START optimizeCalibrationCurves";
+    LOGD << "START CalculateCalibration";
     getFilenames(filenames_I);
 
     // Complete user parameters with schema
@@ -176,13 +176,7 @@ namespace SmartPeak
         excluded_feature_concentrations
       );
 
-      // remove features with an actual concentration of 0.0 or less
-      std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration> feature_concentrations_pruned;
-      for (const OpenMS::AbsoluteQuantitationStandards::featureConcentration& feature : feature_concentrations) {
-        if (feature.actual_concentration > 0.0) {
-          feature_concentrations_pruned.push_back(feature);
-        }
-      }
+      auto feature_concentrations_pruned = sequenceSegmentHandler_IO.getFeatureConcentrationsPruned(feature_concentrations);
 
       // remove components without any points
       if (feature_concentrations_pruned.empty()) {
@@ -264,7 +258,7 @@ namespace SmartPeak
     sequenceSegmentHandler_IO.setExcludedComponentsToConcentrations(excluded_components_to_concentrations);
     sequenceSegmentHandler_IO.getQuantitationMethods() = absoluteQuantitation.getQuantMethods();
     //sequenceSegmentHandler_IO.setQuantitationMethods(absoluteQuantitation.getQuantMethods());
-    LOGD << "END optimizeCalibrationCurves";
+    LOGD << "END CalculateCalibration";
   }
 
 }

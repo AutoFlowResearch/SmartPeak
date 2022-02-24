@@ -906,7 +906,7 @@ namespace SmartPeak
                     "PICK_MRM_FEATURES",
                     "CHECK_FEATURES",
                     "SELECT_FEATURES",
-                    "CALCULATE_CALIBRATION",
+                    "OPTIMIZE_CALIBRATION",
                     "STORE_QUANTITATION_METHODS",
                     "QUANTIFY_FEATURES",
                     "STORE_FEATURES" };
@@ -928,7 +928,7 @@ namespace SmartPeak
                     "PICK_MRM_FEATURES",
                     "CHECK_FEATURES",
                     "SELECT_FEATURES",
-                    "CALCULATE_CALIBRATION",
+                    "OPTIMIZE_CALIBRATION",
                     "STORE_QUANTITATION_METHODS",
                     "QUANTIFY_FEATURES",
                     "STORE_FEATURES" };

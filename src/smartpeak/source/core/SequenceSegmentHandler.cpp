@@ -382,4 +382,17 @@ namespace SmartPeak
   {
     return excluded_components_to_concentrations_;
   }
+
+  std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>
+    SequenceSegmentHandler::getFeatureConcentrationsPruned(const std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration> feature_concentrations) const
+  {
+    std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration> feature_concentrations_pruned;
+    for (const OpenMS::AbsoluteQuantitationStandards::featureConcentration& feature : feature_concentrations) {
+      if (feature.actual_concentration > 0.0) {
+        feature_concentrations_pruned.push_back(feature);
+      }
+    }
+    return feature_concentrations_pruned;
+  }
+
 }

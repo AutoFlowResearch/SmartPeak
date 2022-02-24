@@ -23,6 +23,7 @@
 
 #include <SmartPeak/ui/CalibratorsPlotWidget.h>
 #include <SmartPeak/core/SequenceSegmentProcessors/CalculateCalibration.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/OptimizeCalibration.h>
 #include <SmartPeak/core/Utilities.h>
 #include <implot.h>
 
@@ -31,15 +32,30 @@ namespace SmartPeak
 
   void CalibratorsPlotWidget::recomputeCalibration()
   {
-    CalculateCalibration calculate_calibration;
-    Filenames filenames; // calculate_calibration actually does not use it
-    ParameterSet& user_parameters = sequence_handler_.getSequence().at(0).getRawData().getParameters();
-    calculate_calibration.process(
-      sequence_handler_.getSequenceSegments().at(selected_sequence_segment_),
-      sequence_handler_,
-      user_parameters,
-      filenames);
-    onSequenceUpdated();
+    if (selected_action_ == 0)
+    {
+      CalculateCalibration calculate_calibration;
+      Filenames filenames; // calculate_calibration actually does not use it
+      ParameterSet& user_parameters = sequence_handler_.getSequence().at(0).getRawData().getParameters();
+      calculate_calibration.process(
+        sequence_handler_.getSequenceSegments().at(selected_sequence_segment_),
+        sequence_handler_,
+        user_parameters,
+        filenames);
+      onSequenceUpdated();
+    }
+    else if (selected_action_ == 1)
+    {
+      OptimizeCalibration optimize_calibration;
+      Filenames filenames; // optimize_calibration actually does not use it
+      ParameterSet& user_parameters = sequence_handler_.getSequence().at(0).getRawData().getParameters();
+      optimize_calibration.process(
+        sequence_handler_.getSequenceSegments().at(selected_sequence_segment_),
+        sequence_handler_,
+        user_parameters,
+        filenames);
+      onSequenceUpdated();
+    }
   }
 
   std::tuple<std::string, std::string> 
@@ -168,6 +184,9 @@ namespace SmartPeak
 
     ImGui::Begin("Calibrator Parameters");
 
+    ImGui::Combo("Action", &selected_action_, &actions_cstr_[0], actions_cstr_.size());
+    ImGui::Separator();
+
     parameter_editor_widget_.draw();
 
     ImGui::Combo("Component", &selected_component_, &component_cstr_[0], component_cstr_.size());
@@ -204,20 +223,22 @@ namespace SmartPeak
       if (ImGui::BeginTable("Calibrator input parameters", 2, table_flags))
       {
         // CalculateCalibration params
-        CalculateCalibration calculate_calibration;
-        auto calculate_calibration_params_schema = calculate_calibration.getParameterSchema();
-        auto user_params = sequence_handler_.getSequence().at(0).getRawData().getParameters();
-        calculate_calibration_params_schema.setAsSchema(true);
-        user_params.merge(calculate_calibration_params_schema);
-
-        for (auto& calculate_calibration_fct : calculate_calibration_params_schema)
+        if (selected_action_ == 0)
         {
-          for (auto& calculate_calibration_param : calculate_calibration_fct.second)
+          CalculateCalibration calculate_calibration;
+          auto calculate_calibration_params_schema = calculate_calibration.getParameterSchema();
+          auto user_params = sequence_handler_.getSequence().at(0).getRawData().getParameters();
+          calculate_calibration_params_schema.setAsSchema(true);
+          user_params.merge(calculate_calibration_params_schema);
+          for (auto& calculate_calibration_fct : calculate_calibration_params_schema)
           {
-            auto user_param = user_params.findParameter(calculate_calibration_fct.first, calculate_calibration_param.getName());
-            if (user_param)
+            for (auto& calculate_calibration_param : calculate_calibration_fct.second)
             {
-              addParameterRow(std::make_shared<Parameter>(*user_param), true);
+              auto user_param = user_params.findParameter(calculate_calibration_fct.first, calculate_calibration_param.getName());
+              if (user_param)
+              {
+                addParameterRow(std::make_shared<Parameter>(*user_param), true);
+              }
             }
           }
         }

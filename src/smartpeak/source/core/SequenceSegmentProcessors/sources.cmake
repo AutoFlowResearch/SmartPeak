@@ -18,6 +18,7 @@ set(sources_list
 	LoadFeatureRSDQCs.cpp
 	LoadQuantitationMethods.cpp
 	LoadStandardsConcentrations.cpp
+	OptimizeCalibration.cpp
 	StoreFeatureBackgroundEstimations.cpp
 	StoreFeatureBackgroundFilters.cpp
 	StoreFeatureBackgroundQCs.cpp

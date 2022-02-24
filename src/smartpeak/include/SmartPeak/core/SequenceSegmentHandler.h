@@ -132,6 +132,12 @@ public:
     const std::map<std::string, std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>>&
       getExcludedComponentsToConcentrations() const;
 
+    /**
+    * @brief remove features with an actual concentration of 0.0 or less
+    */
+    std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>
+      getFeatureConcentrationsPruned(const std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration> feature_concentrations) const;
+
   private:
     std::string sequence_segment_name_;
     std::vector<size_t> sample_indices_;  ///< The indices of each injection; this could be replaced with `std::shared_ptr<InjectionHandler>` to save the map lookup

@@ -18,6 +18,7 @@ set(sources_list_h
 	LoadFeatureRSDQCs.h
 	LoadQuantitationMethods.h
 	LoadStandardsConcentrations.h
+	OptimizeCalibration.h
 	StoreFeatureBackgroundEstimations.h
 	StoreFeatureBackgroundFilters.h
 	StoreFeatureBackgroundQCs.h
