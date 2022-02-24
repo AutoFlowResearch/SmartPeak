@@ -35,29 +35,6 @@ configure_file(${PROJECT_SOURCE_DIR}/include/SmartPeak/test_config.h.in ${CONFIG
 #------------------------------------------------------------------------------
 find_package(OpenMS REQUIRED)
 
-# check whether the OpenMS package was found
-if (OpenMS_FOUND)
-  # check if the variable containing the include directories is defined
-  if(NOT OpenMS_INCLUDE_DIRECTORIES)
-    set(_message "The variable \${OpenMS_INCLUDE_DIRECTORIES} is not defined.")
-    set(_message "${_message}This CMakeLists.txt and your build of OpenMS seem incompatible.")
-    set(_message "${_message}Please use the latest version from the OpenMS release!")
-    message(FATAL_ERROR ${_message})
-  endif()
-  ## include directories for OpenMS headers (and contrib)
-  #       OpenMS_GUI -> ${OpenMS_GUI_INCLUDE_DIRECTORIES}
-  include_directories(${OpenMS_INCLUDE_DIRECTORIES})
-
-  ## append precompiler macros and compiler flags specific to OpenMS
-  ## Warning: this could be harmful to your project. Check this if problems occur.
-  ## Also, use this to add your own compiler flags, e.g. for OpenMP support.
-  ## e.g. for Visual Studio use /openmp
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OPENMS_ADDCXX_FLAGS}")
-
-else(OpenMS_FOUND)
-  message(FATAL_ERROR "OpenMSConfig.cmake file not found!")
-endif(OpenMS_FOUND)
-
 #------------------------------------------------------------------------------
 # OpenMS QT5 dependencies
 #------------------------------------------------------------------------------
@@ -112,6 +89,7 @@ endif()
 #------------------------------------------------------------------------------
 find_package(ImPlot COMPONENTS Sources REQUIRED)
 include_directories(${IMPLOT_INCLUDE_DIR})
+
 #------------------------------------------------------------------------------
 # OpenSSL
 #------------------------------------------------------------------------------
@@ -121,6 +99,22 @@ if(OpenSSL_FOUND)
   link_directories(${OPENSSL_LIBRARIES})
   message(STATUS "[class_tests] : Using OpenSSL ${OPENSSL_VERSION}")
 endif()
+
+#------------------------------------------------------------------------------
+# SQLITE
+#------------------------------------------------------------------------------
+find_path(SQLite3_INCLUDE_DIR NAMES sqlite3.h PATH_SUFFIXES "sqlite")
+find_package(SQLite3 3.15.0 REQUIRED)
+
+#------------------------------------------------------------------------------
+# Find Boost
+#------------------------------------------------------------------------------
+find_package(Boost REQUIRED) 
+if(Boost_FOUND)
+  include_directories(${BOOST_INCLUDE_DIR})
+  link_directories(${BOOST_LIBRARYDIR})
+endif()
+
 #------------------------------------------------------------------------------
 # core
 add_custom_target(CORE_TEST)
@@ -151,10 +145,10 @@ foreach(_class_test ${TEST_executables})
       OR ${_class_test} STREQUAL "PlotExporter_test"
       OR ${_class_test} STREQUAL "WindowSizesAndPositions_test"
       OR ${_class_test} STREQUAL "UIUtilities_test" ))
-      target_link_libraries(${_class_test} PUBLIC ${SmartPeakWidgets_LIBRARIES} ${SmartPeak_LIBRARIES} OpenMS  ${OPENGL_LIBRARIES} ImGui::ImGui ImPlot::ImPlot 
+      target_link_libraries(${_class_test} PUBLIC ${SmartPeakWidgets_LIBRARIES} ${SmartPeak_LIBRARIES} OpenMS ${SQLite3_LIBRARY} ${OPENGL_LIBRARIES} ImGui::ImGui ImPlot::ImPlot 
       PRIVATE gtest_main gmock_main ImGui::Sources ImPlot::Sources ImGui::SourcesMiscCpp)
   else()
-    target_link_libraries(${_class_test} PUBLIC ${SmartPeak_LIBRARIES} OpenMS PRIVATE gtest_main gmock_main)
+    target_link_libraries(${_class_test} PUBLIC ${SmartPeak_LIBRARIES} OpenMS ${SQLite3_LIBRARY} PRIVATE gtest_main gmock_main)
   endif()
   add_test(${_class_test} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${_class_test})
   # only add OPENMP flags to gcc linker (execpt Mac OS X, due to compiler bug

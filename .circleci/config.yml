@@ -48,10 +48,8 @@ jobs:
           name: Cloning and building OpenMS
           command: |
             cd ~ &&
-            git clone https://github.com/OpenMS/OpenMS.git &&
-            cd OpenMS &&
-            git checkout 7f5009cfbabe74c126eece86f86cb9b7a5e4af62 &&
-            git submodule update --init THIRDPARTY &&
+            git clone --branch develop --depth 1 https://github.com/OpenMS/OpenMS.git &&
+            cd OpenMS && git submodule update --init THIRDPARTY &&
             cmake -DBOOST_USE_STATIC=OFF -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Release -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF ~/OpenMS &&
             make -j4 OpenMS
       - run:
@@ -67,8 +65,7 @@ jobs:
           command: |
             mkdir ~/smartpeak_release_build
             cd ~/smartpeak_release_build
-            ls -l $HOME/SmartPeak/superbuild/Dependencies/Source/sqlite
-            cmake -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -G "Unix Makefiles" -DCMAKE_PREFIX_PATH=$HOME/OpenMS-build/ -DPLOG_INCLUDE_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/plog/include -DIMGUI_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/imgui -DIMPLOT_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/implot -DPORTABLEFILEDIALOGS_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/portablefiledialogs -DSQLite3_INCLUDE_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/sqlite -DSQLite3_LIBRARY=$HOME/SmartPeak/superbuild/Dependencies/Source/sqlite -DCMAKE_BUILD_TYPE=Release ~/SmartPeak
+            cmake -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -G "Unix Makefiles" -DCMAKE_PREFIX_PATH=$HOME/OpenMS-build/ -DPLOG_INCLUDE_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/plog/include -DIMGUI_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/imgui -DIMPLOT_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/implot -DPORTABLEFILEDIALOGS_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/portablefiledialogs  -DCMAKE_BUILD_TYPE=Release ~/SmartPeak
             make -j4
       - run:
           name: Running SmartPeak Class Tests
@@ -111,6 +108,7 @@ jobs:
             brew install cmake qt5 sdl2 zlib
             brew install cppcheck gnuplot
             brew install libomp
+            brew install eigen
             pip3 install -r tools/smartpeak/requirements.txt
       - run:
           name: "Pull latest (only release)"
@@ -125,9 +123,8 @@ jobs:
           name: Cloning and building OpenMS
           command: |
             cd ~ &&
-            git clone https://github.com/OpenMS/OpenMS.git &&
+            git clone --branch develop --depth 1 https://github.com/OpenMS/OpenMS.git &&
             cd OpenMS
-            git checkout 7f5009cfbabe74c126eece86f86cb9b7a5e4af62
             mkdir contrib_build && cd contrib_build
             curl -C - -O https://abibuilder.informatik.uni-tuebingen.de/archive/openms/contrib/macOS/10.15.4/x64/appleclang-11.0.0/contrib_build.tar.gz
             tar -xzf contrib_build.tar.gz
@@ -145,7 +142,7 @@ jobs:
             cd superbuild
             cmake -DUSE_SUPERBUILD=ON -DCMAKE_BUILD_TYPE=Release .. && make -j4
             cd ../smartpeak_release_build
-            cmake -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBOOST_USE_STATIC=OFF -DCMAKE_PREFIX_PATH="~/OpenMS/openms_debug_build/;~/OpenMS/contrib_build;$(brew --prefix qt5);(brew --prefix eigen);$(brew --prefix zlib);$(brew --prefix openssl)" -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl -DOPENSSL_LIBRARIES=/usr/local/opt/openssl/lib -DPLOG_INCLUDE_DIR=~/SmartPeak/superbuild/Dependencies/Source/plog/include   -DIMGUI_DIR=~/SmartPeak/superbuild/Dependencies/Source/imgui  -DIMPLOT_DIR=~/SmartPeak/superbuild/Dependencies/Source/implot -DPORTABLEFILEDIALOGS_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/portablefiledialogs -DSQLite3_INCLUDE_DIR=~/SmartPeak/superbuild/Dependencies/Source/sqlite -DSQLite3_LIBRARY=~/SmartPeak/superbuild/Dependencies/Source/sqlite -DCMAKE_BUILD_TYPE=RelWithDebInfo -DOpenMP_CXX_FLAGS="-Xpreprocessor -fopenmp -I/usr/local/opt/libomp/include" -DOpenMP_CXX_LIB_NAMES="omp" -DOpenMP_omp_LIBRARY=/usr/local/opt/libomp/lib/libomp.dylib -DgRPC_ZLIB_PROVIDER=package ~/SmartPeak
+            cmake -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBOOST_USE_STATIC=OFF -DCMAKE_PREFIX_PATH="~/OpenMS/openms_debug_build/;~/OpenMS/contrib_build;$(brew --prefix qt5);(brew --prefix eigen);$(brew --prefix zlib);$(brew --prefix openssl)" -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl -DOPENSSL_LIBRARIES=/usr/local/opt/openssl/lib -DPLOG_INCLUDE_DIR=~/SmartPeak/superbuild/Dependencies/Source/plog/include   -DIMGUI_DIR=~/SmartPeak/superbuild/Dependencies/Source/imgui  -DIMPLOT_DIR=~/SmartPeak/superbuild/Dependencies/Source/implot -DPORTABLEFILEDIALOGS_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/portablefiledialogs -DCMAKE_BUILD_TYPE=RelWithDebInfo -DOpenMP_CXX_FLAGS="-Xpreprocessor -fopenmp -I/usr/local/opt/libomp/include" -DOpenMP_CXX_LIB_NAMES="omp" -DOpenMP_omp_LIBRARY=/usr/local/opt/libomp/lib/libomp.dylib -DgRPC_ZLIB_PROVIDER=package ~/SmartPeak
             make -j4
       - run:
           name: Running SmartPeak Class Tests
@@ -241,9 +238,8 @@ jobs:
           name: Cloning OpenMS - develop
           command: |
             cd ~
-            git clone https://github.com/OpenMS/OpenMS.git
+            git clone --branch develop --depth 1 https://github.com/OpenMS/OpenMS.git
             cd ~/OpenMS
-            git checkout 7f5009cfbabe74c126eece86f86cb9b7a5e4af62
       - run:
           name: Building OpenMS
           command: |
@@ -273,7 +269,7 @@ jobs:
           name: Update PATH with OpenMS and Qt Binaries
           command: |
             Start-Process powershell -Verb runas
-            [Environment]::SetEnvironmentVariable("Path", $env:Path + ";C:\Users\circleci\OpenMS\openms_build\bin\Release;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\bin", [EnvironmentVariableTarget]::Machine)
+            [Environment]::SetEnvironmentVariable("Path", $env:Path + ";C:\Users\circleci\OpenMS\openms_build\bin\Release;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\bin;C:\lib\boost\boost_1_73_0\lib64-msvc-14.2;C:\Users\circleci\OpenMS\contrib_build\lib", [EnvironmentVariableTarget]::Machine)
             refreshenv
       - run:
           name: Building SmartPeak, running Class Tests and Packaging
@@ -292,7 +288,7 @@ jobs:
             cmake -DUSE_SUPERBUILD=ON -DCMAKE_BUILD_TYPE=Release ~/SmartPeak
             cmake --build .
             cd ~/SmartPeak/smartpeak_release_build
-            cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_CXX_EXTENSIONS=OFF -DCXX_STANDARD_REQUIRED=ON -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBoost_NO_SYSTEM_PATHS=ON -DBOOST_USE_STATIC=ON -DBOOST_ROOT="C:/lib/boost/boost_1_73_0" -DBOOST_INCLUDE_DIR="C:/lib/boost/boost_1_73_0" -DBOOST_LIBRARYDIR="C:/lib/boost/boost_1_73_0/lib64-msvc-14.2" -DCMAKE_PREFIX_PATH="C:/Users/circleci/OpenMS/openms_build/;C:/lib/Qt/qt-5.12.9-dynamic-msvc2019-x86_64;C:/lib/sdl2/SDL2-2.0.12" -DEIGEN3_INCLUDE_DIR=C:/Users/circleci/OpenMS/contrib_build/include/eigen3 -DPLOG_INCLUDE_DIR=C:/Users/circleci/SmartPeak/superbuild/Dependencies/Source/plog/include -DIMGUI_DIR=C:/Users/circleci/SmartPeak/superbuild/Dependencies/Source/imgui -DPORTABLEFILEDIALOGS_DIR=C:/Users/circleci/SmartPeak/superbuild/Dependencies/Source/portablefiledialogs -DSQLite3_INCLUDE_DIR=C:/Users/circleci/SmartPeak/superbuild/Dependencies/Source/sqlite -DSQLite3_LIBRARY=C:/Users/circleci/SmartPeak/superbuild/Dependencies/Source/sqlite -DIMPLOT_DIR=C:/Users/circleci/SmartPeak/superbuild/Dependencies/Source/implot -DCMAKE_BUILD_TYPE=Release ~/SmartPeak
+            cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_CXX_EXTENSIONS=OFF -DCXX_STANDARD_REQUIRED=ON -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBoost_NO_SYSTEM_PATHS=ON -DBOOST_USE_STATIC=ON -DBOOST_ROOT="C:/lib/boost/boost_1_73_0" -DBOOST_INCLUDE_DIR="C:/lib/boost/boost_1_73_0" -DBOOST_LIBRARYDIR="C:/lib/boost/boost_1_73_0/lib64-msvc-14.2" -DCMAKE_PREFIX_PATH="C:/Users/circleci/OpenMS/openms_build/;C:/Users/circleci/OpenMS/contrib_build;C:/lib/Qt/qt-5.12.9-dynamic-msvc2019-x86_64;C:/lib/sdl2/SDL2-2.0.12" -DEIGEN3_INCLUDE_DIR=C:/Users/circleci/OpenMS/contrib_build/include/eigen3 -DPLOG_INCLUDE_DIR=C:/Users/circleci/SmartPeak/superbuild/Dependencies/Source/plog/include -DIMGUI_DIR=C:/Users/circleci/SmartPeak/superbuild/Dependencies/Source/imgui -DPORTABLEFILEDIALOGS_DIR=C:/Users/circleci/SmartPeak/superbuild/Dependencies/Source/portablefiledialogs  -DIMPLOT_DIR=C:/Users/circleci/SmartPeak/superbuild/Dependencies/Source/implot -DCMAKE_BUILD_TYPE=Release ~/SmartPeak
             msbuild src/SmartPeak_src.sln /verbosity:normal /maxcpucount /p:Configuration=Release
             msbuild src/smartpeak/SmartPeak.sln /verbosity:normal /maxcpucount /p:Configuration=Release
             msbuild src/examples/SmartPeak_class_examples_smartpeak.sln /maxcpucount /property:Configuration=Release
