@@ -33,6 +33,43 @@
 
 namespace SmartPeak
 {
+  struct WorfklowStepNode
+  {
+    ImVec2 pos;
+    ImVec2 drag_delta_;
+    std::string text_;
+    bool is_dragging_ = false;
+    bool is_clicked_ = false;
+    virtual ImVec2 getSize();
+    virtual void draw();
+    bool isMouseIn();
+  };
+
+  struct WorfklowStepNodePlaceHolder : public WorfklowStepNode
+  {
+    virtual void draw();
+  };
+
+  struct WorfklowStepNodeGraph
+  {
+    WorfklowStepNodeGraph(ApplicationHandler& application_handler, WorkflowManager& workflow_manager)
+      : application_handler_(application_handler),
+       workflow_manager_(workflow_manager)
+    {
+    };
+    std::vector<WorfklowStepNode> nodes;
+    void draw();
+  
+  protected:
+    std::vector<WorfklowStepNode*> to_display;
+    WorfklowStepNode* dragging_node_ = nullptr;
+    int dragging_node_index_ = 0;
+    int place_holder_node_index_ = 0;
+    WorfklowStepNodePlaceHolder place_holder_;
+    WorkflowManager& workflow_manager_;
+    ApplicationHandler& application_handler_;
+  };
+
   class WorkflowWidget : public Widget
   {
   public:
@@ -42,7 +79,8 @@ namespace SmartPeak
       application_handler_(application_handler),
       workflow_step_widget_(application_handler),
       workflow_manager_(workflow_manager),
-      buildCommandsFromNames_(application_handler)
+      buildCommandsFromNames_(application_handler),
+      workflow_node_graph_(application_handler, workflow_manager)
     {
     };
 
@@ -57,5 +95,6 @@ namespace SmartPeak
     WorkflowManager& workflow_manager_;
     BuildCommandsFromNames buildCommandsFromNames_;
     bool error_building_commands_ = false;
+    WorfklowStepNodeGraph workflow_node_graph_;
   };
 }
