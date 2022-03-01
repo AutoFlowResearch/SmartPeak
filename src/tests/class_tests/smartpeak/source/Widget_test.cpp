@@ -344,7 +344,7 @@ TEST(GraphicDataVizWidget, WriteAndReadGraphViz)
   EXPECT_DOUBLE_EQ(plot_limit.Y.Min, 3);
   EXPECT_DOUBLE_EQ(plot_limit.Y.Max, 4);
 }
-
+/*
 class WorkflowWidget_Test : public WorkflowWidget
 {
 public:
@@ -388,7 +388,7 @@ TEST(WorkflowWidget, updateCommands)
   workflow_widget.updatecommands();
   EXPECT_TRUE(workflow_widget.errorBuildingCommands());
 }
-
+*/
 class SessionFilesWidget_Test : public SessionFilesWidget
 {
 public:

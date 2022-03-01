@@ -174,6 +174,11 @@ namespace SmartPeak
     return (description ? description->getDescription() : "");
   }
 
+  ApplicationHandler::Command::CommandType ApplicationHandler::Command::getType() const
+  {
+    return type;
+  }
+
   const IProcessorDescription* ApplicationHandler::Command::getIProcessorDescription() const
   {
     switch (type)

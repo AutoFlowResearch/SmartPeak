@@ -31,6 +31,36 @@
 
 namespace SmartPeak
 {
+  std::vector<std::tuple<float, float, float>> color_palette =
+  {
+  { 0.996, 0.231, 0.118},
+  { 0.599, 0.186, 0.487 },
+  { 0.312, 0.009, 0.923 },
+  { 0.177, 0.413, 0.795 },
+  { 0.003, 0.649, 0.933 },
+  { 0.435, 0.919, 0.999 },
+  { 0.032, 0.636, 0.605 },
+  { 0.982, 0.624, 0.855 },
+  { 0.035, 0.991, 0.798 },
+  { 0.633, 0.175, 0.196 },
+  { 0.167, 0.401, 0.415 },
+  { 0.29,  0.286, 0.343 },
+  { 0.555, 0.483, 0.644 },
+  { 0.717, 0.753, 0.998 },
+  { 0.674, 0.744, 0.612 },
+  { 0.509, 0.488, 0.44 },
+  { 0.352, 0.233, 0.11 },
+  { 0.682, 0.396, 0.028 },
+  { 0.968, 0.664, 0.19 },
+  { 0.84,  0.626, 0.564 },
+  { 0.955, 0.915, 0.36 },
+  { 0.606, 0.584, 0.004 },
+  { 0.339, 0.384, 0.017 },
+  { 0.901, 0.111, 0.968 },
+  { 0.07,  0.588, 0.231 },
+  { 0.98,  0.185, 0.477 },
+  { 0.317, 0.88,  0.076 }
+  };
 
   void WorfklowStepNodePlaceHolder::draw()
   {
@@ -40,7 +70,8 @@ namespace SmartPeak
     draw_list->AddRect(
       ImVec2(screen_pos.x + pos.x, screen_pos.y + pos.y),
       ImVec2(screen_pos.x + pos.x + node_size.x, screen_pos.y + pos.y + node_size.y),
-      IM_COL32(200, 200, 200, 200)
+      IM_COL32(200, 200, 200, 200),
+      5.0
     );
 
   }
@@ -65,15 +96,34 @@ namespace SmartPeak
     ImDrawList* draw_list = ImGui::GetWindowDrawList();
     const ImVec2 screen_pos = ImGui::GetCursorScreenPos();
     ImVec2 node_size = getSize();
-    int alpha = isMouseIn() ? 128 : 255;
+    int alpha = isMouseIn() ? 255 : 200;
+    auto command_type = command_.getType();
+    std::tuple<float, float, float> color_tuple{ 1.0, 0.0, 1.0 }; // default color
+    switch (command_type)
+    {
+    case ApplicationHandler::Command::CommandType::RawDataMethod:
+      color_tuple = color_palette[0];
+      break;
+    case ApplicationHandler::Command::CommandType::SampleGroupMethod:
+      color_tuple = color_palette[1];
+      break;
+    case ApplicationHandler::Command::CommandType::SequenceSegmentMethod:
+      color_tuple = color_palette[2];
+      break;
+    default:
+      break;
+    };
+    auto [r, g, b] = color_tuple;
+    ImU32 color = IM_COL32(r*255, g*255, b*255, alpha);
     draw_list->AddRectFilled(
       ImVec2(screen_pos.x + pos.x, screen_pos.y + pos.y),
       ImVec2(screen_pos.x + pos.x + node_size.x, screen_pos.y + pos.y + node_size.y),
-      IM_COL32(200, 0, 200, alpha)
+      color,
+      5.0
     );
-    auto text_size = ImGui::CalcTextSize(text_.c_str());
+    auto text_size = ImGui::CalcTextSize(command_.getName().c_str());
     auto text_pos = ImVec2({ pos.x + (node_size.x - text_size.x) / 2 + screen_pos.x, pos.y + (30 - text_size.y) / 2 + screen_pos.y});
-    draw_list->AddText(text_pos, IM_COL32(255, 255, 255, 255), text_.c_str());
+    draw_list->AddText(text_pos, IM_COL32(255, 255, 255, 255), command_.getName().c_str());
   }
 
   void WorfklowStepNodeGraph::draw()
@@ -81,119 +131,158 @@ namespace SmartPeak
     static int workflow_step_space = 10;
 
     // update dragging status
-    int node_index = 0;
-    for (auto node_it = nodes.begin(); node_it !=nodes.end(); node_it++)
+    updatecommands();
+    if (error_building_commands_)
     {
-      auto& node = *node_it;
-      bool is_mouse_clicked = ImGui::IsMouseDragging(0);
-      bool is_mouse_dragging = ImGui::IsMouseDragging(0);
-      if (!dragging_node_)
-      {
-        node.is_clicked_ = (is_mouse_clicked && node.isMouseIn());
-      }
-      if (!dragging_node_ && is_mouse_dragging && node.is_clicked_)
-      {
-        // start dragging
-        node.is_dragging_ = true;
-        dragging_node_ = &node;
-        dragging_node_index_ = node_index;
-      }
-      if (!is_mouse_clicked && node.is_dragging_)
-      {
-        // release
-        node.is_dragging_ = false;
-        node.drag_delta_ = { 0, 0 };
-        dragging_node_ = nullptr;
-        const auto tmp = application_handler_.sequenceHandler_.getWorkflow().at(dragging_node_index_);
-        application_handler_.sequenceHandler_.getWorkflow().erase(application_handler_.sequenceHandler_.getWorkflow().cbegin() + dragging_node_index_);
-        application_handler_.sequenceHandler_.getWorkflow().insert(application_handler_.sequenceHandler_.getWorkflow().cbegin() + place_holder_node_index_, tmp);
-      }
-      node_index++;
+      ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+      ImGui::Text("Unable to load workflow. Please check log.");
+      ImGui::PopStyleColor();
     }
-
-    to_display.clear();
-    ImVec2 pos{ 0,0 };
-    for (auto& node : nodes)
+    else
     {
-      if (!node.is_dragging_)
-      {
-        to_display.push_back(&node);
-      }
-    }
-
-    // update positions
-    for (auto& node : to_display)
-    {
-      node->pos = pos;
-      pos.y += node->getSize().y;
-      pos.y += workflow_step_space;
-    }
-
-    // insert place holder
-    if (dragging_node_)
-    {
-      std::vector<WorfklowStepNode*> to_display_with_placeholder;
-      bool place_holder_found = false;
       int node_index = 0;
-      for (auto it = to_display.begin(); it != to_display.end(); it++)
+      for (auto& node : nodes)
       {
-        auto& node = *it;
+        bool is_mouse_clicked = ImGui::IsMouseDragging(0);
+        bool is_mouse_dragging = ImGui::IsMouseDragging(0);
+        auto mouse_pos = ImGui::GetMousePos();
+        auto window_pos = ImGui::GetWindowPos();
+        auto window_size = ImGui::GetWindowSize();
+        bool mouse_is_in_window = ((mouse_pos.x > window_pos.x) && (mouse_pos.x < (window_pos.x + window_size.x))
+                                && (mouse_pos.y > window_pos.y) && (mouse_pos.y < (window_pos.y + window_size.y)));
+        if (!mouse_is_in_window)
+        {
+          is_mouse_clicked = false;
+          is_mouse_dragging = false;
+        }
+        if (!dragging_node_)
+        {
+          node.is_clicked_ = (is_mouse_clicked && node.isMouseIn());
+        }
+        if (!dragging_node_ && is_mouse_dragging && node.is_clicked_)
+        {
+          // start dragging
+          node.is_dragging_ = true;
+          dragging_node_ = &node;
+          dragging_node_index_ = node_index;
+        }
+        if (!is_mouse_clicked && node.is_dragging_)
+        {
+          // release
+          node.is_dragging_ = false;
+          node.drag_delta_ = { 0, 0 };
+          dragging_node_ = nullptr;
+          if (mouse_is_in_window)
+          {
+            const auto tmp = application_handler_.sequenceHandler_.getWorkflow().at(dragging_node_index_);
+            application_handler_.sequenceHandler_.getWorkflow().erase(application_handler_.sequenceHandler_.getWorkflow().cbegin() + dragging_node_index_);
+            application_handler_.sequenceHandler_.getWorkflow().insert(application_handler_.sequenceHandler_.getWorkflow().cbegin() + place_holder_node_index_, tmp);
+          }
+        }
+        node_index++;
+      }
+
+      to_display.clear();
+      ImVec2 pos{ 0,0 };
+      for (auto& node : nodes)
+      {
+        if (!node.is_dragging_)
+        {
+          to_display.push_back(&node);
+        }
+      }
+
+      // update positions
+      for (auto& node : to_display)
+      {
+        node->pos = pos;
+        pos.y += node->getSize().y;
+        pos.y += workflow_step_space;
+      }
+
+      // insert place holder
+      if (dragging_node_)
+      {
+        std::vector<WorfklowStepNode*> to_display_with_placeholder;
+        bool place_holder_found = false;
+        int node_index = 0;
+        for (auto it = to_display.begin(); it != to_display.end(); it++)
+        {
+          auto& node = *it;
+          if (!place_holder_found)
+          {
+            if (to_display_with_placeholder.empty())
+            {
+              if (dragging_node_->pos.y + dragging_node_->getSize().y / 2 < node->pos.y + node->getSize().y / 2)
+              {
+                to_display_with_placeholder.push_back(&place_holder_);
+                place_holder_node_index_ = node_index;
+                place_holder_found = true;
+              }
+            }
+            else
+            {
+              auto previous_node = to_display_with_placeholder.back();
+              if ((dragging_node_->pos.y + dragging_node_->getSize().y / 2 > previous_node->pos.y + node->getSize().y / 2)
+                && (dragging_node_->pos.y + dragging_node_->getSize().y / 2 < node->pos.y + node->getSize().y / 2))
+              {
+                to_display_with_placeholder.push_back(&place_holder_);
+                place_holder_node_index_ = node_index;
+                place_holder_found = true;
+              }
+            }
+            node_index++;
+          }
+          to_display_with_placeholder.push_back(node);
+        }
         if (!place_holder_found)
         {
-          if (to_display_with_placeholder.empty())
-          {
-            if (dragging_node_->pos.y + dragging_node_->getSize().y / 2 < node->pos.y + node->getSize().y / 2)
-            {
-              to_display_with_placeholder.push_back(&place_holder_);
-              place_holder_node_index_ = node_index;
-              place_holder_found = true;
-            }
-          }
-          else
-          {
-            auto previous_node = to_display_with_placeholder.back();
-            if ((dragging_node_->pos.y + dragging_node_->getSize().y / 2 > previous_node->pos.y + node->getSize().y / 2)
-              && (dragging_node_->pos.y + dragging_node_->getSize().y / 2 < node->pos.y + node->getSize().y / 2))
-            {
-              to_display_with_placeholder.push_back(&place_holder_);
-              place_holder_node_index_ = node_index;
-              place_holder_found = true;
-            }
-          }
-          node_index ++;
+          place_holder_node_index_ = node_index;
+          to_display_with_placeholder.push_back(&place_holder_);
         }
-        to_display_with_placeholder.push_back(node);
+        to_display = to_display_with_placeholder;
       }
-      if (!place_holder_found)
+
+      // update positions with placeholder
+      pos = { 0,0 };
+      for (auto& node : to_display)
       {
-        place_holder_node_index_ = node_index;
-        to_display_with_placeholder.push_back(&place_holder_);
+        node->pos = pos;
+        pos.y += node->getSize().y;
+        pos.y += workflow_step_space;
       }
-      to_display = to_display_with_placeholder;
-    }
 
-    // update positions with placeholder
-    pos = { 0,0 };
-    for (auto& node : to_display)
-    {
-      node->pos = pos;
-      pos.y += node->getSize().y;
-      pos.y += workflow_step_space;
-    }
+      if (dragging_node_)
+      {
+        to_display.push_back(dragging_node_);
+        auto drag_delta = ImGui::GetMouseDragDelta();
+        dragging_node_->pos.x += (drag_delta.x - dragging_node_->drag_delta_.x);
+        dragging_node_->pos.y += (drag_delta.y - dragging_node_->drag_delta_.y);
+        dragging_node_->drag_delta_ = drag_delta;
+      }
 
-    if (dragging_node_)
-    {
-      to_display.push_back(dragging_node_);
-      auto drag_delta = ImGui::GetMouseDragDelta();
-      dragging_node_->pos.x += (drag_delta.x - dragging_node_->drag_delta_.x);
-      dragging_node_->pos.y += (drag_delta.y - dragging_node_->drag_delta_.y);
-      dragging_node_->drag_delta_ = drag_delta;
+      // draw
+      for (auto& node : to_display)
+      {
+        node->draw();
+      }
     }
-   
-    // draw
-    for (auto& node : to_display)
+  }
+
+  void WorfklowStepNodeGraph::updatecommands()
+  {
+    const auto& names = application_handler_.sequenceHandler_.getWorkflow();
+    if (buildCommandsFromNames_.names_ != names)
     {
-      node->draw();
+      buildCommandsFromNames_.names_ = names;
+      error_building_commands_ = !buildCommandsFromNames_.process();
+      nodes.clear();
+      for (const auto& command : buildCommandsFromNames_.commands_)
+      {
+        WorfklowStepNode node;
+        node.command_ = command;
+        nodes.push_back(node);
+      }
     }
   }
 
@@ -350,82 +439,9 @@ namespace SmartPeak
     }
     else
     {
-      updatecommands();
-      if (!error_building_commands_)
-      {
-        workflow_node_graph_.draw();
-        /*
-        int i = 0;
-        for (const auto& command: buildCommandsFromNames_.commands_) {
-          ImGui::PushID(i + 1 ); // avoid hashing an id := 0, not sure it's necessary
-          std::ostringstream os;
-          os << "[" << (i + 1) << "] " << command.getName().c_str();
-          ImGui::Button(os.str().c_str());
-          if (editable && ImGui::BeginDragDropSource())
-          {
-            ImGui::SetDragDropPayload("DND_STEP", &i, sizeof(int));
-            ImGui::Text("Moving %s", application_handler_.sequenceHandler_.getWorkflow().at(i).c_str());
-            ImGui::EndDragDropSource();
-          }
-          else if (ImGui::IsItemHovered())
-          {
-            ImGui::BeginTooltip();
-            ImGui::Text("%s", command.getDescription().c_str());
-            ImGui::EndTooltip();
-          }
-          if (editable && ImGui::BeginDragDropTarget())
-          {
-            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("DND_STEP"))
-            {
-              IM_ASSERT(payload->DataSize == sizeof(int));
-              int source_n = *(const int*)payload->Data;
-              const auto tmp = application_handler_.sequenceHandler_.getWorkflow().at(source_n);
-              application_handler_.sequenceHandler_.getWorkflow().erase(application_handler_.sequenceHandler_.getWorkflow().cbegin() + source_n);
-              application_handler_.sequenceHandler_.getWorkflow().insert(application_handler_.sequenceHandler_.getWorkflow().cbegin() + i, tmp);
-            }
-            ImGui::EndDragDropTarget();
-          }
-          if (editable)
-          {
-            ImGui::SameLine();
-          }
-          if (editable && ImGui::Button("x")) {
-            application_handler_.sequenceHandler_.getWorkflow().erase(application_handler_.sequenceHandler_.getWorkflow().cbegin() + i);
-            application_handler_.sequenceHandler_.notifyWorkflowUpdated();
-          }
-          else 
-          {
-            ++i;
-          }
-          ImGui::PopID();
-        }
-        */
-      }
-      else
-      {
-        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
-        ImGui::Text("Unable to load workflow. Please check log.");
-        ImGui::PopStyleColor();
-      }
+      workflow_node_graph_.draw();
     }
     ImGui::EndChild();
-  }
-
-  void WorkflowWidget::updatecommands()
-  {
-    const auto& names = application_handler_.sequenceHandler_.getWorkflow();
-    if (buildCommandsFromNames_.names_ != names)
-    {
-      buildCommandsFromNames_.names_ = names;
-      error_building_commands_ = !buildCommandsFromNames_.process();
-      workflow_node_graph_.nodes.clear();
-      for (const auto& commande_name : buildCommandsFromNames_.names_)
-      {
-        WorfklowStepNode node;
-        node.text_ = commande_name;
-        workflow_node_graph_.nodes.push_back(node);
-      }
-    }
   }
 
 }
