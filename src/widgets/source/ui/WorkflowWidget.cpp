@@ -82,6 +82,27 @@ namespace SmartPeak
     return { width, 30 };
   }
 
+  std::tuple<int,int,int,int> WorfklowStepNode::getCloseButtonPosition()
+  {
+    static int width = 16;
+    static int height = 16;
+    static int right_margin = 8;
+    ImVec4 result;
+    auto node_size = getSize();
+    auto pos_x = node_size.x - right_margin - width;
+    auto pos_y = node_size.y - (node_size.y - height)/2 - height;
+    return std::make_tuple(pos_x, pos_y, width, height);
+  }
+
+  bool WorfklowStepNode::isCloseButtonMouseIn()
+  {
+    auto mouse_pos = ImGui::GetMousePos();
+    const ImVec2 screen_pos = ImGui::GetCursorScreenPos();
+    auto [btn_pos_x, btn_pos_y, btn_pos_w, btn_pos_h] = getCloseButtonPosition();
+    return  (mouse_pos.x > screen_pos.x + pos.x + btn_pos_x) && (mouse_pos.x < screen_pos.x + pos.x + btn_pos_x + btn_pos_w) &&
+            (mouse_pos.y > screen_pos.y + pos.y + btn_pos_y) && (mouse_pos.y < screen_pos.y + pos.y + btn_pos_y + btn_pos_h);
+  }
+
   bool WorfklowStepNode::isMouseIn()
   {
     auto mouse_pos = ImGui::GetMousePos();
@@ -93,6 +114,7 @@ namespace SmartPeak
 
   void WorfklowStepNode::draw()
   {
+    // Node container
     ImDrawList* draw_list = ImGui::GetWindowDrawList();
     const ImVec2 screen_pos = ImGui::GetCursorScreenPos();
     ImVec2 node_size = getSize();
@@ -121,9 +143,41 @@ namespace SmartPeak
       color,
       5.0
     );
+    
+    // Text
     auto text_size = ImGui::CalcTextSize(command_.getName().c_str());
+    
+    // Delete button
     auto text_pos = ImVec2({ pos.x + (node_size.x - text_size.x) / 2 + screen_pos.x, pos.y + (30 - text_size.y) / 2 + screen_pos.y});
     draw_list->AddText(text_pos, IM_COL32(255, 255, 255, 255), command_.getName().c_str());
+    auto [btn_pos_x, btn_pos_y, btn_pos_w, btn_pos_h] = getCloseButtonPosition();
+    float thickness = 1.0f;
+    if (isCloseButtonMouseIn())
+    {
+      thickness = 2.0f;
+    }
+    if (isMouseIn())
+    {
+      draw_list->AddCircle(
+        ImVec2(pos.x + screen_pos.x + btn_pos_x + btn_pos_w / 2, pos.y + screen_pos.y + btn_pos_y + btn_pos_h / 2),
+        btn_pos_w / 2,
+        IM_COL32(255, 255, 255, alpha),
+        0,
+        thickness
+      );
+      draw_list->AddLine(
+        ImVec2(pos.x + btn_pos_x + screen_pos.x, pos.y + btn_pos_y + screen_pos.y),
+        ImVec2(pos.x + btn_pos_x + screen_pos.x + btn_pos_w, pos.y + btn_pos_y + screen_pos.y + btn_pos_h),
+        IM_COL32(255, 255, 255, alpha),
+        thickness
+      );
+      draw_list->AddLine(
+        ImVec2(pos.x + btn_pos_x + screen_pos.x, pos.y + btn_pos_y + screen_pos.y + btn_pos_h),
+        ImVec2(pos.x + btn_pos_x + screen_pos.x + btn_pos_w, pos.y + btn_pos_y + screen_pos.y),
+        IM_COL32(255, 255, 255, alpha),
+        thickness
+      );
+    }
   }
 
   void WorfklowStepNodeGraph::draw()
@@ -131,7 +185,6 @@ namespace SmartPeak
     static int workflow_step_space = 10;
 
     // update dragging status
-    updatecommands();
     if (error_building_commands_)
     {
       ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
@@ -143,7 +196,7 @@ namespace SmartPeak
       int node_index = 0;
       for (auto& node : nodes)
       {
-        bool is_mouse_clicked = ImGui::IsMouseDragging(0);
+        bool is_mouse_down = ImGui::IsMouseDown(0);
         bool is_mouse_dragging = ImGui::IsMouseDragging(0);
         auto mouse_pos = ImGui::GetMousePos();
         auto window_pos = ImGui::GetWindowPos();
@@ -152,21 +205,21 @@ namespace SmartPeak
                                 && (mouse_pos.y > window_pos.y) && (mouse_pos.y < (window_pos.y + window_size.y)));
         if (!mouse_is_in_window)
         {
-          is_mouse_clicked = false;
+          is_mouse_down = false;
           is_mouse_dragging = false;
         }
         if (!dragging_node_)
         {
-          node.is_clicked_ = (is_mouse_clicked && node.isMouseIn());
+          node.is_mouse_down_ = (is_mouse_down && node.isMouseIn());
         }
-        if (!dragging_node_ && is_mouse_dragging && node.is_clicked_)
+        if (!dragging_node_ && is_mouse_dragging && node.is_mouse_down_)
         {
           // start dragging
           node.is_dragging_ = true;
           dragging_node_ = &node;
           dragging_node_index_ = node_index;
         }
-        if (!is_mouse_clicked && node.is_dragging_)
+        if (!is_mouse_down && node.is_dragging_)
         {
           // release
           node.is_dragging_ = false;
@@ -177,10 +230,18 @@ namespace SmartPeak
             const auto tmp = application_handler_.sequenceHandler_.getWorkflow().at(dragging_node_index_);
             application_handler_.sequenceHandler_.getWorkflow().erase(application_handler_.sequenceHandler_.getWorkflow().cbegin() + dragging_node_index_);
             application_handler_.sequenceHandler_.getWorkflow().insert(application_handler_.sequenceHandler_.getWorkflow().cbegin() + place_holder_node_index_, tmp);
+            application_handler_.sequenceHandler_.notifyWorkflowUpdated();
           }
+        }
+        if (ImGui::IsMouseClicked(0) && node.isCloseButtonMouseIn())
+        {
+          application_handler_.sequenceHandler_.getWorkflow().erase(application_handler_.sequenceHandler_.getWorkflow().cbegin() + node_index);
+          application_handler_.sequenceHandler_.notifyWorkflowUpdated();
         }
         node_index++;
       }
+
+      updatecommands();
 
       to_display.clear();
       ImVec2 pos{ 0,0 };

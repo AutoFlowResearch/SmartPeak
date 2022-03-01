@@ -39,10 +39,13 @@ namespace SmartPeak
     ImVec2 drag_delta_;
     ApplicationHandler::Command command_;
     bool is_dragging_ = false;
-    bool is_clicked_ = false;
+    bool is_mouse_down_ = false;
     virtual ImVec2 getSize();
     virtual void draw();
     bool isMouseIn();
+    bool isCloseButtonMouseIn();
+  protected:
+    std::tuple<int, int, int, int> getCloseButtonPosition();
   };
 
   struct WorfklowStepNodePlaceHolder : public WorfklowStepNode
@@ -95,8 +98,6 @@ namespace SmartPeak
     ApplicationHandler& application_handler_;
     WorkflowStepWidget workflow_step_widget_;
     WorkflowManager& workflow_manager_;
-//    BuildCommandsFromNames buildCommandsFromNames_;
-//    bool error_building_commands_ = false;
     WorfklowStepNodeGraph workflow_node_graph_;
   };
 }
