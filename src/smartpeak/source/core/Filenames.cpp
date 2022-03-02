@@ -22,6 +22,7 @@
 // --------------------------------------------------------------------------
 
 #include <SmartPeak/core/Filenames.h>
+#include <SmartPeak/core/Utilities.h>
 #include <plog/Log.h>
 
 #include <string>
@@ -128,19 +129,15 @@ namespace SmartPeak
     if (!filename.full_path_override_)
     {
       std::string file_pattern = filename.name_pattern_;
-      std::regex search_regex("\\$\\{([^}]*)\\}");
-      std::smatch match;
-      std::string search_string = file_pattern;
-      while (std::regex_search(search_string, match, search_regex))
+      for (const auto& tag : string_to_tag_)
       {
+        std::string search = "${" + tag.first + "}";
         std::string replace_with;
-        if (string_to_tag_.count(match.str(1)))
+        if (string_to_tag_.count(tag.first))
         {
-          replace_with = tags_[string_to_tag_[match.str(1)]];
+          replace_with = tags_[string_to_tag_[tag.first]];
         }
-        std::regex replace_regex(std::string("\\$\\{") + match.str(1) + std::string("\\}"));
-        file_pattern = std::regex_replace(file_pattern, replace_regex, replace_with);
-        search_string = match.suffix().str();
+        file_pattern = Utilities::replaceAll(file_pattern, search, replace_with);
       }
       filename.full_path_ = file_pattern;
     }

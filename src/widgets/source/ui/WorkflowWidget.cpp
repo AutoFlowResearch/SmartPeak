@@ -32,7 +32,7 @@
 namespace SmartPeak
 {
 
-  ImU32 getColorPalete(const int index, int alpha)
+  ImU32 getColorPalete(int index, int alpha)
   {
     static std::vector<ImU32> color_palette =
     {
@@ -42,6 +42,7 @@ namespace SmartPeak
       0xa7d0b8,
       0xdcdcd7
     };
+    index = index % color_palette.size();
     auto color = color_palette[index];
     ImU8 r = (color>>16);
     ImU8 g = (color >> 8) & 0xFF;

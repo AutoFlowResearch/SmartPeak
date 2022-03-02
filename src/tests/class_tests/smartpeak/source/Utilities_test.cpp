@@ -853,3 +853,13 @@ TEST(ParametersParser, hasBOMMarker)
   const string pathname_32be_bom = SMARTPEAK_GET_TEST_DATA_PATH("FileReader_parameters_bom_32be.csv");
   EXPECT_TRUE(Utilities::hasBOMMarker(pathname_32be_bom));
 }
+
+
+TEST(Filenames, replaceAll)
+{
+  std::string str = "apple strawberry apple peach ";
+  auto result1 = Utilities::replaceAll(str, "apple", "banana");
+  EXPECT_EQ(result1, "banana strawberry banana peach ");
+  auto result2 = Utilities::replaceAll(str, "not found", "banana");
+  EXPECT_EQ(result2, "apple strawberry apple peach ");
+}
