@@ -33,18 +33,25 @@
 
 namespace SmartPeak
 {
+  struct WorfklowStepNodeGraphContainer;
+
   struct WorfklowStepNode
   {
     ImVec2 getSize();
+    ImVec2 getScreenPosition();
+    int getWidth();
+    int getHeight();
     virtual void draw();
     bool isMouseIn();
     bool isCloseButtonMouseIn();
 
     ImVec2 pos_;
+    int width_;
     ImVec2 drag_delta_;
     ApplicationHandler::Command command_;
     bool is_dragging_ = false;
     bool is_mouse_down_ = false;
+    WorfklowStepNodeGraphContainer* container = nullptr;
 
   protected:
     std::tuple<int, int, int, int> getCloseButtonPosition();
@@ -53,6 +60,15 @@ namespace SmartPeak
   struct WorfklowStepNodePlaceHolder : public WorfklowStepNode
   {
     virtual void draw();
+  };
+
+  struct WorfklowStepNodeGraphContainer
+  {
+    std::vector<WorfklowStepNode*> to_display_;
+    ImVec2 pos_;
+    void draw();
+    ImVec2 getSize();
+    void layout();
   };
 
   struct WorfklowStepNodeGraph
@@ -71,6 +87,7 @@ namespace SmartPeak
 
   protected:
     std::vector<WorfklowStepNode*> to_display;
+    WorfklowStepNodeGraphContainer container_;
     WorfklowStepNode* dragging_node_ = nullptr;
     int dragging_node_index_ = 0;
     int place_holder_node_index_ = 0;
