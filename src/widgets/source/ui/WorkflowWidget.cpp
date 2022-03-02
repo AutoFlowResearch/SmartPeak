@@ -191,7 +191,7 @@ namespace SmartPeak
   {
     containers_.clear();
     auto container = std::make_shared<WorfklowStepNodeGraphContainer>();
-    for (auto& node : to_display)
+    for (auto& node : to_display_)
     {
       auto node_type = node->command_.getType();
       if (container->type_ != node_type)
@@ -284,12 +284,12 @@ namespace SmartPeak
 
       updatecommands();
 
-      to_display.clear();
+      to_display_.clear();
       for (auto& node : nodes)
       {
         if (!node.is_dragging_)
         {
-          to_display.push_back(&node);
+          to_display_.push_back(&node);
         }
       }
 
@@ -305,7 +305,7 @@ namespace SmartPeak
         std::vector<WorfklowStepNode*> to_display_with_placeholder;
         bool place_holder_found = false;
         int node_index = 0;
-        for (auto& node : to_display)
+        for (auto& node : to_display_)
         {
           auto node_pos = node->getScreenPosition();
           auto dragging_node_pos = dragging_node_->getScreenPosition();
@@ -343,7 +343,7 @@ namespace SmartPeak
           place_holder_node_index_ = node_index;
           to_display_with_placeholder.push_back(&place_holder_);
         }
-        to_display = to_display_with_placeholder;
+        to_display_ = to_display_with_placeholder;
       }
 
       // create containers with place holder

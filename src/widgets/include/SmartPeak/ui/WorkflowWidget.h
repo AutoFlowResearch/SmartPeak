@@ -84,12 +84,12 @@ namespace SmartPeak
     void draw();
   
   protected:
-    void updatecommands();
+    virtual void updatecommands();
     void createContainers();
     void layout();
 
   protected:
-    std::vector<WorfklowStepNode*> to_display;
+    std::vector<WorfklowStepNode*> to_display_;
     std::vector<std::shared_ptr<WorfklowStepNodeGraphContainer>> containers_;
     WorfklowStepNode* dragging_node_ = nullptr;
     int dragging_node_index_ = 0;
