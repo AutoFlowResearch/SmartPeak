@@ -36,7 +36,10 @@ namespace SmartPeak
   static int container_out_margin = 10;
   static int container_in_margin = 20;
   static int container_header_height = 30;
-
+  static int close_button_width = 10;
+  static int close_button_height = 10;
+  static int close_button_right_margin = 8;
+  static int workflow_step_height = 30;
 
   ImU32 getColorPalete(int index, int alpha)
   {
@@ -59,15 +62,14 @@ namespace SmartPeak
   void WorfklowStepNodePlaceHolder::draw()
   {
     ImDrawList* draw_list = ImGui::GetWindowDrawList();
-    const ImVec2 screen_pos = ImGui::GetCursorScreenPos();
+    const ImVec2 pos = getScreenPosition();
     ImVec2 node_size = getSize();
     draw_list->AddRect(
-      ImVec2(screen_pos.x + pos_.x, screen_pos.y + pos_.y),
-      ImVec2(screen_pos.x + pos_.x + node_size.x, screen_pos.y + pos_.y + node_size.y),
+      ImVec2(pos.x, pos.y),
+      ImVec2(pos.x + node_size.x, pos.y + node_size.y),
       IM_COL32(200, 200, 200, 200),
       5.0
     );
-
   }
 
   ImVec2 WorfklowStepNode::getSize()
@@ -80,9 +82,9 @@ namespace SmartPeak
     ImVec2 pos = pos_;
     const ImVec2 screen_pos = ImGui::GetCursorScreenPos();
     ImVec2 container_position;
-    if (container)
+    if (container_)
     {
-      container_position = container->pos_;
+      container_position = container_->pos_;
     }
     pos.x += screen_pos.x + container_position.x;
     pos.y += screen_pos.y + container_position.y;
@@ -96,37 +98,33 @@ namespace SmartPeak
 
   int WorfklowStepNode::getHeight()
   {
-    return 30;
+    return workflow_step_height;
   }
 
   std::tuple<int,int,int,int> WorfklowStepNode::getCloseButtonPosition()
   {
-    static int width = 16;
-    static int height = 16;
-    static int right_margin = 8;
-    ImVec4 result;
     auto node_size = getSize();
-    auto pos_x = node_size.x - right_margin - width;
-    auto pos_y = node_size.y - (node_size.y - height)/2 - height;
-    return std::make_tuple(pos_x, pos_y, width, height);
+    auto pos_x = node_size.x - close_button_right_margin - close_button_width;
+    auto pos_y = node_size.y - (node_size.y - close_button_height)/2 - close_button_height;
+    return std::make_tuple(pos_x, pos_y, close_button_width, close_button_height);
   }
 
   bool WorfklowStepNode::isCloseButtonMouseIn()
   {
     auto mouse_pos = ImGui::GetMousePos();
-    const ImVec2 screen_pos = ImGui::GetCursorScreenPos();
+    const ImVec2 pos = getScreenPosition();
     auto [btn_pos_x, btn_pos_y, btn_pos_w, btn_pos_h] = getCloseButtonPosition();
-    return  (mouse_pos.x > screen_pos.x + pos_.x + btn_pos_x) && (mouse_pos.x < screen_pos.x + pos_.x + btn_pos_x + btn_pos_w) &&
-            (mouse_pos.y > screen_pos.y + pos_.y + btn_pos_y) && (mouse_pos.y < screen_pos.y + pos_.y + btn_pos_y + btn_pos_h);
+    return  (mouse_pos.x > pos.x + btn_pos_x) && (mouse_pos.x < pos.x + btn_pos_x + btn_pos_w) &&
+            (mouse_pos.y > pos.y + btn_pos_y) && (mouse_pos.y < pos.y + btn_pos_y + btn_pos_h);
   }
 
   bool WorfklowStepNode::isMouseIn()
   {
     auto mouse_pos = ImGui::GetMousePos();
-    const ImVec2 screen_pos = ImGui::GetCursorScreenPos();
+    const ImVec2 pos = getScreenPosition();
     ImVec2 node_size = getSize();
-    return  (mouse_pos.x > screen_pos.x + pos_.x) && (mouse_pos.x < screen_pos.x + pos_.x + node_size.x) &&
-            (mouse_pos.y > screen_pos.y + pos_.y) && (mouse_pos.y < screen_pos.y + pos_.y + node_size.y);
+    return  (mouse_pos.x > pos.x) && (mouse_pos.x < pos.x + node_size.x) &&
+            (mouse_pos.y > pos.y) && (mouse_pos.y < pos.y + node_size.y);
   }
 
   void WorfklowStepNode::draw()
@@ -162,10 +160,10 @@ namespace SmartPeak
     
     // Text
     auto text_size = ImGui::CalcTextSize(command_.getName().c_str());
-    
-    // Delete button
-    auto text_pos = ImVec2({ pos_.x + (node_size.x - text_size.x) / 2 + screen_pos.x, pos_.y + (30 - text_size.y) / 2 + screen_pos.y});
+    auto text_pos = ImVec2({ node_pos.x + (node_size.x - text_size.x) / 2, node_pos.y + (workflow_step_height - text_size.y) / 2 });
     draw_list->AddText(text_pos, IM_COL32(255, 255, 255, 255), command_.getName().c_str());
+
+    // Delete button
     auto [btn_pos_x, btn_pos_y, btn_pos_w, btn_pos_h] = getCloseButtonPosition();
     float thickness = 1.0f;
     if (isCloseButtonMouseIn())
@@ -186,6 +184,42 @@ namespace SmartPeak
         IM_COL32(255, 255, 255, alpha),
         thickness
       );
+    }
+  }
+
+  void WorfklowStepNodeGraph::createContainers()
+  {
+    containers_.clear();
+    auto container = std::make_shared<WorfklowStepNodeGraphContainer>();
+    for (auto& node : to_display)
+    {
+      auto node_type = node->command_.getType();
+      if (container->type_ != node_type)
+      {
+        if (!container->to_display_.empty())
+        {
+          containers_.push_back(container);
+        }
+        container = std::make_shared<WorfklowStepNodeGraphContainer>();
+        container->type_ = node_type;
+      }
+      container->to_display_.push_back(node);
+      node->container_ = container;
+    }
+    if (!container->to_display_.empty())
+    {
+      containers_.push_back(container);
+    }
+  }
+
+  void WorfklowStepNodeGraph::layout()
+  {
+    ImVec2 pos{ 0,0 };
+    for (auto& container : containers_)
+    {
+      container->pos_ = pos;
+      container->layout();
+      pos.y += container->getSize().y;
     }
   }
 
@@ -251,7 +285,6 @@ namespace SmartPeak
       updatecommands();
 
       to_display.clear();
-      ImVec2 pos{ 0,0 };
       for (auto& node : nodes)
       {
         if (!node.is_dragging_)
@@ -260,9 +293,11 @@ namespace SmartPeak
         }
       }
 
+      // create containers
+      createContainers();
+
       // update positions
-      container_.to_display_ = to_display;
-      container_.layout();
+      layout();
 
       // insert place holder
       if (dragging_node_)
@@ -280,6 +315,7 @@ namespace SmartPeak
             {
               if (dragging_node_pos.y < node_pos.y)
               {
+                place_holder_.command_ = dragging_node_->command_;
                 to_display_with_placeholder.push_back(&place_holder_);
                 place_holder_node_index_ = node_index;
                 place_holder_found = true;
@@ -292,6 +328,7 @@ namespace SmartPeak
               if ((dragging_node_pos.y > previous_node_pos.y)
                 && (dragging_node_pos.y < node_pos.y))
               {
+                place_holder_.command_ = dragging_node_->command_;
                 to_display_with_placeholder.push_back(&place_holder_);
                 place_holder_node_index_ = node_index;
                 place_holder_found = true;
@@ -309,14 +346,18 @@ namespace SmartPeak
         to_display = to_display_with_placeholder;
       }
 
-      // update positions with placeholder
-      container_.to_display_ = to_display;
-      container_.layout();
+      // create containers with place holder
+      createContainers();
 
+      // update positions with place holder
+      layout();
+
+      ImGui::SetWindowSize(ImVec2(50, 1000));
       // draw
-      container_.to_display_ = to_display;
-      container_.draw();
-
+      for (auto& container : containers_)
+      {
+        container->draw();
+      }
       if (dragging_node_)
       {
         auto drag_delta = ImGui::GetMouseDragDelta();
@@ -368,10 +409,25 @@ namespace SmartPeak
       IM_COL32(255, 255, 255, 255),
       5.0
     );
+    std::string header_text;
+    switch (type_)
+    {
+    case ApplicationHandler::Command::CommandType::RawDataMethod:
+      header_text = "for every injection";
+      break;
+    case ApplicationHandler::Command::CommandType::SampleGroupMethod:
+      header_text = "for every sample group";
+      break;
+    case ApplicationHandler::Command::CommandType::SequenceSegmentMethod:
+      header_text = "for every sample sequence segment";
+      break;
+    default:
+      break;
+    }
     draw_list->AddText(
       ImVec2(screen_pos.x + pos_.x + container_out_margin + 5, screen_pos.y + pos_.y + container_out_margin + 5),
       IM_COL32(255, 255, 255, 255),
-      "for every injection"
+      header_text.c_str()
     );
     for (auto& node : to_display_)
     {
