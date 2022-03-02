@@ -225,7 +225,8 @@ namespace SmartPeak
 
   void WorfklowStepNodeGraph::draw()
   {
-    // update dragging status
+    updatecommands();
+
     if (error_building_commands_)
     {
       ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
@@ -272,17 +273,17 @@ namespace SmartPeak
             application_handler_.sequenceHandler_.getWorkflow().erase(application_handler_.sequenceHandler_.getWorkflow().cbegin() + dragging_node_index_);
             application_handler_.sequenceHandler_.getWorkflow().insert(application_handler_.sequenceHandler_.getWorkflow().cbegin() + place_holder_node_index_, tmp);
             application_handler_.sequenceHandler_.notifyWorkflowUpdated();
+            updatecommands();
           }
         }
         if (ImGui::IsMouseClicked(0) && node.isCloseButtonMouseIn())
         {
           application_handler_.sequenceHandler_.getWorkflow().erase(application_handler_.sequenceHandler_.getWorkflow().cbegin() + node_index);
           application_handler_.sequenceHandler_.notifyWorkflowUpdated();
+          updatecommands();
         }
         node_index++;
       }
-
-      updatecommands();
 
       to_display_.clear();
       for (auto& node : nodes)
