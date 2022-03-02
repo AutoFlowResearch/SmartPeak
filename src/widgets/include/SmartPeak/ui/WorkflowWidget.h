@@ -35,15 +35,17 @@ namespace SmartPeak
 {
   struct WorfklowStepNode
   {
-    ImVec2 pos;
+    ImVec2 getSize();
+    virtual void draw();
+    bool isMouseIn();
+    bool isCloseButtonMouseIn();
+
+    ImVec2 pos_;
     ImVec2 drag_delta_;
     ApplicationHandler::Command command_;
     bool is_dragging_ = false;
     bool is_mouse_down_ = false;
-    virtual ImVec2 getSize();
-    virtual void draw();
-    bool isMouseIn();
-    bool isCloseButtonMouseIn();
+
   protected:
     std::tuple<int, int, int, int> getCloseButtonPosition();
   };
