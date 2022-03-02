@@ -352,8 +352,13 @@ namespace SmartPeak
       // update positions with place holder
       layout();
 
-      ImGui::SetWindowSize(ImVec2(50, 1000));
       // draw
+      float frame_height = 0;
+      for (auto& container : containers_)
+      {
+        frame_height += container->getSize().y + container_out_margin;
+      }
+      ImGui::BeginChildFrame(1, { 0, frame_height });
       for (auto& container : containers_)
       {
         container->draw();
@@ -366,7 +371,7 @@ namespace SmartPeak
         dragging_node_->drag_delta_ = drag_delta;
         dragging_node_->draw();
       }
-
+      ImGui::EndChildFrame();
     }
   }
 
@@ -475,15 +480,15 @@ namespace SmartPeak
         if (ImGui::Selectable(s))
         {
           std::vector<std::string> ids;
-          const std::string s_string { s };
+          const std::string s_string{ s };
           if (s_string == "DDA")
             ids = { "LOAD_RAW_DATA",
                     "PICK_MS2_FEATURES",
                     "SEARCH_SPECTRUM",
                     "DDA",
-                    "STORE_FEATURES"};
+                    "STORE_FEATURES" };
           else if (s_string == "LCMS MRM Unknowns")
-            ids = { "LOAD_RAW_DATA", 
+            ids = { "LOAD_RAW_DATA",
                     "MAP_CHROMATOGRAMS",
                     "PICK_MRM_FEATURES",
                     "QUANTIFY_FEATURES",
@@ -597,7 +602,7 @@ namespace SmartPeak
     ImGui::Separator();
     ImGui::Text("Steps");
     ImGui::Separator();
-    
+
     ImGui::BeginChild("Workflow Steps");
     if (application_handler_.sequenceHandler_.getWorkflow().empty())
     {
