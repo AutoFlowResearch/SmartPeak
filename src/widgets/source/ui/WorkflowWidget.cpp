@@ -31,36 +31,23 @@
 
 namespace SmartPeak
 {
-  std::vector<std::tuple<float, float, float>> color_palette =
+
+  ImU32 getColorPalete(const int index, int alpha)
   {
-  { 0.996, 0.231, 0.118},
-  { 0.599, 0.186, 0.487 },
-  { 0.312, 0.009, 0.923 },
-  { 0.177, 0.413, 0.795 },
-  { 0.003, 0.649, 0.933 },
-  { 0.435, 0.919, 0.999 },
-  { 0.032, 0.636, 0.605 },
-  { 0.982, 0.624, 0.855 },
-  { 0.035, 0.991, 0.798 },
-  { 0.633, 0.175, 0.196 },
-  { 0.167, 0.401, 0.415 },
-  { 0.29,  0.286, 0.343 },
-  { 0.555, 0.483, 0.644 },
-  { 0.717, 0.753, 0.998 },
-  { 0.674, 0.744, 0.612 },
-  { 0.509, 0.488, 0.44 },
-  { 0.352, 0.233, 0.11 },
-  { 0.682, 0.396, 0.028 },
-  { 0.968, 0.664, 0.19 },
-  { 0.84,  0.626, 0.564 },
-  { 0.955, 0.915, 0.36 },
-  { 0.606, 0.584, 0.004 },
-  { 0.339, 0.384, 0.017 },
-  { 0.901, 0.111, 0.968 },
-  { 0.07,  0.588, 0.231 },
-  { 0.98,  0.185, 0.477 },
-  { 0.317, 0.88,  0.076 }
-  };
+    static std::vector<ImU32> color_palette =
+    {
+      0x5d61a2,
+      0x93cdd1,
+      0xd598a0,
+      0xa7d0b8,
+      0xdcdcd7
+    };
+    auto color = color_palette[index];
+    ImU8 r = (color>>16);
+    ImU8 g = (color >> 8) & 0xFF;
+    ImU8 b = color & 0xFF;
+    return IM_COL32(r, g, b, alpha);
+  }
 
   void WorfklowStepNodePlaceHolder::draw()
   {
@@ -120,23 +107,21 @@ namespace SmartPeak
     ImVec2 node_size = getSize();
     int alpha = isMouseIn() ? 255 : 200;
     auto command_type = command_.getType();
-    std::tuple<float, float, float> color_tuple{ 1.0, 0.0, 1.0 }; // default color
+    ImU32 color = IM_COL32(255, 0, 255, alpha); // default color
     switch (command_type)
     {
     case ApplicationHandler::Command::CommandType::RawDataMethod:
-      color_tuple = color_palette[0];
+      color = getColorPalete(0, alpha);
       break;
     case ApplicationHandler::Command::CommandType::SampleGroupMethod:
-      color_tuple = color_palette[1];
+      color = getColorPalete(1, alpha);
       break;
     case ApplicationHandler::Command::CommandType::SequenceSegmentMethod:
-      color_tuple = color_palette[2];
+      color = getColorPalete(2, alpha);
       break;
     default:
       break;
     };
-    auto [r, g, b] = color_tuple;
-    ImU32 color = IM_COL32(r*255, g*255, b*255, alpha);
     draw_list->AddRectFilled(
       ImVec2(screen_pos.x + pos.x, screen_pos.y + pos.y),
       ImVec2(screen_pos.x + pos.x + node_size.x, screen_pos.y + pos.y + node_size.y),
