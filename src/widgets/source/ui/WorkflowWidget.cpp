@@ -27,11 +27,439 @@
 #include <plog/Log.h>
 #include <SmartPeak/core/SharedProcessors.h>
 
+#include <mutex> 
+
 namespace SmartPeak
 {
+
+  static int workflow_step_space = 10;
+  static int container_out_margin = 10;
+  static int container_in_margin = 20;
+  static int container_header_height = 30;
+  static int close_button_width = 10;
+  static int close_button_height = 10;
+  static int close_button_right_margin = 8;
+  static int workflow_step_height = 30;
+
+  ImU32 getColorPalete(int index, int alpha)
+  {
+    static std::vector<ImU32> color_palette =
+    {
+      0x5d61a2,
+      0x93cdd1,
+      0xd598a0,
+      0xa7d0b8,
+      0xdcdcd7
+    };
+    index = index % color_palette.size();
+    auto color = color_palette[index];
+    ImU8 r = (color>>16);
+    ImU8 g = (color >> 8) & 0xFF;
+    ImU8 b = color & 0xFF;
+    return IM_COL32(r, g, b, alpha);
+  }
+
+  void WorfklowStepNodePlaceHolder::draw()
+  {
+    ImDrawList* draw_list = ImGui::GetWindowDrawList();
+    const ImVec2 pos = getScreenPosition();
+    ImVec2 node_size = getSize();
+    draw_list->AddRect(
+      ImVec2(pos.x, pos.y),
+      ImVec2(pos.x + node_size.x, pos.y + node_size.y),
+      IM_COL32(200, 200, 200, 200),
+      5.0
+    );
+  }
+
+  ImVec2 WorfklowStepNode::getSize()
+  {
+    return { static_cast<float>(getWidth()), static_cast<float>(getHeight()) };
+  }
+
+  ImVec2 WorfklowStepNode::getScreenPosition()
+  {
+    ImVec2 pos = pos_;
+    const ImVec2 screen_pos = ImGui::GetCursorScreenPos();
+    ImVec2 container_position;
+    if (container_)
+    {
+      container_position = container_->pos_;
+    }
+    pos.x += screen_pos.x + container_position.x;
+    pos.y += screen_pos.y + container_position.y;
+    return pos;
+  }
+
+  int WorfklowStepNode::getWidth()
+  {
+    return width_;
+  }
+
+  int WorfklowStepNode::getHeight()
+  {
+    return workflow_step_height;
+  }
+
+  std::tuple<int,int,int,int> WorfklowStepNode::getCloseButtonPosition()
+  {
+    auto node_size = getSize();
+    auto pos_x = node_size.x - close_button_right_margin - close_button_width;
+    auto pos_y = node_size.y - (node_size.y - close_button_height)/2 - close_button_height;
+    return std::make_tuple(pos_x, pos_y, close_button_width, close_button_height);
+  }
+
+  bool WorfklowStepNode::isCloseButtonMouseIn()
+  {
+    auto mouse_pos = ImGui::GetMousePos();
+    const ImVec2 pos = getScreenPosition();
+    auto [btn_pos_x, btn_pos_y, btn_pos_w, btn_pos_h] = getCloseButtonPosition();
+    return  (mouse_pos.x > pos.x + btn_pos_x) && (mouse_pos.x < pos.x + btn_pos_x + btn_pos_w) &&
+            (mouse_pos.y > pos.y + btn_pos_y) && (mouse_pos.y < pos.y + btn_pos_y + btn_pos_h);
+  }
+
+  bool WorfklowStepNode::isMouseIn()
+  {
+    auto mouse_pos = ImGui::GetMousePos();
+    const ImVec2 pos = getScreenPosition();
+    ImVec2 node_size = getSize();
+    return  (mouse_pos.x > pos.x) && (mouse_pos.x < pos.x + node_size.x) &&
+            (mouse_pos.y > pos.y) && (mouse_pos.y < pos.y + node_size.y);
+  }
+
+  void WorfklowStepNode::draw()
+  {
+    // Node container
+    auto node_pos = getScreenPosition();
+    ImDrawList* draw_list = ImGui::GetWindowDrawList();
+    const ImVec2 screen_pos = ImGui::GetCursorScreenPos();
+    ImVec2 node_size = getSize();
+    int alpha = isMouseIn() ? 255 : 200;
+    auto command_type = command_.getType();
+    ImU32 color = IM_COL32(255, 0, 255, alpha); // default color
+    switch (command_type)
+    {
+    case ApplicationHandler::Command::CommandType::RawDataMethod:
+      color = getColorPalete(0, alpha);
+      break;
+    case ApplicationHandler::Command::CommandType::SampleGroupMethod:
+      color = getColorPalete(1, alpha);
+      break;
+    case ApplicationHandler::Command::CommandType::SequenceSegmentMethod:
+      color = getColorPalete(2, alpha);
+      break;
+    default:
+      break;
+    };
+    draw_list->AddRectFilled(
+      ImVec2(node_pos.x, node_pos.y),
+      ImVec2(node_pos.x + node_size.x, node_pos.y + node_size.y),
+      color,
+      5.0
+    );
+    
+    // Text
+    auto text_size = ImGui::CalcTextSize(command_.getName().c_str());
+    auto text_pos = ImVec2({ node_pos.x + (node_size.x - text_size.x) / 2, node_pos.y + (workflow_step_height - text_size.y) / 2 });
+    draw_list->AddText(text_pos, IM_COL32(255, 255, 255, 255), command_.getName().c_str());
+
+    // Delete button
+    auto [btn_pos_x, btn_pos_y, btn_pos_w, btn_pos_h] = getCloseButtonPosition();
+    float thickness = 1.0f;
+    if (isCloseButtonMouseIn())
+    {
+      thickness = 2.0f;
+    }
+    if (isMouseIn())
+    {
+      draw_list->AddLine(
+        ImVec2(node_pos.x + btn_pos_x, node_pos.y + btn_pos_y ),
+        ImVec2(node_pos.x + btn_pos_x + btn_pos_w, node_pos.y + btn_pos_y + btn_pos_h),
+        IM_COL32(255, 255, 255, alpha),
+        thickness
+      );
+      draw_list->AddLine(
+        ImVec2(node_pos.x + btn_pos_x, node_pos.y + btn_pos_y + btn_pos_h),
+        ImVec2(node_pos.x + btn_pos_x + btn_pos_w, node_pos.y + btn_pos_y),
+        IM_COL32(255, 255, 255, alpha),
+        thickness
+      );
+    }
+  }
+
+  void WorfklowStepNodeGraph::createContainers()
+  {
+    containers_.clear();
+    auto container = std::make_shared<WorfklowStepNodeGraphContainer>();
+    for (auto& node : to_display_)
+    {
+      auto node_type = node->command_.getType();
+      if (container->type_ != node_type)
+      {
+        if (!container->to_display_.empty())
+        {
+          containers_.push_back(container);
+        }
+        container = std::make_shared<WorfklowStepNodeGraphContainer>();
+        container->type_ = node_type;
+      }
+      container->to_display_.push_back(node);
+      node->container_ = container;
+    }
+    if (!container->to_display_.empty())
+    {
+      containers_.push_back(container);
+    }
+  }
+
+  void WorfklowStepNodeGraph::layout()
+  {
+    ImVec2 pos{ 0,0 };
+    for (auto& container : containers_)
+    {
+      container->pos_ = pos;
+      container->layout();
+      pos.y += container->getSize().y;
+    }
+  }
+
+  void WorfklowStepNodeGraph::draw()
+  {
+    updatecommands();
+
+    if (error_building_commands_)
+    {
+      ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+      ImGui::Text("Unable to load workflow. Please check log.");
+      ImGui::PopStyleColor();
+    }
+    else
+    {
+      int node_index = 0;
+      for (auto& node : nodes)
+      {
+        bool is_mouse_down = ImGui::IsMouseDown(0);
+        bool is_mouse_dragging = ImGui::IsMouseDragging(0);
+        auto mouse_pos = ImGui::GetMousePos();
+        auto window_pos = ImGui::GetWindowPos();
+        auto window_size = ImGui::GetWindowSize();
+        bool mouse_is_in_window = ((mouse_pos.x > window_pos.x) && (mouse_pos.x < (window_pos.x + window_size.x))
+                                && (mouse_pos.y > window_pos.y) && (mouse_pos.y < (window_pos.y + window_size.y)));
+        if (!mouse_is_in_window)
+        {
+          is_mouse_down = false;
+          is_mouse_dragging = false;
+        }
+        if (!dragging_node_)
+        {
+          node.is_mouse_down_ = (is_mouse_down && node.isMouseIn());
+        }
+        if (!dragging_node_ && is_mouse_dragging && node.is_mouse_down_)
+        {
+          // start dragging
+          node.is_dragging_ = true;
+          dragging_node_ = &node;
+          dragging_node_index_ = node_index;
+        }
+        if (!is_mouse_down && node.is_dragging_)
+        {
+          // release
+          node.is_dragging_ = false;
+          node.drag_delta_ = { 0, 0 };
+          dragging_node_ = nullptr;
+          if (mouse_is_in_window)
+          {
+            const auto tmp = application_handler_.sequenceHandler_.getWorkflow().at(dragging_node_index_);
+            application_handler_.sequenceHandler_.getWorkflow().erase(application_handler_.sequenceHandler_.getWorkflow().cbegin() + dragging_node_index_);
+            application_handler_.sequenceHandler_.getWorkflow().insert(application_handler_.sequenceHandler_.getWorkflow().cbegin() + place_holder_node_index_, tmp);
+            application_handler_.sequenceHandler_.notifyWorkflowUpdated();
+            updatecommands();
+          }
+        }
+        if (ImGui::IsMouseClicked(0) && node.isCloseButtonMouseIn())
+        {
+          application_handler_.sequenceHandler_.getWorkflow().erase(application_handler_.sequenceHandler_.getWorkflow().cbegin() + node_index);
+          application_handler_.sequenceHandler_.notifyWorkflowUpdated();
+          updatecommands();
+        }
+        node_index++;
+      }
+
+      to_display_.clear();
+      for (auto& node : nodes)
+      {
+        if (!node.is_dragging_)
+        {
+          to_display_.push_back(&node);
+        }
+      }
+
+      // create containers
+      createContainers();
+
+      // update positions
+      layout();
+
+      // insert place holder
+      if (dragging_node_)
+      {
+        std::vector<WorfklowStepNode*> to_display_with_placeholder;
+        bool place_holder_found = false;
+        int node_index = 0;
+        for (auto& node : to_display_)
+        {
+          auto node_pos = node->getScreenPosition();
+          auto dragging_node_pos = dragging_node_->getScreenPosition();
+          if (!place_holder_found)
+          {
+            if (to_display_with_placeholder.empty())
+            {
+              if (dragging_node_pos.y < node_pos.y)
+              {
+                place_holder_.command_ = dragging_node_->command_;
+                to_display_with_placeholder.push_back(&place_holder_);
+                place_holder_node_index_ = node_index;
+                place_holder_found = true;
+              }
+            }
+            else
+            {
+              auto previous_node = to_display_with_placeholder.back();
+              auto previous_node_pos = previous_node->getScreenPosition();
+              if ((dragging_node_pos.y > previous_node_pos.y)
+                && (dragging_node_pos.y < node_pos.y))
+              {
+                place_holder_.command_ = dragging_node_->command_;
+                to_display_with_placeholder.push_back(&place_holder_);
+                place_holder_node_index_ = node_index;
+                place_holder_found = true;
+              }
+            }
+            node_index++;
+          }
+          to_display_with_placeholder.push_back(node);
+        }
+        if (!place_holder_found)
+        {
+          place_holder_node_index_ = node_index;
+          to_display_with_placeholder.push_back(&place_holder_);
+        }
+        to_display_ = to_display_with_placeholder;
+      }
+
+      // create containers with place holder
+      createContainers();
+
+      // update positions with place holder
+      layout();
+
+      // draw
+      float frame_height = 0;
+      for (auto& container : containers_)
+      {
+        frame_height += container->getSize().y + container_out_margin;
+      }
+      ImGui::BeginChildFrame(1, { 0, frame_height });
+      for (auto& container : containers_)
+      {
+        container->draw();
+      }
+      if (dragging_node_)
+      {
+        auto drag_delta = ImGui::GetMouseDragDelta();
+        dragging_node_->pos_.x += (drag_delta.x - dragging_node_->drag_delta_.x);
+        dragging_node_->pos_.y += (drag_delta.y - dragging_node_->drag_delta_.y);
+        dragging_node_->drag_delta_ = drag_delta;
+        dragging_node_->draw();
+      }
+      ImGui::EndChildFrame();
+    }
+  }
+
+  ImVec2 WorfklowStepNodeGraphContainer::getSize()
+  {
+    auto width = ImGui::GetWindowWidth() - container_out_margin *2;
+    int height = container_header_height;
+    for (auto node_it = to_display_.begin(); node_it != to_display_.end(); node_it++)
+    {
+      auto& node = *node_it;
+      height += workflow_step_space;
+      height += node->getHeight();
+    }
+    height += workflow_step_space;
+    return { static_cast<float>(width), static_cast<float>(height) };
+  }
+
+  void WorfklowStepNodeGraphContainer::layout()
+  {
+    ImVec2 pos{ static_cast<float>(container_in_margin), static_cast<float>(container_header_height) };
+    pos.y += workflow_step_space;
+    auto container_width = getSize().x;
+    for (auto& node : to_display_)
+    {
+      node->pos_ = pos;
+      node->width_ = container_width - container_in_margin * 2;
+      pos.y += node->getSize().y;
+      pos.y += workflow_step_space;
+    }
+  }
+
+  void WorfklowStepNodeGraphContainer::draw()
+  {
+    auto container_size = getSize();
+    ImDrawList* draw_list = ImGui::GetWindowDrawList();
+    const ImVec2 screen_pos = ImGui::GetCursorScreenPos();
+    draw_list->AddRect(
+      ImVec2(screen_pos.x + pos_.x + container_out_margin, screen_pos.y + pos_.y + container_out_margin),
+      ImVec2(screen_pos.x + pos_.x + container_size.x, screen_pos.y + pos_.y + container_size.y),
+      IM_COL32(255, 255, 255, 255),
+      5.0
+    );
+    std::string header_text;
+    switch (type_)
+    {
+    case ApplicationHandler::Command::CommandType::RawDataMethod:
+      header_text = "for every injection";
+      break;
+    case ApplicationHandler::Command::CommandType::SampleGroupMethod:
+      header_text = "for every sample group";
+      break;
+    case ApplicationHandler::Command::CommandType::SequenceSegmentMethod:
+      header_text = "for every sample sequence segment";
+      break;
+    default:
+      break;
+    }
+    draw_list->AddText(
+      ImVec2(screen_pos.x + pos_.x + container_out_margin + 5, screen_pos.y + pos_.y + container_out_margin + 5),
+      IM_COL32(255, 255, 255, 255),
+      header_text.c_str()
+    );
+    for (auto& node : to_display_)
+    {
+      node->draw();
+    }
+  }
+
+  void WorfklowStepNodeGraph::updatecommands()
+  {
+    const auto& names = application_handler_.sequenceHandler_.getWorkflow();
+    if (buildCommandsFromNames_.names_ != names)
+    {
+      buildCommandsFromNames_.names_ = names;
+      error_building_commands_ = !buildCommandsFromNames_.process();
+      nodes.clear();
+      for (const auto& command : buildCommandsFromNames_.commands_)
+      {
+        WorfklowStepNode node;
+        node.command_ = command;
+        nodes.push_back(node);
+      }
+    }
+  }
+
   void WorkflowWidget::draw()
   {
-
     workflow_step_widget_.draw();
     bool editable = workflow_manager_.isWorkflowDone();
     if (editable && ImGui::BeginCombo("Presets", NULL))
@@ -53,15 +481,15 @@ namespace SmartPeak
         if (ImGui::Selectable(s))
         {
           std::vector<std::string> ids;
-          const std::string s_string { s };
+          const std::string s_string{ s };
           if (s_string == "DDA")
             ids = { "LOAD_RAW_DATA",
                     "PICK_MS2_FEATURES",
                     "SEARCH_SPECTRUM",
                     "DDA",
-                    "STORE_FEATURES"};
+                    "STORE_FEATURES" };
           else if (s_string == "LCMS MRM Unknowns")
-            ids = { "LOAD_RAW_DATA", 
+            ids = { "LOAD_RAW_DATA",
                     "MAP_CHROMATOGRAMS",
                     "PICK_MRM_FEATURES",
                     "QUANTIFY_FEATURES",
@@ -177,80 +605,15 @@ namespace SmartPeak
     ImGui::Separator();
 
     ImGui::BeginChild("Workflow Steps");
-
     if (application_handler_.sequenceHandler_.getWorkflow().empty())
     {
       ImGui::Text("No steps set. Please select a preset and/or add a single method step.");
     }
     else
     {
-      updatecommands();
-      if (!error_building_commands_)
-      {
-        int i = 0;
-        for (const auto& command: buildCommandsFromNames_.commands_) {
-          ImGui::PushID(i + 1 ); // avoid hashing an id := 0, not sure it's necessary
-          std::ostringstream os;
-          os << "[" << (i + 1) << "] " << command.getName().c_str();
-          ImGui::Button(os.str().c_str());
-          if (editable && ImGui::BeginDragDropSource())
-          {
-            ImGui::SetDragDropPayload("DND_STEP", &i, sizeof(int));
-            ImGui::Text("Moving %s", application_handler_.sequenceHandler_.getWorkflow().at(i).c_str());
-            ImGui::EndDragDropSource();
-          }
-          else if (ImGui::IsItemHovered())
-          {
-            ImGui::BeginTooltip();
-            ImGui::Text("%s", command.getDescription().c_str());
-            ImGui::EndTooltip();
-          }
-          if (editable && ImGui::BeginDragDropTarget())
-          {
-            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("DND_STEP"))
-            {
-              IM_ASSERT(payload->DataSize == sizeof(int));
-              int source_n = *(const int*)payload->Data;
-              const auto tmp = application_handler_.sequenceHandler_.getWorkflow().at(source_n);
-              application_handler_.sequenceHandler_.getWorkflow().erase(application_handler_.sequenceHandler_.getWorkflow().cbegin() + source_n);
-              application_handler_.sequenceHandler_.getWorkflow().insert(application_handler_.sequenceHandler_.getWorkflow().cbegin() + i, tmp);
-            }
-            ImGui::EndDragDropTarget();
-          }
-          if (editable)
-          {
-            ImGui::SameLine();
-          }
-          if (editable && ImGui::Button("x")) {
-            application_handler_.sequenceHandler_.getWorkflow().erase(application_handler_.sequenceHandler_.getWorkflow().cbegin() + i);
-            application_handler_.sequenceHandler_.notifyWorkflowUpdated();
-          }
-          else 
-          {
-            ++i;
-          }
-          ImGui::PopID();
-        }
-      }
-      else
-      {
-        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
-        ImGui::Text("Unable to load workflow. Please check log.");
-        ImGui::PopStyleColor();
-      }
+      workflow_node_graph_.draw();
     }
-
     ImGui::EndChild();
-  }
-
-  void WorkflowWidget::updatecommands()
-  {
-    const auto& names = application_handler_.sequenceHandler_.getWorkflow();
-    if (buildCommandsFromNames_.names_ != names)
-    {
-      buildCommandsFromNames_.names_ = names;
-      error_building_commands_ = !buildCommandsFromNames_.process();
-    }
   }
 
 }

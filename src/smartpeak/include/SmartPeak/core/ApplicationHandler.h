@@ -72,6 +72,8 @@ namespace SmartPeak
 
       std::string getDescription() const;
 
+      CommandType getType() const;
+
     public:
       std::shared_ptr<RawDataProcessor> raw_data_method;
       std::shared_ptr<SequenceSegmentProcessor> seq_seg_method;

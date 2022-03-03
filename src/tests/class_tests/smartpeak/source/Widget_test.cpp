@@ -345,20 +345,18 @@ TEST(GraphicDataVizWidget, WriteAndReadGraphViz)
   EXPECT_DOUBLE_EQ(plot_limit.Y.Max, 4);
 }
 
-class WorkflowWidget_Test : public WorkflowWidget
+class WorfklowStepNodeGraph_Test : public WorfklowStepNodeGraph
 {
 public:
-  WorkflowWidget_Test(const std::string title, 
-                      ApplicationHandler& application_handler, 
-                      WorkflowManager& workflow_manager) :
-    WorkflowWidget(title, application_handler, workflow_manager)
+  WorfklowStepNodeGraph_Test(ApplicationHandler& application_handler, WorkflowManager& workflow_manager)
+    : WorfklowStepNodeGraph(application_handler, workflow_manager)
   {};
 
 public:
   // wrappers to protected methods
   virtual void updatecommands() override
   {
-    WorkflowWidget::updatecommands();
+    WorfklowStepNodeGraph::updatecommands();
   }
 
   bool errorBuildingCommands()
@@ -367,11 +365,11 @@ public:
   }
 };
 
-TEST(WorkflowWidget, updateCommands)
+TEST(WorfklowStepNodeGraph, updateCommands)
 {
   ApplicationHandler application_handler;
   WorkflowManager workflow_manager;
-  WorkflowWidget_Test workflow_widget("Workflow Widget", application_handler, workflow_manager);
+  WorfklowStepNodeGraph_Test workflow_widget(application_handler, workflow_manager);
   
   // initial state
   EXPECT_FALSE(workflow_widget.errorBuildingCommands());

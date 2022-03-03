@@ -33,6 +33,74 @@
 
 namespace SmartPeak
 {
+  struct WorfklowStepNodeGraphContainer;
+
+  struct WorfklowStepNode
+  {
+    ImVec2 getSize();
+    ImVec2 getScreenPosition();
+    int getWidth();
+    int getHeight();
+    virtual void draw();
+    bool isMouseIn();
+    bool isCloseButtonMouseIn();
+
+    ImVec2 pos_;
+    int width_;
+    ImVec2 drag_delta_;
+    ApplicationHandler::Command command_;
+    bool is_dragging_ = false;
+    bool is_mouse_down_ = false;
+    std::shared_ptr<WorfklowStepNodeGraphContainer> container_;
+
+  protected:
+    std::tuple<int, int, int, int> getCloseButtonPosition();
+  };
+
+  struct WorfklowStepNodePlaceHolder : public WorfklowStepNode
+  {
+    virtual void draw();
+  };
+
+  struct WorfklowStepNodeGraphContainer
+  {
+    std::vector<WorfklowStepNode*> to_display_;
+    ImVec2 pos_;
+    void draw();
+    ImVec2 getSize();
+    void layout();
+    ApplicationHandler::Command::CommandType type_ = ApplicationHandler::Command::CommandType::RawDataMethod;
+  };
+
+  struct WorfklowStepNodeGraph
+  {
+    WorfklowStepNodeGraph(ApplicationHandler& application_handler, WorkflowManager& workflow_manager)
+      : application_handler_(application_handler),
+       workflow_manager_(workflow_manager),
+       buildCommandsFromNames_(application_handler)
+    {
+    };
+    std::vector<WorfklowStepNode> nodes;
+    void draw();
+  
+  protected:
+    virtual void updatecommands();
+    void createContainers();
+    void layout();
+
+  protected:
+    std::vector<WorfklowStepNode*> to_display_;
+    std::vector<std::shared_ptr<WorfklowStepNodeGraphContainer>> containers_;
+    WorfklowStepNode* dragging_node_ = nullptr;
+    int dragging_node_index_ = 0;
+    int place_holder_node_index_ = 0;
+    WorfklowStepNodePlaceHolder place_holder_;
+    WorkflowManager& workflow_manager_;
+    ApplicationHandler& application_handler_;
+    BuildCommandsFromNames buildCommandsFromNames_;
+    bool error_building_commands_ = false;
+  };
+
   class WorkflowWidget : public Widget
   {
   public:
@@ -42,20 +110,16 @@ namespace SmartPeak
       application_handler_(application_handler),
       workflow_step_widget_(application_handler),
       workflow_manager_(workflow_manager),
-      buildCommandsFromNames_(application_handler)
+      workflow_node_graph_(application_handler, workflow_manager)
     {
     };
 
     void draw() override;
 
   protected:
-    virtual void updatecommands();
-
-  protected:
     ApplicationHandler& application_handler_;
     WorkflowStepWidget workflow_step_widget_;
     WorkflowManager& workflow_manager_;
-    BuildCommandsFromNames buildCommandsFromNames_;
-    bool error_building_commands_ = false;
+    WorfklowStepNodeGraph workflow_node_graph_;
   };
 }

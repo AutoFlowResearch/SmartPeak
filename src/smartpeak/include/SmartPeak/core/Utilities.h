@@ -483,6 +483,14 @@ public:
     static bool isList(const std::string& str, const std::regex& re);
 
     /**
+     @brief replace all instance of one string with another string.
+     @param[in] str the string to look into
+     @param[in] search the string to look for
+     @param[in] replace the string to replace with
+     */
+    static std::string replaceAll(const std::string& str, const std::string search, const std::string& replace);
+
+    /**
      @brief Check if a csv file has required headers
     */
     template<char Separator, typename ...Columns>

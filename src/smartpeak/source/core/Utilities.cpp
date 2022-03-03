@@ -820,6 +820,26 @@ namespace SmartPeak
     return tmp_dir_path;
   }
 
+  std::string Utilities::replaceAll(const std::string& str, const std::string search, const std::string& replace)
+  {
+    std::string result = str;
+    size_t pos = 0;
+    while (true)
+    {
+      pos = result.find(search, pos);
+      if (pos != std::string::npos)
+      {
+        result.replace(pos, search.length(), replace);
+        pos += replace.length();
+      }
+      else
+      {
+        break;
+      }
+    }
+    return result;
+  }
+
   void Utilities::prepareFileParameter(
     ParameterSet& parameter_set,
     const std::string& function_parameter,
