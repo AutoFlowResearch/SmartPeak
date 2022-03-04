@@ -59,7 +59,7 @@ namespace SmartPeak
     return IM_COL32(r, g, b, alpha);
   }
 
-  void WorfklowStepNodePlaceHolder::draw()
+  void WorfklowStepNodePlaceHolder::draw(bool enable)
   {
     ImDrawList* draw_list = ImGui::GetWindowDrawList();
     const ImVec2 pos = getScreenPosition();
@@ -127,14 +127,14 @@ namespace SmartPeak
             (mouse_pos.y > pos.y) && (mouse_pos.y < pos.y + node_size.y);
   }
 
-  void WorfklowStepNode::draw()
+  void WorfklowStepNode::draw(bool enable)
   {
     // Node container
     auto node_pos = getScreenPosition();
     ImDrawList* draw_list = ImGui::GetWindowDrawList();
     const ImVec2 screen_pos = ImGui::GetCursorScreenPos();
     ImVec2 node_size = getSize();
-    int alpha = isMouseIn() ? 255 : 200;
+    int alpha = isMouseIn() && enable ? 255 : 200;
     auto command_type = command_.getType();
     ImU32 color = IM_COL32(255, 0, 255, alpha); // default color
     switch (command_type)
@@ -235,54 +235,57 @@ namespace SmartPeak
     }
     else
     {
-      int node_index = 0;
-      for (auto& node : nodes)
+      if (is_graph_hovered_)
       {
-        bool is_mouse_down = ImGui::IsMouseDown(0);
-        bool is_mouse_dragging = ImGui::IsMouseDragging(0);
-        auto mouse_pos = ImGui::GetMousePos();
-        auto window_pos = ImGui::GetWindowPos();
-        auto window_size = ImGui::GetWindowSize();
-        bool mouse_is_in_window = ((mouse_pos.x > window_pos.x) && (mouse_pos.x < (window_pos.x + window_size.x))
-                                && (mouse_pos.y > window_pos.y) && (mouse_pos.y < (window_pos.y + window_size.y)));
-        if (!mouse_is_in_window)
+        int node_index = 0;
+        for (auto& node : nodes)
         {
-          is_mouse_down = false;
-          is_mouse_dragging = false;
-        }
-        if (!dragging_node_)
-        {
-          node.is_mouse_down_ = (is_mouse_down && node.isMouseIn());
-        }
-        if (!dragging_node_ && is_mouse_dragging && node.is_mouse_down_)
-        {
-          // start dragging
-          node.is_dragging_ = true;
-          dragging_node_ = &node;
-          dragging_node_index_ = node_index;
-        }
-        if (!is_mouse_down && node.is_dragging_)
-        {
-          // release
-          node.is_dragging_ = false;
-          node.drag_delta_ = { 0, 0 };
-          dragging_node_ = nullptr;
-          if (mouse_is_in_window)
+          bool is_mouse_down = ImGui::IsMouseDown(0);
+          bool is_mouse_dragging = ImGui::IsMouseDragging(0);
+          auto mouse_pos = ImGui::GetMousePos();
+          auto window_pos = ImGui::GetWindowPos();
+          auto window_size = ImGui::GetWindowSize();
+          bool mouse_is_in_window = ((mouse_pos.x > window_pos.x) && (mouse_pos.x < (window_pos.x + window_size.x))
+            && (mouse_pos.y > window_pos.y) && (mouse_pos.y < (window_pos.y + window_size.y)));
+          if (!mouse_is_in_window)
           {
-            const auto tmp = application_handler_.sequenceHandler_.getWorkflow().at(dragging_node_index_);
-            application_handler_.sequenceHandler_.getWorkflow().erase(application_handler_.sequenceHandler_.getWorkflow().cbegin() + dragging_node_index_);
-            application_handler_.sequenceHandler_.getWorkflow().insert(application_handler_.sequenceHandler_.getWorkflow().cbegin() + place_holder_node_index_, tmp);
+            is_mouse_down = false;
+            is_mouse_dragging = false;
+          }
+          if (!dragging_node_)
+          {
+            node.is_mouse_down_ = (is_mouse_down && node.isMouseIn());
+          }
+          if (!dragging_node_ && is_mouse_dragging && node.is_mouse_down_)
+          {
+            // start dragging
+            node.is_dragging_ = true;
+            dragging_node_ = &node;
+            dragging_node_index_ = node_index;
+          }
+          if (!is_mouse_down && node.is_dragging_)
+          {
+            // release
+            node.is_dragging_ = false;
+            node.drag_delta_ = { 0, 0 };
+            dragging_node_ = nullptr;
+            if (mouse_is_in_window)
+            {
+              const auto tmp = application_handler_.sequenceHandler_.getWorkflow().at(dragging_node_index_);
+              application_handler_.sequenceHandler_.getWorkflow().erase(application_handler_.sequenceHandler_.getWorkflow().cbegin() + dragging_node_index_);
+              application_handler_.sequenceHandler_.getWorkflow().insert(application_handler_.sequenceHandler_.getWorkflow().cbegin() + place_holder_node_index_, tmp);
+              application_handler_.sequenceHandler_.notifyWorkflowUpdated();
+              updatecommands();
+            }
+          }
+          if (ImGui::IsMouseClicked(0) && node.isCloseButtonMouseIn())
+          {
+            application_handler_.sequenceHandler_.getWorkflow().erase(application_handler_.sequenceHandler_.getWorkflow().cbegin() + node_index);
             application_handler_.sequenceHandler_.notifyWorkflowUpdated();
             updatecommands();
           }
+          node_index++;
         }
-        if (ImGui::IsMouseClicked(0) && node.isCloseButtonMouseIn())
-        {
-          application_handler_.sequenceHandler_.getWorkflow().erase(application_handler_.sequenceHandler_.getWorkflow().cbegin() + node_index);
-          application_handler_.sequenceHandler_.notifyWorkflowUpdated();
-          updatecommands();
-        }
-        node_index++;
       }
 
       to_display_.clear();
@@ -360,9 +363,10 @@ namespace SmartPeak
         frame_height += container->getSize().y + container_out_margin;
       }
       ImGui::BeginChildFrame(1, { 0, frame_height });
+      is_graph_hovered_ = (ImGui::IsWindowHovered());
       for (auto& container : containers_)
       {
-        container->draw();
+        container->draw(is_graph_hovered_);
       }
       if (dragging_node_)
       {
@@ -370,7 +374,7 @@ namespace SmartPeak
         dragging_node_->pos_.x += (drag_delta.x - dragging_node_->drag_delta_.x);
         dragging_node_->pos_.y += (drag_delta.y - dragging_node_->drag_delta_.y);
         dragging_node_->drag_delta_ = drag_delta;
-        dragging_node_->draw();
+        dragging_node_->draw(is_graph_hovered_);
       }
       ImGui::EndChildFrame();
     }
@@ -404,7 +408,7 @@ namespace SmartPeak
     }
   }
 
-  void WorfklowStepNodeGraphContainer::draw()
+  void WorfklowStepNodeGraphContainer::draw(bool enable)
   {
     auto container_size = getSize();
     ImDrawList* draw_list = ImGui::GetWindowDrawList();
@@ -437,7 +441,7 @@ namespace SmartPeak
     );
     for (auto& node : to_display_)
     {
-      node->draw();
+      node->draw(enable);
     }
   }
 
@@ -614,6 +618,6 @@ namespace SmartPeak
       workflow_node_graph_.draw();
     }
     ImGui::EndChild();
-  }
+}
 
 }
