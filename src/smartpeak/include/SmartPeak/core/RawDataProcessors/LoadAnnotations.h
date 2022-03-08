@@ -38,6 +38,8 @@ namespace SmartPeak
     /* IProcessorDescription */
     virtual std::string getName() const override { return "LOAD_ANNOTATIONS"; }
     virtual std::string getDescription() const override { return "Read in the annotations from disk."; }
+    virtual std::set<std::string> getOutputs() const override;
+    virtual std::set<std::string> getInputs() const override;
 
     /** Read in the annotations from disk.
     */

@@ -36,6 +36,16 @@
 namespace SmartPeak
 {
 
+  std::set<std::string> PickMRMFeatures::getInputs() const
+  {
+    return { "Chromatogram", "Targeted Experiment", "SWATH"};
+  }
+
+  std::set<std::string> PickMRMFeatures::getOutputs() const
+  {
+    return { "Features" };
+  }
+
   std::vector<std::string> PickMRMFeatures::getRequirements() const
   {
     return { "sequence", "traML" };

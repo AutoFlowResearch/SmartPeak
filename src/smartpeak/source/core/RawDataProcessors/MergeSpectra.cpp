@@ -36,6 +36,16 @@
 namespace SmartPeak
 {
 
+  std::set<std::string> MergeSpectra::getInputs() const
+  {
+    return { "Spectra" };
+  }
+
+  std::set<std::string> MergeSpectra::getOutputs() const
+  {
+    return { "Spectra" };
+  }
+
   // Parameters used by Spetra related processors
   ParameterSet FIAMSParameters2()
   {

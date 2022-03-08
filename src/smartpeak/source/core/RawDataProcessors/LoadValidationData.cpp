@@ -39,6 +39,11 @@
 namespace SmartPeak
 {
 
+  std::set<std::string> LoadValidationData::getOutputs() const
+  {
+    return { "Reference Data" };
+  }
+
   void LoadValidationData::getFilenames(Filenames& filenames) const
   {
     filenames.addFileName("referenceData", "${MAIN_DIR}/referenceData.csv", "Reference data", true, true);

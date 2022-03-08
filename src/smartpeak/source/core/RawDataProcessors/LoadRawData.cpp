@@ -97,6 +97,11 @@ namespace SmartPeak
     filenames.addFileName("mzML_i", "${MZML_INPUT_PATH}/${INPUT_MZML_FILENAME}.mzML");
   };
 
+  std::set<std::string> LoadRawData::getOutputs() const
+  {
+    return { "Experiment", "Targeted Experiment", "Chromatogram"};
+  }
+
   void LoadRawData::process(
     RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,

@@ -34,6 +34,16 @@
 namespace SmartPeak
 {
 
+  std::set<std::string> StoreFeatureQCsRDP::getInputs() const
+  {
+    return { "FeatureQC" };
+  }
+
+  std::set<std::string> StoreFeatureQCsRDP::getOutputs() const
+  {
+    return { };
+  }
+
   bool StoreFeatureQCsRDP::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
   {
     if (application_handler->sequenceHandler_.getSequence().size() == 0)

@@ -35,6 +35,16 @@
 namespace SmartPeak
 {
 
+  std::set<std::string> CalculateMDVAccuracies::getInputs() const
+  {
+    return { "Targeted Experiment" };
+  }
+
+  std::set<std::string> CalculateMDVAccuracies::getOutputs() const
+  {
+    return { "Features" };
+  }
+
   std::vector<std::string> CalculateMDVAccuracies::getRequirements() const
   {
     return { "sequence", "traML" };

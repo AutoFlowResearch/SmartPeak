@@ -49,6 +49,8 @@ namespace SmartPeak
     virtual std::string getDescription() const override { return ""; }
     virtual ParameterSet getParameterSchema() const override { return ParameterSet(); };
     virtual std::vector<std::string> getRequirements() const override { return {}; };
+    virtual std::set<std::string> getInputs() const override { return {}; };
+    virtual std::set<std::string> getOutputs() const override { return {}; };
 
   protected:
     ApplicationHandler& application_handler_;
