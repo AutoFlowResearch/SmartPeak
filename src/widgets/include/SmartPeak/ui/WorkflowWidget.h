@@ -41,7 +41,7 @@ namespace SmartPeak
     ImVec2 getScreenPosition();
     int getWidth();
     int getHeight();
-    virtual void draw();
+    virtual void draw(bool enable);
     bool isMouseIn();
     bool isCloseButtonMouseIn();
 
@@ -59,14 +59,14 @@ namespace SmartPeak
 
   struct WorfklowStepNodePlaceHolder : public WorfklowStepNode
   {
-    virtual void draw();
+    virtual void draw(bool enable);
   };
 
   struct WorfklowStepNodeGraphContainer
   {
     std::vector<WorfklowStepNode*> to_display_;
     ImVec2 pos_;
-    void draw();
+    void draw(bool enable);
     ImVec2 getSize();
     void layout();
     ApplicationHandler::Command::CommandType type_ = ApplicationHandler::Command::CommandType::RawDataMethod;
@@ -99,6 +99,7 @@ namespace SmartPeak
     ApplicationHandler& application_handler_;
     BuildCommandsFromNames buildCommandsFromNames_;
     bool error_building_commands_ = false;
+    bool is_graph_hovered_ = false;
   };
 
   class WorkflowWidget : public Widget
