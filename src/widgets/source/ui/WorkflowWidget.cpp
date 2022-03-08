@@ -115,7 +115,7 @@ namespace SmartPeak
     return pos;
   }
 
-  void WorfklowStepNodeIO::draw()
+  void WorfklowStepNodeIO::draw(bool enable)
   {
     ImDrawList* draw_list = ImGui::GetWindowDrawList();
     const ImVec2 pos = getScreenPosition();
@@ -128,7 +128,7 @@ namespace SmartPeak
     c.x = pos.x + output_size.x/2;
     c.y = pos.y + output_size.y;
     ImU32 color = 0;
-    if (isMouseIn())
+    if (isMouseIn() && enable)
     {
       ImGui::BeginTooltip();
       ImGui::Text("%s", text_.c_str());
@@ -151,7 +151,7 @@ namespace SmartPeak
       (mouse_pos.y > pos.y) && (mouse_pos.y < pos.y + node_size.y);
   }
 
-  void WorfklowStepNodePlaceHolder::draw()
+  void WorfklowStepNodePlaceHolder::draw(bool enable)
   {
     ImDrawList* draw_list = ImGui::GetWindowDrawList();
     const ImVec2 pos = getScreenPosition();
@@ -253,7 +253,7 @@ namespace SmartPeak
     const ImVec2 screen_pos = ImGui::GetCursorScreenPos();
     ImVec2 node_size = getSize();
     int alpha = 0;
-    if (isMouseIn())
+    if (isMouseIn() && enable)
     {
       if (!is_dragging_)
       {
@@ -321,11 +321,11 @@ namespace SmartPeak
     // inputs / outputs
     for (auto& input : inputs_)
     {
-      input.draw();
+      input.draw(enable);
     }
     for (auto& output : outputs_)
     {
-      output.draw();
+      output.draw(enable);
     }
   }
 
@@ -471,20 +471,20 @@ namespace SmartPeak
           }
           if (!dragging_node_)
           {
-            node.is_mouse_down_ = (is_mouse_down && node.isMouseIn());
+            node->is_mouse_down_ = (is_mouse_down && node->isMouseIn());
           }
-          if (!dragging_node_ && is_mouse_dragging && node.is_mouse_down_)
+          if (!dragging_node_ && is_mouse_dragging && node->is_mouse_down_)
           {
             // start dragging
-            node.is_dragging_ = true;
-            dragging_node_ = &node;
+            node->is_dragging_ = true;
+            dragging_node_ = node;
             dragging_node_index_ = node_index;
           }
-          if (!is_mouse_down && node.is_dragging_)
+          if (!is_mouse_down && node->is_dragging_)
           {
             // release
-            node.is_dragging_ = false;
-            node.drag_delta_ = { 0, 0 };
+            node->is_dragging_ = false;
+            node->drag_delta_ = { 0, 0 };
             dragging_node_ = nullptr;
             if (mouse_is_in_window)
             {
@@ -495,7 +495,7 @@ namespace SmartPeak
               updatecommands();
             }
           }
-          if (ImGui::IsMouseClicked(0) && node.isCloseButtonMouseIn())
+          if (ImGui::IsMouseClicked(0) && node->isCloseButtonMouseIn())
           {
             application_handler_.sequenceHandler_.getWorkflow().erase(application_handler_.sequenceHandler_.getWorkflow().cbegin() + node_index);
             application_handler_.sequenceHandler_.notifyWorkflowUpdated();
@@ -503,13 +503,6 @@ namespace SmartPeak
           }
           node_index++;
         }
-        if (ImGui::IsMouseClicked(0) && node->isCloseButtonMouseIn())
-        {
-          application_handler_.sequenceHandler_.getWorkflow().erase(application_handler_.sequenceHandler_.getWorkflow().cbegin() + node_index);
-          application_handler_.sequenceHandler_.notifyWorkflowUpdated();
-          updatecommands();
-        }
-        node_index++;
       }
 
       to_display_.clear();
@@ -590,7 +583,7 @@ namespace SmartPeak
       is_graph_hovered_ = (ImGui::IsWindowHovered());
       for (auto& container : containers_)
       {
-        container->draw(is_graph_hovered_);
+        container->draw(is_graph_hovered_ && (!dragging_node_));
       }
       if (dragging_node_)
       {

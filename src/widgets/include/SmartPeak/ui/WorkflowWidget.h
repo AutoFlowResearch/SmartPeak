@@ -40,7 +40,7 @@ namespace SmartPeak
   {
     ImVec2 getSize();
     ImVec2 getScreenPosition();
-    virtual void draw();
+    virtual void draw(bool enable);
     bool isMouseIn();
     ImVec2 pos_;
     std::string text_;
