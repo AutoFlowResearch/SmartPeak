@@ -32,6 +32,7 @@
 namespace SmartPeak
 {
 
+  // size / position constants
   static int workflow_step_space = 20;
   static int container_out_margin = 10;
   static int container_in_margin = 20;
@@ -43,7 +44,11 @@ namespace SmartPeak
   static int input_output_width = 10;
   static int input_output_height = 10;
 
-  std::map<std::string, ImU32> all_possible_input_outputs_to_color;
+  // color constants
+  static int hovered_alpha = 255;
+  static int non_hovered_alpha = 200;
+
+  std::map<std::string, std::pair<ImU32,ImU32>> all_possible_input_outputs_to_color;
 
   ImU32 getNodeColorPalete(int index, int alpha)
   {
@@ -91,12 +96,12 @@ namespace SmartPeak
     return IM_COL32(r, g, b, alpha);
   }
 
-  ImVec2 WorfklowStepNodeOutput::getSize()
+  ImVec2 WorfklowStepNodeIO::getSize()
   {
     return { static_cast<float>(input_output_width), static_cast<float>(input_output_height) };
   }
 
-  ImVec2 WorfklowStepNodeOutput::getScreenPosition()
+  ImVec2 WorfklowStepNodeIO::getScreenPosition()
   {
     ImVec2 pos = pos_;
     const ImVec2 screen_pos = ImGui::GetCursorScreenPos();
@@ -110,7 +115,7 @@ namespace SmartPeak
     return pos;
   }
 
-  void WorfklowStepNodeOutput::draw()
+  void WorfklowStepNodeIO::draw()
   {
     ImDrawList* draw_list = ImGui::GetWindowDrawList();
     const ImVec2 pos = getScreenPosition();
@@ -120,19 +125,24 @@ namespace SmartPeak
     a.y = pos.y;
     b.x = pos.x + output_size.x;
     b.y = pos.y;
-    c.x = pos.x;
+    c.x = pos.x + output_size.x/2;
     c.y = pos.y + output_size.y;
-    auto color = all_possible_input_outputs_to_color.at(text_);
+    ImU32 color = 0;
     if (isMouseIn())
     {
       ImGui::BeginTooltip();
       ImGui::Text("%s", text_.c_str());
       ImGui::EndTooltip();
+      color = all_possible_input_outputs_to_color.at(text_).first;
+    }
+    else
+    {
+      color = all_possible_input_outputs_to_color.at(text_).second;
     }
     draw_list->AddTriangleFilled(a, b, c, color);
   }
 
-  bool WorfklowStepNodeOutput::isMouseIn()
+  bool WorfklowStepNodeIO::isMouseIn()
   {
     auto mouse_pos = ImGui::GetMousePos();
     const ImVec2 pos = getScreenPosition();
@@ -214,6 +224,14 @@ namespace SmartPeak
           output.pos_.y = getHeight();
         }
       }
+      for (auto& input : inputs_)
+      {
+        if (input.text_ == possible_output.first)
+        {
+          input.pos_.x = (index + 1) * space_width;
+          input.pos_.y = -input.getSize().y;
+        }
+      }
       index++;
     }
   }
@@ -234,7 +252,21 @@ namespace SmartPeak
     ImDrawList* draw_list = ImGui::GetWindowDrawList();
     const ImVec2 screen_pos = ImGui::GetCursorScreenPos();
     ImVec2 node_size = getSize();
-    int alpha = isMouseIn() && enable ? 255 : 200;
+    int alpha = 0;
+    if (isMouseIn())
+    {
+      if (!is_dragging_)
+      {
+        ImGui::BeginTooltip();
+        ImGui::Text("%s", command_.getDescription().c_str());
+        ImGui::EndTooltip();
+      }
+      alpha = hovered_alpha;
+    }
+    else
+    {
+      alpha = non_hovered_alpha;
+    }
     auto command_type = command_.getType();
     ImU32 color = IM_COL32(255, 0, 255, alpha); // default color
     switch (command_type)
@@ -287,6 +319,10 @@ namespace SmartPeak
     }
 
     // inputs / outputs
+    for (auto& input : inputs_)
+    {
+      input.draw();
+    }
     for (auto& output : outputs_)
     {
       output.draw();
@@ -331,7 +367,8 @@ namespace SmartPeak
         {
           if (!all_possible_input_outputs_to_color.count(output))
           {
-            all_possible_input_outputs_to_color.emplace(output, getInputOutputColorPalete(color_index, 255));
+            all_possible_input_outputs_to_color.emplace(output, 
+              std::make_pair(getInputOutputColorPalete(color_index, hovered_alpha), getInputOutputColorPalete(color_index, non_hovered_alpha)));
             color_index++;
           }
         }
@@ -340,7 +377,8 @@ namespace SmartPeak
         {
           if (!all_possible_input_outputs_to_color.count(input))
           {
-            all_possible_input_outputs_to_color.emplace(input, getInputOutputColorPalete(color_index, 255));
+            all_possible_input_outputs_to_color.emplace(input,
+              std::make_pair(getInputOutputColorPalete(color_index, hovered_alpha), getInputOutputColorPalete(color_index, non_hovered_alpha)));
             color_index++;
           }
         }
@@ -352,7 +390,8 @@ namespace SmartPeak
         {
           if (!all_possible_input_outputs_to_color.count(output))
           {
-            all_possible_input_outputs_to_color.emplace(output, getInputOutputColorPalete(color_index, 255));
+            all_possible_input_outputs_to_color.emplace(output,
+              std::make_pair(getInputOutputColorPalete(color_index, hovered_alpha), getInputOutputColorPalete(color_index, non_hovered_alpha)));
             color_index++;
           }
         }
@@ -361,7 +400,8 @@ namespace SmartPeak
         {
           if (!all_possible_input_outputs_to_color.count(input))
           {
-            all_possible_input_outputs_to_color.emplace(input, getInputOutputColorPalete(color_index, 255));
+            all_possible_input_outputs_to_color.emplace(input,
+              std::make_pair(getInputOutputColorPalete(color_index, hovered_alpha), getInputOutputColorPalete(color_index, non_hovered_alpha))); 
             color_index++;
           }
         }
@@ -373,7 +413,8 @@ namespace SmartPeak
         {
           if (!all_possible_input_outputs_to_color.count(output))
           {
-            all_possible_input_outputs_to_color.emplace(output, getInputOutputColorPalete(color_index, 255));
+            all_possible_input_outputs_to_color.emplace(output,
+              std::make_pair(getInputOutputColorPalete(color_index, hovered_alpha), getInputOutputColorPalete(color_index, non_hovered_alpha)));
             color_index++;
           }
         }
@@ -382,7 +423,8 @@ namespace SmartPeak
         {
           if (!all_possible_input_outputs_to_color.count(input))
           {
-            all_possible_input_outputs_to_color.emplace(input, getInputOutputColorPalete(color_index, 255));
+            all_possible_input_outputs_to_color.emplace(input,
+              std::make_pair(getInputOutputColorPalete(color_index, hovered_alpha), getInputOutputColorPalete(color_index, non_hovered_alpha)));
             color_index++;
           }
         }
@@ -642,12 +684,18 @@ namespace SmartPeak
         node->command_ = command;
         for (const auto& output : command.getOutputs())
         {
-          WorfklowStepNodeOutput node_output;
+          WorfklowStepNodeIO node_output;
           node_output.text_ = output;
           node_output.node_ = node;
           node->outputs_.push_back(node_output);
         }
-
+        for (const auto& input : command.getInputs())
+        {
+          WorfklowStepNodeIO node_input;
+          node_input.text_ = input;
+          node_input.node_ = node;
+          node->inputs_.push_back(node_input);
+        }
         nodes.push_back(node);
       }
     }
