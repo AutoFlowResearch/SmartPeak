@@ -34,6 +34,17 @@
 namespace SmartPeak
 {
 
+
+  std::set<std::string> StoreValidationData::getInputs() const
+  {
+    return { "Reference Data" };
+  }
+
+  std::set<std::string> StoreValidationData::getOutputs() const
+  {
+    return { };
+  }
+
   std::vector<std::string> StoreValidationData::getRequirements() const
   {
     return { "sequence", "traML" };

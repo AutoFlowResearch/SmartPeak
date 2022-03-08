@@ -36,6 +36,16 @@
 namespace SmartPeak
 {
 
+  std::set<std::string> FitFeaturesEMG::getInputs() const
+  {
+    return { "Features", "Chromatogram"};
+  }
+
+  std::set<std::string> FitFeaturesEMG::getOutputs() const
+  {
+    return { "Features" };
+  }
+
   std::vector<std::string> FitFeaturesEMG::getRequirements() const
   {
     return { "sequence", "traML" };

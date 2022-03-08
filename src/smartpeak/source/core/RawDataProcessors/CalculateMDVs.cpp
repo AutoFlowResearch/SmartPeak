@@ -35,6 +35,16 @@
 namespace SmartPeak
 {
 
+  std::set<std::string> CalculateMDVs::getInputs() const
+  {
+    return { "Features" };
+  }
+
+  std::set<std::string> CalculateMDVs::getOutputs() const
+  {
+    return { "Features" };
+  }
+
   std::vector<std::string> CalculateMDVs::getRequirements() const
   {
     return { "sequence", "traML" };

@@ -35,6 +35,15 @@
 
 namespace SmartPeak
 {
+  std::set<std::string> StoreAnnotations::getInputs() const
+  {
+    return { "Mz Tab" };
+  }
+
+  std::set<std::string> StoreAnnotations::getOutputs() const
+  {
+    return { };
+  }
 
   std::vector<std::string> StoreAnnotations::getRequirements() const
   {

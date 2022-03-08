@@ -34,6 +34,18 @@
 namespace SmartPeak
 {
   struct WorfklowStepNodeGraphContainer;
+  struct WorfklowStepNode;
+
+  struct WorfklowStepNodeOutput
+  {
+    ImVec2 getSize();
+    ImVec2 getScreenPosition();
+    virtual void draw();
+    bool isMouseIn();
+    ImVec2 pos_;
+    std::string text_;
+    std::shared_ptr<WorfklowStepNode> node_;
+  };
 
   struct WorfklowStepNode
   {
@@ -44,6 +56,7 @@ namespace SmartPeak
     virtual void draw(bool enable);
     bool isMouseIn();
     bool isCloseButtonMouseIn();
+    void layout();
 
     ImVec2 pos_;
     int width_;
@@ -52,6 +65,7 @@ namespace SmartPeak
     bool is_dragging_ = false;
     bool is_mouse_down_ = false;
     std::shared_ptr<WorfklowStepNodeGraphContainer> container_;
+    std::vector<WorfklowStepNodeOutput> outputs_;
 
   protected:
     std::tuple<int, int, int, int> getCloseButtonPosition();
@@ -64,7 +78,7 @@ namespace SmartPeak
 
   struct WorfklowStepNodeGraphContainer
   {
-    std::vector<WorfklowStepNode*> to_display_;
+    std::vector<std::shared_ptr<WorfklowStepNode>> to_display_;
     ImVec2 pos_;
     void draw(bool enable);
     ImVec2 getSize();
@@ -79,8 +93,9 @@ namespace SmartPeak
        workflow_manager_(workflow_manager),
        buildCommandsFromNames_(application_handler)
     {
+      place_holder_ = std::make_shared< WorfklowStepNodePlaceHolder>();
     };
-    std::vector<WorfklowStepNode> nodes;
+    std::vector<std::shared_ptr<WorfklowStepNode>> nodes;
     void draw();
   
   protected:
@@ -89,12 +104,12 @@ namespace SmartPeak
     void layout();
 
   protected:
-    std::vector<WorfklowStepNode*> to_display_;
+    std::vector<std::shared_ptr<WorfklowStepNode>> to_display_;
     std::vector<std::shared_ptr<WorfklowStepNodeGraphContainer>> containers_;
-    WorfklowStepNode* dragging_node_ = nullptr;
+    std::shared_ptr<WorfklowStepNode> dragging_node_ = nullptr;
     int dragging_node_index_ = 0;
     int place_holder_node_index_ = 0;
-    WorfklowStepNodePlaceHolder place_holder_;
+    std::shared_ptr<WorfklowStepNodePlaceHolder> place_holder_;
     WorkflowManager& workflow_manager_;
     ApplicationHandler& application_handler_;
     BuildCommandsFromNames buildCommandsFromNames_;

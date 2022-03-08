@@ -36,6 +36,16 @@
 namespace SmartPeak
 {
 
+  std::set<std::string> ValidateFeatures::getInputs() const
+  {
+    return { "Reference Data", "Features"};
+  }
+
+  std::set<std::string> ValidateFeatures::getOutputs() const
+  {
+    return { "Features" };
+  }
+
   std::vector<std::string> ValidateFeatures::getRequirements() const
   {
     return { "sequence", "traML" };

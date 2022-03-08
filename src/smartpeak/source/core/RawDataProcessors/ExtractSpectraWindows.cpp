@@ -76,6 +76,16 @@ namespace SmartPeak
     return ParameterSet(param_struct);
   }
 
+  std::set<std::string> ExtractSpectraWindows::getInputs() const
+  {
+    return { "Spectra" };
+  }
+
+  std::set<std::string> ExtractSpectraWindows::getOutputs() const
+  {
+    return { "Spectra" };
+  }
+
   std::vector<std::string> ExtractSpectraWindows::getRequirements() const
   {
     return { "sequence", "traML" };

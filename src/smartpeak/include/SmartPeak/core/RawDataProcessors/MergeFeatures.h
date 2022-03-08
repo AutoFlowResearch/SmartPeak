@@ -39,6 +39,8 @@ namespace SmartPeak
     virtual std::string getName() const override { return "MERGE_FEATURES"; }
     virtual std::string getDescription() const override { return "Create merged features from accurate mass search results."; }
     virtual std::vector<std::string> getRequirements() const override;
+    virtual std::set<std::string> getOutputs() const override;
+    virtual std::set<std::string> getInputs() const override;
 
     /** Create merged features from accurate mass search results.
     */

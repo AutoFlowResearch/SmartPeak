@@ -32,7 +32,7 @@
 namespace SmartPeak
 {
 
-  static int workflow_step_space = 10;
+  static int workflow_step_space = 20;
   static int container_out_margin = 10;
   static int container_in_margin = 20;
   static int container_header_height = 30;
@@ -40,8 +40,12 @@ namespace SmartPeak
   static int close_button_height = 10;
   static int close_button_right_margin = 8;
   static int workflow_step_height = 30;
+  static int input_output_width = 10;
+  static int input_output_height = 10;
 
-  ImU32 getColorPalete(int index, int alpha)
+  std::map<std::string, ImU32> all_possible_input_outputs_to_color;
+
+  ImU32 getNodeColorPalete(int index, int alpha)
   {
     static std::vector<ImU32> color_palette =
     {
@@ -59,7 +63,85 @@ namespace SmartPeak
     return IM_COL32(r, g, b, alpha);
   }
 
-  void WorfklowStepNodePlaceHolder::draw(bool enable)
+  ImU32 getInputOutputColorPalete(int index, int alpha)
+  {
+    static std::vector<ImU32> color_palette =
+    {
+      0xaec086,
+      0xb9c5c7,
+      0xd7d2cc,
+      0xa08c7d,
+      0xb3504b,
+      0x601813,
+      0xd6482f,
+      0xc7c4ac,
+      0x5b836d,
+      0x155049,
+      0xfae9e7,
+      0xfaafa0,
+      0xffe489,
+      0xcedd81,
+      0xb06d81
+    };
+    index = index % color_palette.size();
+    auto color = color_palette[index];
+    ImU8 r = (color >> 16);
+    ImU8 g = (color >> 8) & 0xFF;
+    ImU8 b = color & 0xFF;
+    return IM_COL32(r, g, b, alpha);
+  }
+
+  ImVec2 WorfklowStepNodeOutput::getSize()
+  {
+    return { static_cast<float>(input_output_width), static_cast<float>(input_output_height) };
+  }
+
+  ImVec2 WorfklowStepNodeOutput::getScreenPosition()
+  {
+    ImVec2 pos = pos_;
+    const ImVec2 screen_pos = ImGui::GetCursorScreenPos();
+    ImVec2 node_position;
+    if (node_)
+    {
+      node_position = node_->getScreenPosition();
+    }
+    pos.x += node_position.x;
+    pos.y += node_position.y;
+    return pos;
+  }
+
+  void WorfklowStepNodeOutput::draw()
+  {
+    ImDrawList* draw_list = ImGui::GetWindowDrawList();
+    const ImVec2 pos = getScreenPosition();
+    auto output_size = getSize();
+    ImVec2 a, b, c;
+    a.x = pos.x;
+    a.y = pos.y;
+    b.x = pos.x + output_size.x;
+    b.y = pos.y;
+    c.x = pos.x;
+    c.y = pos.y + output_size.y;
+    auto color = all_possible_input_outputs_to_color.at(text_);
+    if (isMouseIn())
+    {
+      ImGui::BeginTooltip();
+      ImGui::Text("%s", text_.c_str());
+      ImGui::EndTooltip();
+    }
+    draw_list->AddTriangleFilled(a, b, c, color);
+  }
+
+  bool WorfklowStepNodeOutput::isMouseIn()
+  {
+    auto mouse_pos = ImGui::GetMousePos();
+    const ImVec2 pos = getScreenPosition();
+    ImVec2 node_size = getSize();
+    return  (mouse_pos.x > pos.x) && (mouse_pos.x < pos.x + node_size.x) &&
+      (mouse_pos.y > pos.y) && (mouse_pos.y < pos.y + node_size.y);
+  }
+
+  void WorfklowStepNodePlaceHolder::draw()
   {
     ImDrawList* draw_list = ImGui::GetWindowDrawList();
     const ImVec2 pos = getScreenPosition();
@@ -118,6 +200,24 @@ namespace SmartPeak
             (mouse_pos.y > pos.y + btn_pos_y) && (mouse_pos.y < pos.y + btn_pos_y + btn_pos_h);
   }
 
+  void WorfklowStepNode::layout()
+  {
+    int index = 0;
+    float space_width = (std::max((getWidth() - 20), 0) / (all_possible_input_outputs_to_color.size() + 1));
+    for (auto possible_output : all_possible_input_outputs_to_color)
+    {
+      for (auto& output : outputs_)
+      {
+        if (output.text_ == possible_output.first)
+        {
+          output.pos_.x = (index + 1) * space_width;
+          output.pos_.y = getHeight();
+        }
+      }
+      index++;
+    }
+  }
+
   bool WorfklowStepNode::isMouseIn()
   {
     auto mouse_pos = ImGui::GetMousePos();
@@ -140,13 +240,13 @@ namespace SmartPeak
     switch (command_type)
     {
     case ApplicationHandler::Command::CommandType::RawDataMethod:
-      color = getColorPalete(0, alpha);
+      color = getNodeColorPalete(0, alpha);
       break;
     case ApplicationHandler::Command::CommandType::SampleGroupMethod:
-      color = getColorPalete(1, alpha);
+      color = getNodeColorPalete(1, alpha);
       break;
     case ApplicationHandler::Command::CommandType::SequenceSegmentMethod:
-      color = getColorPalete(2, alpha);
+      color = getNodeColorPalete(2, alpha);
       break;
     default:
       break;
@@ -185,13 +285,19 @@ namespace SmartPeak
         thickness
       );
     }
+
+    // inputs / outputs
+    for (auto& output : outputs_)
+    {
+      output.draw();
+    }
   }
 
   void WorfklowStepNodeGraph::createContainers()
   {
     containers_.clear();
     auto container = std::make_shared<WorfklowStepNodeGraphContainer>();
-    for (auto& node : to_display_)
+    for (auto node : to_display_)
     {
       auto node_type = node->command_.getType();
       if (container->type_ != node_type)
@@ -214,6 +320,75 @@ namespace SmartPeak
 
   void WorfklowStepNodeGraph::layout()
   {
+    static std::once_flag once_flag;
+    std::call_once(once_flag, []
+    {
+      int color_index = 0;
+      for (const auto& p : n_to_raw_data_method_)
+      {
+        auto outputs = p.second->getOutputs();
+        for (auto output : outputs)
+        {
+          if (!all_possible_input_outputs_to_color.count(output))
+          {
+            all_possible_input_outputs_to_color.emplace(output, getInputOutputColorPalete(color_index, 255));
+            color_index++;
+          }
+        }
+        auto inputs = p.second->getInputs();
+        for (auto input : inputs)
+        {
+          if (!all_possible_input_outputs_to_color.count(input))
+          {
+            all_possible_input_outputs_to_color.emplace(input, getInputOutputColorPalete(color_index, 255));
+            color_index++;
+          }
+        }
+      }
+      for (const auto& p : n_to_seq_seg_method_)
+      {
+        auto outputs = p.second->getOutputs();
+        for (auto output : outputs)
+        {
+          if (!all_possible_input_outputs_to_color.count(output))
+          {
+            all_possible_input_outputs_to_color.emplace(output, getInputOutputColorPalete(color_index, 255));
+            color_index++;
+          }
+        }
+        auto inputs = p.second->getInputs();
+        for (auto input : inputs)
+        {
+          if (!all_possible_input_outputs_to_color.count(input))
+          {
+            all_possible_input_outputs_to_color.emplace(input, getInputOutputColorPalete(color_index, 255));
+            color_index++;
+          }
+        }
+      }
+      for (const auto& p : n_to_sample_group_method_)
+      {
+        auto outputs = p.second->getOutputs();
+        for (auto output : outputs)
+        {
+          if (!all_possible_input_outputs_to_color.count(output))
+          {
+            all_possible_input_outputs_to_color.emplace(output, getInputOutputColorPalete(color_index, 255));
+            color_index++;
+          }
+        }
+        auto inputs = p.second->getInputs();
+        for (auto input : inputs)
+        {
+          if (!all_possible_input_outputs_to_color.count(input))
+          {
+            all_possible_input_outputs_to_color.emplace(input, getInputOutputColorPalete(color_index, 255));
+            color_index++;
+          }
+        }
+      }
+    });
+
     ImVec2 pos{ 0,0 };
     for (auto& container : containers_)
     {
@@ -286,14 +461,21 @@ namespace SmartPeak
           }
           node_index++;
         }
+        if (ImGui::IsMouseClicked(0) && node->isCloseButtonMouseIn())
+        {
+          application_handler_.sequenceHandler_.getWorkflow().erase(application_handler_.sequenceHandler_.getWorkflow().cbegin() + node_index);
+          application_handler_.sequenceHandler_.notifyWorkflowUpdated();
+          updatecommands();
+        }
+        node_index++;
       }
 
       to_display_.clear();
-      for (auto& node : nodes)
+      for (auto node : nodes)
       {
-        if (!node.is_dragging_)
+        if (!node->is_dragging_)
         {
-          to_display_.push_back(&node);
+          to_display_.push_back(node);
         }
       }
 
@@ -306,7 +488,7 @@ namespace SmartPeak
       // insert place holder
       if (dragging_node_)
       {
-        std::vector<WorfklowStepNode*> to_display_with_placeholder;
+        std::vector<std::shared_ptr<WorfklowStepNode>> to_display_with_placeholder;
         bool place_holder_found = false;
         int node_index = 0;
         for (auto& node : to_display_)
@@ -319,8 +501,8 @@ namespace SmartPeak
             {
               if (dragging_node_pos.y < node_pos.y)
               {
-                place_holder_.command_ = dragging_node_->command_;
-                to_display_with_placeholder.push_back(&place_holder_);
+                place_holder_->command_ = dragging_node_->command_;
+                to_display_with_placeholder.push_back(place_holder_);
                 place_holder_node_index_ = node_index;
                 place_holder_found = true;
               }
@@ -332,8 +514,8 @@ namespace SmartPeak
               if ((dragging_node_pos.y > previous_node_pos.y)
                 && (dragging_node_pos.y < node_pos.y))
               {
-                place_holder_.command_ = dragging_node_->command_;
-                to_display_with_placeholder.push_back(&place_holder_);
+                place_holder_->command_ = dragging_node_->command_;
+                to_display_with_placeholder.push_back(place_holder_);
                 place_holder_node_index_ = node_index;
                 place_holder_found = true;
               }
@@ -345,7 +527,7 @@ namespace SmartPeak
         if (!place_holder_found)
         {
           place_holder_node_index_ = node_index;
-          to_display_with_placeholder.push_back(&place_holder_);
+          to_display_with_placeholder.push_back(place_holder_);
         }
         to_display_ = to_display_with_placeholder;
       }
@@ -405,6 +587,7 @@ namespace SmartPeak
       node->width_ = container_width - container_in_margin * 2;
       pos.y += node->getSize().y;
       pos.y += workflow_step_space;
+      node->layout();
     }
   }
 
@@ -455,8 +638,16 @@ namespace SmartPeak
       nodes.clear();
       for (const auto& command : buildCommandsFromNames_.commands_)
       {
-        WorfklowStepNode node;
-        node.command_ = command;
+        auto node = std::make_shared<WorfklowStepNode>();
+        node->command_ = command;
+        for (const auto& output : command.getOutputs())
+        {
+          WorfklowStepNodeOutput node_output;
+          node_output.text_ = output;
+          node_output.node_ = node;
+          node->outputs_.push_back(node_output);
+        }
+
         nodes.push_back(node);
       }
     }

@@ -33,6 +33,15 @@
 
 namespace SmartPeak
 {
+  std::set<std::string> LoadFeatureQCsRDP::getInputs() const
+  {
+    return { };
+  }
+
+  std::set<std::string> LoadFeatureQCsRDP::getOutputs() const
+  {
+    return { "Feature QC" };
+  }
 
   void LoadFeatureQCsRDP::getFilenames(Filenames& filenames) const
   {

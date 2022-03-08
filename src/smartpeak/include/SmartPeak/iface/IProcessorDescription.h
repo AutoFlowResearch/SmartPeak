@@ -48,6 +48,16 @@ namespace SmartPeak
     */
     virtual std::vector<std::string> getRequirements() const = 0;
 
+    /**
+      Returns the list of data type accepted as input.
+    */
+    virtual std::set<std::string> getInputs() const = 0;
+
+    /**
+      Returns the list of data type produced as output.
+    */
+    virtual std::set<std::string> getOutputs() const = 0;
+
     virtual ~IProcessorDescription() = default;
   };
 }

@@ -38,6 +38,16 @@
 namespace SmartPeak
 {
 
+  std::set<std::string> PickMS2Features::getInputs() const
+  {
+    return { "Spectra" };
+  }
+
+  std::set<std::string> PickMS2Features::getOutputs() const
+  {
+    return { "Features" };
+  }
+
   std::vector<std::string> PickMS2Features::getRequirements() const
   {
     return { "sequence", "traML" };

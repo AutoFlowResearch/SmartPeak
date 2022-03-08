@@ -36,6 +36,10 @@
 
 namespace SmartPeak
 {
+  std::set<std::string> LoadTransitions::getOutputs() const
+  {
+    return { "Targeted Experiment" };
+  }
 
   bool LoadTransitions::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
   {

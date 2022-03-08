@@ -36,6 +36,16 @@
 namespace SmartPeak
 {
 
+  std::set<std::string> SearchAccurateMass::getInputs() const
+  {
+    return { "Features" };
+  }
+
+  std::set<std::string> SearchAccurateMass::getOutputs() const
+  {
+    return { "Features", "Mz Tab"};
+  }
+
   std::vector<std::string> SearchAccurateMass::getRequirements() const
   {
     return { "sequence", "traML" };
