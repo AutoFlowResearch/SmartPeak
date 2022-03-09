@@ -99,7 +99,7 @@ namespace SmartPeak
 
   std::set<std::string> LoadRawData::getOutputs() const
   {
-    return { "Experiment", "Targeted Experiment", "Chromatogram"};
+    return { "Experiment", "Targeted Experiment", "Chromatogram", "Spectra"};
   }
 
   void LoadRawData::process(
