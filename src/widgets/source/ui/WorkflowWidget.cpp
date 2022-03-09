@@ -283,10 +283,10 @@ namespace SmartPeak
     const ImVec2 screen_pos = ImGui::GetCursorScreenPos();
     ImVec2 node_size = getSize();
     int alpha = 0;
-    bool is_close_button_mouse_in = isCloseButtonMouseIn();
+    is_close_button_mouse_in_ = isCloseButtonMouseIn();
     if (isMouseIn() && enable)
     {
-      if (!is_dragging_ && !is_close_button_mouse_in)
+      if (!is_dragging_ && !is_close_button_mouse_in_)
       {
         ImGui::BeginTooltip();
         ImGui::Text("%s", command_.getDescription().c_str());
@@ -329,7 +329,7 @@ namespace SmartPeak
     // Delete button
     auto [btn_pos_x, btn_pos_y, btn_pos_w, btn_pos_h] = getCloseButtonPosition();
     float thickness = 1.0f;
-    if (is_close_button_mouse_in)
+    if (is_close_button_mouse_in_)
     {
       thickness = 2.0f;
     }
@@ -526,7 +526,7 @@ namespace SmartPeak
               updatecommands();
             }
           }
-          if (ImGui::IsMouseClicked(0) && node->isCloseButtonMouseIn())
+          if (ImGui::IsMouseClicked(0) && node->is_close_button_mouse_in_)
           {
             application_handler_.sequenceHandler_.getWorkflow().erase(application_handler_.sequenceHandler_.getWorkflow().cbegin() + node_index);
             application_handler_.sequenceHandler_.notifyWorkflowUpdated();

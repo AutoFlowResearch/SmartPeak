@@ -57,7 +57,6 @@ namespace SmartPeak
     int getHeight();
     virtual void draw(bool enable);
     bool isMouseIn();
-    bool isCloseButtonMouseIn();
     void layout();
 
     ImVec2 pos_;
@@ -69,8 +68,10 @@ namespace SmartPeak
     std::shared_ptr<WorfklowStepNodeGraphContainer> container_;
     std::vector<WorfklowStepNodeIO> outputs_;
     std::vector<WorfklowStepNodeIO> inputs_;
+    bool is_close_button_mouse_in_ = false;
 
   protected:
+    bool isCloseButtonMouseIn();
     std::tuple<int, int, int, int> getCloseButtonPosition();
   };
 
