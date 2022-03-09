@@ -40,6 +40,8 @@ namespace SmartPeak
   {
     ImVec2 getSize();
     ImVec2 getScreenPosition();
+    ImVec2 getInputLinkScreenPosition();
+    ImVec2 getOuputLinkScreenPosition();
     virtual void draw(bool enable);
     bool isMouseIn();
     ImVec2 pos_;
