@@ -36,7 +36,7 @@ namespace SmartPeak
 
   std::set<std::string> StoreFeatureFiltersRDP::getInputs() const
   {
-    return { "Feature Filter" };
+    return { "Feature Filters" };
   }
 
   std::set<std::string> StoreFeatureFiltersRDP::getOutputs() const

@@ -45,7 +45,7 @@ namespace SmartPeak
 
   std::set<std::string> EstimateFeatureRSDs::getOutputs() const
   {
-    return { "Feature RSD Filter" };
+    return { "Feature RSD Filters" };
   }
 
   std::vector<std::string> EstimateFeatureRSDs::getRequirements() const

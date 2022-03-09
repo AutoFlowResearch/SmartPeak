@@ -45,7 +45,7 @@ namespace SmartPeak
 
   std::set<std::string> EstimateFeatureFilterValues::getOutputs() const
   {
-    return { "Feature Filter" };
+    return { "Feature Filters" };
   }
 
   std::vector<std::string> EstimateFeatureFilterValues::getRequirements() const

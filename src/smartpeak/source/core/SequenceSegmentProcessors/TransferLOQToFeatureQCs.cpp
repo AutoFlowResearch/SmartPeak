@@ -45,7 +45,7 @@ namespace SmartPeak
 
   std::set<std::string> TransferLOQToFeatureQCs::getOutputs() const
   {
-    return { "Feature QC" };
+    return { "Feature QCs" };
   }
 
   std::vector<std::string> TransferLOQToFeatureQCs::getRequirements() const

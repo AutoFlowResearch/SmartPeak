@@ -37,7 +37,7 @@ namespace SmartPeak
 
   std::set<std::string> CheckFeaturesRSDs::getInputs() const
   {
-    return { "FeatureRSD QC", "Feature RSD Estimations" };
+    return { "Feature RSD QCs", "Feature RSD Estimations" };
   }
 
   std::set<std::string> CheckFeaturesRSDs::getOutputs() const

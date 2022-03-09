@@ -37,7 +37,7 @@ namespace SmartPeak
 
   std::set<std::string> FilterFeatures::getInputs() const
   {
-    return { "Feature Filter", "Targeted Experiment" };
+    return { "Feature Filters", "Targeted Experiment" };
   }
 
   std::set<std::string> FilterFeatures::getOutputs() const
