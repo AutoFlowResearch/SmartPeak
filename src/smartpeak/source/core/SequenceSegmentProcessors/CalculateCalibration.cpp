@@ -37,6 +37,16 @@
 
 namespace SmartPeak
 {
+  std::set<std::string> CalculateCalibration::getInputs() const
+  {
+    return { "Features"};
+  }
+
+  std::set<std::string> CalculateCalibration::getOutputs() const
+  {
+    return { "Quantitation Methods" };
+  }
+
   std::vector<std::string> CalculateCalibration::getRequirements() const
   {
     return { "sequence", "traML" };

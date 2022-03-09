@@ -38,6 +38,16 @@
 namespace SmartPeak
 {
 
+  std::set<std::string> EstimateFeatureQCValues::getInputs() const
+  {
+    return { "Features", "Targeted Experiment" };
+  }
+
+  std::set<std::string> EstimateFeatureQCValues::getOutputs() const
+  {
+    return { "Feature QC" };
+  }
+
   std::vector<std::string> EstimateFeatureQCValues::getRequirements() const
   {
     return { "sequence", "traML" };

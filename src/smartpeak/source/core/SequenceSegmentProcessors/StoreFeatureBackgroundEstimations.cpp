@@ -37,6 +37,15 @@
 namespace SmartPeak
 {
 
+  std::set<std::string> StoreFeatureBackgroundEstimations::getInputs() const
+  {
+    return { "Feature Background Estimations" };
+  }
+
+  std::set<std::string> StoreFeatureBackgroundEstimations::getOutputs() const
+  {
+    return { };
+  }
 
   bool StoreFeatureBackgroundEstimations::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
   {

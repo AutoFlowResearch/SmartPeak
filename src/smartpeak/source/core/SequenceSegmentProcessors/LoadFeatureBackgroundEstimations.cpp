@@ -36,6 +36,16 @@
 namespace SmartPeak
 {
 
+  std::set<std::string> LoadFeatureBackgroundEstimations::getInputs() const
+  {
+    return { };
+  }
+
+  std::set<std::string> LoadFeatureBackgroundEstimations::getOutputs() const
+  {
+    return { "Feature Background Estimations" };
+  }
+
   std::vector<std::string> LoadFeatureBackgroundEstimations::getRequirements() const
   {
     return { "sequence", "traML" };

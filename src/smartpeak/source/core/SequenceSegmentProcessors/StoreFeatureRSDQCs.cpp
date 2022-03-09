@@ -36,6 +36,16 @@
 namespace SmartPeak
 {
 
+  std::set<std::string> StoreFeatureRSDQCs::getInputs() const
+  {
+    return { "Feature RSD QCs" };
+  }
+
+  std::set<std::string> StoreFeatureRSDQCs::getOutputs() const
+  {
+    return { };
+  }
+
   std::vector<std::string> StoreFeatureRSDQCs::getRequirements() const
   {
     return { "sequence", "traML" };

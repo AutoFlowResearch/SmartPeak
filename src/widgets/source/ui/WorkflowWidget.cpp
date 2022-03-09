@@ -72,6 +72,12 @@ namespace SmartPeak
   {
     static std::vector<ImU32> color_palette =
     {
+      0x5b836d,
+      0x155049,
+      0xfae9e7,
+      0xfaafa0,
+      0xffe489,
+      0xcedd81,
       0xaec086,
       0xb9c5c7,
       0xd7d2cc,
@@ -80,12 +86,6 @@ namespace SmartPeak
       0x601813,
       0xd6482f,
       0xc7c4ac,
-      0x5b836d,
-      0x155049,
-      0xfae9e7,
-      0xfaafa0,
-      0xffe489,
-      0xcedd81,
       0xb06d81
     };
     index = index % color_palette.size();

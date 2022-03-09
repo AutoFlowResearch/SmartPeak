@@ -38,6 +38,16 @@
 namespace SmartPeak
 {
 
+  std::set<std::string> EstimateFeatureBackgroundInterferences::getInputs() const
+  {
+    return { "Features", "Targeted Experiment"};
+  }
+
+  std::set<std::string> EstimateFeatureBackgroundInterferences::getOutputs() const
+  {
+    return { "Feature Background Estimations" };
+  }
+
   std::vector<std::string> EstimateFeatureBackgroundInterferences::getRequirements() const
   {
     return { "sequence", "traML" };

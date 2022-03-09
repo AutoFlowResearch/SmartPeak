@@ -38,6 +38,16 @@
 namespace SmartPeak
 {
 
+  std::set<std::string> EstimateFeatureRSDs::getInputs() const
+  {
+    return { "Features", "Targeted Experiment" };
+  }
+
+  std::set<std::string> EstimateFeatureRSDs::getOutputs() const
+  {
+    return { "Feature RSD Filter" };
+  }
+
   std::vector<std::string> EstimateFeatureRSDs::getRequirements() const
   {
     return { "sequence", "traML" };

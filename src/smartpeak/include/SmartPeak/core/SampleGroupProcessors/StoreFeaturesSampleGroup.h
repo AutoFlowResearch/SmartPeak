@@ -34,6 +34,8 @@ namespace SmartPeak
     virtual std::string getName() const override { return "STORE_FEATURES_SAMPLE_GROUP"; }
     virtual std::string getDescription() const override { return "Store the features for the sample group."; }
     virtual ParameterSet getParameterSchema() const override;
+    virtual std::set<std::string> getOutputs() const override;
+    virtual std::set<std::string> getInputs() const override;
 
     /**
       Store the features for the sample group.

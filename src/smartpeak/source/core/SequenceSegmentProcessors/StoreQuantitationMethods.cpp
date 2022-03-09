@@ -38,6 +38,16 @@
 namespace SmartPeak
 {
 
+  std::set<std::string> StoreQuantitationMethods::getInputs() const
+  {
+    return { "Quantitation Methods" };
+  }
+
+  std::set<std::string> StoreQuantitationMethods::getOutputs() const
+  {
+    return { };
+  }
+
   std::vector<std::string> StoreQuantitationMethods::getRequirements() const
   {
     return { "sequence", "traML" };
