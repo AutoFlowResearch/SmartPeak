@@ -47,6 +47,7 @@ namespace SmartPeak
   // color constants
   static int hovered_alpha = 255;
   static int non_hovered_alpha = 200;
+  static ImU32 link_color = 0x88FFFFFF;
 
   std::map<std::string, std::pair<ImU32,ImU32>> all_possible_input_outputs_to_color;
 
@@ -114,6 +115,37 @@ namespace SmartPeak
     pos.y += node_position.y;
     return pos;
   }
+
+  ImVec2 WorfklowStepNodeIO::getInputLinkScreenPosition()
+  {
+    ImVec2 pos = pos_;
+    const ImVec2 screen_pos = ImGui::GetCursorScreenPos();
+    ImVec2 node_position;
+    if (node_)
+    {
+      node_position = node_->getScreenPosition();
+    }
+    auto io_size = getSize();
+    pos.x += node_position.x + io_size.x/2;
+    pos.y += node_position.y;
+    return pos;
+  }
+
+  ImVec2 WorfklowStepNodeIO::getOuputLinkScreenPosition()
+  {
+    ImVec2 pos = pos_;
+    const ImVec2 screen_pos = ImGui::GetCursorScreenPos();
+    ImVec2 node_position;
+    if (node_)
+    {
+      node_position = node_->getScreenPosition();
+    }
+    auto io_size = getSize();
+    pos.x += node_position.x + io_size.x / 2;
+    pos.y += node_position.y + io_size.y;
+    return pos;
+  }
+
 
   void WorfklowStepNodeIO::draw(bool enable)
   {
@@ -581,10 +613,63 @@ namespace SmartPeak
       }
       ImGui::BeginChildFrame(1, { 0, frame_height });
       is_graph_hovered_ = (ImGui::IsWindowHovered());
+
+      // draw containers and nodes
       for (auto& container : containers_)
       {
         container->draw(is_graph_hovered_ && (!dragging_node_));
       }
+
+      // draw links
+      for (auto src_container_it = containers_.begin(); src_container_it != containers_.end(); src_container_it++)
+      {
+        auto& src_container = *src_container_it;
+        for (auto src_node_it = src_container->to_display_.begin(); src_node_it != src_container->to_display_.end(); src_node_it++)
+        {
+          auto& src_node = *src_node_it;
+          for (auto& src_output : src_node->outputs_)
+          {
+            bool continue_to_search = true;
+            for (auto dest_container_it = src_container_it; dest_container_it != containers_.end(); dest_container_it++)
+            {
+              for (auto dest_node_it = src_node_it; dest_node_it != src_container->to_display_.end(); dest_node_it++)
+              {
+                auto& dest_node = *dest_node_it;
+                if (dest_node.get() != src_node.get())
+                {
+                  for (auto& dest_input : dest_node->inputs_)
+                  {
+                    if (src_output.text_ == dest_input.text_)
+                    {
+                      ImDrawList* draw_list = ImGui::GetWindowDrawList();
+                      const ImVec2 src_pos = src_output.getOuputLinkScreenPosition();
+                      const ImVec2 dest_pos = dest_input.getInputLinkScreenPosition();
+                      draw_list->AddLine(src_pos, dest_pos, link_color);
+                      continue_to_search = false;
+                    }
+                  }
+                  for (auto& dest_output : dest_node->outputs_)
+                  {
+                    if (src_output.text_ == dest_output.text_)
+                    {
+                      continue_to_search = false;
+                    }
+                  }
+                }
+                if (!continue_to_search)
+                {
+                  break;
+                }
+              }
+              if (!continue_to_search)
+              {
+                break;
+              }
+            }
+          }
+        }
+      }
+      // draw dragging node
       if (dragging_node_)
       {
         auto drag_delta = ImGui::GetMouseDragDelta();

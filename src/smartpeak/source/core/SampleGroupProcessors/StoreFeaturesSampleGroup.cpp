@@ -30,12 +30,12 @@ namespace SmartPeak
 
   std::set<std::string> StoreFeaturesSampleGroup::getInputs() const
   {
-    return { "Targeted Experiment" };
+    return { "Sample Group Features" };
   }
 
   std::set<std::string> StoreFeaturesSampleGroup::getOutputs() const
   {
-    return { "Sample Group Features" };
+    return { };
   }
 
   ParameterSet StoreFeaturesSampleGroup::getParameterSchema() const
