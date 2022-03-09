@@ -45,7 +45,7 @@ namespace SmartPeak
 
   std::set<std::string> EstimateFeatureQCValues::getOutputs() const
   {
-    return { "Feature QC" };
+    return { "Feature QCs" };
   }
 
   std::vector<std::string> EstimateFeatureQCValues::getRequirements() const
