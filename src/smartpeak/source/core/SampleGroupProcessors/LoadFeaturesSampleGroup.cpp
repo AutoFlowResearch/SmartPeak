@@ -28,6 +28,11 @@
 namespace SmartPeak
 {
 
+  std::set<std::string> LoadFeaturesSampleGroup::getOutputs() const
+  {
+    return { "Sample Group Features" };
+  }
+  
   ParameterSet LoadFeaturesSampleGroup::getParameterSchema() const
   {
     return ParameterSet();
