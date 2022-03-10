@@ -127,7 +127,7 @@ namespace SmartPeak
       valid_strings->push_back("1/y");
       valid_strings->push_back("1/y2");
       valid_strings->push_back("ln(y)");
-      valid_strings->push_back("no weight");
+      valid_strings->push_back("y");
       result->setConstraintsList(valid_strings);
     }
     else if (param.name == "x_weight")
@@ -136,7 +136,7 @@ namespace SmartPeak
       valid_strings->push_back("1/x");
       valid_strings->push_back("1/x2");
       valid_strings->push_back("ln(x)");
-      valid_strings->push_back("no weight");
+      valid_strings->push_back("x");
       result->setConstraintsList(valid_strings);
     }
     return result;
