@@ -39,6 +39,8 @@ namespace SmartPeak
     virtual std::string getName() const override { return "ZERO_CHROMATOGRAM_BASELINE"; }
     virtual std::string getDescription() const override { return "Normalize the lowest chromatogram intensity to zero."; }
     virtual std::vector<std::string> getRequirements() const override;
+    virtual std::set<std::string> getOutputs() const override;
+    virtual std::set<std::string> getInputs() const override;
 
     /** Normalize the lowest chromatogram intensity to zero FOR MAPPED CHROMATOGRAMS.
     */

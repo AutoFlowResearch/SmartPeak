@@ -29,7 +29,7 @@ namespace SmartPeak
 {
   std::set<std::string> MergeInjections::getInputs() const
   {
-    return { };
+    return { "Features" };
   }
 
   std::set<std::string> MergeInjections::getOutputs() const
