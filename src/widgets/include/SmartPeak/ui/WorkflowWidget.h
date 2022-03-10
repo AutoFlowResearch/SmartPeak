@@ -46,7 +46,7 @@ namespace SmartPeak
     bool isMouseIn();
     ImVec2 pos_;
     std::string text_;
-    std::shared_ptr<WorfklowStepNode> node_;
+    std::weak_ptr<WorfklowStepNode> parent_;
   };
 
   struct WorfklowStepNode
@@ -58,14 +58,18 @@ namespace SmartPeak
     virtual void draw(bool enable);
     bool isMouseIn();
     void layout();
+    
+    virtual std::string getName() const { return ""; };
+    virtual std::string getDescription() const { return ""; };
+    virtual ImU32 getColor(float alpha) const { return IM_COL32(255, 0, 255, alpha); };
+    virtual std::string getType() const { return ""; };
 
     ImVec2 pos_;
     int width_;
     ImVec2 drag_delta_;
-    ApplicationHandler::Command command_;
     bool is_dragging_ = false;
     bool is_mouse_down_ = false;
-    std::shared_ptr<WorfklowStepNodeGraphContainer> container_;
+    std::weak_ptr<WorfklowStepNodeGraphContainer> container_;
     std::vector<WorfklowStepNodeIO> outputs_;
     std::vector<WorfklowStepNodeIO> inputs_;
     bool is_close_button_mouse_in_ = false;
@@ -75,7 +79,23 @@ namespace SmartPeak
     std::tuple<int, int, int, int> getCloseButtonPosition();
   };
 
-  struct WorfklowStepNodePlaceHolder : public WorfklowStepNode
+  struct WorfklowStepNodeSession : public WorfklowStepNode
+  {
+    virtual std::string getName() const override;
+    virtual ImU32 getColor(float alpha) const override;
+    virtual std::string getType() const override;
+  };
+
+  struct WorfklowStepNodeCommand : public WorfklowStepNode
+  {
+    virtual std::string getDescription() const override;
+    virtual std::string getName() const override;
+    virtual ImU32 getColor(float alpha) const override;
+    virtual std::string getType() const override;
+    ApplicationHandler::Command command_;
+  };
+
+  struct WorfklowStepNodePlaceHolder : public WorfklowStepNodeCommand
   {
     virtual void draw(bool enable);
   };
@@ -87,7 +107,9 @@ namespace SmartPeak
     void draw(bool enable);
     ImVec2 getSize();
     void layout();
-    ApplicationHandler::Command::CommandType type_ = ApplicationHandler::Command::CommandType::RawDataMethod;
+    std::string type_;
+  protected:
+    std::string getHeaderText() const;
   };
 
   struct WorfklowStepNodeGraph
@@ -106,11 +128,13 @@ namespace SmartPeak
     virtual void updatecommands();
     void createContainers();
     void layout();
+    void setupCurrentSessionNode();
 
   protected:
+    std::shared_ptr<WorfklowStepNode> current_session_node_;
     std::vector<std::shared_ptr<WorfklowStepNode>> to_display_;
     std::vector<std::shared_ptr<WorfklowStepNodeGraphContainer>> containers_;
-    std::shared_ptr<WorfklowStepNode> dragging_node_ = nullptr;
+    std::shared_ptr<WorfklowStepNodeCommand> dragging_node_;
     int dragging_node_index_ = 0;
     int place_holder_node_index_ = 0;
     std::shared_ptr<WorfklowStepNodePlaceHolder> place_holder_;
