@@ -208,11 +208,6 @@ namespace SmartPeak
     );
   }
 
-  ImVec2 WorfklowStepNode::getSize()
-  {
-    return { static_cast<float>(getWidth()), static_cast<float>(getHeight()) };
-  }
-
   ImVec2 WorfklowStepNode::getScreenPosition()
   {
     ImVec2 pos = pos_;
@@ -228,12 +223,12 @@ namespace SmartPeak
     return pos;
   }
 
-  int WorfklowStepNode::getWidth()
+  float WorfklowStepNode::getWidth()
   {
     return width_;
   }
 
-  int WorfklowStepNode::getHeight()
+  float WorfklowStepNode::getHeight()
   {
     return workflow_step_height;
   }
@@ -258,7 +253,7 @@ namespace SmartPeak
   void WorfklowStepNode::layout()
   {
     int index = 0;
-    float io_area_width = (std::max((getWidth() - 20), 0) * 0.75);
+    float io_area_width = (std::max((getWidth() - 20), 0.0f) * 0.75);
     float space_width = io_area_width / (all_possible_input_outputs_to_color.size() + 1);
     float first_io_posx = getWidth() - io_area_width;
     for (auto possible_output : all_possible_input_outputs_to_color)
@@ -281,15 +276,6 @@ namespace SmartPeak
       }
       index++;
     }
-  }
-
-  bool WorfklowStepNode::isMouseIn()
-  {
-    auto mouse_pos = ImGui::GetMousePos();
-    const ImVec2 pos = getScreenPosition();
-    ImVec2 node_size = getSize();
-    return  (mouse_pos.x > pos.x) && (mouse_pos.x < pos.x + node_size.x) &&
-            (mouse_pos.y > pos.y) && (mouse_pos.y < pos.y + node_size.y);
   }
 
   void WorfklowStepNode::draw(bool enable)

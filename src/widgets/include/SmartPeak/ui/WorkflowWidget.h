@@ -58,14 +58,12 @@ namespace SmartPeak
     std::string text_;
   };
 
-  struct WorfklowStepNode
+  struct WorfklowStepNode : public Canvas
   {
-    ImVec2 getSize();
-    ImVec2 getScreenPosition();
-    int getWidth();
-    int getHeight();
+    virtual ImVec2 getScreenPosition() override;
+    virtual float getWidth() override;
+    virtual float getHeight() override;
     virtual void draw(bool enable);
-    bool isMouseIn();
     void layout();
     
     virtual std::string getName() const { return ""; };
