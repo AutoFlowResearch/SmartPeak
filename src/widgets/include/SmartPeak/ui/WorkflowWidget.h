@@ -36,17 +36,26 @@ namespace SmartPeak
   struct WorfklowStepNodeGraphContainer;
   struct WorfklowStepNode;
 
-  struct WorfklowStepNodeIO
+  struct Canvas
   {
-    ImVec2 getSize();
-    ImVec2 getScreenPosition();
+    virtual ImVec2 getScreenPosition();
+    virtual ImVec2 getSize();
+    virtual float getWidth() { return 0; };
+    virtual float getHeight() { return 0; };
+    virtual bool isMouseIn();
+
+    std::weak_ptr<WorfklowStepNode> parent_;
+    ImVec2 pos_;
+  };
+
+  struct WorfklowStepNodeIO : Canvas
+  {
     ImVec2 getInputLinkScreenPosition();
     ImVec2 getOuputLinkScreenPosition();
+    virtual float getWidth() override;
+    virtual float getHeight() override;
     virtual void draw(bool enable);
-    bool isMouseIn();
-    ImVec2 pos_;
     std::string text_;
-    std::weak_ptr<WorfklowStepNode> parent_;
   };
 
   struct WorfklowStepNode

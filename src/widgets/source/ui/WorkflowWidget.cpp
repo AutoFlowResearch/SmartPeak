@@ -96,12 +96,7 @@ namespace SmartPeak
     return IM_COL32(r, g, b, alpha);
   }
 
-  ImVec2 WorfklowStepNodeIO::getSize()
-  {
-    return { static_cast<float>(input_output_width), static_cast<float>(input_output_height) };
-  }
-
-  ImVec2 WorfklowStepNodeIO::getScreenPosition()
+  ImVec2 Canvas::getScreenPosition()
   {
     ImVec2 pos = pos_;
     const ImVec2 screen_pos = ImGui::GetCursorScreenPos();
@@ -114,6 +109,30 @@ namespace SmartPeak
     pos.x += node_position.x;
     pos.y += node_position.y;
     return pos;
+  }
+
+  bool Canvas::isMouseIn()
+  {
+    auto mouse_pos = ImGui::GetMousePos();
+    const ImVec2 pos = getScreenPosition();
+    ImVec2 canvas_size = getSize();
+    return  (mouse_pos.x > pos.x) && (mouse_pos.x < pos.x + canvas_size.x) &&
+            (mouse_pos.y > pos.y) && (mouse_pos.y < pos.y + canvas_size.y);
+  }
+
+  ImVec2 Canvas::getSize()
+  {
+    return { getWidth(), getHeight() };
+  }
+
+  float WorfklowStepNodeIO::getWidth()
+  {
+    return static_cast<float>(input_output_width);
+  }
+
+  float WorfklowStepNodeIO::getHeight()
+  {
+    return static_cast<float>(input_output_height);
   }
 
   ImVec2 WorfklowStepNodeIO::getInputLinkScreenPosition()
@@ -174,15 +193,6 @@ namespace SmartPeak
       color = all_possible_input_outputs_to_color.at(text_).second;
     }
     draw_list->AddTriangleFilled(a, b, c, color);
-  }
-
-  bool WorfklowStepNodeIO::isMouseIn()
-  {
-    auto mouse_pos = ImGui::GetMousePos();
-    const ImVec2 pos = getScreenPosition();
-    ImVec2 node_size = getSize();
-    return  (mouse_pos.x > pos.x) && (mouse_pos.x < pos.x + node_size.x) &&
-      (mouse_pos.y > pos.y) && (mouse_pos.y < pos.y + node_size.y);
   }
 
   void WorfklowStepNodePlaceHolder::draw(bool enable)
