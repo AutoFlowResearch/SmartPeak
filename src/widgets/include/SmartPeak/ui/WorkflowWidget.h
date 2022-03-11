@@ -33,8 +33,6 @@
 
 namespace SmartPeak
 {
-  struct WorfklowStepNodeGraphContainer;
-  struct WorfklowStepNode;
 
   struct Canvas
   {
@@ -44,7 +42,7 @@ namespace SmartPeak
     virtual float getHeight() { return 0; };
     virtual bool isMouseIn();
 
-    std::weak_ptr<WorfklowStepNode> parent_;
+    std::weak_ptr<Canvas> parent_;
     ImVec2 pos_;
   };
 
@@ -71,15 +69,14 @@ namespace SmartPeak
     virtual ImU32 getColor(float alpha) const { return IM_COL32(255, 0, 255, alpha); };
     virtual std::string getType() const { return ""; };
 
-    ImVec2 pos_;
     int width_;
     ImVec2 drag_delta_;
     bool is_dragging_ = false;
     bool is_mouse_down_ = false;
-    std::weak_ptr<WorfklowStepNodeGraphContainer> container_;
     std::vector<WorfklowStepNodeIO> outputs_;
     std::vector<WorfklowStepNodeIO> inputs_;
     bool is_close_button_mouse_in_ = false;
+    int node_index_;
 
   protected:
     bool isCloseButtonMouseIn();
@@ -107,12 +104,11 @@ namespace SmartPeak
     virtual void draw(bool enable);
   };
 
-  struct WorfklowStepNodeGraphContainer
+  struct WorfklowStepNodeGraphContainer : public Canvas
   {
+    virtual ImVec2 getSize() override;
     std::vector<std::shared_ptr<WorfklowStepNode>> to_display_;
-    ImVec2 pos_;
     void draw(bool enable);
-    ImVec2 getSize();
     void layout();
     std::string type_;
   protected:
@@ -142,7 +138,6 @@ namespace SmartPeak
     std::vector<std::shared_ptr<WorfklowStepNode>> to_display_;
     std::vector<std::shared_ptr<WorfklowStepNodeGraphContainer>> containers_;
     std::shared_ptr<WorfklowStepNodeCommand> dragging_node_;
-    int dragging_node_index_ = 0;
     int place_holder_node_index_ = 0;
     std::shared_ptr<WorfklowStepNodePlaceHolder> place_holder_;
     WorkflowManager& workflow_manager_;

@@ -213,7 +213,7 @@ namespace SmartPeak
     ImVec2 pos = pos_;
     const ImVec2 screen_pos = ImGui::GetCursorScreenPos();
     ImVec2 container_position;
-    auto parent = container_.lock();
+    auto parent = parent_.lock();
     if (parent)
     {
       container_position = parent->pos_;
@@ -437,7 +437,7 @@ namespace SmartPeak
         container->type_ = node_type;
       }
       container->to_display_.push_back(node);
-      node->container_ = container;
+      node->parent_ = container;
     }
     if (!container->to_display_.empty())
     {
@@ -557,7 +557,6 @@ namespace SmartPeak
     {
       if (is_graph_hovered_)
       {
-        int node_index = 0;
         for (auto& node : nodes)
         {
           bool is_mouse_down = ImGui::IsMouseDown(0);
@@ -581,41 +580,42 @@ namespace SmartPeak
             // start dragging
             node->is_dragging_ = true;
             dragging_node_ = std::dynamic_pointer_cast<WorfklowStepNodeCommand>(node);
-            dragging_node_index_ = node_index;
           }
           if (!is_mouse_down && node->is_dragging_)
           {
             // release
-            node->is_dragging_ = false;
-            node->drag_delta_ = { 0, 0 };
-            dragging_node_ = nullptr;
             if (mouse_is_in_window)
             {
-              const auto tmp = application_handler_.sequenceHandler_.getWorkflow().at(dragging_node_index_);
-              application_handler_.sequenceHandler_.getWorkflow().erase(application_handler_.sequenceHandler_.getWorkflow().cbegin() + dragging_node_index_);
+              const auto tmp = application_handler_.sequenceHandler_.getWorkflow().at(dragging_node_->node_index_);
+              application_handler_.sequenceHandler_.getWorkflow().erase(application_handler_.sequenceHandler_.getWorkflow().cbegin() + dragging_node_->node_index_);
               application_handler_.sequenceHandler_.getWorkflow().insert(application_handler_.sequenceHandler_.getWorkflow().cbegin() + place_holder_node_index_, tmp);
               application_handler_.sequenceHandler_.notifyWorkflowUpdated();
               updatecommands();
             }
+            node->is_dragging_ = false;
+            node->drag_delta_ = { 0, 0 };
+            dragging_node_ = nullptr;
           }
           if (ImGui::IsMouseClicked(0) && node->is_close_button_mouse_in_)
           {
-            application_handler_.sequenceHandler_.getWorkflow().erase(application_handler_.sequenceHandler_.getWorkflow().cbegin() + node_index);
+            application_handler_.sequenceHandler_.getWorkflow().erase(application_handler_.sequenceHandler_.getWorkflow().cbegin() + node->node_index_);
             application_handler_.sequenceHandler_.notifyWorkflowUpdated();
             updatecommands();
           }
-          node_index++;
         }
       }
 
       setupCurrentSessionNode();
       to_display_.clear();
       to_display_.push_back(current_session_node_);
+      int node_index = 0;
       for (auto node : nodes)
       {
         if (!node->is_dragging_)
         {
+          node->node_index_ = node_index;
           to_display_.push_back(node);
+          node_index++;
         }
       }
 
@@ -630,43 +630,44 @@ namespace SmartPeak
       {
         std::vector<std::shared_ptr<WorfklowStepNode>> to_display_with_placeholder;
         bool place_holder_found = false;
-        int node_index = 0;
         for (auto& node : to_display_)
         {
-          auto node_pos = node->getScreenPosition();
-          auto dragging_node_pos = dragging_node_->getScreenPosition();
-          if (!place_holder_found)
+          if (!std::dynamic_pointer_cast<WorfklowStepNodeSession>(node))
           {
-            if (to_display_with_placeholder.empty())
+            auto node_pos = node->getScreenPosition();
+            auto dragging_node_pos = ImGui::GetMousePos(); // dragging_node_->getScreenPosition();
+            if (!place_holder_found)
             {
-              if (dragging_node_pos.y < node_pos.y)
+              if (to_display_with_placeholder.empty())
               {
-                place_holder_->command_ = dragging_node_->command_;
-                to_display_with_placeholder.push_back(place_holder_);
-                place_holder_node_index_ = node_index;
-                place_holder_found = true;
+                if (dragging_node_pos.y < node_pos.y)
+                {
+                  place_holder_->command_ = dragging_node_->command_;
+                  to_display_with_placeholder.push_back(place_holder_);
+                  place_holder_node_index_ = 0;
+                  place_holder_found = true;
+                }
+              }
+              else
+              {
+                auto previous_node = to_display_with_placeholder.back();
+                auto previous_node_pos = previous_node->getScreenPosition();
+                if ((dragging_node_pos.y > previous_node_pos.y)
+                  && (dragging_node_pos.y < node_pos.y))
+                {
+                  place_holder_->command_ = dragging_node_->command_;
+                  to_display_with_placeholder.push_back(place_holder_);
+                  place_holder_node_index_ = node->node_index_;
+                  place_holder_found = true;
+                }
               }
             }
-            else
-            {
-              auto previous_node = to_display_with_placeholder.back();
-              auto previous_node_pos = previous_node->getScreenPosition();
-              if ((dragging_node_pos.y > previous_node_pos.y)
-                && (dragging_node_pos.y < node_pos.y))
-              {
-                place_holder_->command_ = dragging_node_->command_;
-                to_display_with_placeholder.push_back(place_holder_);
-                place_holder_node_index_ = node_index;
-                place_holder_found = true;
-              }
-            }
-            node_index++;
           }
           to_display_with_placeholder.push_back(node);
         }
         if (!place_holder_found)
         {
-          place_holder_node_index_ = node_index;
+          place_holder_node_index_ = to_display_with_placeholder.back()->node_index_+1;
           to_display_with_placeholder.push_back(place_holder_);
         }
         to_display_ = to_display_with_placeholder;
