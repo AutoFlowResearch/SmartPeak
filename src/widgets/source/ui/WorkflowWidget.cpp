@@ -580,6 +580,10 @@ namespace SmartPeak
             // start dragging
             node->is_dragging_ = true;
             dragging_node_ = std::dynamic_pointer_cast<WorfklowStepNodeCommand>(node);
+            auto node_pos = node->getScreenPosition();
+            node->drag_draging_mouse_position_.x = mouse_pos.x - node_pos.x;
+            node->drag_draging_mouse_position_.y = mouse_pos.y - node_pos.y;
+            std::cout << node->drag_draging_mouse_position_.x << ", " << node->drag_draging_mouse_position_.y << std::endl;
           }
           if (!is_mouse_down && node->is_dragging_)
           {
@@ -593,7 +597,6 @@ namespace SmartPeak
               updatecommands();
             }
             node->is_dragging_ = false;
-            node->drag_delta_ = { 0, 0 };
             dragging_node_ = nullptr;
           }
           if (ImGui::IsMouseClicked(0) && node->is_close_button_mouse_in_)
@@ -635,7 +638,7 @@ namespace SmartPeak
           if (!std::dynamic_pointer_cast<WorfklowStepNodeSession>(node))
           {
             auto node_pos = node->getScreenPosition();
-            auto dragging_node_pos = ImGui::GetMousePos(); // dragging_node_->getScreenPosition();
+            auto dragging_node_pos = ImGui::GetMousePos();
             if (!place_holder_found)
             {
               if (to_display_with_placeholder.empty())
@@ -734,10 +737,10 @@ namespace SmartPeak
       // draw dragging node
       if (dragging_node_)
       {
-        auto drag_delta = ImGui::GetMouseDragDelta();
-        dragging_node_->pos_.x += (drag_delta.x - dragging_node_->drag_delta_.x);
-        dragging_node_->pos_.y += (drag_delta.y - dragging_node_->drag_delta_.y);
-        dragging_node_->drag_delta_ = drag_delta;
+        auto mouse_pos = ImGui::GetMousePos();
+        auto screen_position = ImGui::GetCursorScreenPos();
+        dragging_node_->pos_.x = mouse_pos.x - dragging_node_->drag_draging_mouse_position_.x - screen_position.x;
+        dragging_node_->pos_.y = mouse_pos.y - dragging_node_->drag_draging_mouse_position_.y - screen_position.y;
         dragging_node_->draw(is_graph_hovered_);
       }
       ImGui::EndChildFrame();

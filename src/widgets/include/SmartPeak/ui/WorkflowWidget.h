@@ -70,7 +70,7 @@ namespace SmartPeak
     virtual std::string getType() const { return ""; };
 
     int width_;
-    ImVec2 drag_delta_;
+    ImVec2 drag_draging_mouse_position_;
     bool is_dragging_ = false;
     bool is_mouse_down_ = false;
     std::vector<WorfklowStepNodeIO> outputs_;
