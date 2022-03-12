@@ -35,6 +35,15 @@
 
 namespace SmartPeak
 {
+  std::set<std::string> IsotopicCorrections::getInputs() const
+  {
+    return { "Features" };
+  }
+
+  std::set<std::string> IsotopicCorrections::getOutputs() const
+  {
+    return { "Features" };
+  }
 
   std::vector<std::string> IsotopicCorrections::getRequirements() const
   {

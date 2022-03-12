@@ -35,6 +35,16 @@
 namespace SmartPeak
 {
 
+  std::set<std::string> ExtractChromatogramWindows::getInputs() const
+  {
+    return { "Feature Filters", "Chromatogram"};
+  }
+
+  std::set<std::string> ExtractChromatogramWindows::getOutputs() const
+  {
+    return { "Chromatogram" };
+  }
+
   std::vector<std::string> ExtractChromatogramWindows::getRequirements() const
   {
     return { "sequence", "traML" };

@@ -40,6 +40,8 @@ namespace SmartPeak
     virtual std::string getDescription() const override { return "Flag and score transitions and transition groups based on a user defined criteria."; }
     virtual ParameterSet getParameterSchema() const override;
     virtual std::vector<std::string> getRequirements() const override;
+    virtual std::set<std::string> getOutputs() const override;
+    virtual std::set<std::string> getInputs() const override;
 
     /** Flag features that do not pass the filter QCs.
     */

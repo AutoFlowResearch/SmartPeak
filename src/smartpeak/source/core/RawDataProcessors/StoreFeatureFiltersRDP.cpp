@@ -34,6 +34,16 @@
 namespace SmartPeak
 {
 
+  std::set<std::string> StoreFeatureFiltersRDP::getInputs() const
+  {
+    return { "Feature Filters" };
+  }
+
+  std::set<std::string> StoreFeatureFiltersRDP::getOutputs() const
+  {
+    return { };
+  }
+
   std::vector<std::string> StoreFeatureFiltersRDP::getRequirements() const
   {
     return { "sequence", "traML" };

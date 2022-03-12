@@ -36,6 +36,16 @@
 namespace SmartPeak
 {
 
+  std::set<std::string> MapChromatograms::getInputs() const
+  {
+    return { "Experiment", "Targeted Experiment" };
+  }
+
+  std::set<std::string> MapChromatograms::getOutputs() const
+  {
+    return { "Chromatogram" };
+  }
+
   std::vector<std::string> MapChromatograms::getRequirements() const
   {
     return { "sequence", "traML" };

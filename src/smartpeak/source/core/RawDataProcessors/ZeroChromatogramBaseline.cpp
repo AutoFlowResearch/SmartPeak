@@ -36,6 +36,16 @@
 namespace SmartPeak
 {
 
+  std::set<std::string> ZeroChromatogramBaseline::getInputs() const
+  {
+    return { "Chromatogram" };
+  }
+
+  std::set<std::string> ZeroChromatogramBaseline::getOutputs() const
+  {
+    return { "Chromatogram" };
+  }
+
   std::vector<std::string> ZeroChromatogramBaseline::getRequirements() const
   {
     return { "sequence", "traML" };

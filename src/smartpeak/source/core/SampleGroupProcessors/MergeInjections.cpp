@@ -27,6 +27,16 @@
 
 namespace SmartPeak
 {
+  std::set<std::string> MergeInjections::getInputs() const
+  {
+    return { "Features" };
+  }
+
+  std::set<std::string> MergeInjections::getOutputs() const
+  {
+    return { "Sample Group Features" };
+  }
+
   std::vector<std::string> MergeInjections::getRequirements() const
   {
     return { "sequence", "traML" };

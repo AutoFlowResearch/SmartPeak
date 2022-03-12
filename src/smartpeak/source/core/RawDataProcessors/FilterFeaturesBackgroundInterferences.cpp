@@ -35,6 +35,16 @@
 namespace SmartPeak
 {
 
+  std::set<std::string> FilterFeaturesBackgroundInterferences::getInputs() const
+  {
+    return { "Features", "Feature Background Filters", "Feature Background Estimations" };
+  }
+
+  std::set<std::string> FilterFeaturesBackgroundInterferences::getOutputs() const
+  {
+    return { "Features" };
+  }
+
   std::vector<std::string> FilterFeaturesBackgroundInterferences::getRequirements() const
   {
     return { "sequence", "traML" };

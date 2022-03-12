@@ -35,6 +35,16 @@
 namespace SmartPeak
 {
 
+  std::set<std::string> CalculateIsotopicPurities::getInputs() const
+  {
+    return { };
+  }
+
+  std::set<std::string> CalculateIsotopicPurities::getOutputs() const
+  {
+    return { "Features" };
+  }
+
   std::vector<std::string> CalculateIsotopicPurities::getRequirements() const
   {
     return { "sequence", "traML" };

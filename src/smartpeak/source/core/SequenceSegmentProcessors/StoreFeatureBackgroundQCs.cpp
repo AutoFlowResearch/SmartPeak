@@ -37,6 +37,16 @@
 namespace SmartPeak
 {
 
+  std::set<std::string> StoreFeatureBackgroundQCs::getInputs() const
+  {
+    return { "Feature Background QCs" };
+  }
+
+  std::set<std::string> StoreFeatureBackgroundQCs::getOutputs() const
+  {
+    return { };
+  }
+
   std::vector<std::string> StoreFeatureBackgroundQCs::getRequirements() const
   {
     return { "sequence", "traML" };

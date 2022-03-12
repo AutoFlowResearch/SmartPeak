@@ -36,6 +36,16 @@
 namespace SmartPeak
 {
 
+  std::set<std::string> StoreStandardsConcentrations::getInputs() const
+  {
+    return { "Standards Concentrations" };
+  }
+
+  std::set<std::string> StoreStandardsConcentrations::getOutputs() const
+  {
+    return { };
+  }
+
   std::vector<std::string> StoreStandardsConcentrations::getRequirements() const
   {
     return { "sequence", "traML" };

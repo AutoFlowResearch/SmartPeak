@@ -37,6 +37,16 @@
 namespace SmartPeak
 {
 
+  std::set<std::string> StoreFeatureRSDEstimations::getInputs() const
+  {
+    return { "Feature RSD Estimations" };
+  }
+
+  std::set<std::string> StoreFeatureRSDEstimations::getOutputs() const
+  {
+    return { };
+  }
+
   bool StoreFeatureRSDEstimations::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
   {
     Filenames filenames;

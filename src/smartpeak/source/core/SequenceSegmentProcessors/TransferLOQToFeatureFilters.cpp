@@ -39,6 +39,16 @@
 namespace SmartPeak
 {
 
+  std::set<std::string> TransferLOQToFeatureFilters::getInputs() const
+  {
+    return { "Quantitation Methods" };
+  }
+
+  std::set<std::string> TransferLOQToFeatureFilters::getOutputs() const
+  {
+    return { "Feature Filters" };
+  }
+
   std::vector<std::string> TransferLOQToFeatureFilters::getRequirements() const
   {
     return { "sequence", "traML" };

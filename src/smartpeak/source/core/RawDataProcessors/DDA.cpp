@@ -34,6 +34,15 @@
 
 namespace SmartPeak
 {
+  std::set<std::string> DDA::getInputs() const
+  {
+    return { "Features" };
+  }
+
+  std::set<std::string> DDA::getOutputs() const
+  {
+    return { "Features" };
+  }
 
   std::vector<std::string> DDA::getRequirements() const
   {

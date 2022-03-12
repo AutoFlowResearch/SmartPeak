@@ -33,43 +33,86 @@
 
 namespace SmartPeak
 {
-  struct WorfklowStepNodeGraphContainer;
 
-  struct WorfklowStepNode
+  struct Canvas
   {
-    ImVec2 getSize();
-    ImVec2 getScreenPosition();
-    int getWidth();
-    int getHeight();
-    virtual void draw(bool enable);
-    bool isMouseIn();
-    bool isCloseButtonMouseIn();
+    virtual ImVec2 getScreenPosition();
+    virtual ImVec2 getSize();
+    virtual float getWidth() { return 0; };
+    virtual float getHeight() { return 0; };
+    virtual bool isMouseIn();
 
+    std::weak_ptr<Canvas> parent_;
     ImVec2 pos_;
+  };
+
+  struct WorfklowStepNodeIO : Canvas
+  {
+    ImVec2 getInputLinkScreenPosition();
+    ImVec2 getOuputLinkScreenPosition();
+    virtual float getWidth() override;
+    virtual float getHeight() override;
+    virtual void draw(bool enable);
+    std::string text_;
+  };
+
+  struct WorfklowStepNode : public Canvas
+  {
+    virtual ImVec2 getScreenPosition() override;
+    virtual float getWidth() override;
+    virtual float getHeight() override;
+    virtual void draw(bool enable);
+    void layout();
+    
+    virtual std::string getName() const { return ""; };
+    virtual std::string getDescription() const { return ""; };
+    virtual ImU32 getColor(float alpha) const { return IM_COL32(255, 0, 255, alpha); };
+    virtual std::string getType() const { return ""; };
+
     int width_;
-    ImVec2 drag_delta_;
-    ApplicationHandler::Command command_;
+    ImVec2 drag_draging_mouse_position_;
     bool is_dragging_ = false;
     bool is_mouse_down_ = false;
-    std::shared_ptr<WorfklowStepNodeGraphContainer> container_;
+    std::vector<WorfklowStepNodeIO> outputs_;
+    std::vector<WorfklowStepNodeIO> inputs_;
+    bool is_close_button_mouse_in_ = false;
+    int node_index_;
 
   protected:
+    bool isCloseButtonMouseIn();
     std::tuple<int, int, int, int> getCloseButtonPosition();
   };
 
-  struct WorfklowStepNodePlaceHolder : public WorfklowStepNode
+  struct WorfklowStepNodeSession : public WorfklowStepNode
+  {
+    virtual std::string getName() const override;
+    virtual ImU32 getColor(float alpha) const override;
+    virtual std::string getType() const override;
+  };
+
+  struct WorfklowStepNodeCommand : public WorfklowStepNode
+  {
+    virtual std::string getDescription() const override;
+    virtual std::string getName() const override;
+    virtual ImU32 getColor(float alpha) const override;
+    virtual std::string getType() const override;
+    ApplicationHandler::Command command_;
+  };
+
+  struct WorfklowStepNodePlaceHolder : public WorfklowStepNodeCommand
   {
     virtual void draw(bool enable);
   };
 
-  struct WorfklowStepNodeGraphContainer
+  struct WorfklowStepNodeGraphContainer : public Canvas
   {
-    std::vector<WorfklowStepNode*> to_display_;
-    ImVec2 pos_;
+    virtual ImVec2 getSize() override;
+    std::vector<std::shared_ptr<WorfklowStepNode>> to_display_;
     void draw(bool enable);
-    ImVec2 getSize();
     void layout();
-    ApplicationHandler::Command::CommandType type_ = ApplicationHandler::Command::CommandType::RawDataMethod;
+    std::string type_;
+  protected:
+    std::string getHeaderText() const;
   };
 
   struct WorfklowStepNodeGraph
@@ -79,22 +122,24 @@ namespace SmartPeak
        workflow_manager_(workflow_manager),
        buildCommandsFromNames_(application_handler)
     {
+      place_holder_ = std::make_shared< WorfklowStepNodePlaceHolder>();
     };
-    std::vector<WorfklowStepNode> nodes;
+    std::vector<std::shared_ptr<WorfklowStepNode>> nodes;
     void draw();
   
   protected:
     virtual void updatecommands();
     void createContainers();
     void layout();
+    void setupCurrentSessionNode();
 
   protected:
-    std::vector<WorfklowStepNode*> to_display_;
+    std::shared_ptr<WorfklowStepNode> current_session_node_;
+    std::vector<std::shared_ptr<WorfklowStepNode>> to_display_;
     std::vector<std::shared_ptr<WorfklowStepNodeGraphContainer>> containers_;
-    WorfklowStepNode* dragging_node_ = nullptr;
-    int dragging_node_index_ = 0;
+    std::shared_ptr<WorfklowStepNodeCommand> dragging_node_;
     int place_holder_node_index_ = 0;
-    WorfklowStepNodePlaceHolder place_holder_;
+    std::shared_ptr<WorfklowStepNodePlaceHolder> place_holder_;
     WorkflowManager& workflow_manager_;
     ApplicationHandler& application_handler_;
     BuildCommandsFromNames buildCommandsFromNames_;

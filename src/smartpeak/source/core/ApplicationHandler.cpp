@@ -174,6 +174,18 @@ namespace SmartPeak
     return (description ? description->getDescription() : "");
   }
 
+  std::set<std::string> ApplicationHandler::Command::getInputs() const
+  {
+    const auto description = getIProcessorDescription();
+    return (description ? description->getInputs() : std::set<std::string>());
+  }
+
+  std::set<std::string> ApplicationHandler::Command::getOutputs() const
+  {
+    const auto description = getIProcessorDescription();
+    return (description ? description->getOutputs() : std::set<std::string>());
+  }
+
   ApplicationHandler::Command::CommandType ApplicationHandler::Command::getType() const
   {
     return type;

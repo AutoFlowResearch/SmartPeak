@@ -36,6 +36,16 @@
 namespace SmartPeak
 {
 
+  std::set<std::string> LoadAnnotations::getInputs() const
+  {
+    return { };
+  }
+
+  std::set<std::string> LoadAnnotations::getOutputs() const
+  {
+    return { "Mz Tab" };
+  }
+
   void LoadAnnotations::getFilenames(Filenames& filenames) const
   {
     filenames.addFileName("mzTab_i", "${FEATURES_INPUT_PATH}/${INPUT_INJECTION_NAME}.mzTab");

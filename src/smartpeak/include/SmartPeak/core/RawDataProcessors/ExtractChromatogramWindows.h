@@ -39,6 +39,8 @@ namespace SmartPeak
     virtual std::string getName() const override { return "EXTRACT_CHROMATOGRAM_WINDOWS"; }
     virtual std::string getDescription() const override { return "Extract out specified chromatogram windows using the componentFeatureFilters."; }
     virtual std::vector<std::string> getRequirements() const override;
+    virtual std::set<std::string> getOutputs() const override;
+    virtual std::set<std::string> getInputs() const override;
 
     /** Extract out specified chromatogram windows FROM A MAPPED CHROMATOGRAM using the componentFeatureFilters
     */

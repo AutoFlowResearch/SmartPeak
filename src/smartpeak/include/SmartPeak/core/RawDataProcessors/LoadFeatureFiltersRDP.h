@@ -38,6 +38,8 @@ namespace SmartPeak
     /* IProcessorDescription */
     virtual std::string getName() const override { return "LOAD_FEATURE_FILTERS"; }
     virtual std::string getDescription() const override { return "Load the component and component group transition filters from file."; }
+    virtual std::set<std::string> getOutputs() const override;
+    virtual std::set<std::string> getInputs() const override;
 
     /** Load the component and component group transition filters from file.
     */

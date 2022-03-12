@@ -45,6 +45,8 @@ namespace SmartPeak
     /* IProcessorDescription */
     virtual ParameterSet getParameterSchema() const override { return ParameterSet(); };
     virtual std::vector<std::string> getRequirements() const override { return {}; };
+    virtual std::set<std::string> getInputs() const override { return {}; };
+    virtual std::set<std::string> getOutputs() const override { return {}; };
 
     /** Interface to all raw data processing methods.
 

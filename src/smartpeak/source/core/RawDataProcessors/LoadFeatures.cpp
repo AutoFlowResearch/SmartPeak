@@ -35,6 +35,15 @@
 
 namespace SmartPeak
 {
+  std::set<std::string> LoadFeatures::getInputs() const
+  {
+    return { };
+  }
+
+  std::set<std::string> LoadFeatures::getOutputs() const
+  {
+    return { "Features" };
+  }
 
   void LoadFeatures::getFilenames(Filenames& filenames) const
   {
