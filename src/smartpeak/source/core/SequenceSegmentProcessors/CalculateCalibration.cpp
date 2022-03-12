@@ -39,7 +39,7 @@ namespace SmartPeak
 {
   std::set<std::string> CalculateCalibration::getInputs() const
   {
-    return { "Features"};
+    return { "Features", "Standards Concentrations", "Quantitation Methods" };
   }
 
   std::set<std::string> CalculateCalibration::getOutputs() const
