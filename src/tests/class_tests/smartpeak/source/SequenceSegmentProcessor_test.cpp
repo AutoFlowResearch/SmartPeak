@@ -24,7 +24,7 @@
 #include <gtest/gtest.h>
 #include <SmartPeak/test_config.h>
 #include <SmartPeak/core/SequenceSegmentProcessor.h>
-#include <SmartPeak/core/SequenceSegmentProcessors/CalculateCalibration.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/OptimizeCalibration.h>
 #include <SmartPeak/core/SequenceSegmentProcessors/EstimateFeatureBackgroundInterferences.h>
 #include <SmartPeak/core/SequenceSegmentProcessors/EstimateFeatureFilterValues.h>
 #include <SmartPeak/core/SequenceSegmentProcessors/EstimateFeatureQCValues.h>
@@ -499,24 +499,24 @@ void addQCFeatures(SequenceHandler& sequenceHandler_IO) {
   }
 }
 
-TEST(CalculateCalibration, constructorCalculateCalibration)
+TEST(OptimizeCalibration, constructorOptimizeCalibration)
 {
-  CalculateCalibration* ptrCalculateCalibration = nullptr;
-  CalculateCalibration* nullPointerCalculateCalibration = nullptr;
-  EXPECT_EQ(ptrCalculateCalibration, nullPointerCalculateCalibration);
+  OptimizeCalibration* ptrOptimizeCalibration = nullptr;
+  OptimizeCalibration* nullPointerOptimizeCalibration = nullptr;
+  EXPECT_EQ(ptrOptimizeCalibration, nullPointerOptimizeCalibration);
 }
 
-TEST(CalculateCalibration, destructorCalculateCalibration)
+TEST(OptimizeCalibration, destructorOptimizeCalibration)
 {
-  CalculateCalibration* ptrCalculateCalibration = nullptr;
-  ptrCalculateCalibration = new CalculateCalibration();
-  delete ptrCalculateCalibration;
+  OptimizeCalibration* OptimizeCalibration = nullptr;
+  ptrOptimizeCalibration = new OptimizeCalibration();
+  delete ptrOptimizeCalibration;
 }
 
-TEST(CalculateCalibration, gettersCalculateCalibration)
+TEST(OptimizeCalibration, gettersOptimizeCalibration)
 {
-  CalculateCalibration processor;
-  EXPECT_EQ(processor.getName(), "CALCULATE_CALIBRATION");
+  OptimizeCalibration processor;
+  EXPECT_EQ(processor.getName(), "FIT_CALIBRATION");
 }
 
 TEST(SequenceSegmentProcessor, getSampleIndicesBySampleType)
@@ -576,7 +576,7 @@ TEST(SequenceSegmentProcessor, getSampleIndicesBySampleType)
   EXPECT_EQ(sample_indices[1], 2);
 }
 
-TEST(SequenceSegmentProcessor, processCalculateCalibration)
+TEST(SequenceSegmentProcessor, processOptimizeCalibration)
 {
   // Pre-requisites: set up the parameters and data structures for testing
   const map<string, vector<map<string, string>>> absquant_params = {{"AbsoluteQuantitation", {
@@ -653,9 +653,9 @@ TEST(SequenceSegmentProcessor, processCalculateCalibration)
   sequenceSegmentHandler.setSampleIndices(indices);
 
   // Test calculate calibration
-  CalculateCalibration calculateCalibration;
+  OptimizeCalibration optimizeCalibration;
   Filenames filenames;
-  calculateCalibration.process(sequenceSegmentHandler, sequenceHandler, absquant_params, filenames);
+  optimizeCalibration.process(sequenceSegmentHandler, sequenceHandler, absquant_params, filenames);
 
   const std::vector<OpenMS::AbsoluteQuantitationMethod>& AQMs = sequenceSegmentHandler.getQuantitationMethods();
 

@@ -59,7 +59,7 @@
 #include <SmartPeak/core/RawDataProcessors/IsotopicCorrections.h>
 #include <SmartPeak/core/RawDataProcessors/CalculateIsotopicPurities.h>
 #include <SmartPeak/core/RawDataProcessors/CalculateMDVAccuracies.h>
-#include <SmartPeak/core/SequenceSegmentProcessors/CalculateCalibration.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/FitCalibration.h>
 #include <SmartPeak/core/SequenceSegmentProcessors/EstimateFeatureBackgroundInterferences.h>
 #include <SmartPeak/core/SequenceSegmentProcessors/EstimateFeatureFilterValues.h>
 #include <SmartPeak/core/SequenceSegmentProcessors/EstimateFeatureQCValues.h>
@@ -135,7 +135,7 @@ namespace SmartPeak {
     {"CALCULATE_MDV_ACCURACIES",                  std::make_shared<CalculateMDVAccuracies>()}
   };
   const std::map<std::string, std::shared_ptr<SequenceSegmentProcessor>> n_to_seq_seg_method_ {
-    {"CALCULATE_CALIBRATION",                     std::make_shared<CalculateCalibration>()},
+    {"FIT_CALIBRATION",                     std::make_shared<FitCalibration>()},
     {"OPTIMIZE_CALIBRATION",                      std::make_shared<OptimizeCalibration>()},
     {"STORE_QUANTITATION_METHODS",                std::make_shared<StoreQuantitationMethods>()},
     {"LOAD_QUANTITATION_METHODS",                 std::make_shared<LoadQuantitationMethods>()},

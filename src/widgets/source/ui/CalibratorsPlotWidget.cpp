@@ -22,7 +22,7 @@
 // --------------------------------------------------------------------------
 
 #include <SmartPeak/ui/CalibratorsPlotWidget.h>
-#include <SmartPeak/core/SequenceSegmentProcessors/CalculateCalibration.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/FitCalibration.h>
 #include <SmartPeak/core/SequenceSegmentProcessors/OptimizeCalibration.h>
 #include <SmartPeak/core/Utilities.h>
 #include <implot.h>
@@ -34,10 +34,10 @@ namespace SmartPeak
   {
     if (selected_action_ == 0)
     {
-      CalculateCalibration calculate_calibration;
+      FitCalibration fit_calibration;
       Filenames filenames; // calculate_calibration actually does not use it
       ParameterSet& user_parameters = sequence_handler_.getSequence().at(0).getRawData().getParameters();
-      calculate_calibration.process(
+      fit_calibration.process(
         sequence_handler_.getSequenceSegments().at(selected_sequence_segment_),
         sequence_handler_,
         user_parameters,
@@ -222,11 +222,11 @@ namespace SmartPeak
     {
       if (ImGui::BeginTable("Calibrator input parameters", 2, table_flags))
       {
-        // CalculateCalibration params
+        // FitCalibration params
         if (selected_action_ == 0)
         {
-          CalculateCalibration calculate_calibration;
-          auto calculate_calibration_params_schema = calculate_calibration.getParameterSchema();
+          FitCalibration fit_calibration;
+          auto calculate_calibration_params_schema = fit_calibration.getParameterSchema();
           auto user_params = sequence_handler_.getSequence().at(0).getRawData().getParameters();
           calculate_calibration_params_schema.setAsSchema(true);
           user_params.merge(calculate_calibration_params_schema);
@@ -637,7 +637,7 @@ namespace SmartPeak
           std::ostringstream os;
           os << sample_name << ";" << serie_name;
           ParameterSet& user_parameters = sequence_handler_.getSequence().at(0).getRawData().getParameters();
-          Parameter* existing_parameter = user_parameters.findParameter("CalculateCalibration", "excluded_points");
+          Parameter* existing_parameter = user_parameters.findParameter("FitCalibration", "excluded_points");
           if ((!existing_parameter) || (!existing_parameter->isInList(os.str())))
           {
             if (ImGui::Selectable("Exclude from calibration"))
@@ -655,7 +655,7 @@ namespace SmartPeak
                   { { "name", "excluded_points" },
                     { "type", "list" },
                     { "value", os.str() } });
-                user_parameters.addParameter("CalculateCalibration", new_param);
+                user_parameters.addParameter("FitCalibration", new_param);
                 recomputeCalibration();
               }
             }

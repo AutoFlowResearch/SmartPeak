@@ -21,7 +21,7 @@
 // $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
 // --------------------------------------------------------------------------
 
-#include <SmartPeak/core/SequenceSegmentProcessors/CalculateCalibration.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/FitCalibration.h>
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/MetaDataHandler.h>
 #include <SmartPeak/core/SampleType.h>
@@ -37,28 +37,28 @@
 
 namespace SmartPeak
 {
-  std::set<std::string> CalculateCalibration::getInputs() const
+  std::set<std::string> FitCalibration::getInputs() const
   {
     return { "Features", "Standards Concentrations", "Quantitation Methods" };
   }
 
-  std::set<std::string> CalculateCalibration::getOutputs() const
+  std::set<std::string> FitCalibration::getOutputs() const
   {
     return { "Quantitation Methods" };
   }
 
-  std::vector<std::string> CalculateCalibration::getRequirements() const
+  std::vector<std::string> FitCalibration::getRequirements() const
   {
     return { "sequence", "traML" };
   }
 
-  ParameterSet CalculateCalibration::getParameterSchema() const
+  ParameterSet FitCalibration::getParameterSchema() const
   {
     OpenMS::AbsoluteQuantitation oms_params;
     ParameterSet parameters({ oms_params });
 
     std::map<std::string, std::vector<std::map<std::string, std::string>>> param_struct({
-    {"CalculateCalibration", {
+    {"FitCalibration", {
     {
       {"name", "excluded_points"},
       {"type", "list"},
@@ -71,14 +71,14 @@ namespace SmartPeak
     return parameters;
   }
 
-  void CalculateCalibration::process(
+  void FitCalibration::process(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START CalculateCalibration";
+    LOGD << "START FitCalibration";
     getFilenames(filenames_I);
 
     // Complete user parameters with schema
@@ -86,10 +86,10 @@ namespace SmartPeak
     params.merge(getParameterSchema());
 
     std::vector<std::tuple<std::string, std::string>> excluded_points;
-    auto excluded_points_param = params.findParameter("CalculateCalibration", "excluded_points");
+    auto excluded_points_param = params.findParameter("FitCalibration", "excluded_points");
     if ((!excluded_points_param) || (excluded_points_param->getType() != "string_list"))
     {
-      throw std::invalid_argument("CalculateCalibration::excluded_points not found or wrong type");
+      throw std::invalid_argument("FitCalibration::excluded_points not found or wrong type");
     }
     CastValue excluded_points_value;
     Utilities::parseString(excluded_points_param->getValueAsString(), excluded_points_value);
@@ -258,7 +258,7 @@ namespace SmartPeak
     sequenceSegmentHandler_IO.setExcludedComponentsToConcentrations(excluded_components_to_concentrations);
     sequenceSegmentHandler_IO.getQuantitationMethods() = absoluteQuantitation.getQuantMethods();
     //sequenceSegmentHandler_IO.setQuantitationMethods(absoluteQuantitation.getQuantMethods());
-    LOGD << "END CalculateCalibration";
+    LOGD << "END FitCalibration";
   }
 
 }

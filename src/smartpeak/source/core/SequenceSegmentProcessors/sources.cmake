@@ -3,11 +3,11 @@ set(directory source/core/SequenceSegmentProcessors)
 
 ### list all filenames of the directory here
 set(sources_list
-	CalculateCalibration.cpp
 	EstimateFeatureBackgroundInterferences.cpp
 	EstimateFeatureFilterValues.cpp
 	EstimateFeatureQCValues.cpp
 	EstimateFeatureRSDs.cpp
+	FitCalibration.cpp
 	LoadFeatureBackgroundEstimations.cpp
 	LoadFeatureBackgroundFilters.cpp
 	LoadFeatureBackgroundQCs.cpp

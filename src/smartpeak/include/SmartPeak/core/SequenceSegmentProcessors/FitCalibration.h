@@ -27,10 +27,10 @@
 
 namespace SmartPeak
 {
-  struct CalculateCalibration : SequenceSegmentProcessor
+  struct FitCalibration : SequenceSegmentProcessor
   {
     /* IProcessorDescription */
-    virtual std::string getName() const override { return "CALCULATE_CALIBRATION"; }
+    virtual std::string getName() const override { return "FIT_CALIBRATION"; }
     virtual std::string getDescription() const override { return "Determine the optimal relationship between known sample concentration and measured intensity."; }
     virtual ParameterSet getParameterSchema() const override;
     virtual std::vector<std::string> getRequirements() const override;
