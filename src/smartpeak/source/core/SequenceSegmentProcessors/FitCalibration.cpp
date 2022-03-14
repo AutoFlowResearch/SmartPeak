@@ -66,8 +66,8 @@ namespace SmartPeak
       {"description", "List of point to exclude from calibration. Each item of the list is composed of sample_name;component_name"},
     }
     }} });
-    ParameterSet calculate_calibration_params(param_struct);
-    parameters.merge(calculate_calibration_params);
+    ParameterSet fit_calibration_params(param_struct);
+    parameters.merge(fit_calibration_params);
     return parameters;
   }
 
@@ -85,24 +85,7 @@ namespace SmartPeak
     ParameterSet params(params_I);
     params.merge(getParameterSchema());
 
-    std::vector<std::tuple<std::string, std::string>> excluded_points;
-    auto excluded_points_param = params.findParameter("FitCalibration", "excluded_points");
-    if ((!excluded_points_param) || (excluded_points_param->getType() != "string_list"))
-    {
-      throw std::invalid_argument("FitCalibration::excluded_points not found or wrong type");
-    }
-    CastValue excluded_points_value;
-    Utilities::parseString(excluded_points_param->getValueAsString(), excluded_points_value);
-    for (const std::string excluded_point_value : excluded_points_value.sl_)
-    {
-      auto sep_pos = excluded_point_value.find(";");
-      if (sep_pos != std::string::npos)
-      {
-        auto sample_name = excluded_point_value.substr(0, sep_pos);
-        auto component_name = excluded_point_value.substr(sep_pos+1, excluded_point_value.size()-sep_pos);
-        excluded_points.push_back(std::make_tuple(sample_name, component_name));
-      }
-    }
+    std::vector<std::tuple<std::string, std::string>> excluded_points = getExcludedPointsFromParameters(params);
       
     // get all standards
     std::vector<size_t> all_standards_indices;
@@ -261,4 +244,27 @@ namespace SmartPeak
     LOGD << "END FitCalibration";
   }
 
+  std::vector<std::tuple<std::string, std::string>>
+  FitCalibration::getExcludedPointsFromParameters(const ParameterSet& params) const
+  {
+    std::vector<std::tuple<std::string, std::string>> excluded_points;
+    auto excluded_points_param = params.findParameter("FitCalibration", "excluded_points");
+    if ((!excluded_points_param) || (excluded_points_param->getType() != "string_list"))
+    {
+      throw std::invalid_argument("FitCalibration::excluded_points not found or wrong type");
+    }
+    CastValue excluded_points_value;
+    Utilities::parseString(excluded_points_param->getValueAsString(), excluded_points_value);
+    for (const std::string excluded_point_value : excluded_points_value.sl_)
+    {
+      auto sep_pos = excluded_point_value.find(";");
+      if (sep_pos != std::string::npos)
+      {
+        auto sample_name = excluded_point_value.substr(0, sep_pos);
+        auto component_name = excluded_point_value.substr(sep_pos + 1, excluded_point_value.size() - sep_pos);
+        excluded_points.push_back(std::make_tuple(sample_name, component_name));
+      }
+    }
+    return excluded_points;
+  }
 }

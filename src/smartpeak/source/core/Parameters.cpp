@@ -851,6 +851,18 @@ namespace SmartPeak
     }
   }
 
+  const Parameter* ParameterSet::findParameter(const std::string& function_name, const std::string& parameter_name) const
+  {
+    if (!function_parameters_.count(function_name))
+    {
+      return nullptr;
+    }
+    else
+    {
+      return function_parameters_.at(function_name).findParameter(parameter_name);
+    }
+  }
+
   void ParameterSet::clear()
   {
     function_parameters_.clear();

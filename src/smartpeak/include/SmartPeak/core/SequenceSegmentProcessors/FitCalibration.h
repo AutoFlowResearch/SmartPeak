@@ -37,15 +37,15 @@ namespace SmartPeak
     virtual std::set<std::string> getOutputs() const override;
     virtual std::set<std::string> getInputs() const override;
 
-    /**
-      Optimize the calibration curve for all components.
-    */
     void process(
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
       Filenames& filenames_I
     ) const override;
+
+  protected:
+    std::vector<std::tuple<std::string, std::string>> getExcludedPointsFromParameters(const ParameterSet& params) const;
   };
 
 }

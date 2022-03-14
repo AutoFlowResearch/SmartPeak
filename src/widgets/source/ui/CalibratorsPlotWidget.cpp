@@ -35,7 +35,7 @@ namespace SmartPeak
     if (selected_action_ == 0)
     {
       FitCalibration fit_calibration;
-      Filenames filenames; // calculate_calibration actually does not use it
+      Filenames filenames; // fit_calibration actually does not use it
       ParameterSet& user_parameters = sequence_handler_.getSequence().at(0).getRawData().getParameters();
       fit_calibration.process(
         sequence_handler_.getSequenceSegments().at(selected_sequence_segment_),
@@ -222,19 +222,39 @@ namespace SmartPeak
     {
       if (ImGui::BeginTable("Calibrator input parameters", 2, table_flags))
       {
-        // FitCalibration params
+        // Fit Calibration params
         if (selected_action_ == 0)
         {
           FitCalibration fit_calibration;
-          auto calculate_calibration_params_schema = fit_calibration.getParameterSchema();
+          auto fit_calibration_params_schema = fit_calibration.getParameterSchema();
           auto user_params = sequence_handler_.getSequence().at(0).getRawData().getParameters();
-          calculate_calibration_params_schema.setAsSchema(true);
-          user_params.merge(calculate_calibration_params_schema);
-          for (auto& calculate_calibration_fct : calculate_calibration_params_schema)
+          fit_calibration_params_schema.setAsSchema(true);
+          user_params.merge(fit_calibration_params_schema);
+          for (auto& fit_calibration_fct : fit_calibration_params_schema)
           {
-            for (auto& calculate_calibration_param : calculate_calibration_fct.second)
+            for (auto& fit_calibration_param : fit_calibration_fct.second)
             {
-              auto user_param = user_params.findParameter(calculate_calibration_fct.first, calculate_calibration_param.getName());
+              auto user_param = user_params.findParameter(fit_calibration_fct.first, fit_calibration_param.getName());
+              if (user_param)
+              {
+                addParameterRow(std::make_shared<Parameter>(*user_param), true);
+              }
+            }
+          }
+        }
+        // Optimize calibration
+        else if (selected_action_ == 1)
+        {
+          OptimizeCalibration optimize_calibration;
+          auto optimize_calibration_params_schema = optimize_calibration.getParameterSchema();
+          auto user_params = sequence_handler_.getSequence().at(0).getRawData().getParameters();
+          optimize_calibration_params_schema.setAsSchema(true);
+          user_params.merge(optimize_calibration_params_schema);
+          for (auto& optimize_calibration_fct : optimize_calibration_params_schema)
+          {
+            for (auto& optimize_calibration_param : optimize_calibration_fct.second)
+            {
+              auto user_param = user_params.findParameter(optimize_calibration_fct.first, optimize_calibration_param.getName());
               if (user_param)
               {
                 addParameterRow(std::make_shared<Parameter>(*user_param), true);

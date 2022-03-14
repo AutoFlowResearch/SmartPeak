@@ -508,7 +508,7 @@ TEST(OptimizeCalibration, constructorOptimizeCalibration)
 
 TEST(OptimizeCalibration, destructorOptimizeCalibration)
 {
-  OptimizeCalibration* OptimizeCalibration = nullptr;
+  OptimizeCalibration* ptrOptimizeCalibration = nullptr;
   ptrOptimizeCalibration = new OptimizeCalibration();
   delete ptrOptimizeCalibration;
 }

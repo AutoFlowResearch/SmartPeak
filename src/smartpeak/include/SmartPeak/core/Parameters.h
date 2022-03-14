@@ -370,6 +370,7 @@ namespace SmartPeak
     @param[in] parameter_name the parameter name to search
     */
     Parameter* findParameter(const std::string& function_name, const std::string& parameter_name);
+    const Parameter* findParameter(const std::string& function_name, const std::string& parameter_name) const;
 
     /**
     @brief Mark all parameters as schema parameter.
