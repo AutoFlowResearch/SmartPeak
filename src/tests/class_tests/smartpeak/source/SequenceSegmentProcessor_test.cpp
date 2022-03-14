@@ -516,7 +516,7 @@ TEST(OptimizeCalibration, destructorOptimizeCalibration)
 TEST(OptimizeCalibration, gettersOptimizeCalibration)
 {
   OptimizeCalibration processor;
-  EXPECT_EQ(processor.getName(), "FIT_CALIBRATION");
+  EXPECT_EQ(processor.getName(), "OPTIMIZE_CALIBRATION");
 }
 
 TEST(SequenceSegmentProcessor, getSampleIndicesBySampleType)
