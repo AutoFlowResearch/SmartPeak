@@ -118,7 +118,7 @@ namespace SmartPeak
     absoluteQuantitation.setQuantMethods(sequenceSegmentHandler_IO.getQuantitationMethods());
 //    std::map<std::string, std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>> components_to_concentrations;
 //    std::map<std::string, std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>> outlier_components_to_concentrations;
-//    std::map<std::string, std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>> excluded_components_to_concentrations;
+    std::map<std::string, std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>> excluded_components_to_concentrations;
     for (OpenMS::AbsoluteQuantitationMethod& row : sequenceSegmentHandler_IO.getQuantitationMethods())
     {
       if (row.getComponentName() != component_name)
@@ -240,8 +240,30 @@ namespace SmartPeak
       */
 
       //auto feature_concentrations_pruned = sequenceSegmentHandler_IO.getFeatureConcentrationsPruned(feature_concentrations);
+      std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration> excluded_feature_concentrations;
+      std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration> feature_concentrations_without_excluded;
       auto component_concentration = sequenceSegmentHandler_IO.getComponentsToConcentrations(); // getFeatureConcentrationsPruned(feature_concentrations);
       auto feature_concentrations = component_concentration.at(component_name);
+
+      auto excluded_features_map = getExcludedFeaturesMap(
+        sequenceSegmentHandler_IO,
+        sequenceHandler_I,
+        row.getComponentName(),
+        feature_concentrations,
+        excluded_points);
+
+      for (auto feature_concentration : feature_concentrations)
+      {
+        for (auto excluded_features : excluded_features_map)
+        {
+          for (auto excluded_feature : excluded_features)
+          {
+            //if (excluded_feature.getUniqueId() == feature_concentration.)
+            int break_here2 = 42;
+          }
+        }
+      }
+
       // remove components without any points
       /*
       if (feature_concentrations_pruned.empty()) {
@@ -320,14 +342,14 @@ namespace SmartPeak
       components_to_concentrations.insert({ row.getComponentName(), feature_concentrations_pruned });
       outlier_components_to_concentrations.erase(row.getComponentName());
       outlier_components_to_concentrations.insert({ row.getComponentName(), outlier_feature_concentrations });
+      */
       excluded_components_to_concentrations.erase(row.getComponentName());
       excluded_components_to_concentrations.insert({ row.getComponentName(), excluded_feature_concentrations });
-      */
     }
     // store results
     //sequenceSegmentHandler_IO.setComponentsToConcentrations(components_to_concentrations);
     //sequenceSegmentHandler_IO.setOutlierComponentsToConcentrations(outlier_components_to_concentrations);
-    //sequenceSegmentHandler_IO.setExcludedComponentsToConcentrations(excluded_components_to_concentrations);
+    sequenceSegmentHandler_IO.setExcludedComponentsToConcentrations(excluded_components_to_concentrations);
     //sequenceSegmentHandler_IO.getQuantitationMethods() = absoluteQuantitation.getQuantMethods();
     //sequenceSegmentHandler_IO.setQuantitationMethods(absoluteQuantitation.getQuantMethods());
     LOGD << "END FitCalibration";
@@ -356,4 +378,38 @@ namespace SmartPeak
     }
     return excluded_points;
   }
+
+  
+  std::vector<OpenMS::FeatureMap>
+  FitCalibration::getExcludedFeaturesMap(
+    SequenceSegmentHandler& sequenceSegmentHandler_IO,
+    const SequenceHandler& sequenceHandler_I,
+    const std::string component_name,
+    const std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>& feature_concentrations,
+    const std::vector<std::tuple<std::string, std::string>>& excluded_points) const
+  {
+    std::vector<size_t> excluded_standards_indices;
+    for (auto feature_concentration : feature_concentrations)
+    {
+      for (const auto [excluded_sample_name, excluded_component_name] : excluded_points)
+      {
+        if (excluded_component_name == component_name)
+        {
+          for (const size_t index : sequenceSegmentHandler_IO.getSampleIndices())
+          {
+            if (sequenceHandler_I.getSequence().at(index).getMetaData().getSampleName() == excluded_sample_name)
+            {
+              excluded_standards_indices.push_back(index);
+            }
+          }
+        }
+      }
+    }
+    std::vector<OpenMS::FeatureMap> excluded_standards_featureMaps;
+    for (const size_t index : excluded_standards_indices) {
+      excluded_standards_featureMaps.push_back(sequenceHandler_I.getSequence().at(index).getRawData().getFeatureMap());
+    }
+    return excluded_standards_featureMaps;
+  }
+
 }

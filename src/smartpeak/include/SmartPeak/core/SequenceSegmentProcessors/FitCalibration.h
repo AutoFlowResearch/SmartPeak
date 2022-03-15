@@ -46,6 +46,13 @@ namespace SmartPeak
 
   protected:
     std::vector<std::tuple<std::string, std::string>> getExcludedPointsFromParameters(const ParameterSet& params) const;
+
+    std::vector<OpenMS::FeatureMap> FitCalibration::getExcludedFeaturesMap(
+      SequenceSegmentHandler& sequenceSegmentHandler_IO,
+      const SequenceHandler& sequenceHandler_I,
+      const std::string component_name,
+      const std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>& feature_concentrations,
+      const std::vector<std::tuple<std::string, std::string>>& excluded_points) const;
   };
 
 }
