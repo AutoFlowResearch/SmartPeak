@@ -37,6 +37,9 @@ namespace SmartPeak
       FitCalibration fit_calibration;
       Filenames filenames; // fit_calibration actually does not use it
       ParameterSet& user_parameters = sequence_handler_.getSequence().at(0).getRawData().getParameters();
+      auto fit_calibration_params_schema = fit_calibration.getParameterSchema();
+      user_parameters.merge(fit_calibration_params_schema);
+      user_parameters.findParameter("FitCalibration", "component_name")->setValueFromString(components_.at(selected_component_));
       fit_calibration.process(
         sequence_handler_.getSequenceSegments().at(selected_sequence_segment_),
         sequence_handler_,
@@ -237,7 +240,10 @@ namespace SmartPeak
               auto user_param = user_params.findParameter(fit_calibration_fct.first, fit_calibration_param.getName());
               if (user_param)
               {
-                addParameterRow(std::make_shared<Parameter>(*user_param), true);
+                if (user_param->getName() != "component_name") // compoonent_name is an internal parameter
+                {
+                  addParameterRow(std::make_shared<Parameter>(*user_param), true);
+                }
               }
             }
           }
@@ -264,7 +270,7 @@ namespace SmartPeak
         }
 
         // Transformation model Params (inputs)
-        const auto& params = quantitation_methods->getTransformationModelParams();
+        const auto params = quantitation_methods->getTransformationModelParams();
         for (const auto& param : params)
         {
           if (std::find(output_parameters.begin(), output_parameters.end(), param.name) == output_parameters.end())
@@ -327,7 +333,7 @@ namespace SmartPeak
         ImGui::Text("%d", quantitation_methods->getNPoints());
 
         // Transformation model Params (outputs)
-        const auto& params = quantitation_methods->getTransformationModelParams();
+        const auto params = quantitation_methods->getTransformationModelParams();
         for (const auto& param : params)
         {
           if (std::find(output_parameters.begin(), output_parameters.end(), param.name) != output_parameters.end())
@@ -353,7 +359,7 @@ namespace SmartPeak
     
     // try to find in the quantitation methods parameters
     auto quantitation_methods = getQuantitationMethod(calibration_data_.series_names[selected_component_]);
-    auto& params = quantitation_methods->getTransformationModelParams();
+    auto params = quantitation_methods->getTransformationModelParams();
     OpenMS::Param new_params; // params iterator returns const parameters. so we need to reconstruct and set the whole list
     for (auto & param_entry : params)
     {

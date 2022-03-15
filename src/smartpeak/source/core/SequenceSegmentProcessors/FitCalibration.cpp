@@ -54,9 +54,6 @@ namespace SmartPeak
 
   ParameterSet FitCalibration::getParameterSchema() const
   {
-    OpenMS::AbsoluteQuantitation oms_params;
-    ParameterSet parameters({ oms_params });
-
     std::map<std::string, std::vector<std::map<std::string, std::string>>> param_struct({
     {"FitCalibration", {
     {
@@ -64,11 +61,16 @@ namespace SmartPeak
       {"type", "list"},
       {"value", "[]"},
       {"description", "List of point to exclude from calibration. Each item of the list is composed of sample_name;component_name"},
+    },
+    {
+      {"name", "component_name"},
+      {"type", "string"},
+      {"value", ""},
+      {"description", "Component name to which apply Fit Calibration"},
     }
     }} });
     ParameterSet fit_calibration_params(param_struct);
-    parameters.merge(fit_calibration_params);
-    return parameters;
+    return fit_calibration_params;
   }
 
   void FitCalibration::process(
@@ -105,12 +107,84 @@ namespace SmartPeak
     OpenMS::AbsoluteQuantitation absoluteQuantitation;
     Utilities::setUserParameters(absoluteQuantitation, params_I);
 
-    absoluteQuantitation.setQuantMethods(sequenceSegmentHandler_IO.getQuantitationMethods());
-    std::map<std::string, std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>> components_to_concentrations;
-    std::map<std::string, std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>> outlier_components_to_concentrations;
-    std::map<std::string, std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>> excluded_components_to_concentrations;
-    for (const OpenMS::AbsoluteQuantitationMethod& row : sequenceSegmentHandler_IO.getQuantitationMethods())
+    // fit the model
+    auto component_name_param = params.findParameter("FitCalibration", "component_name");
+    if (!component_name_param)
     {
+      throw std::invalid_argument("component_name argument is empty.");
+    }
+    std::string component_name = component_name_param->getValueAsString();
+
+    absoluteQuantitation.setQuantMethods(sequenceSegmentHandler_IO.getQuantitationMethods());
+//    std::map<std::string, std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>> components_to_concentrations;
+//    std::map<std::string, std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>> outlier_components_to_concentrations;
+//    std::map<std::string, std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>> excluded_components_to_concentrations;
+    for (OpenMS::AbsoluteQuantitationMethod& row : sequenceSegmentHandler_IO.getQuantitationMethods())
+    {
+      if (row.getComponentName() != component_name)
+      {
+        continue;
+      }
+      /*
+      std::vector<size_t> standards_indices = all_standards_indices;
+
+      // construct excluded points
+      std::vector<size_t> excluded_standards_indices;
+      for (const auto [sample_name, component] : excluded_points)
+      {
+        if (component == row.getComponentName())
+        {
+          for (const size_t index : sequenceSegmentHandler_IO.getSampleIndices())
+          {
+            if (sequenceHandler_I.getSequence().at(index).getMetaData().getSampleName() == sample_name)
+            {
+              standards_indices.erase(std::remove(standards_indices.begin(), standards_indices.end(), index), standards_indices.end());
+              excluded_standards_indices.push_back(index);
+            }
+          }
+        }
+      }
+      
+      std::vector<OpenMS::FeatureMap> standards_featureMaps;
+      for (const size_t index : standards_indices) {
+        standards_featureMaps.push_back(sequenceHandler_I.getSequence().at(index).getRawData().getFeatureMap());
+      }
+
+      std::vector<OpenMS::FeatureMap> excluded_standards_featureMaps;
+      for (const size_t index : excluded_standards_indices) {
+        excluded_standards_featureMaps.push_back(sequenceHandler_I.getSequence().at(index).getRawData().getFeatureMap());
+      }
+
+      // map standards to features
+      OpenMS::AbsoluteQuantitationStandards absoluteQuantitationStandards;
+      std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration> feature_concentrations;
+
+      absoluteQuantitationStandards.getComponentFeatureConcentrations(
+        sequenceSegmentHandler_IO.getStandardsConcentrations(),
+        standards_featureMaps,
+        row.getComponentName(),
+        feature_concentrations
+      );
+
+      std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration> excluded_feature_concentrations;
+      absoluteQuantitationStandards.getComponentFeatureConcentrations(
+        sequenceSegmentHandler_IO.getStandardsConcentrations(),
+        excluded_standards_featureMaps,
+        row.getComponentName(),
+        excluded_feature_concentrations
+      );
+      
+      auto feature_concentrations_pruned = sequenceSegmentHandler_IO.getFeatureConcentrationsPruned(feature_concentrations);
+
+      // remove components without any points
+      if (feature_concentrations_pruned.empty()) {
+        continue;
+      }
+
+      // Keep a copy to compute outer points
+      auto all_feature_concentrations = feature_concentrations_pruned;
+      */
+
       std::vector<size_t> standards_indices = all_standards_indices;
 
       // construct excluded points
@@ -166,32 +240,35 @@ namespace SmartPeak
         continue;
       }
 
-      // Keep a copy to compute outer points
-      auto all_feature_concentrations = feature_concentrations_pruned;
+      auto optimized_params = row.getTransformationModelParams();
+      optimized_params = absoluteQuantitation.fitCalibration(
+        feature_concentrations_pruned,
+        row.getFeatureName(),
+        row.getTransformationModel(),
+        optimized_params);
 
-      try
-      {
-        absoluteQuantitation.optimizeSingleCalibrationCurve(
-          row.getComponentName(),
-          feature_concentrations_pruned
-        );
-      }
-      catch (OpenMS::Exception::DivisionByZero&)
-      {
-        LOGW << "Warning: '" << row.getComponentName() << "' cannot be analysed - division by zero\n";
-        continue;
-      }
-      catch (...)
-      {
-        LOGW << "Warning: '" << row.getComponentName() << "' cannot be analysed.\n";
-        continue;
-      }
+      // calculate the R2 and bias
+      std::vector<double> biases; // not needed (method parameters)
+      double correlation_coefficient = 0.0; // not needed (method parameters)
+      absoluteQuantitation.calculateBiasAndR(
+        feature_concentrations_pruned,
+        row.getFeatureName(),
+        row.getTransformationModel(),
+        optimized_params,
+        biases,
+        correlation_coefficient);
 
+      row.setTransformationModelParams(optimized_params);
+
+      int break_here = 42;
+
+      // ---
       // Compute outer points
-      std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration> outlier_feature_concentrations;
+      //std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration> outlier_feature_concentrations;
 
       // Calibration not found: all the points will stay untouched by absoluteQuantitation.optimizeSingleCalibrationCurve
       // but we would like to have them in the outlier point list instead.
+      /*
       bool optimize_single_calibration_curve_succeed = false;
       for (const auto& result_quant_method : absoluteQuantitation.getQuantMethods())
       {
@@ -234,12 +311,13 @@ namespace SmartPeak
       outlier_components_to_concentrations.insert({ row.getComponentName(), outlier_feature_concentrations });
       excluded_components_to_concentrations.erase(row.getComponentName());
       excluded_components_to_concentrations.insert({ row.getComponentName(), excluded_feature_concentrations });
+      */
     }
     // store results
-    sequenceSegmentHandler_IO.setComponentsToConcentrations(components_to_concentrations);
-    sequenceSegmentHandler_IO.setOutlierComponentsToConcentrations(outlier_components_to_concentrations);
-    sequenceSegmentHandler_IO.setExcludedComponentsToConcentrations(excluded_components_to_concentrations);
-    sequenceSegmentHandler_IO.getQuantitationMethods() = absoluteQuantitation.getQuantMethods();
+    //sequenceSegmentHandler_IO.setComponentsToConcentrations(components_to_concentrations);
+    //sequenceSegmentHandler_IO.setOutlierComponentsToConcentrations(outlier_components_to_concentrations);
+    //sequenceSegmentHandler_IO.setExcludedComponentsToConcentrations(excluded_components_to_concentrations);
+    //sequenceSegmentHandler_IO.getQuantitationMethods() = absoluteQuantitation.getQuantMethods();
     //sequenceSegmentHandler_IO.setQuantitationMethods(absoluteQuantitation.getQuantMethods());
     LOGD << "END FitCalibration";
   }
