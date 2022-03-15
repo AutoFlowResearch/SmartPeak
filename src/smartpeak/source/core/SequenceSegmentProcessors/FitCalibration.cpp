@@ -188,6 +188,7 @@ namespace SmartPeak
       std::vector<size_t> standards_indices = all_standards_indices;
 
       // construct excluded points
+      /*
       std::vector<size_t> excluded_standards_indices;
       for (const auto [sample_name, component] : excluded_points)
       {
@@ -203,16 +204,18 @@ namespace SmartPeak
           }
         }
       }
+      */
 
       std::vector<OpenMS::FeatureMap> standards_featureMaps;
       for (const size_t index : standards_indices) {
         standards_featureMaps.push_back(sequenceHandler_I.getSequence().at(index).getRawData().getFeatureMap());
       }
 
+      /*
       std::vector<OpenMS::FeatureMap> excluded_standards_featureMaps;
       for (const size_t index : excluded_standards_indices) {
         excluded_standards_featureMaps.push_back(sequenceHandler_I.getSequence().at(index).getRawData().getFeatureMap());
-      }
+      }*/
 
       // map standards to features
       OpenMS::AbsoluteQuantitationStandards absoluteQuantitationStandards;
@@ -225,6 +228,7 @@ namespace SmartPeak
         feature_concentrations
       );
 
+      /*
       std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration> excluded_feature_concentrations;
       absoluteQuantitationStandards.getComponentFeatureConcentrations(
         sequenceSegmentHandler_IO.getStandardsConcentrations(),
@@ -232,13 +236,17 @@ namespace SmartPeak
         row.getComponentName(),
         excluded_feature_concentrations
       );
+      */
 
-      auto feature_concentrations_pruned = sequenceSegmentHandler_IO.getFeatureConcentrationsPruned(feature_concentrations);
-
+      //auto feature_concentrations_pruned = sequenceSegmentHandler_IO.getFeatureConcentrationsPruned(feature_concentrations);
+      auto component_concentration = sequenceSegmentHandler_IO.getComponentsToConcentrations(); // getFeatureConcentrationsPruned(feature_concentrations);
+      auto feature_concentrations_pruned = component_concentration.at(component_name);
       // remove components without any points
+      /*
       if (feature_concentrations_pruned.empty()) {
         continue;
       }
+      */
 
       auto optimized_params = row.getTransformationModelParams();
       optimized_params = absoluteQuantitation.fitCalibration(
@@ -259,6 +267,8 @@ namespace SmartPeak
         correlation_coefficient);
 
       row.setTransformationModelParams(optimized_params);
+      row.setCorrelationCoefficient(correlation_coefficient);
+      row.setNPoints(feature_concentrations_pruned.size());
 
       int break_here = 42;
 
