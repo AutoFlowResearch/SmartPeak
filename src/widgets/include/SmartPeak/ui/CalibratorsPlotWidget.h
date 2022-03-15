@@ -112,8 +112,17 @@ namespace SmartPeak
     std::vector<std::string> sequence_segments_;
     std::vector<const char*> sequence_segments_cstr_;
     int selected_sequence_segment_ = 0;
-    std::vector<const char*> actions_cstr_ = {"Calculate Calibration","Optimize Calibration"};
-    int selected_action_ = 0;
+    enum Action
+    {
+      EActionFitCalibration,
+      EActionOptimizeCalibration
+    };
+    std::vector<const char*> actions_cstr_ = 
+    {
+      "Fit Calibration",
+      "Optimize Calibration"
+    };
+    int selected_action_ = EActionFitCalibration;
     bool reset_zoom_ = true;
     SessionHandler& session_handler_;
     SequenceHandler& sequence_handler_;

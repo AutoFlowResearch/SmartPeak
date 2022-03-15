@@ -218,6 +218,7 @@ namespace SmartPeak
       }*/
 
       // map standards to features
+      /*
       OpenMS::AbsoluteQuantitationStandards absoluteQuantitationStandards;
       std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration> feature_concentrations;
 
@@ -227,7 +228,7 @@ namespace SmartPeak
         row.getComponentName(),
         feature_concentrations
       );
-
+      */
       /*
       std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration> excluded_feature_concentrations;
       absoluteQuantitationStandards.getComponentFeatureConcentrations(
@@ -240,7 +241,7 @@ namespace SmartPeak
 
       //auto feature_concentrations_pruned = sequenceSegmentHandler_IO.getFeatureConcentrationsPruned(feature_concentrations);
       auto component_concentration = sequenceSegmentHandler_IO.getComponentsToConcentrations(); // getFeatureConcentrationsPruned(feature_concentrations);
-      auto feature_concentrations_pruned = component_concentration.at(component_name);
+      auto feature_concentrations = component_concentration.at(component_name);
       // remove components without any points
       /*
       if (feature_concentrations_pruned.empty()) {
@@ -250,7 +251,7 @@ namespace SmartPeak
 
       auto optimized_params = row.getTransformationModelParams();
       optimized_params = absoluteQuantitation.fitCalibration(
-        feature_concentrations_pruned,
+        feature_concentrations,
         row.getFeatureName(),
         row.getTransformationModel(),
         optimized_params);
@@ -259,7 +260,7 @@ namespace SmartPeak
       std::vector<double> biases; // not needed (method parameters)
       double correlation_coefficient = 0.0; // not needed (method parameters)
       absoluteQuantitation.calculateBiasAndR(
-        feature_concentrations_pruned,
+        feature_concentrations,
         row.getFeatureName(),
         row.getTransformationModel(),
         optimized_params,
@@ -268,7 +269,7 @@ namespace SmartPeak
 
       row.setTransformationModelParams(optimized_params);
       row.setCorrelationCoefficient(correlation_coefficient);
-      row.setNPoints(feature_concentrations_pruned.size());
+      row.setNPoints(feature_concentrations.size());
 
       int break_here = 42;
 

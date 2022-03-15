@@ -32,7 +32,7 @@ namespace SmartPeak
 
   void CalibratorsPlotWidget::recomputeCalibration()
   {
-    if (selected_action_ == 0)
+    if (selected_action_ == EActionFitCalibration)
     {
       FitCalibration fit_calibration;
       Filenames filenames; // fit_calibration actually does not use it
@@ -47,7 +47,7 @@ namespace SmartPeak
         filenames);
       onSequenceUpdated();
     }
-    else if (selected_action_ == 1)
+    else if (selected_action_ == EActionFitCalibration)
     {
       OptimizeCalibration optimize_calibration;
       Filenames filenames; // optimize_calibration actually does not use it
@@ -109,6 +109,12 @@ namespace SmartPeak
     ImGui::TableNextRow();
     ImGui::TableSetColumnIndex(0);
     ImGui::Text(param->getName().c_str());
+    if (ImGui::IsItemHovered() && (!param->getDescription().empty()))
+    {
+      ImGui::BeginTooltip();
+      ImGui::Text(param->getDescription().c_str());
+      ImGui::EndTooltip();
+    }
     ImGui::TableSetColumnIndex(1);
     auto value_as_string = param->getValueAsString();
     if (value_as_string.empty())
@@ -225,8 +231,7 @@ namespace SmartPeak
     {
       if (ImGui::BeginTable("Calibrator input parameters", 2, table_flags))
       {
-        // Fit Calibration params
-        if (selected_action_ == 0)
+        if (selected_action_ == EActionFitCalibration)
         {
           FitCalibration fit_calibration;
           auto fit_calibration_params_schema = fit_calibration.getParameterSchema();
@@ -248,8 +253,7 @@ namespace SmartPeak
             }
           }
         }
-        // Optimize calibration
-        else if (selected_action_ == 1)
+        else if (selected_action_ == EActionOptimizeCalibration)
         {
           OptimizeCalibration optimize_calibration;
           auto optimize_calibration_params_schema = optimize_calibration.getParameterSchema();
@@ -725,7 +729,7 @@ namespace SmartPeak
     {
       SessionHandler::CalibrationData calibration_data;
       session_handler_.setCalibratorsScatterLinePlot(sequence_handler_, calibration_data);
-      setCalibrationData(calibration_data, "CalibratorsMainWindow");
+      setCalibrationData(calibration_data, "Calibration Curve");
       refresh_needed_ = false;
     }
 
