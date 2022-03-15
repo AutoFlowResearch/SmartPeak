@@ -454,8 +454,11 @@ namespace SmartPeak
     ImGui::Checkbox("Points", &show_matching_points_);
     ImGui::SameLine();
     ImGui::Checkbox("Outlier", &show_outlier_points_);
-    ImGui::SameLine();
-    ImGui::Checkbox("Excluded", &show_excluded_points_);
+    if (selected_action_ == EActionFitCalibration)
+    {
+      ImGui::SameLine();
+      ImGui::Checkbox("Excluded", &show_excluded_points_);
+    }
     ImGui::SameLine();
     if (ImGui::Button("Fit Zoom"))
     {
