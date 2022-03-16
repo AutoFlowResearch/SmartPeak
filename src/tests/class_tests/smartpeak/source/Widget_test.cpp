@@ -920,11 +920,6 @@ public:
     return hovered_matching_point_;
   }
 
-  std::optional<std::tuple<int, int>>& get_hovered_outlier_point_()
-  {
-    return hovered_outlier_point_;
-  }
-
   std::optional<std::tuple<int, int>>& get_hovered_excluded_point_()
   {
     return hovered_excluded_point_;
@@ -933,10 +928,9 @@ public:
   std::tuple<std::string, std::string>
   wrapper_getSampleNameAndSerieFromSelectedPoint(
     const std::optional<std::tuple<int, int>>& matching_point,
-    const std::optional<std::tuple<int, int>>& outlier_point,
     const std::optional<std::tuple<int, int>>& excluded_point) const
   {
-    return getSampleNameAndSerieFromSelectedPoint(matching_point, outlier_point, excluded_point);
+    return getSampleNameAndSerieFromSelectedPoint(matching_point, excluded_point);
   }
 };
 
@@ -982,8 +976,6 @@ TEST(CalibratorsPlotWidget, getSelectedPoint)
   calibrator_data.y_axis_title = "y_axis_title";
   calibrator_data.matching_points_.concentrations_.push_back({ 1.1, 2.1, 3.1 });
   calibrator_data.matching_points_.features_.push_back({ 1.2, 2.2, 3.2 });
-  calibrator_data.outlier_points_.concentrations_.push_back({ 11.1, 12.1, 13.1 });
-  calibrator_data.outlier_points_.features_.push_back({ 11.2, 12.2, 13.2 });
   calibrator_data.excluded_points_.concentrations_.push_back({ 101.1, 102.1, 103.1 });
   calibrator_data.excluded_points_.features_.push_back({ 101.2, 102.2, 103.2 });
 
@@ -991,27 +983,22 @@ TEST(CalibratorsPlotWidget, getSelectedPoint)
   calibrator_widget.wrapper_getSelectedPoint({ 2.1, 2.2 }, {0.01, 0.01});
   ASSERT_NE(calibrator_widget.get_hovered_matching_point_(), std::nullopt);
   EXPECT_EQ(*calibrator_widget.get_hovered_matching_point_(), std::make_tuple(0, 1));
-  EXPECT_EQ(calibrator_widget.get_hovered_outlier_point_(), std::nullopt);
   EXPECT_EQ(calibrator_widget.get_hovered_excluded_point_(), std::nullopt);
 
   calibrator_widget.wrapper_setCalibrationData(calibrator_data, "");
   calibrator_widget.wrapper_getSelectedPoint({ 11.1, 11.2 }, { 0.01, 0.01 });
   EXPECT_EQ(calibrator_widget.get_hovered_matching_point_(), std::nullopt);
-  ASSERT_NE(calibrator_widget.get_hovered_outlier_point_(), std::nullopt);
-  EXPECT_EQ(*calibrator_widget.get_hovered_outlier_point_(), std::make_tuple(0, 0));
   EXPECT_EQ(calibrator_widget.get_hovered_excluded_point_(), std::nullopt);
 
   calibrator_widget.wrapper_setCalibrationData(calibrator_data, "");
   calibrator_widget.wrapper_getSelectedPoint({ 103.1, 103.2 }, { 0.01, 0.01 });
   EXPECT_EQ(calibrator_widget.get_hovered_matching_point_(), std::nullopt);
-  EXPECT_EQ(calibrator_widget.get_hovered_outlier_point_(), std::nullopt);
   ASSERT_NE(calibrator_widget.get_hovered_excluded_point_(), std::nullopt);
   EXPECT_EQ(*calibrator_widget.get_hovered_excluded_point_(), std::make_tuple(0, 2));
 
   calibrator_widget.wrapper_setCalibrationData(calibrator_data, "");
   calibrator_widget.wrapper_getSelectedPoint({ 1003.1, 1003.2 }, { 0.01, 0.01 });
   EXPECT_EQ(calibrator_widget.get_hovered_matching_point_(), std::nullopt);
-  EXPECT_EQ(calibrator_widget.get_hovered_outlier_point_(), std::nullopt);
   EXPECT_EQ(calibrator_widget.get_hovered_excluded_point_(), std::nullopt);
 };
 
@@ -1032,9 +1019,6 @@ TEST(CalibratorsPlotWidget, getSampleNameFromSelectedPoint)
   calibrator_data.matching_points_.concentrations_.push_back({ 1.1, 2.1, 3.1 });
   calibrator_data.matching_points_.features_.push_back({ 1.2, 2.2, 3.2 });
   calibrator_data.matching_points_.injections_.push_back({ "sample11", "sample12", "sample13" });
-  calibrator_data.outlier_points_.concentrations_.push_back({ 11.1, 12.1, 13.1 });
-  calibrator_data.outlier_points_.features_.push_back({ 11.2, 12.2, 13.2 });
-  calibrator_data.outlier_points_.injections_.push_back({ "sample21", "sample22", "sample23" });
   calibrator_data.excluded_points_.concentrations_.push_back({ 101.1, 102.1, 103.1 });
   calibrator_data.excluded_points_.features_.push_back({ 101.2, 102.2, 103.2 });
   calibrator_data.excluded_points_.injections_.push_back({ "sample31", "sample32", "sample33" });
@@ -1043,7 +1027,6 @@ TEST(CalibratorsPlotWidget, getSampleNameFromSelectedPoint)
   calibrator_widget.wrapper_getSelectedPoint({ 2.1, 2.2 }, { 0.01, 0.01 });
   auto [sample_name_1, serie_1] = calibrator_widget.wrapper_getSampleNameAndSerieFromSelectedPoint(
     calibrator_widget.get_hovered_matching_point_(),
-    calibrator_widget.get_hovered_outlier_point_(),
     calibrator_widget.get_hovered_excluded_point_()
   );
   EXPECT_EQ(sample_name_1, "sample12");
@@ -1053,7 +1036,6 @@ TEST(CalibratorsPlotWidget, getSampleNameFromSelectedPoint)
   calibrator_widget.wrapper_getSelectedPoint({ 11.1, 11.2 }, { 0.01, 0.01 });
   auto [sample_name_2, serie_2] = calibrator_widget.wrapper_getSampleNameAndSerieFromSelectedPoint(
     calibrator_widget.get_hovered_matching_point_(),
-    calibrator_widget.get_hovered_outlier_point_(),
     calibrator_widget.get_hovered_excluded_point_()
   );
   EXPECT_EQ(sample_name_2, "sample21");
@@ -1063,7 +1045,6 @@ TEST(CalibratorsPlotWidget, getSampleNameFromSelectedPoint)
   calibrator_widget.wrapper_getSelectedPoint({ 103.1, 103.2 }, { 0.01, 0.01 });
   auto [sample_name_3, serie_3] = calibrator_widget.wrapper_getSampleNameAndSerieFromSelectedPoint(
     calibrator_widget.get_hovered_matching_point_(),
-    calibrator_widget.get_hovered_outlier_point_(),
     calibrator_widget.get_hovered_excluded_point_()
   );
   EXPECT_EQ(sample_name_3, "sample33");
@@ -1073,7 +1054,6 @@ TEST(CalibratorsPlotWidget, getSampleNameFromSelectedPoint)
   calibrator_widget.wrapper_getSelectedPoint({ 1003.1, 1003.2 }, { 0.01, 0.01 });
   auto [sample_name_4, serie_4] = calibrator_widget.wrapper_getSampleNameAndSerieFromSelectedPoint(
     calibrator_widget.get_hovered_matching_point_(),
-    calibrator_widget.get_hovered_outlier_point_(),
     calibrator_widget.get_hovered_excluded_point_()
   );
   EXPECT_EQ(sample_name_4, "");

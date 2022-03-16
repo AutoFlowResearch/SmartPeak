@@ -75,6 +75,7 @@ namespace SmartPeak
 
   protected:
     void setCalibrationData(const SessionHandler::CalibrationData& calibration_data, const std::string& plot_title);
+    bool isExcluded(const std::string& serie_name, const std::string& sample_name);
     void removeExcludedFromMatchingPoints();
     OpenMS::AbsoluteQuantitationMethod* getQuantitationMethod(const std::string& component_name);
     void displayParameters();
@@ -90,13 +91,13 @@ namespace SmartPeak
       int marker_style);
     std::tuple<std::string, std::string> getSampleNameAndSerieFromSelectedPoint(
       const std::optional<std::tuple<int, int>>& matching_point, 
-      const std::optional<std::tuple<int, int>>& outlier_point,
       const std::optional<std::tuple<int, int>>& excluded_point) const;
     std::optional<std::tuple<int, int>> getSelectedPoint(
       ImVec2 point,
       ImVec2 threshold_point,
       const SessionHandler::CalibrationData::Points& points);
     std::shared_ptr<Parameter> CalibratorParameterToSmartPeakParameter(const OpenMS::Param::ParamEntry& param);
+    void setIncludeExcludeParameter(const std::string& parameter_name, const std::vector<std::tuple<std::string, std::string>>& include_exclude_list);
 
   protected:
     SessionHandler::CalibrationData calibration_data_;
@@ -104,7 +105,6 @@ namespace SmartPeak
     bool show_legend_ = true;
     bool show_fit_line_ = true;
     bool show_matching_points_ = true;
-    bool show_outlier_points_ = true;
     bool show_excluded_points_ = true;
     std::string current_component_;
     std::vector<std::string> components_;
@@ -130,15 +130,15 @@ namespace SmartPeak
     ParameterEditorWidget parameter_editor_widget_;
     std::shared_ptr<Parameter> param_to_edit_;
     std::optional<std::tuple<int, int>> hovered_matching_point_;
-    std::optional<std::tuple<int, int>> hovered_outlier_point_;
     std::optional<std::tuple<int, int>> hovered_excluded_point_;
     std::optional<std::tuple<int, int>> clicked_matching_point_;
-    std::optional<std::tuple<int, int>> clicked_outlier_point_;
     std::optional<std::tuple<int, int>> clicked_excluded_point_;
     std::shared_ptr<ExplorerWidget> explorer_widget_;
     std::shared_ptr<ChromatogramPlotWidget> chromatogram_widget_;
     bool refresh_needed_ = true;
     std::vector<bool> previous_transition_selection_;
+    std::vector<std::tuple<std::string, std::string>> user_excluded_points_;
+    std::vector<std::tuple<std::string, std::string>> user_included_points_;
   };
 
 }

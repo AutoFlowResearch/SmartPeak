@@ -359,7 +359,6 @@ namespace SmartPeak
       };
 
       Points matching_points_;
-      Points outlier_points_;
       Points excluded_points_;
 
       std::vector<std::vector<float>> conc_fit_data;

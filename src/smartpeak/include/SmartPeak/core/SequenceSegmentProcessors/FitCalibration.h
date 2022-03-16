@@ -45,7 +45,7 @@ namespace SmartPeak
     ) const override;
 
   protected:
-    std::vector<std::tuple<std::string, std::string>> getExcludedPointsFromParameters(const ParameterSet& params) const;
+    std::vector<std::tuple<std::string, std::string>> getIncludedExcludedPointsFromParameters(const ParameterSet& params, const std::string& param_name) const;
   };
 
 }

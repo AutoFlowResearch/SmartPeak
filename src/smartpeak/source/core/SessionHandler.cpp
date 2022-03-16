@@ -2071,7 +2071,6 @@ namespace SmartPeak
       result.conc_fit_data.clear();
       result.feature_fit_data.clear();
       result.matching_points_.clear();
-      result.outlier_points_.clear();
       result.excluded_points_.clear();
       result.series_names.clear();
       for (const auto& sequence_segment : sequence_handler.getSequenceSegments()) {
@@ -2139,14 +2138,6 @@ namespace SmartPeak
                 result, 
                 sequence_segment);
             n_points += x_raw_data.size();
-            // Extract out the points out of the line of best fit in `ComponentsToConcentrations`
-            auto [outlier_x_raw_data, outlier_y_raw_data, outlier_injections, outlier_feature_concentrations] = 
-              setCalibratorsPoints(
-                sequence_segment.getOutlierComponentsToConcentrations().at(quant_method.getComponentName()),
-                quant_method,
-                result,
-                sequence_segment);
-            n_points += outlier_x_raw_data.size();
             // Excluded points
             auto [excluded_x_raw_data, excluded_y_raw_data, excluded_injections, excluded_feature_concentrations] =
               setCalibratorsPoints(
@@ -2154,17 +2145,13 @@ namespace SmartPeak
                 quant_method,
                 result,
                 sequence_segment);
-            n_points += outlier_x_raw_data.size();
+            n_points += excluded_x_raw_data.size();
             // add points
             if (n_points < max_nb_points) {
               result.matching_points_.concentrations_.push_back(x_raw_data);
               result.matching_points_.features_.push_back(y_raw_data);
               result.matching_points_.injections_.push_back(injections);
               result.matching_points_.feature_concentrations_.push_back(feature_concentrations);
-              result.outlier_points_.concentrations_.push_back(outlier_x_raw_data);
-              result.outlier_points_.features_.push_back(outlier_y_raw_data);
-              result.outlier_points_.injections_.push_back(outlier_injections);
-              result.outlier_points_.feature_concentrations_.push_back(outlier_feature_concentrations);
               result.excluded_points_.concentrations_.push_back(excluded_x_raw_data);
               result.excluded_points_.features_.push_back(excluded_y_raw_data);
               result.excluded_points_.injections_.push_back(excluded_injections);

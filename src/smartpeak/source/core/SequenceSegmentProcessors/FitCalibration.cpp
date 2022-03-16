@@ -60,7 +60,13 @@ namespace SmartPeak
       {"name", "excluded_points"},
       {"type", "list"},
       {"value", "[]"},
-      {"description", "List of point to exclude from calibration. Each item of the list is composed of sample_name;component_name"},
+      {"description", "List of points to exclude from calibration. Each item of the list is composed of sample_name;component_name"},
+    },
+    {
+      {"name", "included_points"},
+      {"type", "list"},
+      {"value", "[]"},
+      {"description", "List of points to include from calibration. Each item of the list is composed of sample_name;component_name"},
     },
     {
       {"name", "component_name"},
@@ -87,7 +93,8 @@ namespace SmartPeak
     ParameterSet params(params_I);
     params.merge(getParameterSchema());
 
-    std::vector<std::tuple<std::string, std::string>> excluded_points = getExcludedPointsFromParameters(params);
+    auto excluded_points = getIncludedExcludedPointsFromParameters(params, "excluded_points");
+    auto included_points = getIncludedExcludedPointsFromParameters(params, "included_points");
 
     // add in the method parameters
     OpenMS::AbsoluteQuantitation absoluteQuantitation;
@@ -109,11 +116,12 @@ namespace SmartPeak
         continue;
       }
       
-      std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration> excluded_feature_concentrations;
-      auto feature_concentrations_without_excluded = sequenceSegmentHandler_IO.getComponentsToConcentrations().at(component_name);
+      auto excluded_feature_concentrations = sequenceSegmentHandler_IO.getExcludedComponentsToConcentrations().at(component_name);
+      auto feature_concentrations = sequenceSegmentHandler_IO.getComponentsToConcentrations().at(component_name);
 
-      std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration> feature_concentrations;
-      for (auto& feature_concentration : feature_concentrations_without_excluded)
+      // Remove user excluded features
+      std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration> new_feature_concentrations;
+      for (auto& feature_concentration : feature_concentrations)
       {
         bool excluded = false;
         for (auto& standard_concentration : sequenceSegmentHandler_IO.getStandardsConcentrations())
@@ -134,9 +142,38 @@ namespace SmartPeak
         }
         if (!excluded)
         {
-          feature_concentrations.push_back(feature_concentration);
+          new_feature_concentrations.push_back(feature_concentration);
         }
       }
+      feature_concentrations = std::move(new_feature_concentrations);
+
+      // Add user included features
+      std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration> new_excluded_feature_concentrations;
+      for (auto& feature_concentration : excluded_feature_concentrations)
+      {
+        bool included = false;
+        for (auto& standard_concentration : sequenceSegmentHandler_IO.getStandardsConcentrations())
+        {
+          for (const auto [included_sample_name, included_component_name] : included_points)
+          {
+            if ((included_component_name == component_name)
+              && (included_component_name == standard_concentration.component_name)
+              && (included_sample_name == standard_concentration.sample_name)
+              && (std::abs(feature_concentration.actual_concentration - standard_concentration.actual_concentration) < 1e-06)
+              && (std::abs(feature_concentration.dilution_factor - standard_concentration.dilution_factor) < 1e-06)
+              )
+            {
+              included = true;
+              feature_concentrations.push_back(feature_concentration);
+            }
+          }
+        }
+        if (!included)
+        {
+          new_excluded_feature_concentrations.push_back(feature_concentration);
+        }
+      }
+      excluded_feature_concentrations = std::move(new_excluded_feature_concentrations);
 
       if (!feature_concentrations.empty())
       {
@@ -171,27 +208,27 @@ namespace SmartPeak
   }
 
   std::vector<std::tuple<std::string, std::string>>
-  FitCalibration::getExcludedPointsFromParameters(const ParameterSet& params) const
+  FitCalibration::getIncludedExcludedPointsFromParameters(const ParameterSet& params, const std::string& param_name) const
   {
-    std::vector<std::tuple<std::string, std::string>> excluded_points;
-    auto excluded_points_param = params.findParameter("FitCalibration", "excluded_points");
-    if ((!excluded_points_param) || (excluded_points_param->getType() != "string_list"))
+    std::vector<std::tuple<std::string, std::string>> points;
+    auto param = params.findParameter("FitCalibration", param_name);
+    if ((!param) || (param->getType() != "string_list"))
     {
-      throw std::invalid_argument("FitCalibration::excluded_points not found or wrong type");
+      throw std::invalid_argument("FitCalibration parameter not found or wrong type");
     }
-    CastValue excluded_points_value;
-    Utilities::parseString(excluded_points_param->getValueAsString(), excluded_points_value);
-    for (const std::string excluded_point_value : excluded_points_value.sl_)
+    CastValue param_points;
+    Utilities::parseString(param->getValueAsString(), param_points);
+    for (const auto& param_point_value : param_points.sl_)
     {
-      auto sep_pos = excluded_point_value.find(";");
+      auto sep_pos = param_point_value.find(";");
       if (sep_pos != std::string::npos)
       {
-        auto sample_name = excluded_point_value.substr(0, sep_pos);
-        auto component_name = excluded_point_value.substr(sep_pos + 1, excluded_point_value.size() - sep_pos);
-        excluded_points.push_back(std::make_tuple(sample_name, component_name));
+        auto sample_name = param_point_value.substr(0, sep_pos);
+        auto component_name = param_point_value.substr(sep_pos + 1, param_point_value.size() - sep_pos);
+        points.push_back(std::make_tuple(sample_name, component_name));
       }
     }
-    return excluded_points;
+    return points;
   }
   
 }

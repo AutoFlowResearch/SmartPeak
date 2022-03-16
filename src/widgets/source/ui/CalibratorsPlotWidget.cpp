@@ -29,11 +29,40 @@
 
 namespace SmartPeak
 {
+  void CalibratorsPlotWidget::setIncludeExcludeParameter(const std::string& parameter_name, const std::vector<std::tuple<std::string, std::string>>& include_exclude_list)
+  {
+    std::ostringstream os;
+    os << "[";
+    std::string separator = "";
+    for (const auto& [sample_name, component_name] : include_exclude_list)
+    {
+      os << separator << "\'" << component_name << ";" << sample_name << "\'";
+      separator = ",";
+    }
+    os << "]";
+
+    ParameterSet& user_parameters = sequence_handler_.getSequence().at(0).getRawData().getParameters();
+    Parameter* existing_parameter = user_parameters.findParameter("FitCalibration", parameter_name);
+    if (existing_parameter)
+    {
+      existing_parameter->setValueFromString(os.str());
+    }
+    else
+    {
+      Parameter new_param(
+        { { "name", parameter_name },
+          { "type", "list" },
+          { "value", os.str() } });
+      user_parameters.addParameter("FitCalibration", new_param);
+    }
+  }
 
   void CalibratorsPlotWidget::recomputeCalibration()
   {
     if (selected_action_ == EActionFitCalibration)
     {
+      setIncludeExcludeParameter("excluded_points", user_excluded_points_);
+      setIncludeExcludeParameter("included_points", user_included_points_);
       FitCalibration fit_calibration;
       Filenames filenames; // fit_calibration actually does not use it
       ParameterSet& user_parameters = sequence_handler_.getSequence().at(0).getRawData().getParameters();
@@ -46,6 +75,8 @@ namespace SmartPeak
         user_parameters,
         filenames);
       onSequenceUpdated();
+      user_excluded_points_.clear();
+      user_included_points_.clear();
     }
     else if (selected_action_ == EActionOptimizeCalibration)
     {
@@ -64,7 +95,6 @@ namespace SmartPeak
   std::tuple<std::string, std::string> 
   CalibratorsPlotWidget::getSampleNameAndSerieFromSelectedPoint(
     const std::optional<std::tuple<int, int>>& matching_point,
-    const std::optional<std::tuple<int, int>>& outlier_point,
     const std::optional<std::tuple<int, int>>& excluded_point
   ) const
   {
@@ -72,11 +102,6 @@ namespace SmartPeak
     {
       const auto [serie, index] = *matching_point;
       return std::make_tuple(calibration_data_.matching_points_.injections_[serie][index], calibration_data_.series_names[serie]);
-    }
-    else if (outlier_point)
-    {
-      const auto [serie, index] = *outlier_point;
-      return std::make_tuple(calibration_data_.outlier_points_.injections_[serie][index], calibration_data_.series_names[serie]);
     }
     else if (excluded_point)
     {
@@ -459,8 +484,6 @@ namespace SmartPeak
       ImGui::Checkbox("Fit line", &show_fit_line_);
       ImGui::SameLine();
       ImGui::Checkbox("Points", &show_matching_points_);
-      ImGui::SameLine();
-      ImGui::Checkbox("Outlier", &show_outlier_points_);
       if (selected_action_ == EActionFitCalibration)
       {
         ImGui::SameLine();
@@ -515,15 +538,12 @@ namespace SmartPeak
         }
 
         plotPoints(show_matching_points_, calibration_data_.matching_points_, ImPlotMarker_Circle);
-        plotPoints(show_outlier_points_, calibration_data_.outlier_points_, ImPlotMarker_Square);
         plotPoints(show_excluded_points_, calibration_data_.excluded_points_, ImPlotMarker_Cross);
 
         plotSelectedPoint(hovered_matching_point_, calibration_data_.matching_points_, ImPlotMarker_Circle);
-        plotSelectedPoint(hovered_outlier_point_, calibration_data_.outlier_points_, ImPlotMarker_Square);
         plotSelectedPoint(hovered_excluded_point_, calibration_data_.excluded_points_, ImPlotMarker_Cross);
 
         plotSelectedPoint(clicked_matching_point_, calibration_data_.matching_points_, ImPlotMarker_Circle);
-        plotSelectedPoint(clicked_outlier_point_, calibration_data_.outlier_points_, ImPlotMarker_Square);
         plotSelectedPoint(clicked_excluded_point_, calibration_data_.excluded_points_, ImPlotMarker_Cross);
 
         // legend hover management
@@ -540,7 +560,6 @@ namespace SmartPeak
         // Compute hovered points and tooltips
         bool open_context_menu = false;
         hovered_matching_point_ = std::nullopt;
-        hovered_outlier_point_ = std::nullopt;
         if (ImPlot::IsPlotHovered())
         {
           auto mouse_plot_point = ImPlot::GetPlotMousePos();
@@ -550,19 +569,18 @@ namespace SmartPeak
           auto threshold_plot_point = ImPlot::PixelsToPlot(ImVec2(5, 5));
           ImVec2 threshold_point(threshold_plot_point.x - zero_plot_point.x, zero_plot_point.y - threshold_plot_point.y);
           getSelectedPoint(mouse_point, threshold_point);
-          if (hovered_outlier_point_ || hovered_matching_point_ || hovered_excluded_point_)
+          if (hovered_matching_point_ || hovered_excluded_point_)
           {
             if (ImGui::IsMouseClicked(1))
             {
               clicked_matching_point_ = hovered_matching_point_;
-              clicked_outlier_point_ = hovered_outlier_point_;
               clicked_excluded_point_ = hovered_excluded_point_;
               open_context_menu = true;
             }
             else if (!ImGui::IsPopupOpen("Point Actions")) // just hovered
             {
               ImGui::BeginTooltip();
-              auto [sample_name, serie_name] = getSampleNameAndSerieFromSelectedPoint(hovered_matching_point_, hovered_outlier_point_, hovered_excluded_point_);
+              auto [sample_name, serie_name] = getSampleNameAndSerieFromSelectedPoint(hovered_matching_point_, hovered_excluded_point_);
               ImGui::Text("%s", sample_name.c_str());
               ImGui::Text("%s", serie_name.c_str());
               OpenMS::AbsoluteQuantitationStandards::featureConcentration* feature_concentration = nullptr;
@@ -571,12 +589,6 @@ namespace SmartPeak
               {
                 const auto [serie, index] = *hovered_matching_point_;
                 feature_concentration = &calibration_data_.matching_points_.feature_concentrations_[serie][index];
-                quantitation_methods = getQuantitationMethod(calibration_data_.series_names[serie]);
-              }
-              else if (hovered_outlier_point_)
-              {
-                const auto [serie, index] = *hovered_outlier_point_;
-                feature_concentration = &calibration_data_.outlier_points_.feature_concentrations_[serie][index];
                 quantitation_methods = getQuantitationMethod(calibration_data_.series_names[serie]);
               }
               else if (hovered_excluded_point_)
@@ -664,7 +676,7 @@ namespace SmartPeak
         {
           if (ImGui::Selectable("Show chromatogram"))
           {
-            auto [sample_name, serie_name] = getSampleNameAndSerieFromSelectedPoint(clicked_matching_point_, clicked_outlier_point_, clicked_excluded_point_);
+            auto [sample_name, serie_name] = getSampleNameAndSerieFromSelectedPoint(clicked_matching_point_, clicked_excluded_point_);
             if (!sample_name.empty())
             {
               showChromatogram(sample_name);
@@ -673,19 +685,25 @@ namespace SmartPeak
           if (selected_action_ == EActionFitCalibration)
           {
             // Exlude/Include point
-            auto [sample_name, serie_name] = getSampleNameAndSerieFromSelectedPoint(clicked_matching_point_, clicked_outlier_point_, clicked_excluded_point_);
+            auto sample_and_serie = getSampleNameAndSerieFromSelectedPoint(clicked_matching_point_, clicked_excluded_point_);
+            auto [sample_name, serie_name] = sample_and_serie;
+            bool is_excluded = isExcluded(serie_name, sample_name);
             if (!sample_name.empty())
             {
-              std::ostringstream os;
-              os << sample_name << ";" << serie_name;
-              ParameterSet& user_parameters = sequence_handler_.getSequence().at(0).getRawData().getParameters();
-              Parameter* existing_parameter = user_parameters.findParameter("FitCalibration", "excluded_points");
-              if ((!existing_parameter) || (!existing_parameter->isInList(os.str())))
+              if (!is_excluded)
               {
                 if (ImGui::Selectable("Exclude from calibration"))
                 {
+                  user_excluded_points_.push_back(std::make_pair(serie_name, sample_name));
+                  user_included_points_.erase(std::remove(user_included_points_.begin(), user_included_points_.end(), sample_and_serie), user_included_points_.end());
+                  recomputeCalibration();
+                  /*
+                  ParameterSet& user_parameters = sequence_handler_.getSequence().at(0).getRawData().getParameters();
+                  Parameter* existing_parameter = user_parameters.findParameter("FitCalibration", "excluded_points");
                   if (existing_parameter)
                   {
+                    std::ostringstream os;
+                    os << sample_name << ";" << serie_name;
                     existing_parameter->addToList(os.str());
                     recomputeCalibration();
                   }
@@ -700,13 +718,17 @@ namespace SmartPeak
                     user_parameters.addParameter("FitCalibration", new_param);
                     recomputeCalibration();
                   }
+                  */
                 }
               }
-              else if (existing_parameter && existing_parameter->isInList(os.str()))
+              else
               {
                 if (ImGui::Selectable("Include to calibration"))
                 {
-                  existing_parameter->removeFromList(os.str());
+                  //existing_parameter->removeFromList(os.str());
+                  //user_excluded_points_.push_back(std::make_pair(serie_name, sample_name));
+                  user_included_points_.push_back(std::make_pair(serie_name, sample_name));
+                  user_excluded_points_.erase(std::remove(user_excluded_points_.begin(), user_excluded_points_.end(), sample_and_serie), user_excluded_points_.end());
                   recomputeCalibration();
                 }
               }
@@ -717,7 +739,6 @@ namespace SmartPeak
         else
         {
           clicked_matching_point_ = std::nullopt;
-          clicked_outlier_point_ = std::nullopt;
           clicked_excluded_point_ = std::nullopt;
         }
       }
@@ -807,10 +828,6 @@ namespace SmartPeak
   {
     hovered_matching_point_ = getSelectedPoint(point, threshold_point, calibration_data_.matching_points_);
     if (!hovered_matching_point_)
-    {
-      hovered_outlier_point_ = getSelectedPoint(point, threshold_point, calibration_data_.outlier_points_);
-    }
-    if (!hovered_outlier_point_)
     {
       hovered_excluded_point_ = getSelectedPoint(point, threshold_point, calibration_data_.excluded_points_);
     }
@@ -922,5 +939,44 @@ namespace SmartPeak
       serie_index++;
     }
     calibration_data_.matching_points_ = new_matching_points;
+  }
+
+  bool CalibratorsPlotWidget::isExcluded(const std::string& serie_name, const std::string& sample_name)
+  {
+    const auto& sequence_segment = sequence_handler_.getSequenceSegments().at(selected_sequence_segment_);
+
+    // find concentrations from serie_name and sample_name
+    OpenMS::AbsoluteQuantitationStandards::runConcentration point_concs;
+    bool found = false;
+    for (const auto& stand_concs : sequence_segment.getStandardsConcentrations())
+    {
+      if ((stand_concs.component_name == serie_name)
+        && (stand_concs.sample_name == sample_name))
+      {
+        point_concs = stand_concs;
+        found = true;
+      }
+    }
+
+    // find it in the excluded points
+    const auto& excluded_components_to_concentrations = sequence_segment.getExcludedComponentsToConcentrations();
+    if (!excluded_components_to_concentrations.count(components_.at(selected_component_)))
+    {
+      return false;
+    }
+    const auto& excluded_points = excluded_components_to_concentrations.at(components_.at(selected_component_));
+    for (const auto& excluded : excluded_points)
+    {
+      if ((std::abs(excluded.actual_concentration - point_concs.actual_concentration) < 1e-9)
+        && (std::abs(excluded.IS_actual_concentration - point_concs.IS_actual_concentration) < 1e-9)
+        && (std::abs(excluded.dilution_factor - point_concs.dilution_factor) < 1e-9))
+      {
+        return true;
+      }
+    }
+    return std::find(
+      user_excluded_points_.begin(), 
+      user_excluded_points_.end(), 
+      std::make_tuple(sample_name, serie_name)) != user_excluded_points_.end();
   }
 }
