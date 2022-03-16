@@ -151,16 +151,16 @@ if (WIN32)
     include(InstallRequiredSystemLibraries)
     include(BundleUtilities)
  
-    SET(DIRS ${Qt5Core_DIR} ${Qt5Network_DIR} ${Qt5_DIR} ${OpenMS_LIBRARY_DIR}   ${SDL2_LIBRARIES_DIR} ${HIDAPI_DIR})
+    SET(DIRS ${Qt5Core_DIR} ${Qt5Network_DIR} ${Qt5_DIR} ${OpenMS_LIBRARY_DIR} ${SDL2_LIBRARIES_DIR} ${HIDAPI_DIR} {OpenMS_SHARE_DIR})
     fixup_bundle(\"${BUNDLE_OUTPUT_PATH}\" \"\" \"\${DIRS}\")
     verify_app(\"${BUNDLE_OUTPUT_PATH}\")
     " 
     COMPONENT applications)
   
-  install(CODE "
-    execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory ${OpenMS_SHARE_DIR} \"\${CMAKE_INSTALL_PREFIX}/share/OpenMS\")
-    " 
-    COMPONENT share)
+#  install(CODE "
+#    execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory ${OpenMS_SHARE_DIR} \"\${CMAKE_INSTALL_PREFIX}/SmartPeakGUI/share/OpenMS\")
+#    " 
+#    COMPONENT share)
 
 elseif(UNIX AND CMAKE_SYSTEM_NAME MATCHES Linux)
  
