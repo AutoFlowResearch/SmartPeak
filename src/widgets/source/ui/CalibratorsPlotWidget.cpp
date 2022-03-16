@@ -387,7 +387,7 @@ namespace SmartPeak
         {
           new_param_entry.value = value_as_string;
         }
-        LOGD << "Set " << new_param_entry.name << " value to " << new_param_entry.value;
+        LOGD << "Set " << new_param_entry.name << " value to " << new_param_entry.value.toString();
       }
       new_params.setValue(new_param_entry.name, new_param_entry.value);
     }
