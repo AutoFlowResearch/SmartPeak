@@ -194,6 +194,7 @@ namespace SmartPeak
     ImGui::Begin("Calibrator Parameters");
 
     ImGui::Combo("Action", &selected_action_, &actions_cstr_[0], actions_cstr_.size());
+    showQuickHelpToolTip("calibration_action");
     ImGui::Separator();
 
     parameter_editor_widget_.draw();
@@ -359,8 +360,7 @@ namespace SmartPeak
 
   void CalibratorsPlotWidget::onParameterSet(const std::string& function_parameter, const Parameter& parameter)
   {
-    // find back the parameter and set it
-    
+    // find back the parameter and set it    
     // try to find in the quantitation methods parameters
     auto quantitation_methods = getQuantitationMethod(calibration_data_.series_names[selected_component_]);
     auto params = quantitation_methods->getTransformationModelParams();
@@ -446,269 +446,280 @@ namespace SmartPeak
 
   void CalibratorsPlotWidget::displayPlot()
   {
-    ImGui::Begin("Calibrator Plot");
-    ImGui::Checkbox("Legend", &show_legend_);
-    ImGui::SameLine();
-    ImGui::Checkbox("Fit line", &show_fit_line_);
-    ImGui::SameLine();
-    ImGui::Checkbox("Points", &show_matching_points_);
-    ImGui::SameLine();
-    ImGui::Checkbox("Outlier", &show_outlier_points_);
-    if (selected_action_ == EActionFitCalibration)
-    {
-      ImGui::SameLine();
-      ImGui::Checkbox("Excluded", &show_excluded_points_);
-    }
-    ImGui::SameLine();
-    if (ImGui::Button("Fit Zoom"))
-    {
-      reset_zoom_ = true;
-    }
 
-    // Main graphic
-    ImGuiCond cond;
-    if (reset_zoom_)
+    ImGui::Begin("Calibrator Plot");
+    if (calibration_data_.series_names.empty())
     {
-      cond = ImGuiCond_Always;
-      reset_zoom_ = false;
+      ImGui::TextWrapped("No data to display. Please select the components in the Transitions Explorer Window and check that you have generated the Calibration data.");
     }
     else
     {
-      cond = ImGuiCond_Once;
-    }
-    // add margin around the plot
-    float x_margin = (calibration_data_.conc_max - calibration_data_.conc_min) * 0.05;
-    float y_margin = (calibration_data_.feature_max - calibration_data_.feature_min) * 0.05;
-    ImPlot::SetNextPlotLimits(calibration_data_.conc_min - x_margin,
-                              calibration_data_.conc_max + x_margin,
-                              calibration_data_.feature_min - y_margin,
-                              calibration_data_.feature_max + y_margin,
-                              cond);
-    auto window_size = ImGui::GetWindowSize();
-    ImPlotFlags plotFlags = show_legend_ ? ImPlotFlags_Default | ImPlotFlags_Legend : ImPlotFlags_Default & ~ImPlotFlags_Legend;
-    plotFlags |= ImPlotFlags_Crosshairs;
-    if (ImPlot::BeginPlot(plot_title_.c_str(), 
-                          calibration_data_.x_axis_title.c_str(), 
-                          calibration_data_.y_axis_title.c_str(), 
-                          ImVec2(window_size.x - 25, window_size.y - 58),
-                          plotFlags)) {
-      if (show_fit_line_)
+      ImGui::Checkbox("Legend", &show_legend_);
+      ImGui::SameLine();
+      ImGui::Checkbox("Fit line", &show_fit_line_);
+      ImGui::SameLine();
+      ImGui::Checkbox("Points", &show_matching_points_);
+      ImGui::SameLine();
+      ImGui::Checkbox("Outlier", &show_outlier_points_);
+      if (selected_action_ == EActionFitCalibration)
       {
-        for (int i = 0; i < calibration_data_.conc_fit_data.size(); ++i) {
-          assert(calibration_data_.conc_fit_data.at(i).size() == calibration_data_.feature_fit_data.at(i).size());
-          ImPlot::PushStyleVar(ImPlotStyleVar_LineWeight, ImPlot::GetStyle().LineWeight);
-          ImPlot::PushStyleVar(ImPlotStyleVar_Marker, ImPlotMarker_None);
-          ImPlot::PlotLine((calibration_data_.series_names.at(i)).c_str(), 
-                            calibration_data_.conc_fit_data.at(i).data(), 
-                            calibration_data_.feature_fit_data.at(i).data(),
-                            calibration_data_.conc_fit_data.at(i).size());
-          ImPlot::PopStyleVar();
-          ImPlot::PopStyleVar();
-        }
+        ImGui::SameLine();
+        ImGui::Checkbox("Excluded", &show_excluded_points_);
+      }
+      ImGui::SameLine();
+      if (ImGui::Button("Fit Zoom"))
+      {
+        reset_zoom_ = true;
       }
 
-      plotPoints(show_matching_points_, calibration_data_.matching_points_, ImPlotMarker_Circle);
-      plotPoints(show_outlier_points_, calibration_data_.outlier_points_, ImPlotMarker_Square);
-      plotPoints(show_excluded_points_, calibration_data_.excluded_points_, ImPlotMarker_Cross);
-
-      plotSelectedPoint(hovered_matching_point_, calibration_data_.matching_points_, ImPlotMarker_Circle);
-      plotSelectedPoint(hovered_outlier_point_, calibration_data_.outlier_points_, ImPlotMarker_Square);
-      plotSelectedPoint(hovered_excluded_point_, calibration_data_.excluded_points_, ImPlotMarker_Cross);
-
-      plotSelectedPoint(clicked_matching_point_, calibration_data_.matching_points_, ImPlotMarker_Circle);
-      plotSelectedPoint(clicked_outlier_point_, calibration_data_.outlier_points_, ImPlotMarker_Square);
-      plotSelectedPoint(clicked_excluded_point_, calibration_data_.excluded_points_, ImPlotMarker_Cross);
-
-      // legend hover management
-      int i = 0;
-      for (const auto& serie_name : calibration_data_.series_names)
+      // Main graphic
+      ImGuiCond cond;
+      if (reset_zoom_)
       {
-        if (ImPlot::IsLegendEntryHovered(serie_name.c_str()))
-        {
-          selected_component_ = i;
-        }
-        ++i;
-      }
-
-      // Compute hovered points and tooltips
-      bool open_context_menu = false;
-      hovered_matching_point_ = std::nullopt;
-      hovered_outlier_point_ = std::nullopt;
-      if (ImPlot::IsPlotHovered())
-      {
-        auto mouse_plot_point = ImPlot::GetPlotMousePos();
-        ImVec2 mouse_point(mouse_plot_point.x, mouse_plot_point.y);
-        // Pixels zone around which the point will be considered hovered
-        auto zero_plot_point = ImPlot::PixelsToPlot(ImVec2(0, 0));
-        auto threshold_plot_point = ImPlot::PixelsToPlot(ImVec2(5, 5));
-        ImVec2 threshold_point(threshold_plot_point.x - zero_plot_point.x, zero_plot_point.y - threshold_plot_point.y);
-        getSelectedPoint(mouse_point, threshold_point);
-        if (hovered_outlier_point_ || hovered_matching_point_ || hovered_excluded_point_)
-        {
-          if (ImGui::IsMouseClicked(1))
-          {
-            clicked_matching_point_ = hovered_matching_point_;
-            clicked_outlier_point_ = hovered_outlier_point_;
-            clicked_excluded_point_ = hovered_excluded_point_;
-            open_context_menu = true;
-          }
-          else if (!ImGui::IsPopupOpen("Point Actions")) // just hovered
-          {
-            ImGui::BeginTooltip();
-            auto [sample_name, serie_name] = getSampleNameAndSerieFromSelectedPoint(hovered_matching_point_, hovered_outlier_point_, hovered_excluded_point_);
-            ImGui::Text("%s", sample_name.c_str());
-            ImGui::Text("%s", serie_name.c_str());
-            OpenMS::AbsoluteQuantitationStandards::featureConcentration* feature_concentration = nullptr;
-            OpenMS::AbsoluteQuantitationMethod* quantitation_methods = nullptr;
-            if (hovered_matching_point_)
-            {
-              const auto [serie, index] = *hovered_matching_point_;
-              feature_concentration = &calibration_data_.matching_points_.feature_concentrations_[serie][index];
-              quantitation_methods = getQuantitationMethod(calibration_data_.series_names[serie]);
-            }
-            else if (hovered_outlier_point_)
-            {
-              const auto [serie, index] = *hovered_outlier_point_;
-              feature_concentration = &calibration_data_.outlier_points_.feature_concentrations_[serie][index];
-              quantitation_methods = getQuantitationMethod(calibration_data_.series_names[serie]);
-            }
-            else if (hovered_excluded_point_)
-            {
-              const auto [serie, index] = *hovered_excluded_point_;
-              feature_concentration = &calibration_data_.excluded_points_.feature_concentrations_[serie][index];
-              quantitation_methods = getQuantitationMethod(calibration_data_.series_names[serie]);
-            }
-            if (feature_concentration && quantitation_methods)
-            {
-              ImGui::Text("actual concentration: %f (%s)", feature_concentration->actual_concentration, feature_concentration->concentration_units.c_str());
-              ImGui::Text("dilution factor: %f", feature_concentration->dilution_factor);
-              ImGui::Text("IS name: %s", quantitation_methods->getISName().c_str());
-              ImGui::Text("IS actual concentration: %f (%s)", feature_concentration->IS_actual_concentration, feature_concentration->concentration_units.c_str());
-              const auto& feature_name = quantitation_methods->getFeatureName();
-              if (feature_name == "intensity")
-              {
-                ImGui::Text("Intensity: %f", feature_concentration->feature.getIntensity());
-                ImGui::Text("IS Intensity: %f", feature_concentration->IS_feature.getIntensity());
-              }
-              else
-              {
-                if (feature_concentration->feature.metaValueExists(feature_name))
-                {
-                  ImGui::Text("feature %s: %f", 
-                    feature_name.c_str(), 
-                    static_cast<double>(feature_concentration->feature.getMetaValue(feature_name)));
-                }
-                else
-                {
-                  ImGui::Text("feature %s: Metadata does not exists!", feature_name.c_str());
-                }
-                if (feature_concentration->IS_feature.metaValueExists(feature_name))
-                {
-                  ImGui::Text("IS feature %s: %f", 
-                    feature_name.c_str(), 
-                    static_cast<double>(feature_concentration->IS_feature.getMetaValue(feature_name)));
-                }
-                else
-                {
-                  ImGui::Text("IS feature %s: Metadata does not exists!", feature_name.c_str());
-                }
-              }
-            }
-            ImGui::EndTooltip();
-          }
-        }
-      }
-      // try to detect label hovered.
-      if (ImGui::IsItemHovered() && !ImPlot::IsPlotHovered())
-      {
-        auto mouse_pos = ImGui::GetMousePos();
-        auto plot_pos = ImPlot::GetPlotPos();
-        auto plot_size = ImPlot::GetPlotSize();
-        if ((mouse_pos.x < plot_pos.x)
-          && (mouse_pos.y < plot_pos.y + plot_size.y)
-          && (mouse_pos.y > plot_pos.y))
-        {
-          // we are in the left label part
-          if (!calibration_data_.series_names.empty())
-          {
-            ImGui::BeginTooltip();
-            auto quantitation_methods = getQuantitationMethod(calibration_data_.series_names[0]);
-            const auto& feature_name = quantitation_methods->getFeatureName();
-            ImGui::Text("%s / IS %s", feature_name.c_str(), feature_name.c_str());
-            ImGui::EndTooltip();
-          }
-        }
-        if ((mouse_pos.x > plot_pos.x)
-          && (mouse_pos.y > plot_pos.y + plot_size.y)
-          && (mouse_pos.x < plot_pos.x + plot_size.x))
-        {
-          // we are in the bottom label part
-          ImGui::BeginTooltip();
-          ImGui::Text("actual concentration / IS actual concentration / dilution_factor");
-          ImGui::EndTooltip();
-        }
-      }
-      ImPlot::EndPlot();
-      if (open_context_menu)
-      {
-        ImGui::OpenPopup("Point Actions");
-      }
-      if (ImGui::BeginPopup("Point Actions"))
-      {
-        if (ImGui::Selectable("Show chromatogram"))
-        {
-          auto [sample_name, serie_name] = getSampleNameAndSerieFromSelectedPoint(clicked_matching_point_, clicked_outlier_point_, clicked_excluded_point_);
-          if (!sample_name.empty())
-          {
-            showChromatogram(sample_name);
-          }
-        }
-        // Exlude/Include point
-        auto [sample_name, serie_name] = getSampleNameAndSerieFromSelectedPoint(clicked_matching_point_, clicked_outlier_point_, clicked_excluded_point_);
-        if (!sample_name.empty())
-        {
-          std::ostringstream os;
-          os << sample_name << ";" << serie_name;
-          ParameterSet& user_parameters = sequence_handler_.getSequence().at(0).getRawData().getParameters();
-          Parameter* existing_parameter = user_parameters.findParameter("FitCalibration", "excluded_points");
-          if ((!existing_parameter) || (!existing_parameter->isInList(os.str())))
-          {
-            if (ImGui::Selectable("Exclude from calibration"))
-            {
-              if (existing_parameter)
-              {
-                existing_parameter->addToList(os.str());
-                recomputeCalibration();
-              }
-              else
-              {
-                std::ostringstream os;
-                os << "[\'" << sample_name << ";" << calibration_data_.series_names[selected_component_] << "\']";
-                Parameter new_param(
-                  { { "name", "excluded_points" },
-                    { "type", "list" },
-                    { "value", os.str() } });
-                user_parameters.addParameter("FitCalibration", new_param);
-                recomputeCalibration();
-              }
-            }
-          }
-          else if (existing_parameter && existing_parameter->isInList(os.str()))
-          {
-            if (ImGui::Selectable("Include to calibration"))
-            {
-              existing_parameter->removeFromList(os.str());
-              recomputeCalibration();
-            }
-          }
-        }
-        ImGui::EndPopup();
+        cond = ImGuiCond_Always;
+        reset_zoom_ = false;
       }
       else
       {
-        clicked_matching_point_ = std::nullopt;
-        clicked_outlier_point_ = std::nullopt;
-        clicked_excluded_point_ = std::nullopt;
+        cond = ImGuiCond_Once;
+      }
+      // add margin around the plot
+      float x_margin = (calibration_data_.conc_max - calibration_data_.conc_min) * 0.05;
+      float y_margin = (calibration_data_.feature_max - calibration_data_.feature_min) * 0.05;
+      ImPlot::SetNextPlotLimits(calibration_data_.conc_min - x_margin,
+        calibration_data_.conc_max + x_margin,
+        calibration_data_.feature_min - y_margin,
+        calibration_data_.feature_max + y_margin,
+        cond);
+      auto window_size = ImGui::GetWindowSize();
+      ImPlotFlags plotFlags = show_legend_ ? ImPlotFlags_Default | ImPlotFlags_Legend : ImPlotFlags_Default & ~ImPlotFlags_Legend;
+      plotFlags |= ImPlotFlags_Crosshairs;
+      if (ImPlot::BeginPlot(plot_title_.c_str(),
+        calibration_data_.x_axis_title.c_str(),
+        calibration_data_.y_axis_title.c_str(),
+        ImVec2(window_size.x - 25, window_size.y - 58),
+        plotFlags)) {
+        if (show_fit_line_)
+        {
+          for (int i = 0; i < calibration_data_.conc_fit_data.size(); ++i) {
+            assert(calibration_data_.conc_fit_data.at(i).size() == calibration_data_.feature_fit_data.at(i).size());
+            ImPlot::PushStyleVar(ImPlotStyleVar_LineWeight, ImPlot::GetStyle().LineWeight);
+            ImPlot::PushStyleVar(ImPlotStyleVar_Marker, ImPlotMarker_None);
+            ImPlot::PlotLine((calibration_data_.series_names.at(i)).c_str(),
+              calibration_data_.conc_fit_data.at(i).data(),
+              calibration_data_.feature_fit_data.at(i).data(),
+              calibration_data_.conc_fit_data.at(i).size());
+            ImPlot::PopStyleVar();
+            ImPlot::PopStyleVar();
+          }
+        }
+
+        plotPoints(show_matching_points_, calibration_data_.matching_points_, ImPlotMarker_Circle);
+        plotPoints(show_outlier_points_, calibration_data_.outlier_points_, ImPlotMarker_Square);
+        plotPoints(show_excluded_points_, calibration_data_.excluded_points_, ImPlotMarker_Cross);
+
+        plotSelectedPoint(hovered_matching_point_, calibration_data_.matching_points_, ImPlotMarker_Circle);
+        plotSelectedPoint(hovered_outlier_point_, calibration_data_.outlier_points_, ImPlotMarker_Square);
+        plotSelectedPoint(hovered_excluded_point_, calibration_data_.excluded_points_, ImPlotMarker_Cross);
+
+        plotSelectedPoint(clicked_matching_point_, calibration_data_.matching_points_, ImPlotMarker_Circle);
+        plotSelectedPoint(clicked_outlier_point_, calibration_data_.outlier_points_, ImPlotMarker_Square);
+        plotSelectedPoint(clicked_excluded_point_, calibration_data_.excluded_points_, ImPlotMarker_Cross);
+
+        // legend hover management
+        int i = 0;
+        for (const auto& serie_name : calibration_data_.series_names)
+        {
+          if (ImPlot::IsLegendEntryHovered(serie_name.c_str()))
+          {
+            selected_component_ = i;
+          }
+          ++i;
+        }
+
+        // Compute hovered points and tooltips
+        bool open_context_menu = false;
+        hovered_matching_point_ = std::nullopt;
+        hovered_outlier_point_ = std::nullopt;
+        if (ImPlot::IsPlotHovered())
+        {
+          auto mouse_plot_point = ImPlot::GetPlotMousePos();
+          ImVec2 mouse_point(mouse_plot_point.x, mouse_plot_point.y);
+          // Pixels zone around which the point will be considered hovered
+          auto zero_plot_point = ImPlot::PixelsToPlot(ImVec2(0, 0));
+          auto threshold_plot_point = ImPlot::PixelsToPlot(ImVec2(5, 5));
+          ImVec2 threshold_point(threshold_plot_point.x - zero_plot_point.x, zero_plot_point.y - threshold_plot_point.y);
+          getSelectedPoint(mouse_point, threshold_point);
+          if (hovered_outlier_point_ || hovered_matching_point_ || hovered_excluded_point_)
+          {
+            if (ImGui::IsMouseClicked(1))
+            {
+              clicked_matching_point_ = hovered_matching_point_;
+              clicked_outlier_point_ = hovered_outlier_point_;
+              clicked_excluded_point_ = hovered_excluded_point_;
+              open_context_menu = true;
+            }
+            else if (!ImGui::IsPopupOpen("Point Actions")) // just hovered
+            {
+              ImGui::BeginTooltip();
+              auto [sample_name, serie_name] = getSampleNameAndSerieFromSelectedPoint(hovered_matching_point_, hovered_outlier_point_, hovered_excluded_point_);
+              ImGui::Text("%s", sample_name.c_str());
+              ImGui::Text("%s", serie_name.c_str());
+              OpenMS::AbsoluteQuantitationStandards::featureConcentration* feature_concentration = nullptr;
+              OpenMS::AbsoluteQuantitationMethod* quantitation_methods = nullptr;
+              if (hovered_matching_point_)
+              {
+                const auto [serie, index] = *hovered_matching_point_;
+                feature_concentration = &calibration_data_.matching_points_.feature_concentrations_[serie][index];
+                quantitation_methods = getQuantitationMethod(calibration_data_.series_names[serie]);
+              }
+              else if (hovered_outlier_point_)
+              {
+                const auto [serie, index] = *hovered_outlier_point_;
+                feature_concentration = &calibration_data_.outlier_points_.feature_concentrations_[serie][index];
+                quantitation_methods = getQuantitationMethod(calibration_data_.series_names[serie]);
+              }
+              else if (hovered_excluded_point_)
+              {
+                const auto [serie, index] = *hovered_excluded_point_;
+                feature_concentration = &calibration_data_.excluded_points_.feature_concentrations_[serie][index];
+                quantitation_methods = getQuantitationMethod(calibration_data_.series_names[serie]);
+              }
+              if (feature_concentration && quantitation_methods)
+              {
+                ImGui::Text("actual concentration: %f (%s)", feature_concentration->actual_concentration, feature_concentration->concentration_units.c_str());
+                ImGui::Text("dilution factor: %f", feature_concentration->dilution_factor);
+                ImGui::Text("IS name: %s", quantitation_methods->getISName().c_str());
+                ImGui::Text("IS actual concentration: %f (%s)", feature_concentration->IS_actual_concentration, feature_concentration->concentration_units.c_str());
+                const auto& feature_name = quantitation_methods->getFeatureName();
+                if (feature_name == "intensity")
+                {
+                  ImGui::Text("Intensity: %f", feature_concentration->feature.getIntensity());
+                  ImGui::Text("IS Intensity: %f", feature_concentration->IS_feature.getIntensity());
+                }
+                else
+                {
+                  if (feature_concentration->feature.metaValueExists(feature_name))
+                  {
+                    ImGui::Text("feature %s: %f",
+                      feature_name.c_str(),
+                      static_cast<double>(feature_concentration->feature.getMetaValue(feature_name)));
+                  }
+                  else
+                  {
+                    ImGui::Text("feature %s: Metadata does not exists!", feature_name.c_str());
+                  }
+                  if (feature_concentration->IS_feature.metaValueExists(feature_name))
+                  {
+                    ImGui::Text("IS feature %s: %f",
+                      feature_name.c_str(),
+                      static_cast<double>(feature_concentration->IS_feature.getMetaValue(feature_name)));
+                  }
+                  else
+                  {
+                    ImGui::Text("IS feature %s: Metadata does not exists!", feature_name.c_str());
+                  }
+                }
+              }
+              ImGui::EndTooltip();
+            }
+          }
+        }
+        // try to detect label hovered.
+        if (ImGui::IsItemHovered() && !ImPlot::IsPlotHovered())
+        {
+          auto mouse_pos = ImGui::GetMousePos();
+          auto plot_pos = ImPlot::GetPlotPos();
+          auto plot_size = ImPlot::GetPlotSize();
+          if ((mouse_pos.x < plot_pos.x)
+            && (mouse_pos.y < plot_pos.y + plot_size.y)
+            && (mouse_pos.y > plot_pos.y))
+          {
+            // we are in the left label part
+            if (!calibration_data_.series_names.empty())
+            {
+              ImGui::BeginTooltip();
+              auto quantitation_methods = getQuantitationMethod(calibration_data_.series_names[0]);
+              const auto& feature_name = quantitation_methods->getFeatureName();
+              ImGui::Text("%s / IS %s", feature_name.c_str(), feature_name.c_str());
+              ImGui::EndTooltip();
+            }
+          }
+          if ((mouse_pos.x > plot_pos.x)
+            && (mouse_pos.y > plot_pos.y + plot_size.y)
+            && (mouse_pos.x < plot_pos.x + plot_size.x))
+          {
+            // we are in the bottom label part
+            ImGui::BeginTooltip();
+            ImGui::Text("actual concentration / IS actual concentration / dilution_factor");
+            ImGui::EndTooltip();
+          }
+        }
+        ImPlot::EndPlot();
+        if (open_context_menu)
+        {
+          ImGui::OpenPopup("Point Actions");
+        }
+        if (ImGui::BeginPopup("Point Actions"))
+        {
+          if (ImGui::Selectable("Show chromatogram"))
+          {
+            auto [sample_name, serie_name] = getSampleNameAndSerieFromSelectedPoint(clicked_matching_point_, clicked_outlier_point_, clicked_excluded_point_);
+            if (!sample_name.empty())
+            {
+              showChromatogram(sample_name);
+            }
+          }
+          if (selected_action_ == EActionFitCalibration)
+          {
+            // Exlude/Include point
+            auto [sample_name, serie_name] = getSampleNameAndSerieFromSelectedPoint(clicked_matching_point_, clicked_outlier_point_, clicked_excluded_point_);
+            if (!sample_name.empty())
+            {
+              std::ostringstream os;
+              os << sample_name << ";" << serie_name;
+              ParameterSet& user_parameters = sequence_handler_.getSequence().at(0).getRawData().getParameters();
+              Parameter* existing_parameter = user_parameters.findParameter("FitCalibration", "excluded_points");
+              if ((!existing_parameter) || (!existing_parameter->isInList(os.str())))
+              {
+                if (ImGui::Selectable("Exclude from calibration"))
+                {
+                  if (existing_parameter)
+                  {
+                    existing_parameter->addToList(os.str());
+                    recomputeCalibration();
+                  }
+                  else
+                  {
+                    std::ostringstream os;
+                    os << "[\'" << sample_name << ";" << calibration_data_.series_names[selected_component_] << "\']";
+                    Parameter new_param(
+                      { { "name", "excluded_points" },
+                        { "type", "list" },
+                        { "value", os.str() } });
+                    user_parameters.addParameter("FitCalibration", new_param);
+                    recomputeCalibration();
+                  }
+                }
+              }
+              else if (existing_parameter && existing_parameter->isInList(os.str()))
+              {
+                if (ImGui::Selectable("Include to calibration"))
+                {
+                  existing_parameter->removeFromList(os.str());
+                  recomputeCalibration();
+                }
+              }
+            }
+          }
+          ImGui::EndPopup();
+        }
+        else
+        {
+          clicked_matching_point_ = std::nullopt;
+          clicked_outlier_point_ = std::nullopt;
+          clicked_excluded_point_ = std::nullopt;
+        }
       }
     }
     ImGui::End();
@@ -718,7 +729,6 @@ namespace SmartPeak
   {
     // update data
     std::vector<bool> selected_transitions;
-    int test_i = session_handler_.transition_explorer_data.checkbox_body.dimension(0);
     for (int i = 0; i < session_handler_.transition_explorer_data.checkbox_body.dimension(0); ++i)
     {
       selected_transitions.push_back(session_handler_.transition_explorer_data.checkbox_body(i, 0));

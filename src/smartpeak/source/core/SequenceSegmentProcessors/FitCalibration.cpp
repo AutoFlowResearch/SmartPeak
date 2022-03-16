@@ -88,26 +88,11 @@ namespace SmartPeak
     params.merge(getParameterSchema());
 
     std::vector<std::tuple<std::string, std::string>> excluded_points = getExcludedPointsFromParameters(params);
-      
-    // get all standards
-    std::vector<size_t> all_standards_indices;
-    this->getSampleIndicesBySampleType(
-      sequenceSegmentHandler_IO,
-      sequenceHandler_I,
-      SampleType::Standard,
-      all_standards_indices
-    );
-
-    // check if there are any standards to calculate the calibrators from
-    if (all_standards_indices.empty()) {
-      throw std::invalid_argument("standards_indices argument is empty.");
-    }
 
     // add in the method parameters
     OpenMS::AbsoluteQuantitation absoluteQuantitation;
     Utilities::setUserParameters(absoluteQuantitation, params_I);
 
-    // fit the model
     auto component_name_param = params.findParameter("FitCalibration", "component_name");
     if (!component_name_param)
     {
@@ -124,13 +109,6 @@ namespace SmartPeak
         continue;
       }
       
-      std::vector<size_t> standards_indices = all_standards_indices;
-
-      std::vector<OpenMS::FeatureMap> standards_featureMaps;
-      for (const size_t index : standards_indices) {
-        standards_featureMaps.push_back(sequenceHandler_I.getSequence().at(index).getRawData().getFeatureMap());
-      }
-
       std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration> excluded_feature_concentrations;
       auto feature_concentrations_without_excluded = sequenceSegmentHandler_IO.getComponentsToConcentrations().at(component_name);
 
