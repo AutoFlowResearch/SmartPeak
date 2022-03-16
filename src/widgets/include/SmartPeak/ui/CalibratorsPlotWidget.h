@@ -75,6 +75,7 @@ namespace SmartPeak
 
   protected:
     void setCalibrationData(const SessionHandler::CalibrationData& calibration_data, const std::string& plot_title);
+    void removeExcludedFromMatchingPoints();
     OpenMS::AbsoluteQuantitationMethod* getQuantitationMethod(const std::string& component_name);
     void displayParameters();
     void displayPlot();
