@@ -116,242 +116,79 @@ namespace SmartPeak
     std::string component_name = component_name_param->getValueAsString();
 
     absoluteQuantitation.setQuantMethods(sequenceSegmentHandler_IO.getQuantitationMethods());
-//    std::map<std::string, std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>> components_to_concentrations;
-//    std::map<std::string, std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>> outlier_components_to_concentrations;
-    std::map<std::string, std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>> excluded_components_to_concentrations;
+    auto excluded_components_to_concentrations = sequenceSegmentHandler_IO.getExcludedComponentsToConcentrations();
     for (OpenMS::AbsoluteQuantitationMethod& row : sequenceSegmentHandler_IO.getQuantitationMethods())
     {
       if (row.getComponentName() != component_name)
       {
         continue;
       }
-      /*
-      std::vector<size_t> standards_indices = all_standards_indices;
-
-      // construct excluded points
-      std::vector<size_t> excluded_standards_indices;
-      for (const auto [sample_name, component] : excluded_points)
-      {
-        if (component == row.getComponentName())
-        {
-          for (const size_t index : sequenceSegmentHandler_IO.getSampleIndices())
-          {
-            if (sequenceHandler_I.getSequence().at(index).getMetaData().getSampleName() == sample_name)
-            {
-              standards_indices.erase(std::remove(standards_indices.begin(), standards_indices.end(), index), standards_indices.end());
-              excluded_standards_indices.push_back(index);
-            }
-          }
-        }
-      }
       
-      std::vector<OpenMS::FeatureMap> standards_featureMaps;
-      for (const size_t index : standards_indices) {
-        standards_featureMaps.push_back(sequenceHandler_I.getSequence().at(index).getRawData().getFeatureMap());
-      }
-
-      std::vector<OpenMS::FeatureMap> excluded_standards_featureMaps;
-      for (const size_t index : excluded_standards_indices) {
-        excluded_standards_featureMaps.push_back(sequenceHandler_I.getSequence().at(index).getRawData().getFeatureMap());
-      }
-
-      // map standards to features
-      OpenMS::AbsoluteQuantitationStandards absoluteQuantitationStandards;
-      std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration> feature_concentrations;
-
-      absoluteQuantitationStandards.getComponentFeatureConcentrations(
-        sequenceSegmentHandler_IO.getStandardsConcentrations(),
-        standards_featureMaps,
-        row.getComponentName(),
-        feature_concentrations
-      );
-
-      std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration> excluded_feature_concentrations;
-      absoluteQuantitationStandards.getComponentFeatureConcentrations(
-        sequenceSegmentHandler_IO.getStandardsConcentrations(),
-        excluded_standards_featureMaps,
-        row.getComponentName(),
-        excluded_feature_concentrations
-      );
-      
-      auto feature_concentrations_pruned = sequenceSegmentHandler_IO.getFeatureConcentrationsPruned(feature_concentrations);
-
-      // remove components without any points
-      if (feature_concentrations_pruned.empty()) {
-        continue;
-      }
-
-      // Keep a copy to compute outer points
-      auto all_feature_concentrations = feature_concentrations_pruned;
-      */
-
       std::vector<size_t> standards_indices = all_standards_indices;
-
-      // construct excluded points
-      /*
-      std::vector<size_t> excluded_standards_indices;
-      for (const auto [sample_name, component] : excluded_points)
-      {
-        if (component == row.getComponentName())
-        {
-          for (const size_t index : sequenceSegmentHandler_IO.getSampleIndices())
-          {
-            if (sequenceHandler_I.getSequence().at(index).getMetaData().getSampleName() == sample_name)
-            {
-              standards_indices.erase(std::remove(standards_indices.begin(), standards_indices.end(), index), standards_indices.end());
-              excluded_standards_indices.push_back(index);
-            }
-          }
-        }
-      }
-      */
 
       std::vector<OpenMS::FeatureMap> standards_featureMaps;
       for (const size_t index : standards_indices) {
         standards_featureMaps.push_back(sequenceHandler_I.getSequence().at(index).getRawData().getFeatureMap());
       }
 
-      /*
-      std::vector<OpenMS::FeatureMap> excluded_standards_featureMaps;
-      for (const size_t index : excluded_standards_indices) {
-        excluded_standards_featureMaps.push_back(sequenceHandler_I.getSequence().at(index).getRawData().getFeatureMap());
-      }*/
+      std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration> excluded_feature_concentrations;
+      auto feature_concentrations_without_excluded = sequenceSegmentHandler_IO.getComponentsToConcentrations().at(component_name);
 
-      // map standards to features
-      /*
-      OpenMS::AbsoluteQuantitationStandards absoluteQuantitationStandards;
       std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration> feature_concentrations;
-
-      absoluteQuantitationStandards.getComponentFeatureConcentrations(
-        sequenceSegmentHandler_IO.getStandardsConcentrations(),
-        standards_featureMaps,
-        row.getComponentName(),
-        feature_concentrations
-      );
-      */
-      /*
-      std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration> excluded_feature_concentrations;
-      absoluteQuantitationStandards.getComponentFeatureConcentrations(
-        sequenceSegmentHandler_IO.getStandardsConcentrations(),
-        excluded_standards_featureMaps,
-        row.getComponentName(),
-        excluded_feature_concentrations
-      );
-      */
-
-      //auto feature_concentrations_pruned = sequenceSegmentHandler_IO.getFeatureConcentrationsPruned(feature_concentrations);
-      std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration> excluded_feature_concentrations;
-      std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration> feature_concentrations_without_excluded;
-      auto component_concentration = sequenceSegmentHandler_IO.getComponentsToConcentrations(); // getFeatureConcentrationsPruned(feature_concentrations);
-      auto feature_concentrations = component_concentration.at(component_name);
-
-      auto excluded_features_map = getExcludedFeaturesMap(
-        sequenceSegmentHandler_IO,
-        sequenceHandler_I,
-        row.getComponentName(),
-        feature_concentrations,
-        excluded_points);
-
-      for (auto feature_concentration : feature_concentrations)
+      for (auto& feature_concentration : feature_concentrations_without_excluded)
       {
-        for (auto excluded_features : excluded_features_map)
+        bool excluded = false;
+        for (auto& standard_concentration : sequenceSegmentHandler_IO.getStandardsConcentrations())
         {
-          for (auto excluded_feature : excluded_features)
+          for (const auto [excluded_sample_name, excluded_component_name] : excluded_points)
           {
-            //if (excluded_feature.getUniqueId() == feature_concentration.)
-            int break_here2 = 42;
-          }
-        }
-      }
-
-      // remove components without any points
-      /*
-      if (feature_concentrations_pruned.empty()) {
-        continue;
-      }
-      */
-
-      auto optimized_params = row.getTransformationModelParams();
-      optimized_params = absoluteQuantitation.fitCalibration(
-        feature_concentrations,
-        row.getFeatureName(),
-        row.getTransformationModel(),
-        optimized_params);
-
-      // calculate the R2 and bias
-      std::vector<double> biases; // not needed (method parameters)
-      double correlation_coefficient = 0.0; // not needed (method parameters)
-      absoluteQuantitation.calculateBiasAndR(
-        feature_concentrations,
-        row.getFeatureName(),
-        row.getTransformationModel(),
-        optimized_params,
-        biases,
-        correlation_coefficient);
-
-      row.setTransformationModelParams(optimized_params);
-      row.setCorrelationCoefficient(correlation_coefficient);
-      row.setNPoints(feature_concentrations.size());
-
-      int break_here = 42;
-
-      // ---
-      // Compute outer points
-      //std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration> outlier_feature_concentrations;
-
-      // Calibration not found: all the points will stay untouched by absoluteQuantitation.optimizeSingleCalibrationCurve
-      // but we would like to have them in the outlier point list instead.
-      /*
-      bool optimize_single_calibration_curve_succeed = false;
-      for (const auto& result_quant_method : absoluteQuantitation.getQuantMethods())
-      {
-        if (result_quant_method.getComponentName() == row.getComponentName())
-        {
-          optimize_single_calibration_curve_succeed = (result_quant_method.getNPoints() > 0);
-          break;
-        }
-      }
-      if (!optimize_single_calibration_curve_succeed)
-      {
-        outlier_feature_concentrations = feature_concentrations_pruned;
-        feature_concentrations_pruned.clear();
-      }
-      else // Calibration curve has succeed
-      {
-        for (const auto& feature : all_feature_concentrations)
-        {
-          bool found = false;
-          for (const auto& feature_pruned : feature_concentrations_pruned)
-          {
-            if ((feature.IS_feature == feature_pruned.IS_feature)
-              && (std::abs(feature.actual_concentration - feature_pruned.actual_concentration) < 1e-9)
-              && (std::abs(feature.IS_actual_concentration - feature_pruned.IS_actual_concentration) < 1e-9)
-              && (std::abs(feature.dilution_factor - feature_pruned.dilution_factor) < 1e-9))
+            if ( (excluded_component_name == component_name)
+              && (excluded_component_name == standard_concentration.component_name)
+              && (excluded_sample_name == standard_concentration.sample_name)
+              && (std::abs(feature_concentration.actual_concentration - standard_concentration.actual_concentration) < 1e-06)
+              && (std::abs(feature_concentration.dilution_factor - standard_concentration.dilution_factor) < 1e-06)
+              )
             {
-              found = true;
-              break;
+              excluded = true;
+              excluded_feature_concentrations.push_back(feature_concentration);
             }
           }
-          if (!found)
-          {
-            outlier_feature_concentrations.push_back(feature);
-          }
+        }
+        if (!excluded)
+        {
+          feature_concentrations.push_back(feature_concentration);
         }
       }
-      components_to_concentrations.erase(row.getComponentName());
-      components_to_concentrations.insert({ row.getComponentName(), feature_concentrations_pruned });
-      outlier_components_to_concentrations.erase(row.getComponentName());
-      outlier_components_to_concentrations.insert({ row.getComponentName(), outlier_feature_concentrations });
-      */
+
+      if (!feature_concentrations.empty())
+      {
+        auto optimized_params = row.getTransformationModelParams();
+        optimized_params = absoluteQuantitation.fitCalibration(
+          feature_concentrations,
+          row.getFeatureName(),
+          row.getTransformationModel(),
+          optimized_params);
+
+        // calculate the R2 and bias
+        std::vector<double> biases; // not needed (method parameters)
+        double correlation_coefficient = 0.0; // not needed (method parameters)
+        absoluteQuantitation.calculateBiasAndR(
+          feature_concentrations,
+          row.getFeatureName(),
+          row.getTransformationModel(),
+          optimized_params,
+          biases,
+          correlation_coefficient);
+
+        row.setTransformationModelParams(optimized_params);
+        row.setCorrelationCoefficient(correlation_coefficient);
+        row.setNPoints(feature_concentrations.size());
+      }
       excluded_components_to_concentrations.erase(row.getComponentName());
       excluded_components_to_concentrations.insert({ row.getComponentName(), excluded_feature_concentrations });
     }
     // store results
-    //sequenceSegmentHandler_IO.setComponentsToConcentrations(components_to_concentrations);
-    //sequenceSegmentHandler_IO.setOutlierComponentsToConcentrations(outlier_components_to_concentrations);
     sequenceSegmentHandler_IO.setExcludedComponentsToConcentrations(excluded_components_to_concentrations);
-    //sequenceSegmentHandler_IO.getQuantitationMethods() = absoluteQuantitation.getQuantMethods();
-    //sequenceSegmentHandler_IO.setQuantitationMethods(absoluteQuantitation.getQuantMethods());
     LOGD << "END FitCalibration";
   }
 
@@ -378,38 +215,5 @@ namespace SmartPeak
     }
     return excluded_points;
   }
-
   
-  std::vector<OpenMS::FeatureMap>
-  FitCalibration::getExcludedFeaturesMap(
-    SequenceSegmentHandler& sequenceSegmentHandler_IO,
-    const SequenceHandler& sequenceHandler_I,
-    const std::string component_name,
-    const std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>& feature_concentrations,
-    const std::vector<std::tuple<std::string, std::string>>& excluded_points) const
-  {
-    std::vector<size_t> excluded_standards_indices;
-    for (auto feature_concentration : feature_concentrations)
-    {
-      for (const auto [excluded_sample_name, excluded_component_name] : excluded_points)
-      {
-        if (excluded_component_name == component_name)
-        {
-          for (const size_t index : sequenceSegmentHandler_IO.getSampleIndices())
-          {
-            if (sequenceHandler_I.getSequence().at(index).getMetaData().getSampleName() == excluded_sample_name)
-            {
-              excluded_standards_indices.push_back(index);
-            }
-          }
-        }
-      }
-    }
-    std::vector<OpenMS::FeatureMap> excluded_standards_featureMaps;
-    for (const size_t index : excluded_standards_indices) {
-      excluded_standards_featureMaps.push_back(sequenceHandler_I.getSequence().at(index).getRawData().getFeatureMap());
-    }
-    return excluded_standards_featureMaps;
-  }
-
 }
