@@ -884,8 +884,13 @@ class CalibratorsPlotWidget_Test :
   public CalibratorsPlotWidget
 {
 public:
-  CalibratorsPlotWidget_Test() :
-    CalibratorsPlotWidget()
+  CalibratorsPlotWidget_Test(
+    SessionHandler& session_handler,
+    SequenceHandler& sequence_handler,
+    std::shared_ptr<ExplorerWidget> explorer_widget,
+    std::shared_ptr<ChromatogramPlotWidget> chromatogram_widget,
+    SequenceObservable& sequence_observable) :
+    CalibratorsPlotWidget(session_handler, sequence_handler, explorer_widget, chromatogram_widget, sequence_observable)
   {};
 
 public:
@@ -900,15 +905,47 @@ public:
     return components_;
   }
 
+  void wrapper_setCalibrationData(SessionHandler::CalibrationData calibration_data, const std::string title)
+  {
+    setCalibrationData(calibration_data, title);
+  }
+
+  void wrapper_getSelectedPoint(ImVec2 point, ImVec2 threshold_point)
+  {
+    getSelectedPoint(point, threshold_point);
+  }
+  
+  std::optional<std::tuple<int, int>>& get_hovered_matching_point_()
+  {
+    return hovered_matching_point_;
+  }
+
+  std::optional<std::tuple<int, int>>& get_hovered_excluded_point_()
+  {
+    return hovered_excluded_point_;
+  }
+
+  std::tuple<std::string, std::string>
+  wrapper_getSampleNameAndSerieFromSelectedPoint(
+    const std::optional<std::tuple<int, int>>& matching_point,
+    const std::optional<std::tuple<int, int>>& excluded_point) const
+  {
+    return getSampleNameAndSerieFromSelectedPoint(matching_point, excluded_point);
+  }
 };
 
-TEST(CalibratorsPlotWidget, setValue)
+TEST(CalibratorsPlotWidget, setCalibrationData)
 {
-  CalibratorsPlotWidget_Test calibrator_widget;
+  SessionHandler session_handler;
+  SequenceHandler sequence_handler;
+  std::shared_ptr<ExplorerWidget> explorer_widget;
+  std::shared_ptr<ChromatogramPlotWidget> chromatogram_widget;
+  EventDispatcher event_dispatcher;
+  CalibratorsPlotWidget_Test calibrator_widget(session_handler, sequence_handler, explorer_widget, chromatogram_widget, event_dispatcher);
   EXPECT_EQ(calibrator_widget.get_reset_zoom_(), true);
 
   SessionHandler::CalibrationData calibrator_data;
-  calibrator_data.series_names = { "on", "two", "three" };
+  calibrator_data.series_names = { "one", "two", "three" };
   calibrator_data.x_axis_title = "x_axis_title";
   calibrator_data.y_axis_title = "y_axis_title";
   calibrator_data.conc_min = 1.0f;
@@ -916,16 +953,100 @@ TEST(CalibratorsPlotWidget, setValue)
   calibrator_data.feature_min = 10.0f;
   calibrator_data.feature_max = 1000.0f;
 
-  calibrator_widget.setValues(calibrator_data, "test");
+  calibrator_widget.wrapper_setCalibrationData(calibrator_data, "test");
   EXPECT_EQ(calibrator_widget.get_reset_zoom_(), true);
-
-  // a draw operation would unflag the reset_zoom
-  calibrator_widget.get_reset_zoom_() = false;
-
-  // same data should not involve a zoom reset
-  calibrator_widget.setValues(calibrator_data, "test");
-  EXPECT_EQ(calibrator_widget.get_reset_zoom_(), false);
 
   auto components = calibrator_widget.get_components_();
   EXPECT_EQ(components, calibrator_data.series_names);
+};
+
+TEST(CalibratorsPlotWidget, getSelectedPoint)
+{
+  SessionHandler session_handler;
+  SequenceHandler sequence_handler;
+  std::shared_ptr<ExplorerWidget> explorer_widget;
+  std::shared_ptr<ChromatogramPlotWidget> chromatogram_widget;
+  EventDispatcher event_dispatcher;
+  CalibratorsPlotWidget_Test calibrator_widget(session_handler, sequence_handler, explorer_widget, chromatogram_widget, event_dispatcher);
+  EXPECT_EQ(calibrator_widget.get_reset_zoom_(), true);
+
+  SessionHandler::CalibrationData calibrator_data;
+  calibrator_data.series_names = { "one", "two", "three" };
+  calibrator_data.x_axis_title = "x_axis_title";
+  calibrator_data.y_axis_title = "y_axis_title";
+  calibrator_data.matching_points_.concentrations_.push_back({ 1.1, 2.1, 3.1 });
+  calibrator_data.matching_points_.features_.push_back({ 1.2, 2.2, 3.2 });
+  calibrator_data.excluded_points_.concentrations_.push_back({ 101.1, 102.1, 103.1 });
+  calibrator_data.excluded_points_.features_.push_back({ 101.2, 102.2, 103.2 });
+
+  calibrator_widget.wrapper_setCalibrationData(calibrator_data, "");
+  calibrator_widget.wrapper_getSelectedPoint({ 2.1, 2.2 }, {0.01, 0.01});
+  ASSERT_NE(calibrator_widget.get_hovered_matching_point_(), std::nullopt);
+  EXPECT_EQ(*calibrator_widget.get_hovered_matching_point_(), std::make_tuple(0, 1));
+  EXPECT_EQ(calibrator_widget.get_hovered_excluded_point_(), std::nullopt);
+
+  calibrator_widget.wrapper_setCalibrationData(calibrator_data, "");
+  calibrator_widget.wrapper_getSelectedPoint({ 11.1, 11.2 }, { 0.01, 0.01 });
+  EXPECT_EQ(calibrator_widget.get_hovered_matching_point_(), std::nullopt);
+  EXPECT_EQ(calibrator_widget.get_hovered_excluded_point_(), std::nullopt);
+
+  calibrator_widget.wrapper_setCalibrationData(calibrator_data, "");
+  calibrator_widget.wrapper_getSelectedPoint({ 103.1, 103.2 }, { 0.01, 0.01 });
+  EXPECT_EQ(calibrator_widget.get_hovered_matching_point_(), std::nullopt);
+  ASSERT_NE(calibrator_widget.get_hovered_excluded_point_(), std::nullopt);
+  EXPECT_EQ(*calibrator_widget.get_hovered_excluded_point_(), std::make_tuple(0, 2));
+
+  calibrator_widget.wrapper_setCalibrationData(calibrator_data, "");
+  calibrator_widget.wrapper_getSelectedPoint({ 1003.1, 1003.2 }, { 0.01, 0.01 });
+  EXPECT_EQ(calibrator_widget.get_hovered_matching_point_(), std::nullopt);
+  EXPECT_EQ(calibrator_widget.get_hovered_excluded_point_(), std::nullopt);
+};
+
+TEST(CalibratorsPlotWidget, getSampleNameFromSelectedPoint)
+{
+  SessionHandler session_handler;
+  SequenceHandler sequence_handler;
+  std::shared_ptr<ExplorerWidget> explorer_widget;
+  std::shared_ptr<ChromatogramPlotWidget> chromatogram_widget;
+  EventDispatcher event_dispatcher;
+  CalibratorsPlotWidget_Test calibrator_widget(session_handler, sequence_handler, explorer_widget, chromatogram_widget, event_dispatcher);
+  EXPECT_EQ(calibrator_widget.get_reset_zoom_(), true);
+
+  SessionHandler::CalibrationData calibrator_data;
+  calibrator_data.series_names = { "one", "two", "three" };
+  calibrator_data.x_axis_title = "x_axis_title";
+  calibrator_data.y_axis_title = "y_axis_title";
+  calibrator_data.matching_points_.concentrations_.push_back({ 1.1, 2.1, 3.1 });
+  calibrator_data.matching_points_.features_.push_back({ 1.2, 2.2, 3.2 });
+  calibrator_data.matching_points_.injections_.push_back({ "sample11", "sample12", "sample13" });
+  calibrator_data.excluded_points_.concentrations_.push_back({ 101.1, 102.1, 103.1 });
+  calibrator_data.excluded_points_.features_.push_back({ 101.2, 102.2, 103.2 });
+  calibrator_data.excluded_points_.injections_.push_back({ "sample31", "sample32", "sample33" });
+
+  calibrator_widget.wrapper_setCalibrationData(calibrator_data, "");
+  calibrator_widget.wrapper_getSelectedPoint({ 2.1, 2.2 }, { 0.01, 0.01 });
+  auto [sample_name_1, serie_1] = calibrator_widget.wrapper_getSampleNameAndSerieFromSelectedPoint(
+    calibrator_widget.get_hovered_matching_point_(),
+    calibrator_widget.get_hovered_excluded_point_()
+  );
+  EXPECT_EQ(sample_name_1, "sample12");
+  EXPECT_EQ(serie_1, "one");
+
+  calibrator_widget.wrapper_setCalibrationData(calibrator_data, "");
+  calibrator_widget.wrapper_getSelectedPoint({ 103.1, 103.2 }, { 0.01, 0.01 });
+  auto [sample_name_3, serie_3] = calibrator_widget.wrapper_getSampleNameAndSerieFromSelectedPoint(
+    calibrator_widget.get_hovered_matching_point_(),
+    calibrator_widget.get_hovered_excluded_point_()
+  );
+  EXPECT_EQ(sample_name_3, "sample33");
+  EXPECT_EQ(serie_3, "one");
+
+  calibrator_widget.wrapper_setCalibrationData(calibrator_data, "");
+  calibrator_widget.wrapper_getSelectedPoint({ 1003.1, 1003.2 }, { 0.01, 0.01 });
+  auto [sample_name_4, serie_4] = calibrator_widget.wrapper_getSampleNameAndSerieFromSelectedPoint(
+    calibrator_widget.get_hovered_matching_point_(),
+    calibrator_widget.get_hovered_excluded_point_()
+  );
+  EXPECT_EQ(sample_name_4, "");
+  EXPECT_EQ(serie_4, "");
 };

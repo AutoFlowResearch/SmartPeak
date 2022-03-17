@@ -153,6 +153,60 @@ namespace SmartPeak
     }
   }
 
+  Parameter::Parameter(const OpenMS::Param::ParamEntry& param_entry)
+  {
+    description_ = param_entry.description;
+    name_ = param_entry.name;
+    switch (param_entry.value.valueType())
+    {
+    case OpenMS::ParamValue::DOUBLE_LIST:
+    {
+      std::vector<float> value;
+      for (const auto& v : param_entry.value.toDoubleVector())
+      {
+        value.push_back(static_cast<float>(v));
+      }
+      value_ = value;
+      break;
+    }
+    case OpenMS::ParamValue::INT_LIST:
+    {
+      std::vector<int> value;
+      for (const auto& v : param_entry.value.toIntVector())
+      {
+        value.push_back(v);
+      }
+      value_ = value;
+      break;
+    }
+    case OpenMS::ParamValue::STRING_LIST:
+    {
+      std::vector<std::string> value;
+      for (const auto& v : param_entry.value.toStringVector())
+      {
+        value.push_back(v);
+      }
+      value_ = value;
+      break;
+    }
+    case OpenMS::ParamValue::INT_VALUE:
+    {
+      value_ = static_cast<int>(param_entry.value);
+      break;
+    }
+    case OpenMS::ParamValue::STRING_VALUE:
+    {
+      value_ = static_cast<std::string>(param_entry.value);
+      break;
+    }
+    case OpenMS::ParamValue::DOUBLE_VALUE:
+    {
+      value_ = static_cast<float>(param_entry.value);
+      break;
+    }
+    }
+  }
+
   std::string Parameter::getType() const
   {
     switch (value_.getTag()) {
@@ -344,6 +398,141 @@ namespace SmartPeak
         }
       }
       return valid;
+    }
+  }
+
+  bool Parameter::isInList(const CastValue& value) const
+  {
+    switch (value_.getTag())
+    {
+    case CastValue::Type::FLOAT:
+    case CastValue::Type::INT:
+    case CastValue::Type::BOOL:
+    case CastValue::Type::UNKNOWN:
+    case CastValue::Type::STRING:
+    case CastValue::Type::UNINITIALIZED:
+    case CastValue::Type::LONG_INT:
+      return false;
+    case CastValue::Type::FLOAT_LIST:
+      return false; // not supported
+    case CastValue::Type::INT_LIST:
+    {
+      if (value.getTag() != CastValue::Type::INT)
+      {
+        return false;
+      }
+      return (std::find(value_.il_.begin(), value_.il_.end(), value.i_) != value_.il_.end());
+    }
+    case CastValue::Type::BOOL_LIST:
+    {
+      if (value.getTag() != CastValue::Type::BOOL)
+      {
+        return false;
+      }
+      return (std::find(value_.bl_.begin(), value_.bl_.end(), value.b_) != value_.bl_.end());
+    }
+    case CastValue::Type::STRING_LIST:
+      if (value.getTag() != CastValue::Type::STRING)
+      {
+        return false;
+      }
+      return (std::find(value_.sl_.begin(), value_.sl_.end(), value.s_) != value_.sl_.end());
+    default:
+      throw "Tag type not managed in getFloatValue(). Implement it.";
+    }
+    return false; // we should not get here
+  }
+
+  void Parameter::addToList(const CastValue& value)
+  {
+    switch (value_.getTag())
+    {
+    case CastValue::Type::FLOAT:
+    case CastValue::Type::INT:
+    case CastValue::Type::BOOL:
+    case CastValue::Type::UNKNOWN:
+    case CastValue::Type::STRING:
+    case CastValue::Type::UNINITIALIZED:
+    case CastValue::Type::LONG_INT:
+      return;
+    case CastValue::Type::FLOAT_LIST:
+      if (value.getTag() != CastValue::Type::FLOAT)
+      {
+        return;
+      }
+      value_.fl_.push_back(value.f_);
+      break;
+    case CastValue::Type::INT_LIST:
+    {
+      if (value.getTag() != CastValue::Type::INT)
+      {
+        return;
+      }
+      value_.il_.push_back(value.i_);
+      break;
+    }
+    case CastValue::Type::BOOL_LIST:
+    {
+      if (value.getTag() != CastValue::Type::BOOL)
+      {
+        return;
+      }
+      value_.bl_.push_back(value.b_);
+      break;
+    }
+    case CastValue::Type::STRING_LIST:
+      if (value.getTag() != CastValue::Type::STRING)
+      {
+        return;
+      }
+      value_.sl_.push_back(value.s_);
+      break;
+    default:
+      throw "Tag type not managed in addToList(). Implement it.";
+    }
+  }
+
+  void Parameter::removeFromList(const CastValue& value)
+  {
+    switch (value_.getTag())
+    {
+    case CastValue::Type::FLOAT:
+    case CastValue::Type::INT:
+    case CastValue::Type::BOOL:
+    case CastValue::Type::UNKNOWN:
+    case CastValue::Type::STRING:
+    case CastValue::Type::UNINITIALIZED:
+    case CastValue::Type::LONG_INT:
+      return;
+    case CastValue::Type::FLOAT_LIST:
+      throw "Tag type not managed in removeFromList(). Implement it.";
+    case CastValue::Type::INT_LIST:
+    {
+      if (value.getTag() != CastValue::Type::INT)
+      {
+        return;
+      }
+      value_.il_.erase(std::remove(value_.il_.begin(), value_.il_.end(), value.i_), value_.il_.end());
+      break;
+    }
+    case CastValue::Type::BOOL_LIST:
+    {
+      if (value.getTag() != CastValue::Type::BOOL)
+      {
+        return;
+      }
+      value_.bl_.erase(std::remove(value_.bl_.begin(), value_.bl_.end(), value.b_), value_.bl_.end());
+      break;
+    }
+    case CastValue::Type::STRING_LIST:
+      if (value.getTag() != CastValue::Type::STRING)
+      {
+        return;
+      }
+      value_.sl_.erase(std::remove(value_.sl_.begin(), value_.sl_.end(), value.s_), value_.sl_.end());
+      break;
+    default:
+      throw "Tag type not managed in removeFromList(). Implement it.";
     }
   }
 
@@ -651,6 +840,18 @@ namespace SmartPeak
   }
 
   Parameter* ParameterSet::findParameter(const std::string& function_name, const std::string& parameter_name)
+  {
+    if (!function_parameters_.count(function_name))
+    {
+      return nullptr;
+    }
+    else
+    {
+      return function_parameters_.at(function_name).findParameter(parameter_name);
+    }
+  }
+
+  const Parameter* ParameterSet::findParameter(const std::string& function_name, const std::string& parameter_name) const
   {
     if (!function_parameters_.count(function_name))
     {

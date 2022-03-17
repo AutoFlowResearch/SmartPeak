@@ -21,7 +21,7 @@
 // $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
 // --------------------------------------------------------------------------
 
-#include <SmartPeak/core/SequenceSegmentProcessors/CalculateCalibration.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/OptimizeCalibration.h>
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/MetaDataHandler.h>
 #include <SmartPeak/core/SampleType.h>
@@ -37,28 +37,28 @@
 
 namespace SmartPeak
 {
-  std::set<std::string> CalculateCalibration::getInputs() const
+  std::set<std::string> OptimizeCalibration::getInputs() const
   {
     return { "Features", "Standards Concentrations", "Quantitation Methods" };
   }
 
-  std::set<std::string> CalculateCalibration::getOutputs() const
+  std::set<std::string> OptimizeCalibration::getOutputs() const
   {
     return { "Quantitation Methods" };
   }
 
-  std::vector<std::string> CalculateCalibration::getRequirements() const
+  std::vector<std::string> OptimizeCalibration::getRequirements() const
   {
     return { "sequence", "traML" };
   }
 
-  ParameterSet CalculateCalibration::getParameterSchema() const
+  ParameterSet OptimizeCalibration::getParameterSchema() const
   {
     OpenMS::AbsoluteQuantitation oms_params;
     return ParameterSet({ oms_params });
   }
 
-  void CalculateCalibration::process(
+  void OptimizeCalibration::process(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
@@ -93,7 +93,7 @@ namespace SmartPeak
 
     absoluteQuantitation.setQuantMethods(sequenceSegmentHandler_IO.getQuantitationMethods());
     std::map<std::string, std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>> components_to_concentrations;
-    std::map<std::string, std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>> outlier_components_to_concentrations;
+    std::map<std::string, std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>> excluded_components_to_concentrations;
     for (const OpenMS::AbsoluteQuantitationMethod& row : sequenceSegmentHandler_IO.getQuantitationMethods()) {
       // map standards to features
       OpenMS::AbsoluteQuantitationStandards absoluteQuantitationStandards;
@@ -105,13 +105,8 @@ namespace SmartPeak
         row.getComponentName(),
         feature_concentrations
       );
-      // remove features with an actual concentration of 0.0 or less
-      std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration> feature_concentrations_pruned;
-      for (const OpenMS::AbsoluteQuantitationStandards::featureConcentration& feature : feature_concentrations) {
-        if (feature.actual_concentration > 0.0) {
-          feature_concentrations_pruned.push_back(feature);
-        }
-      }
+
+      auto feature_concentrations_pruned = sequenceSegmentHandler_IO.getFeatureConcentrationsPruned(feature_concentrations);
 
       // remove components without any points
       if (feature_concentrations_pruned.empty()) {
@@ -128,7 +123,7 @@ namespace SmartPeak
           feature_concentrations_pruned
         );
       }
-      catch (OpenMS::Exception::DivisionByZero& )
+      catch (OpenMS::Exception::DivisionByZero&)
       {
         LOGW << "Warning: '" << row.getComponentName() << "' cannot be analysed - division by zero\n";
         continue;
@@ -140,16 +135,16 @@ namespace SmartPeak
       }
 
       // Compute outer points
-      std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration> outlier_feature_concentrations;
+      std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration> excluded_feature_concentrations;
       for (const auto& feature : all_feature_concentrations)
       {
         bool found = false;
         for (const auto& feature_pruned : feature_concentrations_pruned)
         {
           if ((feature.IS_feature == feature_pruned.IS_feature)
-                && (std::abs(feature.actual_concentration - feature_pruned.actual_concentration) < 1e-9)
-                && (std::abs(feature.IS_actual_concentration - feature_pruned.IS_actual_concentration) < 1e-9)
-                && (std::abs(feature.dilution_factor - feature_pruned.dilution_factor) < 1e-9))
+            && (std::abs(feature.actual_concentration - feature_pruned.actual_concentration) < 1e-9)
+            && (std::abs(feature.IS_actual_concentration - feature_pruned.IS_actual_concentration) < 1e-9)
+            && (std::abs(feature.dilution_factor - feature_pruned.dilution_factor) < 1e-9))
           {
             found = true;
             break;
@@ -157,19 +152,18 @@ namespace SmartPeak
         }
         if (!found)
         {
-          outlier_feature_concentrations.push_back(feature);
+          excluded_feature_concentrations.push_back(feature);
         }
       }
       components_to_concentrations.erase(row.getComponentName());
-      components_to_concentrations.insert({row.getComponentName(), feature_concentrations_pruned });
-      outlier_components_to_concentrations.erase(row.getComponentName());
-      outlier_components_to_concentrations.insert({ row.getComponentName(), outlier_feature_concentrations });
+      components_to_concentrations.insert({ row.getComponentName(), feature_concentrations_pruned });
+      excluded_components_to_concentrations.erase(row.getComponentName());
+      excluded_components_to_concentrations.insert({ row.getComponentName(), excluded_feature_concentrations });
     }
     // store results
     sequenceSegmentHandler_IO.setComponentsToConcentrations(components_to_concentrations);
-    sequenceSegmentHandler_IO.setOutlierComponentsToConcentrations(outlier_components_to_concentrations);
+    sequenceSegmentHandler_IO.setExcludedComponentsToConcentrations(excluded_components_to_concentrations);
     sequenceSegmentHandler_IO.getQuantitationMethods() = absoluteQuantitation.getQuantMethods();
-    //sequenceSegmentHandler_IO.setQuantitationMethods(absoluteQuantitation.getQuantMethods());
     LOGD << "END optimizeCalibrationCurves";
   }
 

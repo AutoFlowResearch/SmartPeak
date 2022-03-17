@@ -41,13 +41,18 @@ namespace SmartPeak
   /**
     @brief Base Parameters table
   */
-  class ParametersTableWidget final : public Widget, public IParametersObserver, public IWorkflowObserver
+  class ParametersTableWidget final : 
+    public Widget, 
+    public IParametersObserver, 
+    public IWorkflowObserver,
+    public IParameterEditorWidgetObserver
   {
   public:
     ParametersTableWidget(SessionHandler& session_handler, ApplicationHandler& application_handler, const std::string& table_id, const std::string title = "");
     ~ParametersTableWidget();
 
     void draw() override;
+
   public:
     /**
      IParametersObserver
@@ -57,6 +62,12 @@ namespace SmartPeak
      IWorkflowObserver
     */
     virtual void onWorkflowUpdated() override;
+    /** 
+      IParameterEditorWidgetObserver
+    */
+    virtual void onParameterSet(const std::string& function_parameter, const Parameter& parameter);
+    virtual void onParameterRemoved(const std::string& function_parameter, const Parameter& parameter);
+
   private:
     void updateParametersTable();
     const std::vector<std::string> header_names_ = { "function", "name", "type", "value", "restrictions" };

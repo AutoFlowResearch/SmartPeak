@@ -64,7 +64,7 @@ namespace SmartPeak
       return false;
     }
     Filenames filenames;
-    filenames.setFullPath("quantitationMethods", filename);
+    filenames.setFullPath("standardsConcentrations", filename);
     sequence_segment_observable_ = &application_handler->sequenceHandler_;
     process(application_handler->sequenceHandler_.getSequenceSegments()[0], SequenceHandler(), {}, filenames);
     return true;

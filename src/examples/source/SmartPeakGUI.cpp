@@ -107,7 +107,6 @@ int main(int argc, char** argv)
   // to disable buttons, display info, and update the session cache
   bool workflow_is_done_ = true;
   bool file_loading_is_done_ = true;
-  bool exceeding_plot_points_ = false;
   bool exceeding_table_size_ = false;
   bool ran_integrity_check_ = false;
   bool integrity_check_failed_ = false;
@@ -179,8 +178,14 @@ int main(int argc, char** argv)
   auto heatmap_plot_widget_ = std::make_shared<Heatmap2DWidget>(session_handler_, application_handler_, "Heatmap Main Window", "Features (heatmap)", event_dispatcher);
   auto spectra_plot_widget_ = std::make_shared<SpectraPlotWidget>(session_handler_, application_handler_, "Spectra Main Window", "Spectra", event_dispatcher);
   auto feature_line_plot_ = std::make_shared<LinePlot2DWidget>("Features (line)");
-  auto calibrators_line_plot_ = std::make_shared<CalibratorsPlotWidget>("Calibrators");
   auto injections_explorer_window_ = std::make_shared<ExplorerWidget>("InjectionsExplorerWindow", "Injections", &event_dispatcher);
+  auto calibrators_line_plot_ = std::make_shared<CalibratorsPlotWidget>(
+    session_handler_, 
+    application_handler_.sequenceHandler_, 
+    injections_explorer_window_, 
+    chromatogram_plot_widget_,
+    event_dispatcher,
+    "Calibrators");
   auto transitions_explorer_window_ = std::make_shared<ExplorerWidget>("TransitionsExplorerWindow", "Transitions", &event_dispatcher);
   auto features_explorer_window_ = std::make_shared<ExplorerWidget>("FeaturesExplorerWindow", "Features", &event_dispatcher);
   auto spectrum_explorer_window_ = std::make_shared<ExplorerWidget>("SpectrumExplorerWindow", "Scans", &event_dispatcher);
@@ -446,7 +451,6 @@ int main(int argc, char** argv)
 
     // Make the quick info text
     quickInfoText_->clearErrorMessages();
-    if (exceeding_plot_points_) quickInfoText_->addErrorMessage("Plot rendering limit reached.  Not plotting all selected data.");
     if (exceeding_table_size_) quickInfoText_->addErrorMessage("Table rendering limit reached.  Not showing all selected data.");
     if (ran_integrity_check_ && integrity_check_failed_) quickInfoText_->addErrorMessage("Integrity check failed.  Check the `Information` log.");
     if (ran_integrity_check_ && !integrity_check_failed_) quickInfoText_->addErrorMessage("Integrity check passed.");
@@ -516,8 +520,8 @@ int main(int argc, char** argv)
             std::make_shared<StoreParameters>(),
             std::make_shared<StoreWorkflow>(application_handler_.sequenceHandler_),
             std::make_shared<StoreValidationData>(),
-            std::make_shared<StoreStandardsConcentrations>(),
-            std::make_shared<StoreQuantitationMethods>(),
+            // std::make_shared<StoreStandardsConcentrations>(), // not implemented
+            std::make_shared<StoreQuantitationMethods>(true),
             std::make_shared<StoreFeatureFilters>(FeatureFiltersUtilsMode::EFeatureFiltersModeComponent, true),
             std::make_shared<StoreFeatureFilters>(FeatureFiltersUtilsMode::EFeatureFiltersModeGroup, true),
             std::make_shared<StoreFeatureQCs>(FeatureFiltersUtilsMode::EFeatureFiltersModeComponent, true),
@@ -878,14 +882,6 @@ int main(int argc, char** argv)
       spectrum_explorer_window_->checked_rows_ = session_handler_.spectrum_explorer_data.checked_rows;
       spectrum_explorer_window_->checkbox_headers_ = session_handler_.spectrum_explorer_data.checkbox_headers;
       spectrum_explorer_window_->checkbox_columns_ = &session_handler_.spectrum_explorer_data.checkbox_body;
-    }
-
-    // calibrators
-    if (calibrators_line_plot_->visible_)
-    {
-      SessionHandler::CalibrationData calibration_data;
-      exceeding_plot_points_ = !session_handler_.setCalibratorsScatterLinePlot(application_handler_.sequenceHandler_, calibration_data);
-      calibrators_line_plot_->setValues(calibration_data, "CalibratorsMainWindow");
     }
 
     // ======================================

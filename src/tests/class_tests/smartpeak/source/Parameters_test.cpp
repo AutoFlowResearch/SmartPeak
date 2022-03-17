@@ -877,6 +877,51 @@ TEST(ParameterSet, Parameter_constructorFromStruct)
   EXPECT_EQ(param_wrong_max.getRestrictionsAsString(), "");
 }
 
+TEST(ParameterSet, Parameter_constructFromParamEntry)
+{
+  OpenMS::Param::ParamEntry param_entry_int("test_int", 42, "test_int_description");
+  Parameter param_int(param_entry_int);
+  EXPECT_EQ(param_int.getType(), "int");
+  EXPECT_EQ(param_int.getValueAsString(), "42");
+  EXPECT_EQ(param_int.getName(), "test_int");
+  EXPECT_EQ(param_int.getDescription(), "test_int_description");
+
+  OpenMS::Param::ParamEntry param_entry_float("test_float", 3.14, "test_float_description");
+  Parameter param_float(param_entry_float);
+  EXPECT_EQ(param_float.getType(), "float");
+  EXPECT_EQ(param_float.getValueAsString(), "3.14");
+  EXPECT_EQ(param_float.getName(), "test_float");
+  EXPECT_EQ(param_float.getDescription(), "test_float_description");
+
+  OpenMS::Param::ParamEntry param_entry_string("test_string", "test", "test_string_description");
+  Parameter param_string(param_entry_string);
+  EXPECT_EQ(param_string.getType(), "string");
+  EXPECT_EQ(param_string.getValueAsString(), "test");
+  EXPECT_EQ(param_string.getName(), "test_string");
+  EXPECT_EQ(param_string.getDescription(), "test_string_description");
+
+  OpenMS::Param::ParamEntry param_entry_int_list("test_int_list", std::vector<int>({ 42, 43, 44 }), "test_int_list_description");
+  Parameter param_int_list(param_entry_int_list);
+  EXPECT_EQ(param_int_list.getType(), "int_list");
+  EXPECT_EQ(param_int_list.getValueAsString(), "[42,43,44]");
+  EXPECT_EQ(param_int_list.getName(), "test_int_list");
+  EXPECT_EQ(param_int_list.getDescription(), "test_int_list_description");
+
+  OpenMS::Param::ParamEntry param_entry_float_list("test_float_list", std::vector<double>({ 3.14, 3.15, 3.16 }), "test_float_list_description");
+  Parameter param_float_list(param_entry_float_list);
+  EXPECT_EQ(param_float_list.getType(), "float_list");
+  EXPECT_EQ(param_float_list.getValueAsString(), "[3.14,3.15,3.16]");
+  EXPECT_EQ(param_float_list.getName(), "test_float_list");
+  EXPECT_EQ(param_float_list.getDescription(), "test_float_list_description");
+
+  OpenMS::Param::ParamEntry param_entry_string_list("test_string_list", std::vector<std::string>({ "test0", "test1", "test2" }), "test_string_list_description");
+  Parameter param_string_list(param_entry_string_list);
+  EXPECT_EQ(param_string_list.getType(), "string_list");
+  EXPECT_EQ(param_string_list.getValueAsString(), "[\'test0\',\'test1\',\'test2\']");
+  EXPECT_EQ(param_string_list.getName(), "test_string_list");
+  EXPECT_EQ(param_string_list.getDescription(), "test_string_list_description");
+}
+
 TEST(ParameterSet, Parameter_type)
 {
   // we use implicit casts
@@ -1144,7 +1189,6 @@ TEST(ParameterSet, Parameter_defaultvalue)
   EXPECT_STREQ(param_int.getDefaultValueAsString().c_str(), "50");
 }
 
-
 TEST(ParameterSet, Parameter_equal)
 {
   Parameter param_int_1("param_int", 10);
@@ -1177,4 +1221,68 @@ TEST(ParameterSet, Parameter_equal)
   Parameter param_list_int_3("param_list_int_1", list_int_3);
   EXPECT_TRUE(param_list_int_1 == param_list_int_3);
 
+}
+
+TEST(ParameterSet, Parameter_isInList)
+{
+  Parameter param("param_int", 10);
+  EXPECT_FALSE(param.isInList(42));
+  EXPECT_FALSE(param.isInList("one"));
+
+  param.setValueFromString("[1, 2, 3]");
+  EXPECT_STREQ(param.getValueAsString().c_str(), "[1,2,3]");
+  EXPECT_TRUE(param.isInList(2));
+  EXPECT_FALSE(param.isInList(42));
+
+  param.setValueFromString("[FAlSe, FALSE, false]");
+  EXPECT_TRUE(param.isInList(false));
+  EXPECT_FALSE(param.isInList(true));
+
+  param.setValueFromString(" ['one','two', 'three']  ");
+  EXPECT_STREQ(param.getValueAsString().c_str(), "['one','two','three']");
+  EXPECT_STREQ(param.getType().c_str(), "string_list");
+  EXPECT_TRUE(param.isInList("three"));
+  EXPECT_FALSE(param.isInList("four"));
+}
+
+TEST(ParameterSet, Parameter_addToList)
+{
+  Parameter param("param_int", 10);
+  param.addToList(42);
+  EXPECT_STREQ(param.getValueAsString().c_str(), "10");
+
+  param.setValueFromString("[1, 2, 3]");
+  param.addToList(4);
+  EXPECT_STREQ(param.getValueAsString().c_str(), "[1,2,3,4]");
+
+  param.setValueFromString("[1.1, 2.2, 3.3]");
+  param.addToList(4.4f);
+  EXPECT_STREQ(param.getValueAsString().c_str(), "[1.1,2.2,3.3,4.4]");
+
+  param.setValueFromString("[true, FALSE, True]");
+  param.addToList(false);
+  EXPECT_STREQ(param.getValueAsString().c_str(), "[true,false,true,false]");
+
+  param.setValueFromString(" ['one','two', 'three']  ");
+  param.addToList("four");
+  EXPECT_STREQ(param.getValueAsString().c_str(), "['one','two','three','four']");
+}
+
+TEST(ParameterSet, Parameter_removeFromList)
+{
+  Parameter param("param_int", 10);
+  param.removeFromList(42);
+  EXPECT_STREQ(param.getValueAsString().c_str(), "10");
+
+  param.setValueFromString("[1, 2, 3]");
+  param.removeFromList(2);
+  EXPECT_STREQ(param.getValueAsString().c_str(), "[1,3]");
+
+  param.setValueFromString("[true, FALSE, True]");
+  param.removeFromList(true);
+  EXPECT_STREQ(param.getValueAsString().c_str(), "[false]");
+
+  param.setValueFromString(" ['one','two', 'three']  ");
+  param.removeFromList("one");
+  EXPECT_STREQ(param.getValueAsString().c_str(), "['two','three']");
 }

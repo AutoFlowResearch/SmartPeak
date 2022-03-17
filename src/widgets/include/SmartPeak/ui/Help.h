@@ -80,6 +80,9 @@ namespace SmartPeak
     {"import_file", " Add a file to the current session by choosing the file type"},
     {"export_file", " Save a workflow or a sequence from the current session"},
     
+    // calibration
+    {"calibration_action", " -Optimize Calibration: try to find the best parameters automatically\n -Fit Calibration: fine tuning of the calibration. You can include, exclude points and change some parameters."},
+
     {"view", " View and hide tables and plot"},
     
     {"actions", " Perform actions on the loaded sequence"},
