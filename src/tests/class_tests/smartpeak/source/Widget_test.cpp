@@ -1033,15 +1033,6 @@ TEST(CalibratorsPlotWidget, getSampleNameFromSelectedPoint)
   EXPECT_EQ(serie_1, "one");
 
   calibrator_widget.wrapper_setCalibrationData(calibrator_data, "");
-  calibrator_widget.wrapper_getSelectedPoint({ 11.1, 11.2 }, { 0.01, 0.01 });
-  auto [sample_name_2, serie_2] = calibrator_widget.wrapper_getSampleNameAndSerieFromSelectedPoint(
-    calibrator_widget.get_hovered_matching_point_(),
-    calibrator_widget.get_hovered_excluded_point_()
-  );
-  EXPECT_EQ(sample_name_2, "sample21");
-  EXPECT_EQ(serie_2, "one");
-
-  calibrator_widget.wrapper_setCalibrationData(calibrator_data, "");
   calibrator_widget.wrapper_getSelectedPoint({ 103.1, 103.2 }, { 0.01, 0.01 });
   auto [sample_name_3, serie_3] = calibrator_widget.wrapper_getSampleNameAndSerieFromSelectedPoint(
     calibrator_widget.get_hovered_matching_point_(),
