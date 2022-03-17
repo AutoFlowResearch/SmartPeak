@@ -24,11 +24,12 @@
 #pragma once
 
 #include <SmartPeak/core/SequenceSegmentProcessor.h>
+#include <SmartPeak/iface/IFilePickerHandler.h>
 
 namespace SmartPeak
 {
 
-  struct StoreQuantitationMethods : SequenceSegmentProcessor
+  struct StoreQuantitationMethods : SequenceSegmentProcessor, IFilePickerHandler
   {
     StoreQuantitationMethods(bool static_filenames = false)
       : static_filenames_(static_filenames) {}
@@ -54,6 +55,14 @@ namespace SmartPeak
 
     /* IFilenamesHandler */
     virtual void getFilenames(Filenames& filenames) const override;
+
+    /**
+    IFilePickerHandler
+    */
+    bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
+
+  protected:
+    bool store_from_file_picker_ = false;
   };
 
 }

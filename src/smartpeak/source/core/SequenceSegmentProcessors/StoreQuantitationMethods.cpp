@@ -60,8 +60,29 @@ namespace SmartPeak
 
   void StoreQuantitationMethods::getFilenames(Filenames& filenames) const
   {
-    filenames.addFileName("quantitationMethods", constructFilename("quantitationMethods.csv", static_filenames_), "Quantitation Methods", false, false, true);
+    filenames.addFileName(
+      "quantitationMethods", 
+      constructFilename("quantitationMethods.csv", static_filenames_),
+      "Quantitation Methods",
+      false,
+      false,
+      true);
   };
+
+  bool StoreQuantitationMethods::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
+  {
+    if (application_handler->sequenceHandler_.getSequenceSegments().size() == 0)
+    {
+      LOGE << "File cannot be written without first loading the sequence.";
+      return false;
+    }
+    auto& sequence_segment = application_handler->sequenceHandler_.getSequenceSegments().at(0);
+    Filenames filenames;
+    filenames.setFullPath("quantitationMethods", filename);
+    store_from_file_picker_ = true;
+    process(sequence_segment, application_handler->sequenceHandler_, {}, filenames);
+    return true;
+  }
 
   void StoreQuantitationMethods::process(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
@@ -71,7 +92,11 @@ namespace SmartPeak
   ) const
   {
     LOGD << "START storeQuantitationMethods";
-    getFilenames(filenames_I);
+    
+    if (!store_from_file_picker_) // This processor is special as quantitationMethods is both input and output we need an additional flag
+    {
+      getFilenames(filenames_I);
+    }
 
     if (!InputDataValidation::prepareToStore(filenames_I, "quantitationMethods"))
     {

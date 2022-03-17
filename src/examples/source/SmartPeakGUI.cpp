@@ -520,8 +520,8 @@ int main(int argc, char** argv)
             std::make_shared<StoreParameters>(),
             std::make_shared<StoreWorkflow>(application_handler_.sequenceHandler_),
             std::make_shared<StoreValidationData>(),
-            std::make_shared<StoreStandardsConcentrations>(),
-            std::make_shared<StoreQuantitationMethods>(),
+            // std::make_shared<StoreStandardsConcentrations>(), // not implemented
+            std::make_shared<StoreQuantitationMethods>(true),
             std::make_shared<StoreFeatureFilters>(FeatureFiltersUtilsMode::EFeatureFiltersModeComponent, true),
             std::make_shared<StoreFeatureFilters>(FeatureFiltersUtilsMode::EFeatureFiltersModeGroup, true),
             std::make_shared<StoreFeatureQCs>(FeatureFiltersUtilsMode::EFeatureFiltersModeComponent, true),
