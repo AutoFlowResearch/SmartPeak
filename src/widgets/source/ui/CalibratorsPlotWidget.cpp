@@ -760,7 +760,6 @@ namespace SmartPeak
       SessionHandler::CalibrationData calibration_data;
       session_handler_.setCalibratorsScatterLinePlot(sequence_handler_, calibration_data);
       setCalibrationData(calibration_data, "Calibration Curve");
-      removeExcludedFromMatchingPoints();
       refresh_needed_ = false;
     }
 
@@ -878,63 +877,6 @@ namespace SmartPeak
   void CalibratorsPlotWidget::onSequenceUpdated()
   {
     refresh_needed_ = true;
-  }
-
-  void CalibratorsPlotWidget::removeExcludedFromMatchingPoints()
-  {
-    // correct the override between excluded point and included points, to avoid double points in the plot.
-    int serie_index = 0;
-    SessionHandler::CalibrationData::Points new_matching_points;
-    for (const auto& serie_name : calibration_data_.series_names)
-    {
-      const auto& concentrations = calibration_data_.matching_points_.concentrations_.at(serie_index);
-      const auto& features = calibration_data_.matching_points_.features_.at(serie_index);
-      const auto& feature_concentrations = calibration_data_.matching_points_.feature_concentrations_.at(serie_index);
-      const auto& injections = calibration_data_.matching_points_.injections_.at(serie_index);
-      if (calibration_data_.excluded_points_.injections_.at(serie_index).empty())
-      {
-        // no excluded point, keep it untouched.
-        new_matching_points.concentrations_.push_back(concentrations);
-        new_matching_points.features_.push_back(features);
-        new_matching_points.feature_concentrations_.push_back(feature_concentrations);
-        new_matching_points.injections_.push_back(injections);
-      }
-      else
-      {
-        std::vector<float> new_concentrations;
-        std::vector<float> new_features;
-        std::vector<std::string> new_injections;
-        std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration> new_feature_concentrations;
-        const auto& excluded_concentrations = calibration_data_.excluded_points_.concentrations_.at(serie_index);
-        int injection_index = 0;
-        for (const auto& concentration : concentrations)
-        {
-          bool found = false;
-          for (const auto& excluded_concentration : excluded_concentrations)
-          {
-            if (std::abs(excluded_concentration - concentration) < 1e-06)
-            {
-              found = true;
-              break;
-            }
-          }
-          if (!found)
-          {
-            new_concentrations.push_back(concentrations.at(injection_index));
-            new_features.push_back(features.at(injection_index));
-            new_feature_concentrations.push_back(feature_concentrations.at(injection_index));
-            new_injections.push_back(injections.at(injection_index));
-          }
-          injection_index++;
-        }
-        new_matching_points.concentrations_.push_back(new_concentrations);
-        new_matching_points.features_.push_back(new_features);
-        new_matching_points.feature_concentrations_.push_back(new_feature_concentrations);
-        new_matching_points.injections_.push_back(new_injections);
-      }
-      serie_index++;
-    }
-    calibration_data_.matching_points_ = new_matching_points;
   }
 
   bool CalibratorsPlotWidget::isExcluded(const std::string& serie_name, const std::string& sample_name)
