@@ -220,6 +220,15 @@ namespace SmartPeak
 
     ImGui::Combo("Action", &selected_action_, &actions_cstr_[0], actions_cstr_.size());
     showQuickHelpToolTip("calibration_action");
+
+    if (selected_action_ == EActionOptimizeCalibration)
+    {
+      if (ImGui::Button("Calculate Optimized Calibration"))
+      {
+        recomputeCalibration();
+      }
+    }
+
     ImGui::Separator();
 
     parameter_editor_widget_.draw();
@@ -271,7 +280,13 @@ namespace SmartPeak
               auto user_param = user_params.findParameter(fit_calibration_fct.first, fit_calibration_param.getName());
               if (user_param)
               {
-                if (user_param->getName() != "component_name") // compoonent_name is an internal parameter
+                static std::vector<std::string> internal_parameters =
+                {
+                  "component_name",
+                  "excluded_points",
+                  "included_points"
+                };
+                if (std::find(internal_parameters.begin(), internal_parameters.end(), user_param->getName()) == internal_parameters.end())
                 {
                   addParameterRow(std::make_shared<Parameter>(*user_param), true);
                 }
@@ -430,8 +445,10 @@ namespace SmartPeak
         }
       }
     }
-
-    recomputeCalibration();
+    if (selected_action_ == EActionFitCalibration)
+    {
+      recomputeCalibration();
+    }
   }
 
   void CalibratorsPlotWidget::plotPoints(bool show_flag, const SessionHandler::CalibrationData::Points& points, int marker_style)
@@ -696,41 +713,20 @@ namespace SmartPeak
                 {
                   user_excluded_points_.push_back(std::make_pair(serie_name, sample_name));
                   user_included_points_.erase(std::remove(user_included_points_.begin(), user_included_points_.end(), sample_and_serie), user_included_points_.end());
-                  recomputeCalibration();
-                  /*
-                  ParameterSet& user_parameters = sequence_handler_.getSequence().at(0).getRawData().getParameters();
-                  Parameter* existing_parameter = user_parameters.findParameter("FitCalibration", "excluded_points");
-                  if (existing_parameter)
                   {
-                    std::ostringstream os;
-                    os << sample_name << ";" << serie_name;
-                    existing_parameter->addToList(os.str());
                     recomputeCalibration();
-                  }
-                  else
-                  {
-                    std::ostringstream os;
-                    os << "[\'" << sample_name << ";" << calibration_data_.series_names[selected_component_] << "\']";
-                    Parameter new_param(
-                      { { "name", "excluded_points" },
-                        { "type", "list" },
-                        { "value", os.str() } });
-                    user_parameters.addParameter("FitCalibration", new_param);
-                    recomputeCalibration();
-                  }
-                  */
-                }
+                  }                }
               }
               else
               {
                 if (ImGui::Selectable("Include to calibration"))
                 {
-                  //existing_parameter->removeFromList(os.str());
-                  //user_excluded_points_.push_back(std::make_pair(serie_name, sample_name));
                   user_included_points_.push_back(std::make_pair(serie_name, sample_name));
                   user_excluded_points_.erase(std::remove(user_excluded_points_.begin(), user_excluded_points_.end(), sample_and_serie), user_excluded_points_.end());
-                  recomputeCalibration();
-                }
+                  if (selected_action_ == EActionFitCalibration)
+                  {
+                    recomputeCalibration();
+                  }                }
               }
             }
           }
@@ -944,7 +940,6 @@ namespace SmartPeak
   bool CalibratorsPlotWidget::isExcluded(const std::string& serie_name, const std::string& sample_name)
   {
     const auto& sequence_segment = sequence_handler_.getSequenceSegments().at(selected_sequence_segment_);
-
     // find concentrations from serie_name and sample_name
     OpenMS::AbsoluteQuantitationStandards::runConcentration point_concs;
     bool found = false;
@@ -957,8 +952,7 @@ namespace SmartPeak
         found = true;
       }
     }
-
-    // find it in the excluded points
+    // find it in the excluded points from the sequence_segment
     const auto& excluded_components_to_concentrations = sequence_segment.getExcludedComponentsToConcentrations();
     if (!excluded_components_to_concentrations.count(components_.at(selected_component_)))
     {
@@ -974,9 +968,10 @@ namespace SmartPeak
         return true;
       }
     }
+    // find in user excluded points
     return std::find(
       user_excluded_points_.begin(), 
       user_excluded_points_.end(), 
-      std::make_tuple(sample_name, serie_name)) != user_excluded_points_.end();
+      std::make_tuple(serie_name, sample_name)) != user_excluded_points_.end();
   }
 }

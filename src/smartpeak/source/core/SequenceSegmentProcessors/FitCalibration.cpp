@@ -109,6 +109,8 @@ namespace SmartPeak
 
     absoluteQuantitation.setQuantMethods(sequenceSegmentHandler_IO.getQuantitationMethods());
     auto excluded_components_to_concentrations = sequenceSegmentHandler_IO.getExcludedComponentsToConcentrations();
+    auto components_to_concentrations = sequenceSegmentHandler_IO.getComponentsToConcentrations();
+
     for (OpenMS::AbsoluteQuantitationMethod& row : sequenceSegmentHandler_IO.getQuantitationMethods())
     {
       if (row.getComponentName() != component_name)
@@ -116,8 +118,8 @@ namespace SmartPeak
         continue;
       }
       
-      auto excluded_feature_concentrations = sequenceSegmentHandler_IO.getExcludedComponentsToConcentrations().at(component_name);
-      auto feature_concentrations = sequenceSegmentHandler_IO.getComponentsToConcentrations().at(component_name);
+      auto excluded_feature_concentrations = excluded_components_to_concentrations.at(component_name);
+      auto feature_concentrations = components_to_concentrations.at(component_name);
 
       // Remove user excluded features
       std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration> new_feature_concentrations;
@@ -199,10 +201,13 @@ namespace SmartPeak
         row.setCorrelationCoefficient(correlation_coefficient);
         row.setNPoints(feature_concentrations.size());
       }
+      components_to_concentrations.erase(row.getComponentName());
+      components_to_concentrations.insert({ row.getComponentName(), feature_concentrations });
       excluded_components_to_concentrations.erase(row.getComponentName());
       excluded_components_to_concentrations.insert({ row.getComponentName(), excluded_feature_concentrations });
     }
     // store results
+    sequenceSegmentHandler_IO.setComponentsToConcentrations(components_to_concentrations);
     sequenceSegmentHandler_IO.setExcludedComponentsToConcentrations(excluded_components_to_concentrations);
     LOGD << "END FitCalibration";
   }
