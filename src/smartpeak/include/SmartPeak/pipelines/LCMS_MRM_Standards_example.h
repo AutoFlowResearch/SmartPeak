@@ -36,7 +36,7 @@
 #include <SmartPeak/core/RawDataProcessors/StoreFeatures.h>
 #include <SmartPeak/core/RawDataProcessors/QuantifyFeatures.h>
 #include <SmartPeak/core/SequenceSegmentProcessors/StoreQuantitationMethods.h>
-#include <SmartPeak/core/SequenceSegmentProcessors/FitCalibration.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/OptimizeCalibration.h>
 #include <SmartPeak/core/ApplicationProcessors/LoadSession.h>
 
 using namespace SmartPeak;
@@ -89,7 +89,7 @@ void example_LCMS_MRM_Standards(
   ps.process(methods_filenames);
 
   const std::vector<std::shared_ptr<SequenceSegmentProcessor>> sequence_segment_processing_methods = {
-    std::make_shared<FitCalibration>(),
+    std::make_shared<OptimizeCalibration>(),
     std::make_shared<StoreQuantitationMethods>()
   };
 
