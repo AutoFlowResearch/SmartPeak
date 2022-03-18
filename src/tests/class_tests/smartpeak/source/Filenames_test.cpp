@@ -91,6 +91,8 @@ TEST(Filenames, setRootPath_setVariant_after)
   filenames.addFileName("my_file_main", "${MAIN_DIR}/file_main.txt");
   filenames.addFileName("my_file_injection_input", "${FEATURES_INPUT_PATH}/${INPUT_INJECTION_NAME}file_injection_input.txt");
   filenames.addFileName("my_file_injection_output", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}file_injection_output.txt");
+  filenames.addFileName("my_file_sequence_segment_input", "${FEATURES_INPUT_PATH}/${INPUT_SEQUENCE_SEGMENT_NAME}file_sequence_segment_input.txt");
+  filenames.addFileName("my_file_sequence_segment_output", "${FEATURES_OUTPUT_PATH}/${OUTPUT_SEQUENCE_SEGMENT_NAME}file_sequence_segment_output.txt");
   filenames.addFileName("my_file_group_input", "${FEATURES_INPUT_PATH}/${INPUT_GROUP_NAME}file_group_input.txt");
   filenames.addFileName("my_file_group_output", "${FEATURES_OUTPUT_PATH}/${OUTPUT_GROUP_NAME}file_group_output.txt");
   filenames.setTagValue(Filenames::Tag::MAIN_DIR, "/main");
@@ -100,11 +102,15 @@ TEST(Filenames, setRootPath_setVariant_after)
   filenames.setTagValue(Filenames::Tag::INPUT_MZML_FILENAME, "variant_mzml_");
   filenames.setTagValue(Filenames::Tag::INPUT_INJECTION_NAME, "variant_input_injection_");
   filenames.setTagValue(Filenames::Tag::OUTPUT_INJECTION_NAME, "variant_output_injection_");
+  filenames.setTagValue(Filenames::Tag::INPUT_SEQUENCE_SEGMENT_NAME, "variant_input_sequence_segment_");
+  filenames.setTagValue(Filenames::Tag::OUTPUT_SEQUENCE_SEGMENT_NAME, "variant_output_segment_segment_");
   filenames.setTagValue(Filenames::Tag::INPUT_GROUP_NAME, "variant_input_sample_");
   filenames.setTagValue(Filenames::Tag::OUTPUT_GROUP_NAME, "variant_output_sample_");
   EXPECT_STREQ(filenames.getFullPath("my_file_main").generic_string().c_str(), "/main/file_main.txt");
   EXPECT_STREQ(filenames.getFullPath("my_file_injection_input").generic_string().c_str(), "/feat_input/variant_input_injection_file_injection_input.txt");
   EXPECT_STREQ(filenames.getFullPath("my_file_injection_output").generic_string().c_str(), "/feat_output/variant_output_injection_file_injection_output.txt");
+  EXPECT_STREQ(filenames.getFullPath("my_file_sequence_segment_input").generic_string().c_str(), "/feat_input/variant_input_sequence_segment_file_sequence_segment_input.txt");
+  EXPECT_STREQ(filenames.getFullPath("my_file_sequence_segment_output").generic_string().c_str(), "/feat_output/variant_output_segment_segment_file_sequence_segment_output.txt");
   EXPECT_STREQ(filenames.getFullPath("my_file_group_input").generic_string().c_str(), "/feat_input/variant_input_sample_file_group_input.txt");
   EXPECT_STREQ(filenames.getFullPath("my_file_group_output").generic_string().c_str(), "/feat_output/variant_output_sample_file_group_output.txt");
 }

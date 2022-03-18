@@ -75,7 +75,7 @@ namespace SmartPeak
     }
     else
     {
-      return "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}_" + filename;
+      return "${FEATURES_OUTPUT_PATH}/${OUTPUT_SEQUENCE_SEGMENT_NAME}_" + filename;
     }
   }
 }

@@ -60,9 +60,6 @@ namespace SmartPeak
     IFilePickerHandler
     */
     bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
-
-  protected:
-    bool store_from_file_picker_ = false;
   };
 
 }
