@@ -97,8 +97,8 @@ void example_LCMS_MRM_Standards(
   for (const SequenceSegmentHandler& sequence_segment : application_handler.sequenceHandler_.getSequenceSegments()) {
     const std::string& key = sequence_segment.getSequenceSegmentName();
     dynamic_filenames2[key] = methods_filenames;
-    dynamic_filenames2[key].setTagValue(Filenames::Tag::INPUT_INJECTION_NAME, key);
-    dynamic_filenames2[key].setTagValue(Filenames::Tag::OUTPUT_INJECTION_NAME, key);
+    dynamic_filenames2[key].setTagValue(Filenames::Tag::INPUT_SEQUENCE_SEGMENT_NAME, key);
+    dynamic_filenames2[key].setTagValue(Filenames::Tag::OUTPUT_SEQUENCE_SEGMENT_NAME, key);
   }
 
   ProcessSequenceSegments pss(application_handler.sequenceHandler_);
