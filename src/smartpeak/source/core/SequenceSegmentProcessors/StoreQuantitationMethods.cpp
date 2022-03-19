@@ -69,18 +69,21 @@ namespace SmartPeak
       true);
   };
 
-  bool StoreQuantitationMethods::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
+  bool StoreQuantitationMethods::onFilePicked(const std::filesystem::path& directory, ApplicationHandler* application_handler)
   {
     if (application_handler->sequenceHandler_.getSequenceSegments().size() == 0)
     {
       LOGE << "File cannot be written without first loading the sequence.";
       return false;
     }
-    auto& sequence_segment = application_handler->sequenceHandler_.getSequenceSegments().at(0);
-    Filenames filenames;
-    filenames.setFullPath("quantitationMethods", filename);
-    store_from_file_picker_ = true;
-    process(sequence_segment, application_handler->sequenceHandler_, {}, filenames);
+    for (auto& sequence_segment : application_handler->sequenceHandler_.getSequenceSegments())
+    {
+      Filenames filenames;
+      filenames.setTagValue(Filenames::Tag::FEATURES_OUTPUT_PATH, directory.generic_string());
+      filenames.setTagValue(Filenames::Tag::OUTPUT_SEQUENCE_SEGMENT_NAME, sequence_segment.getSequenceSegmentName());
+      static_filenames_ = false;
+      process(sequence_segment, application_handler->sequenceHandler_, {}, filenames);
+    }
     return true;
   }
 
@@ -93,10 +96,7 @@ namespace SmartPeak
   {
     LOGD << "START storeQuantitationMethods";
     
-    if (!store_from_file_picker_) // This processor is special as quantitationMethods is both input and output we need an additional flag
-    {
-      getFilenames(filenames_I);
-    }
+    getFilenames(filenames_I);
 
     if (!InputDataValidation::prepareToStore(filenames_I, "quantitationMethods"))
     {

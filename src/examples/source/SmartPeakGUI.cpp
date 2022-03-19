@@ -511,35 +511,36 @@ int main(int argc, char** argv)
         }
         if (ImGui::BeginMenu("Export File"))
         {
-          static std::vector<std::shared_ptr<IFilenamesHandler>> export_processors =
+          // List of tuple: IFilenamesHandler, and a boolean (true for file selection, false for directory selection)
+          static std::vector<std::tuple<std::shared_ptr<IFilenamesHandler>, bool>> export_processors =
           {
-            std::make_shared<StoreSequence>(application_handler_.sequenceHandler_),
-            std::make_shared<StoreSequenceFileAnalyst>(),
-            std::make_shared<StoreSequenceFileMasshunter>(),
-            std::make_shared<StoreSequenceFileXcalibur>(),
-            std::make_shared<StoreParameters>(),
-            std::make_shared<StoreWorkflow>(application_handler_.sequenceHandler_),
-            std::make_shared<StoreValidationData>(),
-            // std::make_shared<StoreStandardsConcentrations>(), // not implemented
-            std::make_shared<StoreQuantitationMethods>(true),
-            std::make_shared<StoreFeatureFilters>(FeatureFiltersUtilsMode::EFeatureFiltersModeComponent, true),
-            std::make_shared<StoreFeatureFilters>(FeatureFiltersUtilsMode::EFeatureFiltersModeGroup, true),
-            std::make_shared<StoreFeatureQCs>(FeatureFiltersUtilsMode::EFeatureFiltersModeComponent, true),
-            std::make_shared<StoreFeatureQCs>(FeatureFiltersUtilsMode::EFeatureFiltersModeGroup, true),
-            std::make_shared<StoreFeatureRSDFilters>(FeatureFiltersUtilsMode::EFeatureFiltersModeComponent, true),
-            std::make_shared<StoreFeatureRSDFilters>(FeatureFiltersUtilsMode::EFeatureFiltersModeGroup, true),
-            std::make_shared<StoreFeatureRSDQCs>(FeatureFiltersUtilsMode::EFeatureFiltersModeComponent, true),
-            std::make_shared<StoreFeatureRSDQCs>(FeatureFiltersUtilsMode::EFeatureFiltersModeGroup, true),
-            std::make_shared<StoreFeatureBackgroundFilters>(FeatureFiltersUtilsMode::EFeatureFiltersModeComponent, true),
-            std::make_shared<StoreFeatureBackgroundFilters>(FeatureFiltersUtilsMode::EFeatureFiltersModeGroup, true),
-            std::make_shared<StoreFeatureBackgroundQCs>(FeatureFiltersUtilsMode::EFeatureFiltersModeComponent, true),
-            std::make_shared<StoreFeatureBackgroundQCs>(FeatureFiltersUtilsMode::EFeatureFiltersModeGroup, true),
-            std::make_shared<StoreFeatureRSDEstimations>(FeatureFiltersUtilsMode::EFeatureFiltersModeComponent, true),
-            std::make_shared<StoreFeatureRSDEstimations>(FeatureFiltersUtilsMode::EFeatureFiltersModeGroup, true),
-            std::make_shared<StoreFeatureBackgroundEstimations>(FeatureFiltersUtilsMode::EFeatureFiltersModeComponent, true),
-            std::make_shared<StoreFeatureBackgroundEstimations>(FeatureFiltersUtilsMode::EFeatureFiltersModeGroup, true)
+            {std::make_shared<StoreSequence>(application_handler_.sequenceHandler_), true},
+            {std::make_shared<StoreSequenceFileAnalyst>(), true},
+            {std::make_shared<StoreSequenceFileMasshunter>(), true},
+            {std::make_shared<StoreSequenceFileXcalibur>(), true},
+            {std::make_shared<StoreParameters>(), true},
+            {std::make_shared<StoreWorkflow>(application_handler_.sequenceHandler_), true},
+            {std::make_shared<StoreValidationData>(), true},
+            // {std::make_shared<StoreStandardsConcentrations>(), true}, // not implemented
+            {std::make_shared<StoreQuantitationMethods>(true), false},
+            {std::make_shared<StoreFeatureFilters>(FeatureFiltersUtilsMode::EFeatureFiltersModeComponent, true), true},
+            {std::make_shared<StoreFeatureFilters>(FeatureFiltersUtilsMode::EFeatureFiltersModeGroup, true), true},
+            {std::make_shared<StoreFeatureQCs>(FeatureFiltersUtilsMode::EFeatureFiltersModeComponent, true), true},
+            {std::make_shared<StoreFeatureQCs>(FeatureFiltersUtilsMode::EFeatureFiltersModeGroup, true), true},
+            {std::make_shared<StoreFeatureRSDFilters>(FeatureFiltersUtilsMode::EFeatureFiltersModeComponent, true), true},
+            {std::make_shared<StoreFeatureRSDFilters>(FeatureFiltersUtilsMode::EFeatureFiltersModeGroup, true), true},
+            {std::make_shared<StoreFeatureRSDQCs>(FeatureFiltersUtilsMode::EFeatureFiltersModeComponent, true), true},
+            {std::make_shared<StoreFeatureRSDQCs>(FeatureFiltersUtilsMode::EFeatureFiltersModeGroup, true), true},
+            {std::make_shared<StoreFeatureBackgroundFilters>(FeatureFiltersUtilsMode::EFeatureFiltersModeComponent, true), true},
+            {std::make_shared<StoreFeatureBackgroundFilters>(FeatureFiltersUtilsMode::EFeatureFiltersModeGroup, true), true},
+            {std::make_shared<StoreFeatureBackgroundQCs>(FeatureFiltersUtilsMode::EFeatureFiltersModeComponent, true), true},
+            {std::make_shared<StoreFeatureBackgroundQCs>(FeatureFiltersUtilsMode::EFeatureFiltersModeGroup, true), true},
+            {std::make_shared<StoreFeatureRSDEstimations>(FeatureFiltersUtilsMode::EFeatureFiltersModeComponent, true), true},
+            {std::make_shared<StoreFeatureRSDEstimations>(FeatureFiltersUtilsMode::EFeatureFiltersModeGroup, true), true},
+            {std::make_shared<StoreFeatureBackgroundEstimations>(FeatureFiltersUtilsMode::EFeatureFiltersModeComponent, true), true},
+            {std::make_shared<StoreFeatureBackgroundEstimations>(FeatureFiltersUtilsMode::EFeatureFiltersModeGroup, true), true}
           };
-          for (const auto& export_processor : export_processors)
+          for (const auto& [export_processor, export_as_file] : export_processors)
           {
             Filenames filenames;
             export_processor->getFilenames(filenames);
@@ -548,11 +549,12 @@ int main(int argc, char** argv)
               auto file_picker_handler = std::dynamic_pointer_cast<IFilePickerHandler>(export_processor);
               if (file_picker_handler)
               {
+                FilePicker::Mode file_picker_mode = export_as_file ? FilePicker::Mode::EFileCreate : FilePicker::Mode::EDirectory;
                 if (ImGui::MenuItem(filenames.getDescription(file_id).c_str(), NULL, false, workflow_is_done_))
                 {
                   file_picker_->open(std::string("Export ") + filenames.getDescription(file_id),
                     file_picker_handler,
-                    FilePicker::Mode::EFileCreate,
+                    file_picker_mode,
                     application_handler_,
                     filenames.getFullPath(file_id).filename().generic_string()
                   );
