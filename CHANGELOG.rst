@@ -1,6 +1,19 @@
 SmartPeak Changelog
 ===================
 
+v1.21.0 (2022-03-21)
+--------------------
+
+Features
+~~~~~~~~
+- Possibility to export Quantitations Methods `(#522) <https://github.com/AutoFlowResearch/SmartPeak/pull/522>`_
+- Improving Calibration curve window: Possibility to exclude points, show chromatogram, editable parameters (WARNING: CALCULATE_CALIBRATION has been renamed OPTIMIZE_CALIBRATION) `(#515) <https://github.com/AutoFlowResearch/SmartPeak/pull/515>`_
+- Show Inputs and Outputs in Workflow Step display `(#520) <https://github.com/AutoFlowResearch/SmartPeak/pull/520>`_
+- Transformation_model_param_x_weight and transformation_model_param_y_weight do not accept empty values (replaced by 'x' and 'y') `(#519) <https://github.com/AutoFlowResearch/SmartPeak/pull/519>`_
+- New Workflow Steps display `(#517) <https://github.com/AutoFlowResearch/SmartPeak/pull/517>`_
+- Check missing or wrong columns for Quantitations Methods and Standards Concentrations files `(#512) <https://github.com/AutoFlowResearch/SmartPeak/pull/512>`_
+- Check csv files BOM `(#513) <https://github.com/AutoFlowResearch/SmartPeak/pull/513>`_
+
 v1.20.0 (2022-01-27)
 --------------------
 
