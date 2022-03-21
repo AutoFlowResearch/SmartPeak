@@ -166,7 +166,6 @@ jobs:
             ls -alt bin
             cpack -G DragNDrop && ls -alth
             yes | hdiutil attach -noautoopen -noverify SmartPeak-*.dmg > /dev/null
-            otool -l /Volumes/SmartPeak-1.0.0-Darwin/SmartPeakGUI.app/Contents/MacOS/SmartPeakGUI | grep -a name
             cp -r /Volumes/SmartPeak-*-Darwin/SmartPeakGUI.app /Volumes/SmartPeak-*-Darwin/share .
             xattr -l SmartPeakGUI.app/*
             sudo xattr -dr com.apple.quarantine SmartPeakGUI.app
