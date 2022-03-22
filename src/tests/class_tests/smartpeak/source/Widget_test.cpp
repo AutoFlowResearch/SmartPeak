@@ -35,6 +35,7 @@
 #include <SmartPeak/ui/LoadSessionWizard.h>
 #include <SmartPeak/ui/SetInputOutputWidget.h>
 #include <SmartPeak/ui/CalibratorsPlotWidget.h>
+#include <SmartPeak/ui/RunWorkflowWidget.h>
 #include <SmartPeak/core/RawDataProcessors/LoadFeatures.h>
 #include <SmartPeak/core/ApplicationProcessors/SaveSession.h>
 
@@ -1050,3 +1051,125 @@ TEST(CalibratorsPlotWidget, getSampleNameFromSelectedPoint)
   EXPECT_EQ(sample_name_4, "");
   EXPECT_EQ(serie_4, "");
 };
+
+class RunWorkflowWidget_Test :
+  public RunWorkflowWidget
+{
+public:
+  RunWorkflowWidget_Test(ApplicationHandler& application_handler,
+    SessionHandler& session_handler,
+    WorkflowManager& workflow_manager,
+    IApplicationProcessorObserver& application_processor_observer,
+    ISequenceProcessorObserver& sequence_processor_observer,
+    ISequenceSegmentProcessorObserver& sequence_segment_processor_observer,
+    ISampleGroupProcessorObserver& sample_group_processor_observer) :
+    RunWorkflowWidget(
+      application_handler,
+      session_handler,
+      workflow_manager,
+      application_processor_observer,
+      sequence_processor_observer,
+      sequence_segment_processor_observer,
+      sample_group_processor_observer)
+  {};
+
+public:
+  bool wrapper_checkDirectories()
+  {
+    return checkDirectories();
+  }
+
+  std::string& get_mzML_dir_edit_()
+  {
+    return mzML_dir_edit_;
+  }
+
+  std::string& get_features_in_dir_edit_()
+  {
+    return features_in_dir_edit_;
+  }
+
+  std::string& get_features_out_dir_edit_()
+  {
+    return features_out_dir_edit_;
+  }
+};
+
+bool SmartPeak::run_on_server = false;
+
+TEST(RunWorkflowWidget, RunWorkflowWidget_checkDirectories)
+{
+  ApplicationHandler application_handler;
+  SessionHandler session_handler;
+  WorkflowManager workflow_manager;
+
+  struct TestObserver:
+    IApplicationProcessorObserver,
+    ISequenceProcessorObserver,
+    ISequenceSegmentProcessorObserver,
+    ISampleGroupProcessorObserver
+  {
+    virtual void onApplicationProcessorStart(const std::vector<std::string>& commands) override {}
+    virtual void onApplicationProcessorCommandStart(size_t command_index, const std::string& command_name) override {}
+    virtual void onApplicationProcessorCommandEnd(size_t command_index, const std::string& command_name) override {}
+    virtual void onApplicationProcessorEnd() override {}
+    virtual void onApplicationProcessorError(const std::string& error) override
+    {
+      application_error_ = error;
+    }
+
+    virtual void onSequenceProcessorStart(const size_t nb_injections) {};
+    virtual void onSequenceProcessorSampleStart(const std::string& sample_name) {};
+    virtual void onSequenceProcessorSampleEnd(const std::string& sample_name) {};
+    virtual void onSequenceProcessorEnd() {};
+    virtual void onSequenceProcessorError(const std::string& sample_name, const std::string& processor_name, const std::string& error) {};
+
+    virtual void onSequenceSegmentProcessorStart(const size_t nb_segments) {};
+    virtual void onSequenceSegmentProcessorSampleStart(const std::string& segment_name) {};
+    virtual void onSequenceSegmentProcessorSampleEnd(const std::string& segment_name) {};
+    virtual void onSequenceSegmentProcessorEnd() {};
+    virtual void onSequenceSegmentProcessorError(const std::string& segment_name, const std::string& processor_name, const std::string& error) {};
+
+    virtual void onSampleGroupProcessorStart(const size_t nb_segments) {};
+    virtual void onSampleGroupProcessorSampleStart(const std::string& segment_name) {};
+    virtual void onSampleGroupProcessorSampleEnd(const std::string& segment_name) {};
+    virtual void onSampleGroupProcessorEnd() {};
+    virtual void onSampleGroupProcessorError(const std::string& group_name, const std::string& processor_name, const std::string& error) {};
+
+    std::string application_error_;
+  };
+  TestObserver observer;
+  RunWorkflowWidget_Test widget_test(
+    application_handler,
+    session_handler,
+    workflow_manager,
+    observer,
+    observer,
+    observer,
+    observer);
+
+  widget_test.get_mzML_dir_edit_() = SMARTPEAK_GET_TEST_DATA_PATH("");
+  widget_test.get_features_in_dir_edit_() = SMARTPEAK_GET_TEST_DATA_PATH("");
+  widget_test.get_features_out_dir_edit_() = SMARTPEAK_GET_TEST_DATA_PATH("");
+  EXPECT_TRUE(widget_test.wrapper_checkDirectories());
+  EXPECT_EQ(observer.application_error_, "");
+
+  widget_test.get_mzML_dir_edit_() = "/non/existing/mzML/folder" ;
+  widget_test.get_features_in_dir_edit_() = SMARTPEAK_GET_TEST_DATA_PATH("");
+  widget_test.get_features_out_dir_edit_() = SMARTPEAK_GET_TEST_DATA_PATH("");
+  EXPECT_FALSE(widget_test.wrapper_checkDirectories());
+  EXPECT_EQ(observer.application_error_, "Input Directory '/non/existing/mzML/folder' not found, aborting.");
+
+  widget_test.get_mzML_dir_edit_() = SMARTPEAK_GET_TEST_DATA_PATH("");
+  widget_test.get_features_in_dir_edit_() = "/non/existing/features_in/folder";
+  widget_test.get_features_out_dir_edit_() = SMARTPEAK_GET_TEST_DATA_PATH("");
+  EXPECT_FALSE(widget_test.wrapper_checkDirectories());
+  EXPECT_EQ(observer.application_error_, "Input Directory '/non/existing/features_in/folder' not found, aborting.");
+
+  observer.application_error_ = "";
+  widget_test.get_mzML_dir_edit_() = SMARTPEAK_GET_TEST_DATA_PATH("");
+  widget_test.get_features_in_dir_edit_() = SMARTPEAK_GET_TEST_DATA_PATH("");
+  widget_test.get_features_out_dir_edit_() = SMARTPEAK_GET_TEST_DATA_PATH("workflow_csv_files/non_existing_folder");
+  EXPECT_TRUE(widget_test.wrapper_checkDirectories());
+  EXPECT_EQ(observer.application_error_, "");
+}

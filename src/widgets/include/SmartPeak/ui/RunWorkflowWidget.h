@@ -34,7 +34,7 @@
 
 namespace SmartPeak
 {
-  class RunWorkflowWidget final : public Widget
+  class RunWorkflowWidget : public Widget
   {
   public:
     RunWorkflowWidget(ApplicationHandler& application_handler,
