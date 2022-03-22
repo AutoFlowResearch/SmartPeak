@@ -209,7 +209,6 @@ namespace SmartPeak
       }
       catch (const std::exception& e)
       {
-        LOGE << e.what();
         WorkflowException we(sequence_segment.getSequenceSegmentName(), methods[i]->getName(), e.what());
         throw we;
       }
@@ -373,7 +372,6 @@ namespace SmartPeak
       }
       catch (const std::exception& e)
       {
-        LOGE << e.what();
         WorkflowException we(sample_group.getSampleGroupName(), methods[i]->getName(), e.what());
         throw we;
       }
@@ -542,7 +540,6 @@ namespace SmartPeak
       }
       catch (const std::exception& e)
       {
-        LOGE << e.what();
         WorkflowException we(inj_name, p->getName(), e.what());
         throw we;
       }

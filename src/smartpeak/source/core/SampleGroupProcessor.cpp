@@ -33,7 +33,15 @@ namespace SmartPeak
   ) const
   {
     LOGD << "START " << getName() << ": " << sampleGroupHandler_IO.getSampleGroupName();
-    doProcess(sampleGroupHandler_IO, sequenceHandler_I, params_I, filenames_I);
+    try
+    {
+      doProcess(sampleGroupHandler_IO, sequenceHandler_I, params_I, filenames_I);
+    }
+    catch (const std::exception& e)
+    {
+      LOGE << "END (ERROR) " << getName() << ": " << sampleGroupHandler_IO.getSampleGroupName() << " " << e.what();
+      throw;
+    }
     LOGD << "END " << getName() << ": " << sampleGroupHandler_IO.getSampleGroupName();
   }
 }

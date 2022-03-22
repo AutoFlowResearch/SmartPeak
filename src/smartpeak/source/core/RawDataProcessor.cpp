@@ -33,7 +33,15 @@ namespace SmartPeak
   ) const
   {
     LOGD << "START " << getName() << ": " << rawDataHandler_IO.getMetaData().getSampleName();
-    doProcess(rawDataHandler_IO, params_I, filenames_I);
+    try
+    {
+      doProcess(rawDataHandler_IO, params_I, filenames_I);
+    }
+    catch (const std::exception& e)
+    {
+      LOGE << "END (ERROR) " << getName() << ": " << rawDataHandler_IO.getMetaData().getSampleName() << " " << e.what();
+      throw;
+    }
     LOGD << "END " << getName() << ": " << rawDataHandler_IO.getMetaData().getSampleName();
   }
 }
