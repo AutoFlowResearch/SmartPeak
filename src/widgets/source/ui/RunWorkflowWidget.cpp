@@ -118,42 +118,38 @@ namespace SmartPeak
         application_handler_.filenames_.setTagValue(Filenames::Tag::MZML_INPUT_PATH, mzML_dir_edit_);
         application_handler_.filenames_.setTagValue(Filenames::Tag::FEATURES_INPUT_PATH, features_in_dir_edit_);
         application_handler_.filenames_.setTagValue(Filenames::Tag::FEATURES_OUTPUT_PATH, features_out_dir_edit_);
-        for (const auto& pathname : { mzML_dir_edit_, features_in_dir_edit_, features_out_dir_edit_ }) {
-          if (std::filesystem::exists(pathname)) {
-            std::filesystem::create_directories(std::filesystem::path(pathname));
-          } else {
-            LOGE << "Invalid mzML, Features Input or Features Output path. No directories created.";
-          }
-        }
-        BuildCommandsFromNames buildCommandsFromNames(application_handler_);
-        buildCommandsFromNames.names_ = application_handler_.sequenceHandler_.getWorkflow();
-        if (!buildCommandsFromNames.process()) {
-          LOGE << "Failed to create Commands, aborting.";
-        }
-        else 
+        if (checkDirectories())
         {
-          for (auto& cmd : buildCommandsFromNames.commands_)
-          {
-            for (auto& p : cmd.dynamic_filenames)
-            {
-              p.second.setTagValue(Filenames::Tag::MZML_INPUT_PATH, mzML_dir_edit_);
-              p.second.setTagValue(Filenames::Tag::FEATURES_INPUT_PATH, features_in_dir_edit_);
-              p.second.setTagValue(Filenames::Tag::FEATURES_OUTPUT_PATH, features_out_dir_edit_);
-            }
+          BuildCommandsFromNames buildCommandsFromNames(application_handler_);
+          buildCommandsFromNames.names_ = application_handler_.sequenceHandler_.getWorkflow();
+          if (!buildCommandsFromNames.process()) {
+            LOGE << "Failed to create Commands, aborting.";
           }
-          const std::set<std::string> injection_names = session_handler_.getSelectInjectionNamesWorkflow(application_handler_.sequenceHandler_);
-          const std::set<std::string> sequence_segment_names = session_handler_.getSelectSequenceSegmentNamesWorkflow(application_handler_.sequenceHandler_);
-          const std::set<std::string> sample_group_names = session_handler_.getSelectSampleGroupNamesWorkflow(application_handler_.sequenceHandler_);
+          else
+          {
+            for (auto& cmd : buildCommandsFromNames.commands_)
+            {
+              for (auto& p : cmd.dynamic_filenames)
+              {
+                p.second.setTagValue(Filenames::Tag::MZML_INPUT_PATH, mzML_dir_edit_);
+                p.second.setTagValue(Filenames::Tag::FEATURES_INPUT_PATH, features_in_dir_edit_);
+                p.second.setTagValue(Filenames::Tag::FEATURES_OUTPUT_PATH, features_out_dir_edit_);
+              }
+            }
+            const std::set<std::string> injection_names = session_handler_.getSelectInjectionNamesWorkflow(application_handler_.sequenceHandler_);
+            const std::set<std::string> sequence_segment_names = session_handler_.getSelectSequenceSegmentNamesWorkflow(application_handler_.sequenceHandler_);
+            const std::set<std::string> sample_group_names = session_handler_.getSelectSampleGroupNamesWorkflow(application_handler_.sequenceHandler_);
             workflow_manager_.addWorkflow(application_handler_,
-            injection_names, 
-            sequence_segment_names,
-            sample_group_names,
-            buildCommandsFromNames.commands_,
-            &application_processor_observer_,
-            &sequence_processor_observer_,
-            &sequence_segment_processor_observer_,
-            &sample_group_processor_observer_
-          );
+              injection_names,
+              sequence_segment_names,
+              sample_group_names,
+              buildCommandsFromNames.commands_,
+              &application_processor_observer_,
+              &sequence_processor_observer_,
+              &sequence_segment_processor_observer_,
+              &sample_group_processor_observer_
+            );
+          }
         }
         visible_ = false;
         ImGui::CloseCurrentPopup();
@@ -209,4 +205,37 @@ namespace SmartPeak
     }
   }
 
+  bool RunWorkflowWidget::checkDirectories() const
+  {
+    for (const auto& pathname : { features_out_dir_edit_ })
+    {
+      if (!std::filesystem::exists(pathname))
+      {
+        try
+        {
+          std::filesystem::create_directories(std::filesystem::path(pathname));
+        }
+        catch (std::filesystem::filesystem_error& fe)
+        {
+          std::ostringstream os;
+          os << "Unable to create Output Directory '" << pathname << "': " << fe.what();
+          LOGE << os.str();
+          application_processor_observer_.onApplicationProcessorError(os.str());
+          return false;
+        }
+      }
+    }
+    for (const auto& pathname : { mzML_dir_edit_, features_in_dir_edit_ })
+    {
+      if (!std::filesystem::exists(pathname))
+      {
+        std::ostringstream os;
+        os << "Input Directory '" << pathname << "' not found, aborting.";
+        LOGE << os.str();
+        application_processor_observer_.onApplicationProcessorError(os.str());
+        return false;
+      }
+    }
+    return true;
+  }
 }

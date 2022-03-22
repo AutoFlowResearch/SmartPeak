@@ -34,7 +34,7 @@
 
 namespace SmartPeak
 {
-  class RunWorkflowWidget final : public Widget
+  class RunWorkflowWidget : public Widget
   {
   public:
     RunWorkflowWidget(ApplicationHandler& application_handler,
@@ -58,6 +58,9 @@ namespace SmartPeak
     };
 
     void draw() override;
+
+  protected:
+    bool checkDirectories() const;
 
   protected:
     std::optional<std::tuple<std::string, std::shared_ptr<IFilePickerHandler>>> popup_file_picker_;

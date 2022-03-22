@@ -230,11 +230,11 @@ namespace SmartPeak
         int cpt = 0;
         for (const auto& error : progress_info_.errors())
         {
-          ImGui::Text("%s", error.c_str());
+          ImGui::TextWrapped("%s", error.c_str());
           ++cpt;
           if (cpt == max_number_of_errors)
           {
-            ImGui::Text("... and %d more errors.", progress_info_.errors().size() - cpt);
+            ImGui::TextWrapped("... and %d more errors.", progress_info_.errors().size() - cpt);
             break;
           }
         }
