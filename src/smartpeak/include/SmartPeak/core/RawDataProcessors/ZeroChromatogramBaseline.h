@@ -44,7 +44,7 @@ namespace SmartPeak
 
     /** Normalize the lowest chromatogram intensity to zero FOR MAPPED CHROMATOGRAMS.
     */
-    void process(
+    void doProcess(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
       Filenames& filenames_I

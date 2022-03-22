@@ -107,14 +107,13 @@ namespace SmartPeak
     return ParameterSet(param_struct);
   }
 
-  void MergeInjections::process(
+  void MergeInjections::doProcess(
     SampleGroupHandler& sampleGroupHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START MergeInjections";
     getFilenames(filenames_I);
 
     // Complete user parameters with schema
@@ -252,7 +251,6 @@ namespace SmartPeak
     sampleGroupHandler_IO.setFeatureMap(fmap);
 
     LOGI << "MergeInjections output size: " << fmap.size();
-    LOGD << "END MergeInjections";
   }
 
   bool MergeInjections::selectDilutions(

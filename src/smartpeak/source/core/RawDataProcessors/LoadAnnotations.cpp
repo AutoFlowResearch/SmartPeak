@@ -51,13 +51,12 @@ namespace SmartPeak
     filenames.addFileName("mzTab_i", "${FEATURES_INPUT_PATH}/${INPUT_INJECTION_NAME}.mzTab");
   };
 
-  void LoadAnnotations::process(
+  void LoadAnnotations::doProcess(
     RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START LoadAnnotations";
     getFilenames(filenames_I);
 
     if (!InputDataValidation::prepareToLoad(filenames_I, "mzTab_i", false))
@@ -76,8 +75,6 @@ namespace SmartPeak
       LOGE << "feature map clear";
       throw;
     }
-
-    LOGD << "END LoadAnnotations";
   }
 
 }

@@ -43,7 +43,7 @@ namespace SmartPeak
 
     /** Load the component and component group transition filters from file.
     */
-    void process(
+    void doProcess(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
       Filenames& filenames_I

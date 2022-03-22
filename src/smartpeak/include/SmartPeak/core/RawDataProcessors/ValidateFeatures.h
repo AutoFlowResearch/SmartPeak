@@ -45,7 +45,7 @@ namespace SmartPeak
 
     /** Validate the selected peaks against reference data.
     */
-    void process(
+    void doProcess(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
       Filenames& filenames_I

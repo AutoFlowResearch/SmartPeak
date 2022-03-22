@@ -48,11 +48,12 @@ namespace SmartPeak
 
     /** Load the data processing parameters from file.
     */
-    void process(
+    void doProcess(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
       Filenames& filenames_I
     ) const override;
+
     static void sanitizeParameters(
       ParameterSet& params_I
     );

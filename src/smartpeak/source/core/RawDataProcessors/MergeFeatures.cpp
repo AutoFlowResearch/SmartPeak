@@ -49,12 +49,11 @@ namespace SmartPeak
     return { "sequence", "traML" };
   }
 
-  void MergeFeatures::process(RawDataHandler& rawDataHandler_IO,
+  void MergeFeatures::doProcess(RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START MergeFeatures";
     getFilenames(filenames_I);
     LOGI << "MergeFeatures input size: " << rawDataHandler_IO.getFeatureMap().size();
 
@@ -129,7 +128,6 @@ namespace SmartPeak
     rawDataHandler_IO.updateFeatureMapHistory();
 
     LOGI << "MergeFeatures output size: " << rawDataHandler_IO.getFeatureMap().size();
-    LOGD << "END MergeFeatures";
   }
 
 }

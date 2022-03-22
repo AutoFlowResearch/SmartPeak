@@ -48,13 +48,13 @@ namespace SmartPeak
     filenames.addFileName("featureXMLSampleGroup_o", "${FEATURES_OUTPUT_PATH}/${OUTPUT_GROUP_NAME}.featureXML");
   };
 
-  void StoreFeaturesSampleGroup::process(SampleGroupHandler& sampleGroupHandler_IO,
+  void StoreFeaturesSampleGroup::doProcess(
+    SampleGroupHandler& sampleGroupHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START storeFeaturesSampleGroup";
     getFilenames(filenames_I);
 
     if (!InputDataValidation::prepareToStore(filenames_I, "featureXMLSampleGroup_o"))
@@ -65,8 +65,6 @@ namespace SmartPeak
     // Store outfile as featureXML
     OpenMS::FeatureXMLFile featurexml;
     featurexml.store(filenames_I.getFullPath("featureXMLSampleGroup_o").generic_string(), sampleGroupHandler_IO.getFeatureMap());
-
-    LOGD << "END storeFeaturesSampleGroup";
   }
 
 }

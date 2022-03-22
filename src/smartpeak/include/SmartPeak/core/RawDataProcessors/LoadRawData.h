@@ -46,7 +46,7 @@ namespace SmartPeak
       Depending upon user specifications, the mzML file will be mapped to the TraML file
       and/or various pre-processing methods will be run to extract out the data.
     */
-    void process(
+    void doProcess(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
       Filenames& filenames_I

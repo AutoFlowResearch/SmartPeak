@@ -79,14 +79,13 @@ namespace SmartPeak
     return fit_calibration_params;
   }
 
-  void FitCalibration::process(
+  void FitCalibration::doProcess(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START FitCalibration";
     getFilenames(filenames_I);
 
     // Complete user parameters with schema
@@ -209,7 +208,6 @@ namespace SmartPeak
     // store results
     sequenceSegmentHandler_IO.setComponentsToConcentrations(components_to_concentrations);
     sequenceSegmentHandler_IO.setExcludedComponentsToConcentrations(excluded_components_to_concentrations);
-    LOGD << "END FitCalibration";
   }
 
   std::vector<std::tuple<std::string, std::string>>

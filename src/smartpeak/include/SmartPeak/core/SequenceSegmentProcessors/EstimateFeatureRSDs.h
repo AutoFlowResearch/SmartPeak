@@ -43,7 +43,7 @@ namespace SmartPeak
 
       NOTE: estimation from replicate Unknown samples is not yet implemented
     */
-    void process(
+    void doProcess(
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,

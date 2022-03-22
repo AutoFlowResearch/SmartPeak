@@ -78,14 +78,13 @@ namespace SmartPeak
     }
   };
 
-  void LoadFeatureBackgroundEstimations::process(
+  void LoadFeatureBackgroundEstimations::doProcess(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START loadFeatureBackgroundEstimation";
     getFilenames(filenames_I);
     FeatureFiltersUtils::loadFeatureFilters(
       "featureBackgroundEstimationComponents",
@@ -96,7 +95,6 @@ namespace SmartPeak
       nullptr,
       feature_filter_mode_
     );
-    LOGD << "END loadFeatureBackgroundEstimation";
   }
 
 }

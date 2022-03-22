@@ -49,13 +49,12 @@ namespace SmartPeak
     filenames.addFileName("featureFilterComponentGroups", "${MAIN_DIR}/featureFilterComponentGroups.csv", "Components Group Filters", true, true);
   };
 
-  void LoadFeatureFiltersRDP::process(
+  void LoadFeatureFiltersRDP::doProcess(
     RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START loadFeatureFilter";
     getFilenames(filenames_I);
     FeatureFiltersUtils::loadFeatureFilters(
       "featureFilterComponents",
@@ -66,7 +65,6 @@ namespace SmartPeak
       nullptr,
       FeatureFiltersUtilsMode::EFeatureFilterComponentAndGroup
     );
-    LOGD << "END loadFeatureFilter";
   }
 
 }

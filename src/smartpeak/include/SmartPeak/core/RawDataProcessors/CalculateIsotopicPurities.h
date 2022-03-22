@@ -45,7 +45,7 @@ namespace SmartPeak
 
     /** Calculate MDV Isotopic Purities
      */
-    void process(
+    void doProcess(
                  RawDataHandler& rawDataHandler_IO,
                  const ParameterSet& params_I,
                  Filenames& filenames_I

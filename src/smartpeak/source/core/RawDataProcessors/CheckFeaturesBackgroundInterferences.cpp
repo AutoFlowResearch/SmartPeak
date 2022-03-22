@@ -56,13 +56,12 @@ namespace SmartPeak
     return ParameterSet({ oms_params });
   }
 
-  void CheckFeaturesBackgroundInterferences::process(
+  void CheckFeaturesBackgroundInterferences::doProcess(
     RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START checkFeaturesBackgroundInterferences";
     getFilenames(filenames_I);
     LOGI << "Feature Checker input size: " << rawDataHandler_IO.getFeatureMap().size();
 
@@ -78,7 +77,6 @@ namespace SmartPeak
     rawDataHandler_IO.updateFeatureMapHistory();
 
     LOGI << "Feature Checker output size: " << rawDataHandler_IO.getFeatureMap().size();
-    LOGD << "END checkFeaturesBackgroundInterferences";
   }
 
 }

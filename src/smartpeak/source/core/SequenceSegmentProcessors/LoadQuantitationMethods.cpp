@@ -79,14 +79,13 @@ namespace SmartPeak
     return true;
   }
 
-  void LoadQuantitationMethods::process(
+  void LoadQuantitationMethods::doProcess(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START loadQuantitationMethods";
     getFilenames(filenames_I);
 
     if (!InputDataValidation::prepareToLoad(filenames_I, "quantitationMethods", true))
@@ -124,7 +123,6 @@ namespace SmartPeak
       LOGI << "quantitation methods clear";
       throw;
     }
-    LOGD << "END loadQuantitationMethods";
   }
 
 }

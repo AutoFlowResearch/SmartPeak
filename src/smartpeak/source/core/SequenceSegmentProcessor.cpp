@@ -41,6 +41,18 @@
 namespace SmartPeak
 {
 
+  void SequenceSegmentProcessor::process(
+    SequenceSegmentHandler& sequenceSegmentHandler_IO,
+    const SequenceHandler& sequenceHandler_I,
+    const ParameterSet& params_I,
+    Filenames& filenames_I
+  ) const
+  {
+    LOGD << "START " << getName() << ": " << sequenceSegmentHandler_IO.getSequenceSegmentName();
+    doProcess(sequenceSegmentHandler_IO, sequenceHandler_I, params_I, filenames_I);
+    LOGD << "END " << getName() << ": " << sequenceSegmentHandler_IO.getSequenceSegmentName();
+  }
+
   void SequenceSegmentProcessor::getSampleIndicesBySampleType(
     const SequenceSegmentHandler& sequenceSegmentHandler,
     const SequenceHandler& sequenceHandler,

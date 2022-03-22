@@ -97,13 +97,12 @@ namespace SmartPeak
     return FIAMSParameters2();
   }
 
-  void MergeSpectra::process(
+  void MergeSpectra::doProcess(
     RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START MergeSpectra";
     getFilenames(filenames_I);
 
     // Complete user parameters with schema
@@ -214,8 +213,6 @@ namespace SmartPeak
     output.setMetaValue("base peak intensity", 0.0);
     output.setMetaValue("total ion current", 0.0);
     rawDataHandler_IO.getExperiment().setSpectra({ output });
-
-    LOGD << "END MergeSpectra";
   }
 
 }

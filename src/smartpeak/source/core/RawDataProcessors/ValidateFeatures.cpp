@@ -66,13 +66,12 @@ namespace SmartPeak
     return ParameterSet(param_struct);
   }
 
-  void ValidateFeatures::process(
+  void ValidateFeatures::doProcess(
     RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START validateFeatures";
     getFilenames(filenames_I);
     // Complete user parameters with schema
     ParameterSet params(params_I);
@@ -93,8 +92,6 @@ namespace SmartPeak
 
     rawDataHandler_IO.setFeatureMap(mapped_features);
     rawDataHandler_IO.setValidationMetrics(validation_metrics);
-
-    LOGD << "END validateFeatures";
   }
 
 }

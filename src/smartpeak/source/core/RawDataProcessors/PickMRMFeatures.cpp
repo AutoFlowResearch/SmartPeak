@@ -57,13 +57,12 @@ namespace SmartPeak
     return ParameterSet({ oms_params });
   }
 
-  void PickMRMFeatures::process(
+  void PickMRMFeatures::doProcess(
     RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START PickMRMFeatures";
     getFilenames(filenames_I);
     OpenMS::MRMFeatureFinderScoring featureFinder;
     Utilities::setUserParameters(featureFinder, params_I);
@@ -87,7 +86,6 @@ namespace SmartPeak
     rawDataHandler_IO.updateFeatureMapHistory();
 
     LOGI << "Feature Picker output size: " << featureMap.size();
-    LOGD << "END PickMRMFeatures";
   }
 
 }

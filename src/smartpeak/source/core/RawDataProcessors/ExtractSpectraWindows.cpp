@@ -96,13 +96,12 @@ namespace SmartPeak
     return FIAMSParameters();
   }
 
-  void ExtractSpectraWindows::process(
+  void ExtractSpectraWindows::doProcess(
     RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START ExtractSpectraWindows";
     getFilenames(filenames_I);
     // Complete user parameters with schema
     ParameterSet params(params_I);
@@ -148,8 +147,6 @@ namespace SmartPeak
       LOGW << "No spectra was extracted.  Check that the specified start and stop retention times in the parameters are compatible with the acquired spectra.";
     }
     rawDataHandler_IO.getExperiment().setSpectra(output);
-
-    LOGD << "END ExtractSpectraWindows";
   }
 
 }

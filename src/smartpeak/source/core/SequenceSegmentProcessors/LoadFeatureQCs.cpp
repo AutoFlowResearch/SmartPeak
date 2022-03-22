@@ -88,14 +88,13 @@ namespace SmartPeak
     }
   };
 
-  void LoadFeatureQCs::process(
+  void LoadFeatureQCs::doProcess(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START loadFeatureQC";
     getFilenames(filenames_I);
     FeatureFiltersUtils::loadFeatureFilters(
       "featureQCComponents",
@@ -106,7 +105,6 @@ namespace SmartPeak
       [&]() { if (sequence_segment_observable_) sequence_segment_observable_->notifyFeatureQCComponentGroupsUpdated(); },
       feature_filter_mode_
     );
-    LOGD << "END loadFeatureQC";
   }
 
 }

@@ -57,13 +57,12 @@ namespace SmartPeak
     return ParameterSet({ oms_params });
   }
 
-  void FitFeaturesEMG::process(
+  void FitFeaturesEMG::doProcess(
     RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START FitFeaturesEMG";
     getFilenames(filenames_I);
     OpenMS::EmgGradientDescent emg;
     Utilities::setUserParameters(emg, params_I);
@@ -163,8 +162,6 @@ namespace SmartPeak
       }
     }
     rawDataHandler_IO.updateFeatureMapHistory();
-
-    LOGD << "END FitFeaturesEMG";
   }
 
   void FitFeaturesEMG::extractPointsIntoVectors(

@@ -91,14 +91,13 @@ namespace SmartPeak
     }
   };
 
-  void StoreFeatureBackgroundQCs::process(
+  void StoreFeatureBackgroundQCs::doProcess(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START storeFeatureBackgroundQC";
     getFilenames(filenames_I);
     FeatureFiltersUtils::storeFeatureFilters(
       "featureBackgroundQCComponents",
@@ -106,7 +105,6 @@ namespace SmartPeak
       filenames_I,
       sequenceSegmentHandler_IO.getFeatureBackgroundQC(),
       feature_filter_mode_);
-    LOGD << "END storeFeatureBackgroundQC";
   }
 
 }

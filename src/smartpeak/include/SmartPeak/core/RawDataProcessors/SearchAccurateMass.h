@@ -45,7 +45,7 @@ namespace SmartPeak
 
     /** Run the accurate mass search algorithm.
     */
-    void process(
+    void doProcess(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
       Filenames& filenames_I

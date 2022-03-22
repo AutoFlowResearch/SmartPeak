@@ -71,13 +71,12 @@ namespace SmartPeak
     return ParameterSet(param_struct);
   }
 
-  void CalculateMDVs::process(
+  void CalculateMDVs::doProcess(
     RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START CalculateMDVs";
     getFilenames(filenames_I);
 
     // Complete user parameters with schema
@@ -115,8 +114,6 @@ namespace SmartPeak
     isotopelabelingmdvs.calculateMDVs(rawDataHandler_IO.getFeatureMap(), normalized_featureMap, mass_intensity_type, feature_name);
     rawDataHandler_IO.setFeatureMap(normalized_featureMap);
     rawDataHandler_IO.updateFeatureMapHistory();
-
-    LOGD << "END calculateMDVs";
   }
 
 }

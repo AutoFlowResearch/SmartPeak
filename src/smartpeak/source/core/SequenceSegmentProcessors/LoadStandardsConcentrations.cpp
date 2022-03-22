@@ -80,14 +80,13 @@ namespace SmartPeak
     filenames.addFileName("standardsConcentrations", constructFilename("standardsConcentrations.csv", static_filenames_), "Standards Concentrations", true, true);
   };
 
-  void LoadStandardsConcentrations::process(
+  void LoadStandardsConcentrations::doProcess(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START loadStandardsConcentrations";
     getFilenames(filenames_I);
 
     if (!InputDataValidation::prepareToLoad(filenames_I, "standardsConcentrations", true))
@@ -155,8 +154,6 @@ namespace SmartPeak
       LOGI << "Standards concentrations clear";
       throw;
     }
-
-    LOGD << "END loadStandardsConcentrations";
   }
 
 }

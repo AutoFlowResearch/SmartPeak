@@ -45,7 +45,7 @@ namespace SmartPeak
 
     /** Merge all spectra along the time axis using a binning strategy that is resolution dependent
     */
-    void process(
+    void doProcess(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
       Filenames& filenames_I

@@ -46,7 +46,7 @@ namespace SmartPeak
 
     /** Map chromatograms to the loaded set of transitions.
     */
-    void process(
+    void doProcess(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
       Filenames& filenames_I

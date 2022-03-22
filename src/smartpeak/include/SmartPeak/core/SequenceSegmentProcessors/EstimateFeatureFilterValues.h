@@ -43,7 +43,7 @@ namespace SmartPeak
         The Standard samples should span the LLOQ and ULOQ. The `setComponentsToConcentrations`
         will be used to guide which Standard samples.
     */
-    void process(
+    void doProcess(
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,

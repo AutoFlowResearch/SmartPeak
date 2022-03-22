@@ -76,13 +76,12 @@ namespace SmartPeak
     filenames.addFileName("featureQCComponentGroups", "${MAIN_DIR}/featureQCComponentGroups.csv", "Components Group QC", true, true);
   };
 
-  void StoreFeatureQCsRDP::process(
+  void StoreFeatureQCsRDP::doProcess(
     RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START storeFeatureQC";
     getFilenames(filenames_I);
     FeatureFiltersUtils::storeFeatureFilters(
       "featureQCComponents",
@@ -90,7 +89,6 @@ namespace SmartPeak
       filenames_I,
       rawDataHandler_IO.getFeatureQC(),
       feature_filter_mode_);
-    LOGD << "END storeFeatureQC";
   }
 
 }

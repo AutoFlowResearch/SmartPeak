@@ -40,7 +40,7 @@ namespace SmartPeak
     /**
       Store the features for the sample group.
     */
-    void process(
+    void doProcess(
       SampleGroupHandler& sampleGroupHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,

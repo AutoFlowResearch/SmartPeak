@@ -44,7 +44,7 @@ namespace SmartPeak
 
     /** Write the annotations to disk.
     */
-    void process(
+    void doProcess(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
       Filenames& filenames_I

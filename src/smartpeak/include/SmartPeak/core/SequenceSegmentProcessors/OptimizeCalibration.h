@@ -40,7 +40,7 @@ namespace SmartPeak
     /**
       Optimize the calibration curve for all components.
     */
-    void process(
+    void doProcess(
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,

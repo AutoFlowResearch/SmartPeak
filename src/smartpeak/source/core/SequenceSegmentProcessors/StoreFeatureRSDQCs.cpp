@@ -90,14 +90,13 @@ namespace SmartPeak
     }
   };
 
-  void StoreFeatureRSDQCs::process(
+  void StoreFeatureRSDQCs::doProcess(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START storeFeatureRSDQC";
     getFilenames(filenames_I);
     FeatureFiltersUtils::storeFeatureFilters(
       "featureRSDQCComponents",
@@ -105,7 +104,6 @@ namespace SmartPeak
       filenames_I,
       sequenceSegmentHandler_IO.getFeatureRSDQC(),
       feature_filter_mode_);
-    LOGD << "END storeFeatureRSDQC";
   }
 
 }
