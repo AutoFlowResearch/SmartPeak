@@ -48,6 +48,21 @@
 namespace SmartPeak
 {
   
+  void SequenceProcessor::process(Filenames& filenames_I)
+  {
+    LOGD << "START " << getName();
+    try
+    {
+      doProcess(filenames_I);
+    }
+    catch (const std::exception& e)
+    {
+      LOGE << "END (ERROR) " << getName() << " " << e.what();
+      throw;
+    }
+    LOGD << "END " << getName();
+  }
+
   class WorkflowException : public std::exception
   {
   public:
@@ -118,7 +133,7 @@ namespace SmartPeak
     return ProcessSequence::getParameterSchemaStatic();
   }
 
-  void ProcessSequence::process(Filenames& filenames_I)
+  void ProcessSequence::doProcess(Filenames& filenames_I)
   {
     // Check that there are raw data processing methods
     if (raw_data_processing_methods_.empty()) {
@@ -147,7 +162,7 @@ namespace SmartPeak
     notifySequenceProcessorEnd();
   }
 
-  void ProcessSequenceSegments::process(Filenames& filenames_I)
+  void ProcessSequenceSegments::doProcess(Filenames& filenames_I)
   {
     std::vector<SequenceSegmentHandler> sequence_segments;
 
@@ -315,7 +330,7 @@ namespace SmartPeak
     }
   }
 
-  void ProcessSampleGroups::process(Filenames& filenames_I)
+  void ProcessSampleGroups::doProcess(Filenames& filenames_I)
   {
     std::vector<SampleGroupHandler> sample_groups;
 
@@ -559,9 +574,8 @@ namespace SmartPeak
     filenames.addFileName("sequence", "${MAIN_DIR}/sequence.csv", "Injections", true, true);
   };
 
-  void LoadSequence::process(Filenames& filenames_I)
+  void LoadSequence::doProcess(Filenames& filenames_I)
   {
-    LOGD << "START LoadSequence";
     getFilenames(filenames_I);
     if (!InputDataValidation::prepareToLoad(filenames_I, "sequence", true))
     {
@@ -658,7 +672,6 @@ namespace SmartPeak
     catch (const std::exception& e) {
       LOGE << e.what();
     }
-    LOGD << "END LoadSequence";
   }
 
   void StoreSequence::getFilenames(Filenames& filenames) const
@@ -674,10 +687,8 @@ namespace SmartPeak
     return true;
   }
 
-  void StoreSequence::process(Filenames& filenames_I)
+  void StoreSequence::doProcess(Filenames& filenames_I)
   {
-    LOGD << "START StoreSequence";
-
     if (!InputDataValidation::prepareToStore(filenames_I, "sequence"))
     {
       LOGD << "END " << getName();
@@ -750,7 +761,6 @@ namespace SmartPeak
       }
       SequenceParser::writeSequenceFileSmartPeak(*sequenceHandler_IO, filenames_I.getFullPath("sequence").generic_string().c_str());
     }
-    LOGD << "END StoreSequence";
   }
 
   bool LoadWorkflow::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
@@ -766,9 +776,8 @@ namespace SmartPeak
     filenames.addFileName("workflow", "${MAIN_DIR}/workflow.csv", "Workflow", true, true);
   };
 
-  void LoadWorkflow::process(Filenames& filenames_I)
+  void LoadWorkflow::doProcess(Filenames& filenames_I)
   {
-    LOGD << "START LoadWorkflow";
     getFilenames(filenames_I);
     if (!InputDataValidation::prepareToLoad(filenames_I, "workflow", true))
     {
@@ -832,7 +841,6 @@ namespace SmartPeak
     }
     sequenceHandler_IO->setWorkflow(res);
     sequenceHandler_IO->notifyWorkflowUpdated();
-    LOGD << "END LoadWorkflow";
   }
 
   void StoreWorkflow::getFilenames(Filenames& filenames) const
@@ -848,10 +856,8 @@ namespace SmartPeak
     return true;
   }
 
-  void StoreWorkflow::process(Filenames& filenames_I)
+  void StoreWorkflow::doProcess(Filenames& filenames_I)
   {
-    LOGD << "START StoreWorkflow";
-
     if (!InputDataValidation::prepareToStore(filenames_I, "workflow"))
     {
       LOGD << "END " << getName();
@@ -902,6 +908,5 @@ namespace SmartPeak
         writer.writeDataInRow(line.cbegin(), line.cend());
       }
     }
-    LOGD << "END StoreWorkflow";
   }
 }

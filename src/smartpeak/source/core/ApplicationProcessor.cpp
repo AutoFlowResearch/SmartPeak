@@ -26,6 +26,23 @@
 
 namespace SmartPeak
 {
+  bool ApplicationProcessor::process()
+  {
+    bool result = false;
+    LOGD << "START " << getName();
+    try
+    {
+      result = doProcess();
+    }
+    catch (const std::exception& e)
+    {
+      LOGE << "END (ERROR) " << getName() << " " << e.what();
+      throw;
+    }
+    LOGD << "END " << getName();
+    return result;
+  }
+
   namespace ApplicationProcessors {
 
   ParameterSet getParameterSchema()

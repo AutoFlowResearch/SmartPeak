@@ -198,10 +198,8 @@ namespace SmartPeak
     return true;
   }
 
-  bool LoadSession::process()
+  bool LoadSession::doProcess()
   {
-    LOGD << "START LoadSession";
-
     if (!readFilenames())
     {
       return false;
@@ -246,7 +244,6 @@ namespace SmartPeak
     }
 
     application_handler_.sequenceHandler_.notifySequenceUpdated();
-    LOGD << "END LoadSession";
     return true;
   }
 

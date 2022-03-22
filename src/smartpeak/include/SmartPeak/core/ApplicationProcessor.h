@@ -43,7 +43,7 @@ namespace SmartPeak
     ApplicationProcessor& operator=(const ApplicationProcessor& other) = delete;
     virtual ~ApplicationProcessor() = default;
 
-    virtual bool process() = 0;
+    virtual bool process();
 
     /* IProcessorDescription */
     virtual std::string getDescription() const override { return ""; }
@@ -56,6 +56,7 @@ namespace SmartPeak
     ApplicationHandler& application_handler_;
 
   protected:
+    virtual bool doProcess() = 0;
     ApplicationProcessor() = default;
     ApplicationProcessor(ApplicationHandler& application_handler) : application_handler_(application_handler) {}
   };

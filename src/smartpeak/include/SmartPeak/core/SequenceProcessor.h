@@ -240,7 +240,7 @@ namespace SmartPeak
     explicit SequenceProcessor(SequenceHandler& sh) : sequenceHandler_IO(&sh) {}
     virtual ~SequenceProcessor() = default;
 
-    virtual void process(Filenames& filenames_I) = 0;
+    virtual void process(Filenames& filenames_I);
     
     /* IProcessorDescription */
     virtual ParameterSet getParameterSchema() const override { return ParameterSet(); };
@@ -252,6 +252,9 @@ namespace SmartPeak
     virtual void getFilenames(Filenames& filenames) const override {};
 
     SequenceHandler* sequenceHandler_IO = nullptr; /// Sequence handler, used by all SequenceProcessor derived classes
+
+  protected:
+    virtual void doProcess(Filenames& filenames_I) = 0;
   };
 
   /**
@@ -268,7 +271,7 @@ namespace SmartPeak
       addSequenceProcessorObserver(sequence_processor_observer);
     }
     static ParameterSet getParameterSchemaStatic();
-    void process(Filenames& filenames_I) override;
+    void doProcess(Filenames& filenames_I) override;
 
     /* IProcessorDescription */
     virtual std::string getName() const override { return "PROCESS_SEQUENCE"; }
@@ -292,7 +295,7 @@ namespace SmartPeak
     {
       addSequenceSegmentProcessorObserver(sequence_segment_processor_observer);
     }
-    void process(Filenames& filenames_I) override;
+    void doProcess(Filenames& filenames_I) override;
 
     /* IProcessorDescription */
     virtual std::string getName() const override { return "PROCESS_SEQUENCE_SEGMENTS"; }
@@ -312,7 +315,7 @@ namespace SmartPeak
     {
       addSampleGroupProcessorObserver(sample_group_processor_observer);
     }
-    void process(Filenames& filenames_I) override;
+    void doProcess(Filenames& filenames_I) override;
 
     /* IProcessorDescription */
     virtual std::string getName() const override { return "PROCESS_SAMPLE_GROUPS"; }
@@ -328,7 +331,7 @@ namespace SmartPeak
 
     LoadSequence() = default;
     explicit LoadSequence(SequenceHandler& sh) : SequenceProcessor(sh) {}
-    void process(Filenames& filenames_I) override;
+    void doProcess(Filenames& filenames_I) override;
 
     /* IProcessorDescription */
     virtual std::string getName() const override { return "LOAD_SEQUENCE"; }
@@ -347,7 +350,7 @@ namespace SmartPeak
 
     StoreSequence() = default;
     explicit StoreSequence(SequenceHandler& sh) : SequenceProcessor(sh) {}
-    void process(Filenames& filenames_I) override;
+    void doProcess(Filenames& filenames_I) override;
 
     /* IProcessorDescription */
     virtual std::string getName() const override { return "STORE_SEQUENCE"; }
@@ -366,7 +369,7 @@ namespace SmartPeak
 
     LoadWorkflow() = default;
     explicit LoadWorkflow(SequenceHandler & sh) : SequenceProcessor(sh) {}
-    void process(Filenames& filenames_I) override;
+    void doProcess(Filenames& filenames_I) override;
 
     /* IProcessorDescription */
     virtual std::string getName() const override { return "LOAD_WORKFLOW"; }
@@ -385,7 +388,7 @@ namespace SmartPeak
 
     StoreWorkflow() = default;
     explicit StoreWorkflow(SequenceHandler& sh) : SequenceProcessor(sh) {}
-    void process(Filenames& filenames_I) override;
+    void doProcess(Filenames& filenames_I) override;
 
     /* IProcessorDescription */
     virtual std::string getName() const override { return "STORE_WORKFLOW"; }
