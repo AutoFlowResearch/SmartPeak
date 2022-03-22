@@ -60,6 +60,9 @@ namespace SmartPeak
     void draw() override;
 
   protected:
+    bool checkDirectories() const;
+
+  protected:
     std::optional<std::tuple<std::string, std::shared_ptr<IFilePickerHandler>>> popup_file_picker_;
     FilePicker file_picker_;
     IApplicationProcessorObserver& application_processor_observer_;
