@@ -92,7 +92,7 @@ jobs:
             cp ~/smartpeak_release_build/*.deb /tmp/packages
       - when:
           condition:
-            matches: { pattern: "^release\/.*", value: << pipeline.git.branch >> }
+            matches: { pattern: "^release/.*", value: << pipeline.git.branch >> }
           steps:
             - store_artifacts:
                 path: /tmp/packages
@@ -182,7 +182,7 @@ jobs:
             cp ~/SmartPeak/smartpeak_release_build/*.dmg /tmp/artifacts
       - when:
           condition:
-            matches: { pattern: "^release\/.*", value: << pipeline.git.branch >> }
+            matches: { pattern: "^release/.*", value: << pipeline.git.branch >> }
           steps:
             - store_artifacts:
                 path: /tmp/artifacts
@@ -337,7 +337,7 @@ jobs:
             cp ~/SmartPeak/smartpeak_release_build/*.exe ~/artifacts
       - when:
           condition:
-            matches: { pattern: "^release\/.*", value: << pipeline.git.branch >> }
+            matches: { pattern: "^release/.*", value: << pipeline.git.branch >> }
           steps:
             - store_artifacts:
                 path: ~/artifacts
