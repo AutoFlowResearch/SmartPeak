@@ -371,8 +371,11 @@ namespace SmartPeak {
         // If this flag is true, no progressbar is printed and workflow is ran on the main thread.
         auto disable_progressbar = application_settings.disable_progressbar;
 
-        int number_of_threads = std::thread::hardware_concurrency();
-        if (number_of_threads < 1) number_of_threads = 1;
+        int number_of_threads = application_settings.nb_threads;
+        if (number_of_threads < 1)
+        {
+          number_of_threads = std::thread::hardware_concurrency();
+        }
         workflow_manager.addWorkflow(
           application_handler,
           injection_names,

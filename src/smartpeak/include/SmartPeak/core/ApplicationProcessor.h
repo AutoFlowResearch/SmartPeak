@@ -62,7 +62,6 @@ namespace SmartPeak
   };
 
   namespace ApplicationProcessors {
-    ParameterSet getParameterSchema();
     void processCommands(ApplicationHandler& application_handler, 
       std::vector<ApplicationHandler::Command> commands, 
       const std::set<std::string>& injection_names, 
