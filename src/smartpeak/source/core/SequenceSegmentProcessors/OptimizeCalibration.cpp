@@ -58,14 +58,13 @@ namespace SmartPeak
     return ParameterSet({ oms_params });
   }
 
-  void OptimizeCalibration::process(
+  void OptimizeCalibration::doProcess(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START optimizeCalibrationCurves";
     getFilenames(filenames_I);
 
     std::vector<size_t> standards_indices;
@@ -164,7 +163,6 @@ namespace SmartPeak
     sequenceSegmentHandler_IO.setComponentsToConcentrations(components_to_concentrations);
     sequenceSegmentHandler_IO.setExcludedComponentsToConcentrations(excluded_components_to_concentrations);
     sequenceSegmentHandler_IO.getQuantitationMethods() = absoluteQuantitation.getQuantMethods();
-    LOGD << "END optimizeCalibrationCurves";
   }
 
 }

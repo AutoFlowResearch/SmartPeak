@@ -105,12 +105,11 @@ namespace SmartPeak
     return parameters;
   }
 
-  void PickMS1Features::process(RawDataHandler& rawDataHandler_IO,
+  void PickMS1Features::doProcess(RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START PickMS1Features";
     getFilenames(filenames_I);
 
     // Complete user parameters with schema
@@ -265,7 +264,6 @@ namespace SmartPeak
     rawDataHandler_IO.updateFeatureMapHistory();
 
     LOGI << "Feature Picker output size: " << featureMap.size();
-    LOGD << "END PickMS1Features";
   }
 
 }

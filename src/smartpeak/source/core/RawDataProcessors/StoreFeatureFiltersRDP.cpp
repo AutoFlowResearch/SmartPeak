@@ -82,14 +82,12 @@ namespace SmartPeak
     }
   };
 
-  void StoreFeatureFiltersRDP::process(
+  void StoreFeatureFiltersRDP::doProcess(
     RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START storeFeatureFilter";
-
     getFilenames(filenames_I);
     FeatureFiltersUtils::storeFeatureFilters(
       "featureFilterComponents",
@@ -97,8 +95,6 @@ namespace SmartPeak
       filenames_I,
       rawDataHandler_IO.getFeatureFilter(),
       feature_filter_mode_);
-
-    LOGD << "END storeFeatureFilter";
   }
 
 }

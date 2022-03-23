@@ -50,13 +50,12 @@ namespace SmartPeak
     filenames.addFileName("featureXML_i", "${FEATURES_INPUT_PATH}/${INPUT_INJECTION_NAME}.featureXML");
   };
 
-  void LoadFeatures::process(
+  void LoadFeatures::doProcess(
     RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START LoadFeatures";
     getFilenames(filenames_I);
 
     if (!InputDataValidation::prepareToLoad(filenames_I, "featureXML_i", false))
@@ -79,8 +78,6 @@ namespace SmartPeak
       LOGE << "feature map clear";
       throw;
     }
-
-    LOGD << "END LoadFeatures";
   }
 
 }

@@ -51,13 +51,12 @@ namespace SmartPeak
     return { "sequence", "traML" };
   }
 
-  void SelectFeatures::process(
+  void SelectFeatures::doProcess(
     RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START selectFeatures";
     getFilenames(filenames_I);
     LOGI << "selectFeatures input size: " << rawDataHandler_IO.getFeatureMap().size();
 
@@ -91,7 +90,6 @@ namespace SmartPeak
     else 
     {
       LOGE << "Both arguments 'select params' and 'schedule params' are empty";
-      LOGD << "END selectFeatures";
       // TODO: replace throw with return?
       throw std::invalid_argument("Both arguments 'select params' and 'schedule params' are empty.");
     }
@@ -104,7 +102,6 @@ namespace SmartPeak
     rawDataHandler_IO.updateFeatureMapHistory();
 
     LOGI << "selectFeatures output size: " << output.size();
-    LOGD << "END selectFeatures";
   }
 
 }

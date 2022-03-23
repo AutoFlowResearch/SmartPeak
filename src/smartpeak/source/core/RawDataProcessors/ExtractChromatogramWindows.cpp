@@ -50,13 +50,12 @@ namespace SmartPeak
     return { "sequence", "traML" };
   }
 
-  void ExtractChromatogramWindows::process(
+  void ExtractChromatogramWindows::doProcess(
     RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START ExtractChromatogramWindows";
     getFilenames(filenames_I);
 
     for (const OpenMS::MRMFeatureQC::ComponentQCs& transition_filters : rawDataHandler_IO.getFeatureFilter().component_qcs) {
@@ -66,8 +65,6 @@ namespace SmartPeak
         }
       }
     }
-
-    LOGD << "END ExtractChromatogramWindows";
   }
 
 }

@@ -26,9 +26,8 @@
 namespace SmartPeak
 {
 
-  bool LoadFilenames::process()
+  bool LoadFilenames::doProcess()
   {
-    LOGD << "START LoadFilenames";
     auto filenames = LoadFilenames::loadFilenamesFromDB(application_handler_.filenames_.getSessionDB().getDBFilePath());
     if (!filenames)
     {
@@ -38,7 +37,6 @@ namespace SmartPeak
     (*filenames).setTagValue(Filenames::Tag::MAIN_DIR, application_handler_.main_dir_.generic_string());
     (*filenames).getSessionDB().setDBFilePath(application_handler_.filenames_.getSessionDB().getDBFilePath());
     application_handler_.filenames_ = *filenames;
-    LOGD << "END LoadFilenames";
     return true;
   }
 

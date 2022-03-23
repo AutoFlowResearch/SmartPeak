@@ -64,13 +64,12 @@ namespace SmartPeak
     return true;
   }
 
-  void StoreParameters::process(
+  void StoreParameters::doProcess(
     RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START StoreParameters";
     if (!InputDataValidation::prepareToStore(filenames_I, "parameters"))
     {
       throw std::invalid_argument("Failed to store output file");
@@ -113,7 +112,6 @@ namespace SmartPeak
       }
       ParametersParser::write(filenames_I.getFullPath("parameters").generic_string(), rawDataHandler_IO.getParameters());
     }
-    LOGD << "END StoreParameters";
   }
 
 }

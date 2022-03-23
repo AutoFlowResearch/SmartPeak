@@ -45,7 +45,7 @@ namespace SmartPeak
 
     /** Create merged features from accurate mass search results.
     */
-    void process(
+    void doProcess(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
       Filenames& filenames_I

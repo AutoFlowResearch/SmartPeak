@@ -76,13 +76,12 @@ namespace SmartPeak
     filenames.addFileName("traML", "${MAIN_DIR}/traML.csv", "Transitions", false, false);
   };
 
-  void LoadTransitions::process(
+  void LoadTransitions::doProcess(
     RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START loadTraML";
     getFilenames(filenames_I);
     // Complete user parameters with schema
     ParameterSet params(params_I);
@@ -137,8 +136,6 @@ namespace SmartPeak
       LOGI << "targeted experiment clear";
       throw;
     }
-
-    LOGD << "END loadTraML";
   }
 
 }

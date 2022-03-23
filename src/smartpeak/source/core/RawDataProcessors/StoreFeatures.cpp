@@ -55,13 +55,12 @@ namespace SmartPeak
     filenames.addFileName("featureXML_o", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}.featureXML");
   };
 
-  void StoreFeatures::process(
+  void StoreFeatures::doProcess(
     RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START storeFeatureMap";
     getFilenames(filenames_I);
 
     if (!InputDataValidation::prepareToStore(filenames_I, "featureXML_o"))
@@ -72,8 +71,6 @@ namespace SmartPeak
     // Store outfile as featureXML
     OpenMS::FeatureXMLFile featurexml;
     featurexml.store(filenames_I.getFullPath("featureXML_o").generic_string(), rawDataHandler_IO.getFeatureMapHistory());
-
-    LOGD << "END storeFeatureMap";
   }
 
 }

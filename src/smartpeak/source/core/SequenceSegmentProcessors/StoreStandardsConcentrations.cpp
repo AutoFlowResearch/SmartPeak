@@ -75,15 +75,13 @@ namespace SmartPeak
     filenames.addFileName("standardsConcentrations", constructFilename("standardsConcentrations.csv", static_filenames_), "Standards Concentrations", true, true);
   };
 
-  void StoreStandardsConcentrations::process(
+  void StoreStandardsConcentrations::doProcess(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START StoreStandardsConcentrations";
-
     if (!InputDataValidation::prepareToStore(filenames_I, "standardsConcentrations"))
     {
       throw std::invalid_argument("Failed to store output file");

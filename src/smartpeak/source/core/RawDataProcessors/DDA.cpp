@@ -60,12 +60,11 @@ namespace SmartPeak
     filenames.addFileName("output_traML", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}.traML");
   };
 
-  void DDA::process(RawDataHandler& rawDataHandler_IO,
+  void DDA::doProcess(RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START DDA";
     getFilenames(filenames_I);
 
     // Complete user parameters with schema
@@ -139,8 +138,6 @@ namespace SmartPeak
     }
     rawDataHandler_IO.setFeatureMap(ms1_ms2_features);
     rawDataHandler_IO.updateFeatureMapHistory();
-
-    LOGD << "END DDA";
   }
 
 }

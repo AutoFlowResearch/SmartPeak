@@ -18,47 +18,30 @@
 //
 // --------------------------------------------------------------------------
 // $Maintainer: Douglas McCloskey $
-// $Authors: Douglas McCloskey, Pasquale Domenico Colaianni, Svetlana Kutuzova, Ahmed Khalil $
+// $Authors: Douglas McCloskey, Bertrand Boudaud $
 // --------------------------------------------------------------------------
 
-#pragma once
-
 #include <SmartPeak/core/RawDataProcessor.h>
-#include <SmartPeak/core/ApplicationHandler.h>
-
-#include <map>
-#include <vector>
-#include <regex>
-#include <sstream>
+#include <plog/Log.h>
 
 namespace SmartPeak
 {
-
-  struct StoreValidationData : RawDataProcessor, IFilePickerHandler
+  void RawDataProcessor::process(
+    RawDataHandler& rawDataHandler_IO,
+    const ParameterSet& params_I,
+    Filenames& filenames_I
+  ) const
   {
-    /**
-    IFilePickerHandler
-    */
-    bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
-
-    StoreValidationData() = default;
-
-    void doProcess(
-      RawDataHandler& rawDataHandler_IO,
-      const ParameterSet& params_I,
-      Filenames& filenames_I
-    ) const override;
-    std::string filename_;
-
-    /* IProcessorDescription */
-    virtual std::string getName() const override { return "STORE_VALIDATION_DATA"; }
-    virtual std::string getDescription() const override { return "Store the validation data."; }
-    virtual std::vector<std::string> getRequirements() const override;
-    virtual std::set<std::string> getOutputs() const override;
-    virtual std::set<std::string> getInputs() const override;
-
-    /* IFilenamesHandler */
-    virtual void getFilenames(Filenames& filenames) const override;
-  };
-
+    LOGD << "START " << getName() << ": " << rawDataHandler_IO.getMetaData().getSampleName();
+    try
+    {
+      doProcess(rawDataHandler_IO, params_I, filenames_I);
+    }
+    catch (const std::exception& e)
+    {
+      LOGE << "END (ERROR) " << getName() << ": " << rawDataHandler_IO.getMetaData().getSampleName() << " " << e.what();
+      throw;
+    }
+    LOGD << "END " << getName() << ": " << rawDataHandler_IO.getMetaData().getSampleName();
+  }
 }

@@ -27,7 +27,7 @@
 namespace SmartPeak
 {
 
-  bool CreateCommand::process() {
+  bool CreateCommand::doProcess() {
     // Enumerate the valid command keys
     std::vector<std::string> valid_commands_raw_data_processor;
     for (const auto& it: n_to_raw_data_method_) { valid_commands_raw_data_processor.push_back(it.first); }

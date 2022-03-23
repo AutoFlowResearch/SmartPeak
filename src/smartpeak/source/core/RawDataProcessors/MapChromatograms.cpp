@@ -57,13 +57,12 @@ namespace SmartPeak
     return ParameterSet({ oms_params });
   }
 
-  void MapChromatograms::process(
+  void MapChromatograms::doProcess(
     RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START MapChromatograms";
     getFilenames(filenames_I);
     // Set up MRMMapping and parse the MRMMapping params
     OpenMS::MRMMapping mrmmapper;
@@ -74,8 +73,6 @@ namespace SmartPeak
       rawDataHandler_IO.getTargetedExperiment(),
       rawDataHandler_IO.getChromatogramMap()
     );
-
-    LOGD << "END MapChromatograms";
   }
 
 }

@@ -51,20 +51,16 @@ namespace SmartPeak
     return { "sequence", "traML" };
   }
 
-  void ZeroChromatogramBaseline::process(
+  void ZeroChromatogramBaseline::doProcess(
     RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
     Filenames & filenames_I
   ) const
   {
-    LOGD << "START ZeroChromatogramBaseline";
-
     std::vector<OpenMS::MSChromatogram>& chroms = rawDataHandler_IO.getChromatogramMap().getChromatograms();
     for (OpenMS::MSChromatogram& ch : chroms) {
       OpenMS::subtractMinimumIntensity(ch);
     }
-
-    LOGD << "END ZeroChromatogramBaseline";
   }
 
 }

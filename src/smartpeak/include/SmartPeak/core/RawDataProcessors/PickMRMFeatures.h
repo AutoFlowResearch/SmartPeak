@@ -45,7 +45,7 @@ namespace SmartPeak
 
     /** Run the openSWATH pick peaking and scoring workflow for a single raw data file.
     */
-    void process(
+    void doProcess(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
       Filenames& filenames_I

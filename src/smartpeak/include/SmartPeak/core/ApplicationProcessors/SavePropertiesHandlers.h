@@ -34,7 +34,7 @@ namespace SmartPeak
     explicit SavePropertiesHandlers(ApplicationHandler& application_handler) : ApplicationProcessor(application_handler) {}
 
     /* ApplicationProcessor */
-    bool process() override;
+    virtual bool doProcess() override;
 
     /* IProcessorDescription */
     virtual std::string getName() const override { return "SAVE_PROPERTIES_HANDLERS"; }

@@ -42,11 +42,13 @@ namespace SmartPeak
     bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
 
     StoreParameters() = default;
-    void process(
+
+    void doProcess(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
       Filenames& filenames_I
     ) const override;
+
     std::string filename_;
 
     /* IProcessorDescription */

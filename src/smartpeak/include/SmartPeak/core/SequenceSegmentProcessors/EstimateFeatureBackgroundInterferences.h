@@ -41,7 +41,7 @@ namespace SmartPeak
     /**
       Estimate the %BackgroundInterferences for component and component group feature filter ion intensity attributes from Blank samples
     */
-    void process(
+    void doProcess(
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,

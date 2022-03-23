@@ -46,7 +46,7 @@ namespace SmartPeak
 
     /** Store the component and component group percent RSD estimations to disk.
     */
-    void process(
+    void doProcess(
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,

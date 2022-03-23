@@ -63,13 +63,12 @@ namespace SmartPeak
     return true;
   }
 
-  void LoadValidationData::process(
+  void LoadValidationData::doProcess(
     RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START loadValidationData";
     getFilenames(filenames_I);
     if (!InputDataValidation::prepareToLoad(filenames_I, "referenceData", true))
     {
@@ -275,7 +274,6 @@ namespace SmartPeak
       LOGI << "RefereceData clear";
       throw;
     }
-    LOGD << "END loadValidationData";
   }
 
 }

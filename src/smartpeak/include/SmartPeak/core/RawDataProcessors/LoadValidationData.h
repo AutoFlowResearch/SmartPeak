@@ -48,7 +48,7 @@ namespace SmartPeak
 
     /** Load the validation data from file.
     */
-    void process(
+    void doProcess(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
       Filenames& filenames_I

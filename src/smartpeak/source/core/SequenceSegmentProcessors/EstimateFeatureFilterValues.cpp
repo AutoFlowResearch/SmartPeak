@@ -58,14 +58,13 @@ namespace SmartPeak
     return ParameterSet();
   }
 
-  void EstimateFeatureFilterValues::process(
+  void EstimateFeatureFilterValues::doProcess(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START estimateFeatureFilterValues";
     getFilenames(filenames_I);
 
     std::vector<size_t> standards_indices, qcs_indices;
@@ -107,8 +106,6 @@ namespace SmartPeak
       sequenceHandler_I.getSequence().front().getRawData().getTargetedExperiment(), // Targeted experiment used by all injections in the sequence
       true
     );
-
-    LOGD << "END estimateFeatureFilterValues";
   }
 
 }

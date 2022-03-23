@@ -55,13 +55,12 @@ namespace SmartPeak
     filenames.addFileName("mzTab_o", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}.mzTab");
   };
 
-  void StoreAnnotations::process(
+  void StoreAnnotations::doProcess(
     RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START StoreAnnotations";
     getFilenames(filenames_I);
 
     if (!InputDataValidation::prepareToStore(filenames_I, "mzTab_o"))
@@ -72,8 +71,6 @@ namespace SmartPeak
     // Store outfile as mzTab
     OpenMS::MzTabFile mztabfile;
     mztabfile.store(filenames_I.getFullPath("mzTab_o").generic_string(), rawDataHandler_IO.getMzTab());
-
-    LOGD << "END StoreAnnotations";
   }
 
 }

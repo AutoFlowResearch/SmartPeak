@@ -48,7 +48,7 @@ namespace SmartPeak
     /**
       Load the quantitation methods file.
     */
-    void process(
+    void doProcess(
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,

@@ -87,14 +87,13 @@ namespace SmartPeak
     }
   };
 
-  void StoreFeatureFilters::process(
+  void StoreFeatureFilters::doProcess(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START storeFeatureFilter";
     getFilenames(filenames_I);
     FeatureFiltersUtils::storeFeatureFilters(
       "featureFilterComponents",
@@ -102,7 +101,6 @@ namespace SmartPeak
       filenames_I,
       sequenceSegmentHandler_IO.getFeatureFilter(),
       feature_filter_mode_);
-    LOGD << "END storeFeatureFilter";
   }
 
 }

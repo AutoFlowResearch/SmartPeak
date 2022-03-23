@@ -45,7 +45,7 @@ namespace SmartPeak
 
     /** Extract out specified spectra windows from an MSExperiment using the range specified in the parameters
     */
-    void process(
+    void doProcess(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
       Filenames& filenames_I

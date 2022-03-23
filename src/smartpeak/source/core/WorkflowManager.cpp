@@ -53,6 +53,16 @@ namespace SmartPeak {
     const std::set<std::string> sample_group_names_(sample_group_names);
     const std::vector<ApplicationHandler::Command> commands_(commands);
 
+    // log workflow
+    if (!commands.empty())
+    {
+      LOGD << "Running workflow:";
+      for (const auto& command : commands)
+      {
+        LOGD << command.getName();
+      }
+    }
+
     if (!blocking)
     {
       std::thread t(run_and_join, 

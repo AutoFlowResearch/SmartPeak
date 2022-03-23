@@ -27,7 +27,7 @@
 namespace SmartPeak
 {
 
-  bool BuildCommandsFromNames::process()
+  bool BuildCommandsFromNames::doProcess()
   {
     bool success = true;
     commands_.clear();

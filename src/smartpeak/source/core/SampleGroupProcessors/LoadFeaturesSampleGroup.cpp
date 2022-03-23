@@ -43,13 +43,12 @@ namespace SmartPeak
     filenames.addFileName("featureXMLSampleGroup_i", "${FEATURES_INPUT_PATH}/${INPUT_GROUP_NAME}.featureXML");
   };
 
-  void LoadFeaturesSampleGroup::process(SampleGroupHandler& sampleGroupHandler_IO,
+  void LoadFeaturesSampleGroup::doProcess(SampleGroupHandler& sampleGroupHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START LoadFeaturesSampleGroup";
     getFilenames(filenames_I);
 
     if (!InputDataValidation::prepareToLoad(filenames_I, "featureXMLSampleGroup_i", false))
@@ -67,8 +66,6 @@ namespace SmartPeak
       LOGE << "feature map clear";
       throw;
     }
-
-    LOGD << "END LoadFeaturesSampleGroup";
   }
 
 }

@@ -58,14 +58,13 @@ namespace SmartPeak
     return ParameterSet();
   }
 
-  void EstimateFeatureBackgroundInterferences::process(
+  void EstimateFeatureBackgroundInterferences::doProcess(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START EstimateFeatureBackgroundInterferences";
     getFilenames(filenames_I);
 
     // get all Blanks
@@ -97,8 +96,6 @@ namespace SmartPeak
       sequenceSegmentHandler_IO.getFeatureBackgroundEstimations(),
       sequenceHandler_I.getSequence().front().getRawData().getTargetedExperiment() // Targeted experiment used by all injections in the sequence
     );
-
-    LOGD << "END EstimateFeatureBackgroundInterferences";
   }
 
 }

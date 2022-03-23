@@ -57,12 +57,11 @@ namespace SmartPeak
     return ParameterSet({ oms_params });
   }
 
-  void SearchAccurateMass::process(RawDataHandler& rawDataHandler_IO,
+  void SearchAccurateMass::doProcess(RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START SearchAccurateMass";
     getFilenames(filenames_I);
     LOGI << "SearchAccurateMass input size: " << rawDataHandler_IO.getFeatureMap().size();
 
@@ -127,6 +126,5 @@ namespace SmartPeak
     rawDataHandler_IO.updateFeatureMapHistory();
 
     LOGI << "SearchAccurateMass output size: " << rawDataHandler_IO.getFeatureMap().size();
-    LOGD << "END SearchAccurateMass";
   }
 }

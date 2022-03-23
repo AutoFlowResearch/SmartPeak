@@ -45,7 +45,7 @@ namespace SmartPeak
 
     /** Flag features that do not pass the filter QCs.
     */
-    void process(
+    void doProcess(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
       Filenames& filenames_I

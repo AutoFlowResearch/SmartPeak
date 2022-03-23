@@ -59,14 +59,13 @@ namespace SmartPeak
     return ParameterSet();
   }
 
-  void TransferLOQToFeatureFilters::process(
+  void TransferLOQToFeatureFilters::doProcess(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START TransferLOQToFeatureFilters";
     getFilenames(filenames_I);
 
     // check if there are any quantitation methods
@@ -79,8 +78,6 @@ namespace SmartPeak
       sequenceSegmentHandler_IO.getQuantitationMethods(),
       sequenceSegmentHandler_IO.getFeatureFilter()
     );
-
-    LOGD << "END TransferLOQToFeatureFilters";
   }
 
 }

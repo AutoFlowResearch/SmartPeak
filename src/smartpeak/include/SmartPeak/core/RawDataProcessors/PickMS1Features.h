@@ -45,7 +45,7 @@ namespace SmartPeak
 
     /** Run the MS1 peak picking and scoring algorithm.
     */
-    void process(
+    void doProcess(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
       Filenames& filenames_I

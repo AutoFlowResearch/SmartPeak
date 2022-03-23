@@ -65,13 +65,12 @@ namespace SmartPeak
     return ParameterSet(param_struct);
   }
 
-  void IsotopicCorrections::process(
+  void IsotopicCorrections::doProcess(
     RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START IsotopicCorrections";
     getFilenames(filenames_I);
 
     // Complete user parameters with schema
@@ -100,8 +99,6 @@ namespace SmartPeak
     isotopelabelingmdvs.isotopicCorrections(rawDataHandler_IO.getFeatureMap(), corrected_featureMap, {}, correction_matrix_agent);
     rawDataHandler_IO.setFeatureMap(corrected_featureMap);
     rawDataHandler_IO.updateFeatureMapHistory();
-
-    LOGD << "END IsotopicCorrections";
   }
 
 }

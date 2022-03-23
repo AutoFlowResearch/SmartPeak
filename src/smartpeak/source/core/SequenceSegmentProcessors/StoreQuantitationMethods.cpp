@@ -87,15 +87,13 @@ namespace SmartPeak
     return true;
   }
 
-  void StoreQuantitationMethods::process(
+  void StoreQuantitationMethods::doProcess(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START storeQuantitationMethods";
-    
     getFilenames(filenames_I);
 
     if (!InputDataValidation::prepareToStore(filenames_I, "quantitationMethods"))
@@ -113,8 +111,6 @@ namespace SmartPeak
     catch (const std::exception& e) {
       LOGE << e.what();
     }
-
-    LOGD << "END storeQuantitationMethods";
   }
 
 }

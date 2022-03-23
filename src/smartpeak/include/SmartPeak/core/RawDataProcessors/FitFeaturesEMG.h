@@ -45,7 +45,7 @@ namespace SmartPeak
 
     /** Apply the EMG peak reconstruction technique to the data points.
     */
-    void process(
+    void doProcess(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
       Filenames& filenames_I
