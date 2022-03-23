@@ -35,7 +35,6 @@ AccurateMassSearchEngine,negative_adducts,string,X:/Analytical_Lab/Daniela  Work
 AccurateMassSearchEngine,use_feature_adducts,boolean,FALSE,FALSE,true; false,Whether to filter AMS candidates mismatching available feature adduct annotation.,FALSE,,
 AccurateMassSearchEngine,keep_unidentified_masses,boolean,FALSE,FALSE,true; false,Keep features that did not yield any DB hit.,FALSE,,
 AccurateMassSearchEngine,mzTab:exportIsotopeIntensities,boolean,FALSE,FALSE,true; false,[featureXML input only] Export column with available isotope trace intensities (opt_global_MTint),FALSE,,
-SequenceProcessor,n_thread,int,,1,,Number of threads to use,TRUE,,
 MergeInjections,scan_polarity_merge_rule,string,Sum,,,,TRUE,,
 MergeInjections,mass_range_merge_rule,string,Sum,,,,TRUE,,
 MergeInjections,dilution_series_merge_rule,string,Max,,,,TRUE,,

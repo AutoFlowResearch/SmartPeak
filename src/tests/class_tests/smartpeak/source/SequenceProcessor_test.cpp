@@ -344,13 +344,6 @@ TEST(SequenceHandler, processSequence)
     n_chroms += sequenceHandler.getSequence().at(i).getRawData().getExperiment().getChromatograms().size();
   EXPECT_EQ(n_chroms, 2040); // loaded all injections
 
-  // Test multi threading parameters
-  ParameterSet const* params;
-  params = &rawDataHandler0.getParameters();
-  EXPECT_EQ(params->count("SequenceProcessor"), 1);
-  unsigned int n_threads = std::stoul(params->at("SequenceProcessor")[0].getValueAsString());
-  EXPECT_EQ(n_threads, 4);
-
   SmartPeak::SequenceProcessorMultithread spMT1(sequenceHandler.getSequence(),
     dynamic_filenames,
     raw_data_processing_methods);

@@ -45,13 +45,6 @@ namespace SmartPeak
 
   namespace ApplicationProcessors {
 
-  ParameterSet getParameterSchema()
-  {
-    ParameterSet parameter_set;
-    parameter_set.merge(ProcessSequence::getParameterSchemaStatic());
-    return parameter_set;
-  }
-
   template<typename COMMANDS_LIST_TYPE>
   void notifyStartCommands(ApplicationProcessorObservable& observable, size_t start_index, const COMMANDS_LIST_TYPE& commands)
   {
@@ -77,6 +70,7 @@ namespace SmartPeak
     const std::set<std::string>& injection_names, 
     const std::set<std::string>& sequence_segment_names, 
     const std::set<std::string>& sample_group_names,
+    const int number_of_threads,
     IApplicationProcessorObserver* application_processor_observer,
     ISequenceProcessorObserver* sequence_processor_observer,
     ISequenceSegmentProcessorObserver* sequence_segment_processor_observer,
@@ -123,6 +117,7 @@ namespace SmartPeak
         ps.filenames_ = filenames;
         ps.raw_data_processing_methods_ = raw_methods;
         ps.injection_names_ = injection_names;
+        ps.number_of_threads_ = number_of_threads;
         notifyStartCommands<decltype(raw_methods)>(observable, i, raw_methods);
         ps.process(application_handler.filenames_);
         notifyEndCommands<decltype(raw_methods)>(observable, i, raw_methods);
@@ -149,6 +144,7 @@ namespace SmartPeak
         pss.filenames_ = filenames;
         pss.sequence_segment_processing_methods_ = seq_seg_methods;
         pss.sequence_segment_names_ = sequence_segment_names;
+        pss.number_of_threads_ = number_of_threads;
         notifyStartCommands<decltype(seq_seg_methods)>(observable, i, seq_seg_methods);
         pss.process(application_handler.filenames_);
         notifyEndCommands<decltype(seq_seg_methods)>(observable, i, seq_seg_methods);
@@ -175,6 +171,7 @@ namespace SmartPeak
         psg.filenames_ = filenames;
         psg.sample_group_processing_methods_ = sample_group_methods;
         psg.sample_group_names_ = sample_group_names;
+        psg.number_of_threads_ = number_of_threads;
         notifyStartCommands<decltype(sample_group_methods)>(observable, i, sample_group_methods);
         psg.process(application_handler.filenames_);
         notifyEndCommands<decltype(sample_group_methods)>(observable, i, sample_group_methods);

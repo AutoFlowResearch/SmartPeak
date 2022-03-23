@@ -123,4 +123,3 @@ AbsoluteQuantitation,max_iters,int,100,100,,The maximum number of iterations to 
 AbsoluteQuantitation,outlier_detection_method,string,iter_jackknife,iter_jackknife,,Outlier detection method to find and remove bad calibration points.,TRUE
 AbsoluteQuantitation,use_chauvenet,string,FALSE,TRUE,,Whether to only remove outliers that fulfill Chauvenet's criterion for outliers (otherwise it will remove any outlier candidate regardless of the criterion).,TRUE
 AbsoluteQuantitation,optimization_method,string,iterative,iterative,,Calibrator optimization method to find the best set of calibration points for each method.,TRUE
-SequenceProcessor,n_thread,int,4,1,,Number of threads to use,TRUE

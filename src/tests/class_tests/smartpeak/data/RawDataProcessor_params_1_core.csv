@@ -124,7 +124,6 @@ MRMFeatureFilter.filter_MRMFeatures,report_tic,string,FALSE,FALSE,true; false,Em
 MRMFeatureFilter.filter_MRMFeatures.qc,flag_or_filter,string,flag,flag,filter; flag,"Flag or Filter (i.e., remove) Components or transitions that do not pass the QC.",TRUE,,
 MRMFeatureFilter.filter_MRMFeatures.qc,report_xic,string,FALSE,FALSE,true; false,Embed an image of the XIC in the QC report.,TRUE,,
 MRMFeatureFilter.filter_MRMFeatures.qc,report_tic,string,FALSE,FALSE,true; false,Embed an image of the TIC in the QC report.,TRUE,,
-SequenceProcessor,n_thread,int,4,1,,Number of threads to use,TRUE,,
 MergeInjections,scan_polarity_merge_rule,string,WeightedMean,,,,TRUE,,
 MergeInjections,mass_range_merge_rule,string,Sum,,,,TRUE,,
 MergeInjections,dilution_series_merge_rule,string,Max,,,,TRUE,,

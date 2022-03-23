@@ -33,7 +33,8 @@ namespace SmartPeak {
     const std::set<std::string>& injection_names, 
     const std::set<std::string>& sequence_segment_names, 
     const std::set<std::string>& sample_group_names, 
-    const std::vector<ApplicationHandler::Command>& commands, 
+    const std::vector<ApplicationHandler::Command>& commands,
+    const int number_of_threads,
     IApplicationProcessorObserver* application_processor_observer,
     ISequenceProcessorObserver* sequence_processor_observer,
     ISequenceSegmentProcessorObserver* sequence_segment_processor_observer,
@@ -72,6 +73,7 @@ namespace SmartPeak {
                     sequence_segment_names_,
                     sample_group_names_,
                     commands_,
+                    number_of_threads,
                     application_processor_observer,
                     sequence_processor_observer,
                     sequence_segment_processor_observer,
@@ -82,9 +84,18 @@ namespace SmartPeak {
     }
     else
     {
-      run_and_join(application_handler_, done_, injection_names_,
-        sequence_segment_names_, sample_group_names_, commands_, application_processor_observer,
-        sequence_processor_observer, sequence_segment_processor_observer, sample_group_processor_observer);
+      run_and_join(
+        application_handler_,
+        done_,
+        injection_names_,
+        sequence_segment_names_,
+        sample_group_names_,
+        commands_,
+        number_of_threads,
+        application_processor_observer,
+        sequence_processor_observer,
+        sequence_segment_processor_observer,
+        sample_group_processor_observer);
     }
   }
 
@@ -99,6 +110,7 @@ namespace SmartPeak {
     const std::set<std::string>& sequence_segment_names, 
     const std::set<std::string>& sample_group_names, 
     const std::vector<ApplicationHandler::Command>& commands,
+    const int number_of_threads,
     IApplicationProcessorObserver* application_processor_observer,
     ISequenceProcessorObserver* sequence_processor_observer,
     ISequenceSegmentProcessorObserver* sequence_segment_processor_observer,
@@ -113,6 +125,7 @@ namespace SmartPeak {
       std::cref(injection_names), 
       std::cref(sequence_segment_names), 
       std::cref(sample_group_names),
+      number_of_threads,
       application_processor_observer,
       sequence_processor_observer,
       sequence_segment_processor_observer,

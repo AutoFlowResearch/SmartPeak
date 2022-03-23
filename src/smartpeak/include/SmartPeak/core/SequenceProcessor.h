@@ -270,16 +270,17 @@ namespace SmartPeak
     {
       addSequenceProcessorObserver(sequence_processor_observer);
     }
-    static ParameterSet getParameterSchemaStatic();
+
     void doProcess(Filenames& filenames_I) override;
 
     /* IProcessorDescription */
     virtual std::string getName() const override { return "PROCESS_SEQUENCE"; }
     virtual std::string getDescription() const override { return "Apply a processing workflow to all injections in a sequence"; }
-    ParameterSet getParameterSchema() const override;
 
     /* IFilenamesHandler */
     virtual void getFilenames(Filenames& filenames) const override {};
+
+    int number_of_threads_ = 1;
   };
 
   /**
@@ -300,6 +301,8 @@ namespace SmartPeak
     /* IProcessorDescription */
     virtual std::string getName() const override { return "PROCESS_SEQUENCE_SEGMENTS"; }
     virtual std::string getDescription() const override { return "Apply a processing workflow to all injections in a sequence segment"; }
+
+    int number_of_threads_ = 1;
   };
 
   /**
@@ -320,6 +323,8 @@ namespace SmartPeak
     /* IProcessorDescription */
     virtual std::string getName() const override { return "PROCESS_SAMPLE_GROUPS"; }
     virtual std::string getDescription() const override { return "Apply a processing workflow to all injections in a sample group"; }
+
+    int number_of_threads_ = 1;
   };
 
   struct LoadSequence : SequenceProcessor, IFilePickerHandler

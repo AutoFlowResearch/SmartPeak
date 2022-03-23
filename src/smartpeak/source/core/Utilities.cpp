@@ -1006,9 +1006,17 @@ namespace SmartPeak
       const std::set<std::string> sequence_segment_names = session_handler.getSelectSequenceSegmentNamesWorkflow(application_handler.sequenceHandler_);
       const std::set<std::string> sample_group_names = session_handler.getSelectSampleGroupNamesWorkflow(application_handler.sequenceHandler_);
       
-      workflow_manager.addWorkflow(application_handler, injection_names, sequence_segment_names,
-                                   sample_group_names, buildCommandsFromNames.commands_, &event_dispatcher,
-                                   &event_dispatcher, &event_dispatcher, &event_dispatcher);
+      workflow_manager.addWorkflow(
+        application_handler,
+        injection_names,
+        sequence_segment_names,
+        sample_group_names,
+        buildCommandsFromNames.commands_,
+        1,
+        &event_dispatcher,
+        &event_dispatcher,
+        &event_dispatcher,
+        &event_dispatcher);
     }
   }
 

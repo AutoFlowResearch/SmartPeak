@@ -189,6 +189,7 @@ namespace SmartPeak
       sequence_segment_names,
       sample_group_names,
       buildCommandsFromNames.commands_,
+      1,
       application_processor_observer_,
       sequence_processor_observer_,
       sequence_segment_processor_observer_,

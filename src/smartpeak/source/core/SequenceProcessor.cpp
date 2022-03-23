@@ -90,49 +90,6 @@ namespace SmartPeak
     std::string msg_;
   };
 
-  int nbThreads(const std::vector<InjectionHandler> injections)
-  {
-    int n_threads = 6;
-    if (injections.size())
-    {
-      const auto& params = injections.front().getRawData().getParameters();
-      if (params.count("SequenceProcessor") && !params.at("SequenceProcessor").empty()) {
-        for (const auto& p : params.at("SequenceProcessor")) {
-          if (p.getName() == "n_thread") {
-            try {
-              n_threads = std::stoi(p.getValueAsString());
-              LOGI << "SequenceProcessor::n_threads set to " << n_threads;
-            }
-            catch (const std::exception& e) {
-              LOGE << e.what();
-            }
-          }
-        }
-      }
-    }
-    return n_threads;
-  }
-
-  ParameterSet ProcessSequence::getParameterSchemaStatic()
-  {
-    std::map<std::string, std::vector<std::map<std::string, std::string>>> param_struct({
-    {"SequenceProcessor", {
-      {
-        {"name", "n_thread"},
-        {"type", "int"},
-        {"value", "6"},
-        {"description", "number of working threads"},
-        {"min", "1"}
-      }
-    }} });
-    return ParameterSet(param_struct);
-  }
-
-  ParameterSet ProcessSequence::getParameterSchema() const
-  {
-    return ProcessSequence::getParameterSchemaStatic();
-  }
-
   void ProcessSequence::doProcess(Filenames& filenames_I)
   {
     // Check that there are raw data processing methods
@@ -157,8 +114,7 @@ namespace SmartPeak
       filenames_,
       raw_data_processing_methods_,
       this);
-    int n_threads = nbThreads(injections);
-    manager.spawn_workers(n_threads);
+    manager.spawn_workers(number_of_threads_);
     notifySequenceProcessorEnd();
   }
 
@@ -192,8 +148,7 @@ namespace SmartPeak
       sequence_segment_processing_methods_,
       filenames_,
       this);
-    int n_threads = nbThreads(sequenceHandler_IO->getSequence());
-    manager.spawn_workers(n_threads);
+    manager.spawn_workers(number_of_threads_);
     sequenceHandler_IO->setSequenceSegments(sequence_segments);
     sequenceHandler_IO->notifySequenceUpdated();
     notifySequenceSegmentProcessorEnd();
@@ -357,8 +312,7 @@ namespace SmartPeak
       sample_group_processing_methods_,
       filenames_,
       this);
-    int n_threads = nbThreads(sequenceHandler_IO->getSequence());
-    manager.spawn_workers(n_threads);
+    manager.spawn_workers(number_of_threads_);
     sequenceHandler_IO->setSampleGroups(sample_groups);
     notifySampleGroupProcessorEnd();
   }
