@@ -90,8 +90,12 @@ jobs:
             dpkg -c ~/smartpeak_release_build/*.deb
             mkdir -p /tmp/packages
             cp ~/smartpeak_release_build/*.deb /tmp/packages
-      - store_artifacts:
-          path: /tmp/packages
+      - when:
+          condition:
+            matches: { pattern: "^release/.*", value: << pipeline.git.branch >> }
+          steps:
+            - store_artifacts:
+                path: /tmp/packages
 
   build_macos:
     macos:
@@ -176,8 +180,12 @@ jobs:
           command: |
             mkdir -p /tmp/artifacts
             cp ~/SmartPeak/smartpeak_release_build/*.dmg /tmp/artifacts
-      - store_artifacts:
-          path: /tmp/artifacts
+      - when:
+          condition:
+            matches: { pattern: "^release/.*", value: << pipeline.git.branch >> }
+          steps:
+            - store_artifacts:
+                path: /tmp/artifacts
 
 
   build_windows:
@@ -327,8 +335,12 @@ jobs:
           command: |
             mkdir -p ~/artifacts
             cp ~/SmartPeak/smartpeak_release_build/*.exe ~/artifacts
-      - store_artifacts:
-          path: ~/artifacts
+      - when:
+          condition:
+            matches: { pattern: "^release/.*", value: << pipeline.git.branch >> }
+          steps:
+            - store_artifacts:
+                path: ~/artifacts
 
   prepare_release:
     # This job is responsible for updating a package version stored in a configuration.
