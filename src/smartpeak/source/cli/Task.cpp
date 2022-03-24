@@ -134,6 +134,10 @@ namespace SmartPeak {
         SmartPeak::LoadSession create_sequence(application_handler, workflow_manager);
         create_sequence.filenames_override_ = filenames_override;
         create_sequence.parameters_override_ = parameters_override;
+        if (application_settings.workflow.size())
+        {
+          create_sequence.workflow_override_ = application_settings.workflow;
+        }
         if (std::filesystem::is_regular_file(application_settings.load_session))
         {
           // Load from session
@@ -371,10 +375,23 @@ namespace SmartPeak {
         // If this flag is true, no progressbar is printed and workflow is ran on the main thread.
         auto disable_progressbar = application_settings.disable_progressbar;
 
+        int number_of_threads = application_settings.nb_threads;
+        if (number_of_threads < 1)
+        {
+          number_of_threads = std::thread::hardware_concurrency();
+        }
         workflow_manager.addWorkflow(
-          application_handler, injection_names, sequence_segment_names,
-          sample_group_names, application_manager.get_workflow_commands(),
-          &event_dispatcher, &event_dispatcher, &event_dispatcher, &event_dispatcher, disable_progressbar);
+          application_handler,
+          injection_names,
+          sequence_segment_names,
+          sample_group_names,
+          application_manager.get_workflow_commands(),
+          number_of_threads,
+          &event_dispatcher,
+          &event_dispatcher,
+          &event_dispatcher,
+          &event_dispatcher,
+          disable_progressbar);
 
         if (!disable_progressbar)
         {

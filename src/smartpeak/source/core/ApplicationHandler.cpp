@@ -247,7 +247,6 @@ namespace SmartPeak
     {
       schema_params.merge(command.getParameterSchema());
     }
-    schema_params.merge(ApplicationProcessors::getParameterSchema()); // Application processor will be used also
     schema_params.setAsSchema(true);
     return schema_params;
   }

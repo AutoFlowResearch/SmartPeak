@@ -167,7 +167,8 @@ TEST(Task, Task_options_change_parameter)
           "--allow-inconsistent",
           "--log-dir", ".",
           "--disable-colors",
-          "--parameter", "SequenceProcessor:n_thread=42"
+          "--workflow", "PICK_MRM_FEATURES",
+          "--parameter", "MRMFeatureFinderScoring:add_up_spectra=42"
   };
   auto pa = cli::Parser{ args };
   auto as = cli::ApplicationSettings{ pa };
@@ -178,7 +179,7 @@ TEST(Task, Task_options_change_parameter)
   EXPECT_TRUE(ls(am));
   ASSERT_GT(am.get_application_handler().sequenceHandler_.getSequence().size(), 0);
   auto parameters = am.get_application_handler().sequenceHandler_.getSequence().at(0).getRawData().getParameters();
-  auto parameter = parameters.findParameter("SequenceProcessor", "n_thread");
+  auto parameter = parameters.findParameter("MRMFeatureFinderScoring", "add_up_spectra");
   ASSERT_NE(parameter, nullptr);
   ASSERT_EQ(parameter->getValueAsString(), "42");
 }
@@ -223,8 +224,7 @@ TEST(Task, Task_options_change_output_dirs)
         "-o", feature_output_dir.generic_string(),
         "--reports-out-dir", report_output_dir.generic_string(),
         "--report", "featuredb",
-        "--report-metadata", "peak_area", "logSN", "RT",
-        "--parameter", "SequenceProcessor:n_thread=1"
+        "--report-metadata", "peak_area", "logSN", "RT"
   };
   auto pa = cli::Parser{ args };
   auto as = cli::ApplicationSettings{ pa };

@@ -50,6 +50,7 @@ namespace SmartPeak {
       @param[in] sequence_segment_names Sequence Segment Names to use for Sequence Segment Processing
       @param[in] sample_group_names Sample Group Names to use for Sample Group Processing
       @param[in] commands Workflow steps
+      @param[in] number_of_threads number of threads to use to execute the workflow
       @param[in] sequence_processor_observer an observer for sequence, used to report progress
       @param[in] sequence_segment_processor_observer an observer for sequence segment, used to report progress
       @param[in] sample_group_processor_observer, used to report progress
@@ -60,6 +61,7 @@ namespace SmartPeak {
       const std::set<std::string>& sequence_segment_names, 
       const std::set<std::string>& sample_group_names, 
       const std::vector<ApplicationHandler::Command>& commands, 
+      const int number_of_threads,
       IApplicationProcessorObserver* application_processor_observer = nullptr,
       ISequenceProcessorObserver* sequence_processor_observer = nullptr,
       ISequenceSegmentProcessorObserver * sequence_segment_processor_observer = nullptr,
@@ -106,6 +108,7 @@ namespace SmartPeak {
       @param[in] sequence_segment_names Sequence Segment Names to use for Sequence Segment Processing
       @param[in] sample_group_names Sample Group Names to use for Sample Group Processing
       @param[in] commands Workflow steps
+      @param[in] number_of_threads number of threads to use to execute the workflow
       @param[in] sequence_processor_observer an observer for sequence, used to report progress
       @param[in] sequence_segment_processor_observer an observer for sequence segment, used to report progress
       @param[in] sample_group_processor_observer, used to report progress
@@ -116,6 +119,7 @@ namespace SmartPeak {
       const std::set<std::string>& sequence_segment_names,
       const std::set<std::string>& sample_group_names,
       const std::vector<ApplicationHandler::Command>& commands,
+      const int number_of_threads,
       IApplicationProcessorObserver* application_processor_observer = nullptr,
       ISequenceProcessorObserver* sequence_processor_observer = nullptr,
       ISequenceSegmentProcessorObserver * sequence_segment_processor_observer = nullptr,

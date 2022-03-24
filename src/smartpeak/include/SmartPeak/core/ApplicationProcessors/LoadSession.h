@@ -36,6 +36,7 @@ namespace SmartPeak
     std::optional<Filenames>    filenames_;           /// Pathnames to load - if not set, read it from session
     std::optional<Filenames>    filenames_override_;  /// Pathnames override
     std::optional<ParameterSet> parameters_override_; /// Parameters override
+    std::optional<std::vector<std::string>> workflow_override_; /// Workflow override
     std::string      delimiter = ",";                 /// String delimiter of the imported file
     bool             checkConsistency = true;         /// Check consistency of data contained in files
 
@@ -65,6 +66,7 @@ namespace SmartPeak
   protected:
     bool overrideFilenames();
     bool overrideParameters();
+    bool overrideWorkflow();
     bool readFilenames();
     bool readInputFiles();
     bool readLoadingWorkflow();

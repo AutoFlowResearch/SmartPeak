@@ -92,6 +92,11 @@ namespace SmartPeak
       file_picker_.draw();
       
       ImGui::Separator();
+      static int number_of_threads = std::thread::hardware_concurrency();
+      if (number_of_threads < 1) number_of_threads = 1;
+      ImGui::InputInt("Number of Threads", &number_of_threads);
+
+      ImGui::Separator();
       ImGui::Checkbox("Run on Server", &run_on_server);
       ImGui::Text("Server URL");
       ImGui::SameLine();
@@ -144,6 +149,7 @@ namespace SmartPeak
               sequence_segment_names,
               sample_group_names,
               buildCommandsFromNames.commands_,
+              number_of_threads,
               &application_processor_observer_,
               &sequence_processor_observer_,
               &sequence_segment_processor_observer_,

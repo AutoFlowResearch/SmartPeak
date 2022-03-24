@@ -110,6 +110,7 @@ public:
     std::vector<std::string> parameters;
     std::string mzml_dir;
     std::string reports_out_dir;
+    int nb_threads;
 
 public:
     void validate_report() const;
