@@ -211,6 +211,11 @@ namespace SmartPeak
       return false;
     }
 
+    if (!overrideWorkflow())
+    {
+      return false;
+    }
+
     if (!overrideParameters())
     {
       return false;
@@ -325,6 +330,15 @@ namespace SmartPeak
           }
         }
       }
+    }
+    return true;
+  }
+
+  bool LoadSession::overrideWorkflow()
+  {
+    if (workflow_override_)
+    {
+      application_handler_.sequenceHandler_.setWorkflow(*workflow_override_);
     }
     return true;
   }

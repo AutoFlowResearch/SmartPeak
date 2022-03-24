@@ -134,6 +134,10 @@ namespace SmartPeak {
         SmartPeak::LoadSession create_sequence(application_handler, workflow_manager);
         create_sequence.filenames_override_ = filenames_override;
         create_sequence.parameters_override_ = parameters_override;
+        if (application_settings.workflow.size())
+        {
+          create_sequence.workflow_override_ = application_settings.workflow;
+        }
         if (std::filesystem::is_regular_file(application_settings.load_session))
         {
           // Load from session

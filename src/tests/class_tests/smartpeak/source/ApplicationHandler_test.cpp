@@ -95,6 +95,7 @@ TEST_F(ApplicationHandlerFixture, setFileSavedState)
 
 TEST_F(ApplicationHandlerFixture, getWorkflowParameterSchema)
 {
+  ah_.sequenceHandler_.setWorkflow({ "LOAD_RAW_DATA", "CALCULATE_MDV_ACCURACIES" });
   auto schema_params = ah_.getWorkflowParameterSchema();
-  EXPECT_EQ(schema_params.size(), 1);
+  EXPECT_EQ(schema_params.size(), 3);
 }
