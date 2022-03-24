@@ -57,39 +57,37 @@ namespace SmartPeak
     }
   }
 
-  void CalibratorsPlotWidget::recomputeCalibration()
+  void CalibratorsPlotWidget::recomputeFitCalibration(const std::string& component_name)
   {
-    if (selected_action_ == EActionFitCalibration)
-    {
-      setIncludeExcludeParameter("excluded_points", user_excluded_points_);
-      setIncludeExcludeParameter("included_points", user_included_points_);
-      FitCalibration fit_calibration;
-      Filenames filenames; // fit_calibration actually does not use it
-      ParameterSet& user_parameters = sequence_handler_.getSequence().at(0).getRawData().getParameters();
-      auto fit_calibration_params_schema = fit_calibration.getParameterSchema();
-      user_parameters.merge(fit_calibration_params_schema);
-      user_parameters.findParameter("FitCalibration", "component_name")->setValueFromString(components_.at(selected_component_));
-      fit_calibration.process(
-        sequence_handler_.getSequenceSegments().at(selected_sequence_segment_),
-        sequence_handler_,
-        user_parameters,
-        filenames);
-      onSequenceUpdated();
-      user_excluded_points_.clear();
-      user_included_points_.clear();
-    }
-    else if (selected_action_ == EActionOptimizeCalibration)
-    {
-      OptimizeCalibration optimize_calibration;
-      Filenames filenames; // optimize_calibration actually does not use it
-      ParameterSet& user_parameters = sequence_handler_.getSequence().at(0).getRawData().getParameters();
-      optimize_calibration.process(
-        sequence_handler_.getSequenceSegments().at(selected_sequence_segment_),
-        sequence_handler_,
-        user_parameters,
-        filenames);
-      onSequenceUpdated();
-    }
+    setIncludeExcludeParameter("excluded_points", user_excluded_points_);
+    setIncludeExcludeParameter("included_points", user_included_points_);
+    FitCalibration fit_calibration;
+    Filenames filenames; // fit_calibration actually does not use it
+    ParameterSet& user_parameters = sequence_handler_.getSequence().at(0).getRawData().getParameters();
+    auto fit_calibration_params_schema = fit_calibration.getParameterSchema();
+    user_parameters.merge(fit_calibration_params_schema);
+    user_parameters.findParameter("FitCalibration", "component_name")->setValueFromString(component_name);
+    fit_calibration.process(
+      sequence_handler_.getSequenceSegments().at(selected_sequence_segment_),
+      sequence_handler_,
+      user_parameters,
+      filenames);
+    onSequenceUpdated();
+    user_excluded_points_.clear();
+    user_included_points_.clear();
+  }
+
+  void CalibratorsPlotWidget::recomputeOptimizeCalibration()
+  {
+    OptimizeCalibration optimize_calibration;
+    Filenames filenames; // optimize_calibration actually does not use it
+    ParameterSet& user_parameters = sequence_handler_.getSequence().at(0).getRawData().getParameters();
+    optimize_calibration.process(
+      sequence_handler_.getSequenceSegments().at(selected_sequence_segment_),
+      sequence_handler_,
+      user_parameters,
+      filenames);
+    onSequenceUpdated();
   }
 
   std::tuple<std::string, std::string> 
@@ -225,7 +223,7 @@ namespace SmartPeak
     {
       if (ImGui::Button("Calculate Optimized Calibration"))
       {
-        recomputeCalibration();
+        recomputeOptimizeCalibration();
       }
     }
 
@@ -447,7 +445,7 @@ namespace SmartPeak
     }
     if (selected_action_ == EActionFitCalibration)
     {
-      recomputeCalibration();
+      recomputeFitCalibration(components_.at(selected_component_));
     }
   }
 
@@ -714,8 +712,9 @@ namespace SmartPeak
                   user_excluded_points_.push_back(std::make_pair(serie_name, sample_name));
                   user_included_points_.erase(std::remove(user_included_points_.begin(), user_included_points_.end(), sample_and_serie), user_included_points_.end());
                   {
-                    recomputeCalibration();
-                  }                }
+                    recomputeFitCalibration(serie_name);
+                  }
+                }
               }
               else
               {
@@ -725,8 +724,9 @@ namespace SmartPeak
                   user_excluded_points_.erase(std::remove(user_excluded_points_.begin(), user_excluded_points_.end(), sample_and_serie), user_excluded_points_.end());
                   if (selected_action_ == EActionFitCalibration)
                   {
-                    recomputeCalibration();
-                  }                }
+                    recomputeFitCalibration(serie_name);
+                  }
+                }
               }
             }
           }
@@ -892,6 +892,7 @@ namespace SmartPeak
       {
         point_concs = stand_concs;
         found = true;
+        break;
       }
     }
     // find it in the excluded points from the sequence_segment

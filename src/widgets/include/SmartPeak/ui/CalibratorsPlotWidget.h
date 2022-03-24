@@ -79,7 +79,8 @@ namespace SmartPeak
     OpenMS::AbsoluteQuantitationMethod* getQuantitationMethod(const std::string& component_name);
     void displayParameters();
     void displayPlot();
-    void recomputeCalibration();
+    void recomputeFitCalibration(const std::string& component_name);
+    void recomputeOptimizeCalibration();
     void addParameterRow(std::shared_ptr<Parameter> param, bool editable);
     void getSelectedPoint(ImVec2 point, ImVec2 threshold_point);
     void showChromatogram(const std::string& sample_name);
