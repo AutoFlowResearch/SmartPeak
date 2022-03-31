@@ -34,6 +34,15 @@
 
 namespace SmartPeak
 {
+  std::set<std::string> ExtractSpectraNonTargeted::getInputs() const
+  {
+    return { "Features", "Experiment"};
+  }
+
+  std::set<std::string> ExtractSpectraNonTargeted::getOutputs() const
+  {
+    return { "Features" };
+  }
 
   std::vector<std::string> ExtractSpectraNonTargeted::getRequirements() const
   {
@@ -47,13 +56,12 @@ namespace SmartPeak
     return parameters;
   }
 
-  void ExtractSpectraNonTargeted::process(
+  void ExtractSpectraNonTargeted::doProcess(
     RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START ExtractSpectraNonTargeted";
     getFilenames(filenames_I);
     // Complete user parameters with schema
     ParameterSet params(params_I);
@@ -68,8 +76,6 @@ namespace SmartPeak
 
     rawDataHandler_IO.setFeatureMap(selected_features);
     rawDataHandler_IO.updateFeatureMapHistory();
-
-    LOGD << "END ExtractSpectraNonTargeted";
   }
 
 }

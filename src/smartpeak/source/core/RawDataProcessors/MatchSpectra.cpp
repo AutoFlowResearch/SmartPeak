@@ -58,7 +58,6 @@ namespace SmartPeak
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START MatchSpectra";
     getFilenames(filenames_I);
 
     // Complete user parameters with schema
@@ -83,7 +82,6 @@ namespace SmartPeak
 
     // rawDataHandler_IO.setFeatureMap(feature_map);
     rawDataHandler_IO.updateFeatureMapHistory();
-    LOGD << "END MatchSpectra";
   }
 
 }

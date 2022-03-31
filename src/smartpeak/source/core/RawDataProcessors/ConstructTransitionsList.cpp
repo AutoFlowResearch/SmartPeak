@@ -36,6 +36,15 @@
 
 namespace SmartPeak
 {
+  std::set<std::string> ConstructTransitionsList::getInputs() const
+  {
+    return { "Features" };
+  }
+
+  std::set<std::string> ConstructTransitionsList::getOutputs() const
+  {
+    return { "Features" };
+  }
 
   std::vector<std::string> ConstructTransitionsList::getRequirements() const
   {
@@ -67,12 +76,11 @@ namespace SmartPeak
     filenames.addFileName("output_transitions_csv", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}.csv");
   };
 
-  void ConstructTransitionsList::process(RawDataHandler& rawDataHandler_IO,
+  void ConstructTransitionsList::doProcess(RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START ConstructTransitionsList";
     getFilenames(filenames_I);
 
     // Complete user parameters with schema
@@ -142,8 +150,6 @@ namespace SmartPeak
     }
     rawDataHandler_IO.setFeatureMap(ms1_ms2_features);
     rawDataHandler_IO.updateFeatureMapHistory();
-
-    LOGD << "END ConstructTransitionsList";
   }
 
 }
