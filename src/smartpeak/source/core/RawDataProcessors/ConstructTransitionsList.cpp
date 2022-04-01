@@ -44,7 +44,7 @@ namespace SmartPeak
 
   std::set<std::string> ConstructTransitionsList::getInputs() const
   {
-    return { "MS1 Features" };
+    return { "Features", "MS1 Features" };
   }
 
   std::set<std::string> ConstructTransitionsList::getOutputs() const

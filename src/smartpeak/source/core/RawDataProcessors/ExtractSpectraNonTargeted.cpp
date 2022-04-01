@@ -37,17 +37,17 @@ namespace SmartPeak
 
   std::vector<std::string> ExtractSpectraNonTargeted::getRequirements() const
   {
-    return { "Experiment", "Features" };
+    return { "sequence", "traML" };
   }
 
   std::set<std::string> ExtractSpectraNonTargeted::getInputs() const
   {
-    return { "Features" };
+    return { "Experiment", "Features" };
   }
 
   std::set<std::string> ExtractSpectraNonTargeted::getOutputs() const
   {
-    return { "Feature Background Estimations" };
+    return { "Features" };
   }
 
   ParameterSet ExtractSpectraNonTargeted::getParameterSchema() const

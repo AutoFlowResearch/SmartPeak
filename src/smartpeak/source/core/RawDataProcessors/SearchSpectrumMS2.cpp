@@ -38,7 +38,7 @@ namespace SmartPeak
 
   std::vector<std::string> SearchSpectrumMS2::getRequirements() const
   {
-    return { "Features" };
+    return { "sequence", "traML" };
   }
 
   std::set<std::string> SearchSpectrumMS2::getInputs() const
@@ -48,7 +48,7 @@ namespace SmartPeak
 
   std::set<std::string> SearchSpectrumMS2::getOutputs() const
   {
-    return { };
+    return { "Features" };
   }
 
   ParameterSet SearchSpectrumMS2::getParameterSchema() const
