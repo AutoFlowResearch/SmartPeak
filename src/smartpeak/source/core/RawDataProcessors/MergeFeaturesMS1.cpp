@@ -43,7 +43,7 @@ namespace SmartPeak
 
   std::set<std::string> MergeFeaturesMS1::getOutputs() const
   {
-    return { "Features" };
+    return { "Features", "MS1 Features" };
   }
 
   std::vector<std::string> MergeFeaturesMS1::getRequirements() const

@@ -42,6 +42,16 @@ namespace SmartPeak
     return { "sequence", "traML" };
   }
 
+  std::set<std::string> StoreMSP::getInputs() const
+  {
+    return { "Experiment", "Spectra" };
+  }
+
+  std::set<std::string> StoreMSP::getOutputs() const
+  {
+    return { };
+  }
+
   ParameterSet StoreMSP::getParameterSchema() const
   {
     OpenMS::TargetedSpectraExtractor oms_params;
@@ -54,12 +64,11 @@ namespace SmartPeak
     filenames.addFileName("output_ms2", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}.msp");
   };
 
-  void StoreMSP::process(RawDataHandler& rawDataHandler_IO,
+  void StoreMSP::doProcess(RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START StoreMSP";
     getFilenames(filenames_I);
 
     // Complete user parameters with schema
@@ -85,8 +94,6 @@ namespace SmartPeak
 
     auto output_ms2 = filenames_I.getFullPath("output_ms2").generic_string();
     targeted_spectra_extractor.storeSpectraMSP(output_ms2, experiment);
-
-    LOGD << "END StoreMSP";
   }
 
 }

@@ -40,10 +40,12 @@ namespace SmartPeak
     virtual std::string getDescription() const override { return "Extract spectra on non targeted experiement."; }
     virtual ParameterSet getParameterSchema() const override;
     virtual std::vector<std::string> getRequirements() const override;
+    virtual std::set<std::string> getOutputs() const override;
+    virtual std::set<std::string> getInputs() const override;
 
     /** Extract out specified spectra windows from an MSExperiment using the range specified in the parameters
     */
-    void process(
+    void doProcess(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
       Filenames& filenames_I

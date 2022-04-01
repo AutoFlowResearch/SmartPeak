@@ -41,6 +41,16 @@ namespace SmartPeak
     return { "sequence", "traML" };
   }
 
+  std::set<std::string> MergeFeaturesMS2::getInputs() const
+  {
+    return { "Features"};
+  }
+
+  std::set<std::string> MergeFeaturesMS2::getOutputs() const
+  {
+    return { "Features" };
+  }
+
   ParameterSet MergeFeaturesMS2::getParameterSchema() const
   {
     OpenMS::TargetedSpectraExtractor oms_params;
@@ -48,12 +58,11 @@ namespace SmartPeak
     return parameters;
   }
 
-  void MergeFeaturesMS2::process(RawDataHandler& rawDataHandler_IO,
+  void MergeFeaturesMS2::doProcess(RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START MergeFeaturesMS2";
     getFilenames(filenames_I);
 
     // Complete user parameters with schema
@@ -69,8 +78,6 @@ namespace SmartPeak
     targeted_spectra_extractor.mergeFeatures(ms2_accurate_mass_found_feature_map, ms2_merged_features);
     rawDataHandler_IO.setFeatureMap(ms2_merged_features);
     rawDataHandler_IO.updateFeatureMapHistory();
-
-    LOGD << "END MergeFeaturesMS2";
   }
 
 }

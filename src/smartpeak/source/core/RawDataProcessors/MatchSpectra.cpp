@@ -38,7 +38,17 @@ namespace SmartPeak
 
   std::vector<std::string> MatchSpectra::getRequirements() const
   {
-    return { "sequence", "traML" };
+    return { "Spectra" };
+  }
+
+  std::set<std::string> MatchSpectra::getInputs() const
+  {
+    return { "Features" };
+  }
+
+  std::set<std::string> MatchSpectra::getOutputs() const
+  {
+    return { "Feature Background Estimations" };
   }
 
   ParameterSet MatchSpectra::getParameterSchema() const
@@ -53,12 +63,11 @@ namespace SmartPeak
     filenames.addFileName("cmp_spectra", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}.msp");
   };
 
-  void MatchSpectra::process(RawDataHandler& rawDataHandler_IO,
+  void MatchSpectra::doProcess(RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START MatchSpectra";
     getFilenames(filenames_I);
 
     // Complete user parameters with schema
@@ -82,7 +91,6 @@ namespace SmartPeak
     targeted_spectra_extractor.targetedMatching(rawDataHandler_IO.getExperiment().getSpectra(), cmp, rawDataHandler_IO.getFeatureMap());
 
     rawDataHandler_IO.updateFeatureMapHistory();
-    LOGD << "END MatchSpectra";
   }
 
 }
