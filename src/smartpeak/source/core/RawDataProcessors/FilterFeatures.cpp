@@ -35,6 +35,16 @@
 namespace SmartPeak
 {
 
+  std::set<std::string> FilterFeatures::getInputs() const
+  {
+    return { "Features", "Feature Filters", "Targeted Experiment" };
+  }
+
+  std::set<std::string> FilterFeatures::getOutputs() const
+  {
+    return { "Features" };
+  }
+
   std::vector<std::string> FilterFeatures::getRequirements() const
   {
     return { "sequence", "traML" };
@@ -46,13 +56,12 @@ namespace SmartPeak
     return ParameterSet({ oms_param });
   }
 
-  void FilterFeatures::process(
+  void FilterFeatures::doProcess(
     RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START filterFeatures";
     getFilenames(filenames_I);
     LOGI << "Feature Filter input size: " << rawDataHandler_IO.getFeatureMap().size();
 
@@ -70,7 +79,6 @@ namespace SmartPeak
     rawDataHandler_IO.updateFeatureMapHistory();
 
     LOGI << "Feature Filter output size: " << featureMap.size();
-    LOGD << "END filterFeatures";
   }
 
 }

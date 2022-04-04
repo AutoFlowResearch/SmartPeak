@@ -38,6 +38,16 @@
 namespace SmartPeak
 {
 
+  std::set<std::string> StoreQuantitationMethods::getInputs() const
+  {
+    return { "Quantitation Methods" };
+  }
+
+  std::set<std::string> StoreQuantitationMethods::getOutputs() const
+  {
+    return { };
+  }
+
   std::vector<std::string> StoreQuantitationMethods::getRequirements() const
   {
     return { "sequence", "traML" };
@@ -50,17 +60,40 @@ namespace SmartPeak
 
   void StoreQuantitationMethods::getFilenames(Filenames& filenames) const
   {
-    filenames.addFileName("quantitationMethods", constructFilename("quantitationMethods.csv", static_filenames_), "Quantitation Methods", false, false, true);
+    filenames.addFileName(
+      "quantitationMethods", 
+      constructFilename("quantitationMethods.csv", static_filenames_),
+      "Quantitation Methods",
+      false,
+      false,
+      true);
   };
 
-  void StoreQuantitationMethods::process(
+  bool StoreQuantitationMethods::onFilePicked(const std::filesystem::path& directory, ApplicationHandler* application_handler)
+  {
+    if (application_handler->sequenceHandler_.getSequenceSegments().size() == 0)
+    {
+      LOGE << "File cannot be written without first loading the sequence.";
+      return false;
+    }
+    for (auto& sequence_segment : application_handler->sequenceHandler_.getSequenceSegments())
+    {
+      Filenames filenames;
+      filenames.setTagValue(Filenames::Tag::FEATURES_OUTPUT_PATH, directory.generic_string());
+      filenames.setTagValue(Filenames::Tag::OUTPUT_SEQUENCE_SEGMENT_NAME, sequence_segment.getSequenceSegmentName());
+      static_filenames_ = false;
+      process(sequence_segment, application_handler->sequenceHandler_, {}, filenames);
+    }
+    return true;
+  }
+
+  void StoreQuantitationMethods::doProcess(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START storeQuantitationMethods";
     getFilenames(filenames_I);
 
     if (!InputDataValidation::prepareToStore(filenames_I, "quantitationMethods"))
@@ -78,8 +111,6 @@ namespace SmartPeak
     catch (const std::exception& e) {
       LOGE << e.what();
     }
-
-    LOGD << "END storeQuantitationMethods";
   }
 
 }

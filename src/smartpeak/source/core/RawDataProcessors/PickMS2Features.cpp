@@ -38,6 +38,16 @@
 namespace SmartPeak
 {
 
+  std::set<std::string> PickMS2Features::getInputs() const
+  {
+    return { "Spectra" };
+  }
+
+  std::set<std::string> PickMS2Features::getOutputs() const
+  {
+    return { "Features" };
+  }
+
   std::vector<std::string> PickMS2Features::getRequirements() const
   {
     return { "sequence", "traML" };
@@ -75,13 +85,12 @@ namespace SmartPeak
     return parameters;
   }
 
-  void PickMS2Features::process(
+  void PickMS2Features::doProcess(
     RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START PickMS2Features";
     getFilenames(filenames_I);
 
     // Complete user parameters with schema
@@ -283,8 +292,6 @@ namespace SmartPeak
     rawDataHandler_IO.setFeatureMap(feat_map);
     rawDataHandler_IO.updateFeatureMapHistory();
     rawDataHandler_IO.getExperiment().setChromatograms(merged_chromatograms);
-
-    LOGD << "END PickMS2Features";
   }
 
 }

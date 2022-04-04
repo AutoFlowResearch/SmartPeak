@@ -29,29 +29,26 @@
 
 namespace SmartPeak
 {
+  struct IParameterEditorWidgetObserver
+  {
+    virtual void onParameterSet(const std::string& function_parameter, const Parameter& parameter) = 0;
+    virtual void onParameterRemoved(const std::string& function_parameter, const Parameter& parameter) = 0;
+  };
+
   class ParameterEditorWidget final : public Widget
   {
   public:
-    ParameterEditorWidget(ApplicationHandler& application_handler) :
-      application_handler_(application_handler),
+    ParameterEditorWidget(IParameterEditorWidgetObserver& observer, bool enable_remove = false) :
       parameter_("parameter"), // dummy name
-      input_text_field_()
+      input_text_field_(),
+      observer_(observer),
+      enable_remove_(enable_remove)
     {
     };
     void draw() override;
     void setParameter(const std::string& function_parameter, const Parameter& parameter);
-    
-    /**
-      @brief returns true when a value has been modified
-    */
-    bool isTableScanRequired() const { return table_scan_required_; };
-    
-    /**
-      @brief sets table_scan_required_ to false after changes has taken place
-    */
-    void setTableScanNotRequired() { table_scan_required_ = false; };
+
   protected:
-    ApplicationHandler& application_handler_;
     std::string function_parameter_;
     Parameter parameter_;
     std::string title_;
@@ -60,6 +57,7 @@ namespace SmartPeak
     std::vector<std::string> valid_string_;
   private:
     void setInputTextField(const std::string& value);
-    bool table_scan_required_ = false;
+    IParameterEditorWidgetObserver& observer_;
+    bool enable_remove_;
   };
 }

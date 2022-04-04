@@ -27,6 +27,16 @@
 #include <SmartPeak/core/Parameters.h>
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/ApplicationHandler.h>
+#include <SmartPeak/core/EventDispatcher.h>
+#include <SmartPeak/core/WorkflowManager.h>
+#include <SmartPeak/core/SessionHandler.h>
+#include <SmartPeak/core/ApplicationProcessors/BuildCommandsFromNames.h>
+
+#ifndef CSV_IO_NO_THREAD
+#define CSV_IO_NO_THREAD
+#endif
+#include <SmartPeak/io/csv.h>
+
 #include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureSelector.h>
 #include <OpenMS/DATASTRUCTURES/Param.h>
 #include <OpenMS/FORMAT/MRMFeatureQCFile.h>
@@ -39,6 +49,7 @@
 #include <tuple>
 
 #include <plog/Log.h>
+#include <openssl/sha.h>
 
 #define maxFunc(a,b) (((a) > (b)) ? (a) : (b))
 
@@ -404,6 +415,109 @@ public:
       const std::string& function_parameter,
       const std::string& parameter_name,
       const std::filesystem::path main_path);
+    
+    /**
+     @brief Returns current time
+     
+     @returns Current time in the format : %H-%M-%S_%d-%m-%Y
+    */
+    static std::string getCurrentTime();
+    
+    /**
+     @brief Calculates sha256 hash on a given string
+     
+     @param[in] str string to perfrom the sha256 hashing on
+     
+     @returns hashed string
+    */
+    static std::string sha256(const std::string str);
+    
+    /**
+     @brief Creates .serversession.ssi file
+     
+     @param[in] file_path pull path to the location of where to create the .serversession.ssi if not existing
+    */
+    static void createServerSessionFile(std::filesystem::path file_path);
+    
+    /**
+     @brief Writes comma seperated values to .serversession.ssi file
+     
+     @param[in] file_path pull path to the location of where to create the .serversession.ssi if not existing
+     @param[in] user_id user id as provided in the login dialog
+     @param[in] dataset_name the name of the dataset name
+     @param[in] workflow_status workflow status if the current/last workflow run
+     @param[in] started_at the start time of the workflow
+     @param[in] finished_at the end time of the workflow
+     @param[in] path_to_exports the full path to the exported reports
+     @param[in] log_file full path to the generated log file
+    */
+    static void writeToServerSessionFile(
+      std::filesystem::path file_path,
+      std::string usr_id, std::string dataset_name, std::string workflow_status,
+      std::string started_at, std::string finished_at, std::string path_to_exports,
+      std::string log_file);
+    
+    /**
+     @brief Checks for the last workflow status
+     
+     @param[in] file_path pull path to the location of the dataset
+     @param[in] username user id of the current user
+    */
+    static bool checkLastServerWorkflowRun(std::filesystem::path file_path, std::string& username);
+    
+    /**
+     @brief Loads processed raw data and features
+     
+     @param[in] application_handler application handler
+     @param[in] session_handler session handler
+     @param[in] workflow_manager workflow manager
+     @param[in] event_dispatcher event dispatcher
+    */
+    static void loadRawDataAndFeatures(
+      ApplicationHandler& application_handler, SessionHandler& session_handler,
+      WorkflowManager& workflow_manager, EventDispatcher& event_dispatcher);
 
+    /**
+     @brief returns true if the string is a list of items matching the regex.
+     */
+    static bool isList(const std::string& str, const std::regex& re);
+
+    /**
+     @brief replace all instance of one string with another string.
+     @param[in] str the string to look into
+     @param[in] search the string to look for
+     @param[in] replace the string to replace with
+     */
+    static std::string replaceAll(const std::string& str, const std::string search, const std::string& replace);
+
+    /**
+     @brief Check if a csv file has required headers
+    */
+    template<char Separator, typename ...Columns>
+    static bool checkCSVHeader(const std::filesystem::path& filename, const Columns& ...columns);
+
+    /**
+     @brief returns true if file has BOM marker
+    */
+    static bool hasBOMMarker(const std::filesystem::path& filename);
   };
+
+  template<char Separator, typename ...Columns>
+  bool Utilities::checkCSVHeader(const std::filesystem::path& filename, const Columns& ...columns)
+  {
+    try
+    {
+      io::CSVReader<sizeof...(Columns), io::trim_chars<>, io::no_quote_escape<Separator>> in(filename.generic_string());
+      in.read_header(
+        io::ignore_extra_column,
+        columns...
+      );
+    }
+    catch (const io::error::missing_column_in_header&)
+    {
+      return false;
+    }
+    return true;
+  }
 }
+

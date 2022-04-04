@@ -29,7 +29,7 @@ namespace SmartPeak
 {
   struct CreateCommand : ApplicationProcessor {
     CreateCommand(ApplicationHandler& application_handler) : ApplicationProcessor(application_handler) {}
-    bool process() override;
+    virtual bool doProcess() override;
     std::string name_;
     ApplicationHandler::Command cmd_; 
     virtual std::string getName() const override { return "CreateCommand"; };

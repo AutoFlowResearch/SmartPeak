@@ -122,3 +122,7 @@ AbsoluteQuantitation,use_chauvenet,string,FALSE,TRUE,,Whether to only remove out
 AbsoluteQuantitation,optimization_method,string,iterative,iterative,,Calibrator optimization method to find the best set of calibration points for each method.,TRUE,,
 SequenceSegmentPlotter,export_format,string,pdf,pdf,,The export format of the plot,TRUE,,
 SequenceSegmentPlotter,annotate_features,bool,TRUE,,,Annotate peaks with features,TRUE,,
+CalculateMDVs,mass_intensity_type,string,norm_sum,,,,TRUE,,
+CalculateMDVs,feature_name,string,peak_apex_int,,,,TRUE,,
+IsotopicCorrections,correction_matrix_agent,string,TBDMS,,,,TRUE,,
+CalculateMDVAccuracies,feature_name,string,peak_apex_int,,,,TRUE,,

@@ -31,7 +31,6 @@
 #include <optional>
 #include <plog/Log.h>
 #include <SmartPeak/iface/IPropertiesHandler.h>
-#include <OpenMS/DATASTRUCTURES/String.h>
 
 namespace SmartPeak
 {

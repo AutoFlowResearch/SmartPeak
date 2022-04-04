@@ -72,6 +72,11 @@ namespace SmartPeak
     Parameter(const std::map<std::string, std::string>& properties);
 
     /**
+      @brief constructor from ParamEntry
+    */
+    Parameter(const OpenMS::Param::ParamEntry& param_entry);
+
+    /**
       @brief returns the type of parameter as string
     */
     std::string getType() const;
@@ -191,6 +196,27 @@ namespace SmartPeak
       @param[in] use_scheme if set, and if a schema is assigned to this parameter, returns the valid strings of the schema.
     */
     const std::vector<CastValue> getValidStrings(bool use_scheme = true) const;
+
+    /**
+     @brief for parameter of type list, return true if the element exists in the list
+
+     @param[in] value the value tu check existence.
+    */
+    bool isInList(const CastValue& value) const;
+
+    /**
+     @brief for parameter of type list, adds an element to the list
+
+     @param[in] value to add to the list.
+    */
+    void addToList(const CastValue& value);
+
+    /**
+     @brief for parameter of type list, removes an element from the list
+
+     @param[in] value to add to the list.
+    */
+    void removeFromList(const CastValue& value);
 
     bool operator==(const Parameter & other) const;
     inline bool operator!=(const Parameter& other) const { return !operator==(other); };
@@ -344,6 +370,7 @@ namespace SmartPeak
     @param[in] parameter_name the parameter name to search
     */
     Parameter* findParameter(const std::string& function_name, const std::string& parameter_name);
+    const Parameter* findParameter(const std::string& function_name, const std::string& parameter_name) const;
 
     /**
     @brief Mark all parameters as schema parameter.

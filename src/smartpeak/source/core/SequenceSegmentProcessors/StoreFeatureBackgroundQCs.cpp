@@ -37,6 +37,16 @@
 namespace SmartPeak
 {
 
+  std::set<std::string> StoreFeatureBackgroundQCs::getInputs() const
+  {
+    return { "Feature Background QCs" };
+  }
+
+  std::set<std::string> StoreFeatureBackgroundQCs::getOutputs() const
+  {
+    return { };
+  }
+
   std::vector<std::string> StoreFeatureBackgroundQCs::getRequirements() const
   {
     return { "sequence", "traML" };
@@ -81,14 +91,13 @@ namespace SmartPeak
     }
   };
 
-  void StoreFeatureBackgroundQCs::process(
+  void StoreFeatureBackgroundQCs::doProcess(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START storeFeatureBackgroundQC";
     getFilenames(filenames_I);
     FeatureFiltersUtils::storeFeatureFilters(
       "featureBackgroundQCComponents",
@@ -96,7 +105,6 @@ namespace SmartPeak
       filenames_I,
       sequenceSegmentHandler_IO.getFeatureBackgroundQC(),
       feature_filter_mode_);
-    LOGD << "END storeFeatureBackgroundQC";
   }
 
 }

@@ -35,13 +35,15 @@ namespace SmartPeak
     virtual std::string getDescription() const override { return "Estimate default FeatureQC parameter values for the feature QCs from Standard and QC samples."; }
     virtual ParameterSet getParameterSchema() const override;
     virtual std::vector<std::string> getRequirements() const override;
+    virtual std::set<std::string> getOutputs() const override;
+    virtual std::set<std::string> getInputs() const override;
 
     /**
       @brief Estimate default FeatureQC parameter values from Standard and QC samples.
         The Standard samples should span the LLOQ and ULOQ. The `setComponentsToConcentrations`
         will be used to guide which Standard samples.
     */
-    void process(
+    void doProcess(
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,

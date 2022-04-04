@@ -26,6 +26,7 @@
 #include <plog/Log.h>
 #include <SmartPeak/core/SharedProcessors.h>
 #include <SmartPeak/core/ApplicationProcessors/BuildCommandsFromNames.h>
+#include <SmartPeak/core/SharedProcessors.h>
 
 namespace SmartPeak
 {
@@ -40,7 +41,7 @@ namespace SmartPeak
     static const char* seq_seg_method_type_ = "Sequence segment methods";
     static const char* sample_group_method_type_ = "Sample group methods";
 
-    if (!ImGui::BeginPopupModal("Add workflow step", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+    if (!ImGui::BeginPopupModal("Add workflow step", NULL)) {
       return;
     }
 
@@ -98,7 +99,6 @@ namespace SmartPeak
     ImGui::Separator();
 
     bool command_success = false;
-    ImGui::BeginChild("Description", ImVec2(popup_width, description_box_height));
     if (!selected_method_.empty())
     {
       ImGui::PushTextWrapPos();
@@ -115,8 +115,37 @@ namespace SmartPeak
         command_success = false;
       }
       ImGui::PopTextWrapPos();
+      ImGui::Separator();
+      
+      const auto& command = buildCommandsFromNames.commands_[0];
+
+      // show inputs
+      const auto inputs = command.getInputs();
+      std::ostringstream os;
+      os << "Inputs: [";
+      std::string separator;
+      for (const auto& input : inputs)
+      {
+        os << separator << input;
+        separator = ", ";
+      }
+      os << "]";
+      ImGui::TextWrapped(os.str().c_str());
+
+      // show outputs
+      const auto outputs = command.getOutputs();
+      os.str("");
+      os << "Outputs: [";
+      separator = "";
+      for (const auto& output : outputs)
+      {
+        os << separator << output;
+        separator = ", ";
+      }
+      os << "]";
+      ImGui::TextWrapped(os.str().c_str());
+
     }
-    ImGui::EndChild();
 
     ImGui::Separator();
 

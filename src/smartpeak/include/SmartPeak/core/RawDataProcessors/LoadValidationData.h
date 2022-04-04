@@ -44,10 +44,11 @@ namespace SmartPeak
     /* IProcessorDescription */
     virtual std::string getName() const override { return "LOAD_VALIDATION_DATA"; }
     virtual std::string getDescription() const override { return "Load the validation data from file."; }
+    virtual std::set<std::string> getOutputs() const override;
 
     /** Load the validation data from file.
     */
-    void process(
+    void doProcess(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
       Filenames& filenames_I

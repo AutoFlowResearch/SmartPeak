@@ -33,6 +33,15 @@
 
 namespace SmartPeak
 {
+  std::set<std::string> LoadFeatureQCsRDP::getInputs() const
+  {
+    return { };
+  }
+
+  std::set<std::string> LoadFeatureQCsRDP::getOutputs() const
+  {
+    return { "Feature QCs" };
+  }
 
   void LoadFeatureQCsRDP::getFilenames(Filenames& filenames) const
   {
@@ -40,13 +49,12 @@ namespace SmartPeak
     filenames.addFileName("featureQCComponentGroups", "${MAIN_DIR}/featureQCComponentGroups.csv", "Components Group QCs", true, true);
   };
 
-  void LoadFeatureQCsRDP::process(
+  void LoadFeatureQCsRDP::doProcess(
     RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START loadFeatureQC";
     getFilenames(filenames_I);
     FeatureFiltersUtils::loadFeatureFilters(
       "featureQCComponents", 
@@ -57,7 +65,6 @@ namespace SmartPeak
       nullptr,
       FeatureFiltersUtilsMode::EFeatureFilterComponentAndGroup
     );
-    LOGD << "END loadFeatureQC";
   }
 
 }

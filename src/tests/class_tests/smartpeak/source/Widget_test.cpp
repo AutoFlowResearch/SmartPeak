@@ -34,6 +34,8 @@
 #include <SmartPeak/ui/SessionFilesWidget.h>
 #include <SmartPeak/ui/LoadSessionWizard.h>
 #include <SmartPeak/ui/SetInputOutputWidget.h>
+#include <SmartPeak/ui/CalibratorsPlotWidget.h>
+#include <SmartPeak/ui/RunWorkflowWidget.h>
 #include <SmartPeak/core/RawDataProcessors/LoadFeatures.h>
 #include <SmartPeak/core/ApplicationProcessors/SaveSession.h>
 
@@ -229,18 +231,6 @@ public:
     return plotLimits();
   }
 
-  void wrapper_setCurrentRange(float range_min, float range_max)
-  {
-    current_range_.first = range_min;
-    current_range_.second = range_max;
-  }
-
-
-  std::tuple<float,float> wrapper_getCurrentRange() const
-  {
-    return current_range_;
-  }
-
   void wrapper_setCompactView(bool enable)
   {
     compact_view_ = enable;
@@ -264,6 +254,19 @@ public:
   void wrapper_updateRanges()
   {
     updateRanges();
+  }
+
+  void wrapper_set_plot_limits_(float xmin, float xmax, float ymin, float ymax)
+  {
+    plot_limits_.X.Min = xmin;
+    plot_limits_.X.Max = xmax;
+    plot_limits_.Y.Min = ymin;
+    plot_limits_.Y.Max = ymax;
+  }
+
+  ImPlotLimits wrapper_get_plot_limits_()
+  {
+    return plot_limits_;
   }
 
 public:
@@ -307,8 +310,8 @@ TEST(GraphicDataVizWidget, plotLimits)
   test_graphic_data_viz.setGraphVizData(graph_viz_data);
 
   const auto [plot_min_x, plot_max_x, plot_min_y, plot_max_y] = test_graphic_data_viz.wrapper_plotLimits();
-  EXPECT_NEAR(plot_min_x, -2.09, 1e-6);
-  EXPECT_NEAR(plot_max_x, 2.09, 1e-6);
+  EXPECT_NEAR(plot_min_x, -1.0899999141, 1e-6);
+  EXPECT_NEAR(plot_max_x, 212.08999633, 1e-6);
   EXPECT_NEAR(plot_min_y, 98.910003662109375, 1e-6);
   EXPECT_NEAR(plot_max_y, 341, 1e-6);
 }
@@ -321,9 +324,9 @@ TEST(GraphicDataVizWidget, WriteAndReadGraphViz)
   std::string title = "GraphicDataVizWidget";
   GraphicDataVizWidget_Test test_graphic_data_viz_write(session_handler, application_handler, id, title);
   test_graphic_data_viz_write.wrapper_setMarkerPosition(42.0f);
-  test_graphic_data_viz_write.wrapper_setCurrentRange(10.0f, 100.0f);
   test_graphic_data_viz_write.wrapper_setShowLegend(false);
   test_graphic_data_viz_write.wrapper_setCompactView(false);
+  test_graphic_data_viz_write.wrapper_set_plot_limits_(1, 2, 3, 4);
 
   SessionDB session_db;
   auto path_db = std::tmpnam(nullptr);
@@ -336,25 +339,25 @@ TEST(GraphicDataVizWidget, WriteAndReadGraphViz)
   test_graphic_data_viz_read.wrapper_updateRanges();
   EXPECT_EQ(test_graphic_data_viz_read.wrapper_getShowLegend(), false);
   EXPECT_EQ(test_graphic_data_viz_read.wrapper_getCompactView(), false);
-  const auto [current_range_min, current_range_max] = test_graphic_data_viz_read.wrapper_getCurrentRange();
-  EXPECT_FLOAT_EQ(current_range_min, 10.0f);
-  EXPECT_FLOAT_EQ(current_range_max, 100.0f);
+  auto plot_limit = test_graphic_data_viz_read.wrapper_get_plot_limits_();
+  EXPECT_DOUBLE_EQ(plot_limit.X.Min, 1);
+  EXPECT_DOUBLE_EQ(plot_limit.X.Max, 2);
+  EXPECT_DOUBLE_EQ(plot_limit.Y.Min, 3);
+  EXPECT_DOUBLE_EQ(plot_limit.Y.Max, 4);
 }
 
-class WorkflowWidget_Test : public WorkflowWidget
+class WorfklowStepNodeGraph_Test : public WorfklowStepNodeGraph
 {
 public:
-  WorkflowWidget_Test(const std::string title, 
-                      ApplicationHandler& application_handler, 
-                      WorkflowManager& workflow_manager) :
-    WorkflowWidget(title, application_handler, workflow_manager)
+  WorfklowStepNodeGraph_Test(ApplicationHandler& application_handler, WorkflowManager& workflow_manager)
+    : WorfklowStepNodeGraph(application_handler, workflow_manager)
   {};
 
 public:
   // wrappers to protected methods
   virtual void updatecommands() override
   {
-    WorkflowWidget::updatecommands();
+    WorfklowStepNodeGraph::updatecommands();
   }
 
   bool errorBuildingCommands()
@@ -363,11 +366,11 @@ public:
   }
 };
 
-TEST(WorkflowWidget, updateCommands)
+TEST(WorfklowStepNodeGraph, updateCommands)
 {
   ApplicationHandler application_handler;
   WorkflowManager workflow_manager;
-  WorkflowWidget_Test workflow_widget("Workflow Widget", application_handler, workflow_manager);
+  WorfklowStepNodeGraph_Test workflow_widget(application_handler, workflow_manager);
   
   // initial state
   EXPECT_FALSE(workflow_widget.errorBuildingCommands());
@@ -878,3 +881,295 @@ TEST(SetInputOutputWidget, cancel)
   EXPECT_EQ(set_input_output_widget_test.on_input_output_cancel_counter, 1);
 }
 
+class CalibratorsPlotWidget_Test :
+  public CalibratorsPlotWidget
+{
+public:
+  CalibratorsPlotWidget_Test(
+    SessionHandler& session_handler,
+    SequenceHandler& sequence_handler,
+    std::shared_ptr<ExplorerWidget> explorer_widget,
+    std::shared_ptr<ChromatogramPlotWidget> chromatogram_widget,
+    SequenceObservable& sequence_observable) :
+    CalibratorsPlotWidget(session_handler, sequence_handler, explorer_widget, chromatogram_widget, sequence_observable)
+  {};
+
+public:
+
+  bool& get_reset_zoom_()
+  {
+    return reset_zoom_;
+  }
+
+  const std::vector<std::string>& get_components_()
+  {
+    return components_;
+  }
+
+  void wrapper_setCalibrationData(SessionHandler::CalibrationData calibration_data, const std::string title)
+  {
+    setCalibrationData(calibration_data, title);
+  }
+
+  void wrapper_getSelectedPoint(ImVec2 point, ImVec2 threshold_point)
+  {
+    getSelectedPoint(point, threshold_point);
+  }
+  
+  std::optional<std::tuple<int, int>>& get_hovered_matching_point_()
+  {
+    return hovered_matching_point_;
+  }
+
+  std::optional<std::tuple<int, int>>& get_hovered_excluded_point_()
+  {
+    return hovered_excluded_point_;
+  }
+
+  std::tuple<std::string, std::string>
+  wrapper_getSampleNameAndSerieFromSelectedPoint(
+    const std::optional<std::tuple<int, int>>& matching_point,
+    const std::optional<std::tuple<int, int>>& excluded_point) const
+  {
+    return getSampleNameAndSerieFromSelectedPoint(matching_point, excluded_point);
+  }
+};
+
+TEST(CalibratorsPlotWidget, setCalibrationData)
+{
+  SessionHandler session_handler;
+  SequenceHandler sequence_handler;
+  std::shared_ptr<ExplorerWidget> explorer_widget;
+  std::shared_ptr<ChromatogramPlotWidget> chromatogram_widget;
+  EventDispatcher event_dispatcher;
+  CalibratorsPlotWidget_Test calibrator_widget(session_handler, sequence_handler, explorer_widget, chromatogram_widget, event_dispatcher);
+  EXPECT_EQ(calibrator_widget.get_reset_zoom_(), true);
+
+  SessionHandler::CalibrationData calibrator_data;
+  calibrator_data.series_names = { "one", "two", "three" };
+  calibrator_data.x_axis_title = "x_axis_title";
+  calibrator_data.y_axis_title = "y_axis_title";
+  calibrator_data.conc_min = 1.0f;
+  calibrator_data.conc_max = 100.0f;
+  calibrator_data.feature_min = 10.0f;
+  calibrator_data.feature_max = 1000.0f;
+
+  calibrator_widget.wrapper_setCalibrationData(calibrator_data, "test");
+  EXPECT_EQ(calibrator_widget.get_reset_zoom_(), true);
+
+  auto components = calibrator_widget.get_components_();
+  EXPECT_EQ(components, calibrator_data.series_names);
+};
+
+TEST(CalibratorsPlotWidget, getSelectedPoint)
+{
+  SessionHandler session_handler;
+  SequenceHandler sequence_handler;
+  std::shared_ptr<ExplorerWidget> explorer_widget;
+  std::shared_ptr<ChromatogramPlotWidget> chromatogram_widget;
+  EventDispatcher event_dispatcher;
+  CalibratorsPlotWidget_Test calibrator_widget(session_handler, sequence_handler, explorer_widget, chromatogram_widget, event_dispatcher);
+  EXPECT_EQ(calibrator_widget.get_reset_zoom_(), true);
+
+  SessionHandler::CalibrationData calibrator_data;
+  calibrator_data.series_names = { "one", "two", "three" };
+  calibrator_data.x_axis_title = "x_axis_title";
+  calibrator_data.y_axis_title = "y_axis_title";
+  calibrator_data.matching_points_.concentrations_.push_back({ 1.1, 2.1, 3.1 });
+  calibrator_data.matching_points_.features_.push_back({ 1.2, 2.2, 3.2 });
+  calibrator_data.excluded_points_.concentrations_.push_back({ 101.1, 102.1, 103.1 });
+  calibrator_data.excluded_points_.features_.push_back({ 101.2, 102.2, 103.2 });
+
+  calibrator_widget.wrapper_setCalibrationData(calibrator_data, "");
+  calibrator_widget.wrapper_getSelectedPoint({ 2.1, 2.2 }, {0.01, 0.01});
+  ASSERT_NE(calibrator_widget.get_hovered_matching_point_(), std::nullopt);
+  EXPECT_EQ(*calibrator_widget.get_hovered_matching_point_(), std::make_tuple(0, 1));
+  EXPECT_EQ(calibrator_widget.get_hovered_excluded_point_(), std::nullopt);
+
+  calibrator_widget.wrapper_setCalibrationData(calibrator_data, "");
+  calibrator_widget.wrapper_getSelectedPoint({ 11.1, 11.2 }, { 0.01, 0.01 });
+  EXPECT_EQ(calibrator_widget.get_hovered_matching_point_(), std::nullopt);
+  EXPECT_EQ(calibrator_widget.get_hovered_excluded_point_(), std::nullopt);
+
+  calibrator_widget.wrapper_setCalibrationData(calibrator_data, "");
+  calibrator_widget.wrapper_getSelectedPoint({ 103.1, 103.2 }, { 0.01, 0.01 });
+  EXPECT_EQ(calibrator_widget.get_hovered_matching_point_(), std::nullopt);
+  ASSERT_NE(calibrator_widget.get_hovered_excluded_point_(), std::nullopt);
+  EXPECT_EQ(*calibrator_widget.get_hovered_excluded_point_(), std::make_tuple(0, 2));
+
+  calibrator_widget.wrapper_setCalibrationData(calibrator_data, "");
+  calibrator_widget.wrapper_getSelectedPoint({ 1003.1, 1003.2 }, { 0.01, 0.01 });
+  EXPECT_EQ(calibrator_widget.get_hovered_matching_point_(), std::nullopt);
+  EXPECT_EQ(calibrator_widget.get_hovered_excluded_point_(), std::nullopt);
+};
+
+TEST(CalibratorsPlotWidget, getSampleNameFromSelectedPoint)
+{
+  SessionHandler session_handler;
+  SequenceHandler sequence_handler;
+  std::shared_ptr<ExplorerWidget> explorer_widget;
+  std::shared_ptr<ChromatogramPlotWidget> chromatogram_widget;
+  EventDispatcher event_dispatcher;
+  CalibratorsPlotWidget_Test calibrator_widget(session_handler, sequence_handler, explorer_widget, chromatogram_widget, event_dispatcher);
+  EXPECT_EQ(calibrator_widget.get_reset_zoom_(), true);
+
+  SessionHandler::CalibrationData calibrator_data;
+  calibrator_data.series_names = { "one", "two", "three" };
+  calibrator_data.x_axis_title = "x_axis_title";
+  calibrator_data.y_axis_title = "y_axis_title";
+  calibrator_data.matching_points_.concentrations_.push_back({ 1.1, 2.1, 3.1 });
+  calibrator_data.matching_points_.features_.push_back({ 1.2, 2.2, 3.2 });
+  calibrator_data.matching_points_.injections_.push_back({ "sample11", "sample12", "sample13" });
+  calibrator_data.excluded_points_.concentrations_.push_back({ 101.1, 102.1, 103.1 });
+  calibrator_data.excluded_points_.features_.push_back({ 101.2, 102.2, 103.2 });
+  calibrator_data.excluded_points_.injections_.push_back({ "sample31", "sample32", "sample33" });
+
+  calibrator_widget.wrapper_setCalibrationData(calibrator_data, "");
+  calibrator_widget.wrapper_getSelectedPoint({ 2.1, 2.2 }, { 0.01, 0.01 });
+  auto [sample_name_1, serie_1] = calibrator_widget.wrapper_getSampleNameAndSerieFromSelectedPoint(
+    calibrator_widget.get_hovered_matching_point_(),
+    calibrator_widget.get_hovered_excluded_point_()
+  );
+  EXPECT_EQ(sample_name_1, "sample12");
+  EXPECT_EQ(serie_1, "one");
+
+  calibrator_widget.wrapper_setCalibrationData(calibrator_data, "");
+  calibrator_widget.wrapper_getSelectedPoint({ 103.1, 103.2 }, { 0.01, 0.01 });
+  auto [sample_name_3, serie_3] = calibrator_widget.wrapper_getSampleNameAndSerieFromSelectedPoint(
+    calibrator_widget.get_hovered_matching_point_(),
+    calibrator_widget.get_hovered_excluded_point_()
+  );
+  EXPECT_EQ(sample_name_3, "sample33");
+  EXPECT_EQ(serie_3, "one");
+
+  calibrator_widget.wrapper_setCalibrationData(calibrator_data, "");
+  calibrator_widget.wrapper_getSelectedPoint({ 1003.1, 1003.2 }, { 0.01, 0.01 });
+  auto [sample_name_4, serie_4] = calibrator_widget.wrapper_getSampleNameAndSerieFromSelectedPoint(
+    calibrator_widget.get_hovered_matching_point_(),
+    calibrator_widget.get_hovered_excluded_point_()
+  );
+  EXPECT_EQ(sample_name_4, "");
+  EXPECT_EQ(serie_4, "");
+};
+
+class RunWorkflowWidget_Test :
+  public RunWorkflowWidget
+{
+public:
+  RunWorkflowWidget_Test(ApplicationHandler& application_handler,
+    SessionHandler& session_handler,
+    WorkflowManager& workflow_manager,
+    IApplicationProcessorObserver& application_processor_observer,
+    ISequenceProcessorObserver& sequence_processor_observer,
+    ISequenceSegmentProcessorObserver& sequence_segment_processor_observer,
+    ISampleGroupProcessorObserver& sample_group_processor_observer) :
+    RunWorkflowWidget(
+      application_handler,
+      session_handler,
+      workflow_manager,
+      application_processor_observer,
+      sequence_processor_observer,
+      sequence_segment_processor_observer,
+      sample_group_processor_observer)
+  {};
+
+public:
+  bool wrapper_checkDirectories()
+  {
+    return checkDirectories();
+  }
+
+  std::string& get_mzML_dir_edit_()
+  {
+    return mzML_dir_edit_;
+  }
+
+  std::string& get_features_in_dir_edit_()
+  {
+    return features_in_dir_edit_;
+  }
+
+  std::string& get_features_out_dir_edit_()
+  {
+    return features_out_dir_edit_;
+  }
+};
+
+bool SmartPeak::run_on_server = false;
+
+TEST(RunWorkflowWidget, RunWorkflowWidget_checkDirectories)
+{
+  ApplicationHandler application_handler;
+  SessionHandler session_handler;
+  WorkflowManager workflow_manager;
+
+  struct TestObserver:
+    IApplicationProcessorObserver,
+    ISequenceProcessorObserver,
+    ISequenceSegmentProcessorObserver,
+    ISampleGroupProcessorObserver
+  {
+    virtual void onApplicationProcessorStart(const std::vector<std::string>& commands) override {}
+    virtual void onApplicationProcessorCommandStart(size_t command_index, const std::string& command_name) override {}
+    virtual void onApplicationProcessorCommandEnd(size_t command_index, const std::string& command_name) override {}
+    virtual void onApplicationProcessorEnd() override {}
+    virtual void onApplicationProcessorError(const std::string& error) override
+    {
+      application_error_ = error;
+    }
+
+    virtual void onSequenceProcessorStart(const size_t nb_injections) {};
+    virtual void onSequenceProcessorSampleStart(const std::string& sample_name) {};
+    virtual void onSequenceProcessorSampleEnd(const std::string& sample_name) {};
+    virtual void onSequenceProcessorEnd() {};
+    virtual void onSequenceProcessorError(const std::string& sample_name, const std::string& processor_name, const std::string& error) {};
+
+    virtual void onSequenceSegmentProcessorStart(const size_t nb_segments) {};
+    virtual void onSequenceSegmentProcessorSampleStart(const std::string& segment_name) {};
+    virtual void onSequenceSegmentProcessorSampleEnd(const std::string& segment_name) {};
+    virtual void onSequenceSegmentProcessorEnd() {};
+    virtual void onSequenceSegmentProcessorError(const std::string& segment_name, const std::string& processor_name, const std::string& error) {};
+
+    virtual void onSampleGroupProcessorStart(const size_t nb_segments) {};
+    virtual void onSampleGroupProcessorSampleStart(const std::string& segment_name) {};
+    virtual void onSampleGroupProcessorSampleEnd(const std::string& segment_name) {};
+    virtual void onSampleGroupProcessorEnd() {};
+    virtual void onSampleGroupProcessorError(const std::string& group_name, const std::string& processor_name, const std::string& error) {};
+
+    std::string application_error_;
+  };
+  TestObserver observer;
+  RunWorkflowWidget_Test widget_test(
+    application_handler,
+    session_handler,
+    workflow_manager,
+    observer,
+    observer,
+    observer,
+    observer);
+
+  widget_test.get_mzML_dir_edit_() = SMARTPEAK_GET_TEST_DATA_PATH("");
+  widget_test.get_features_in_dir_edit_() = SMARTPEAK_GET_TEST_DATA_PATH("");
+  widget_test.get_features_out_dir_edit_() = SMARTPEAK_GET_TEST_DATA_PATH("");
+  EXPECT_TRUE(widget_test.wrapper_checkDirectories());
+  EXPECT_EQ(observer.application_error_, "");
+
+  widget_test.get_mzML_dir_edit_() = "/non/existing/mzML/folder" ;
+  widget_test.get_features_in_dir_edit_() = SMARTPEAK_GET_TEST_DATA_PATH("");
+  widget_test.get_features_out_dir_edit_() = SMARTPEAK_GET_TEST_DATA_PATH("");
+  EXPECT_FALSE(widget_test.wrapper_checkDirectories());
+  EXPECT_EQ(observer.application_error_, "Input Directory '/non/existing/mzML/folder' not found, aborting.");
+
+  widget_test.get_mzML_dir_edit_() = SMARTPEAK_GET_TEST_DATA_PATH("");
+  widget_test.get_features_in_dir_edit_() = "/non/existing/features_in/folder";
+  widget_test.get_features_out_dir_edit_() = SMARTPEAK_GET_TEST_DATA_PATH("");
+  EXPECT_FALSE(widget_test.wrapper_checkDirectories());
+  EXPECT_EQ(observer.application_error_, "Input Directory '/non/existing/features_in/folder' not found, aborting.");
+
+  observer.application_error_ = "";
+  widget_test.get_mzML_dir_edit_() = SMARTPEAK_GET_TEST_DATA_PATH("");
+  widget_test.get_features_in_dir_edit_() = SMARTPEAK_GET_TEST_DATA_PATH("");
+  widget_test.get_features_out_dir_edit_() = SMARTPEAK_GET_TEST_DATA_PATH("workflow_csv_files/non_existing_folder");
+  EXPECT_TRUE(widget_test.wrapper_checkDirectories());
+  EXPECT_EQ(observer.application_error_, "");
+}

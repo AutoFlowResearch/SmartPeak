@@ -53,6 +53,7 @@ namespace SmartPeak
     if (feature_rsd_estimations_ != nullptr) feature_rsd_estimations_ = std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC());
     if (feature_background_estimations_ != nullptr) feature_background_estimations_ = std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC());
     components_to_concentrations_.clear();
+    excluded_components_to_concentrations_.clear();
   }
 
   void SequenceSegmentHandler::setSequenceSegmentName(const std::string& sequence_segment_name)
@@ -343,4 +344,36 @@ namespace SmartPeak
   {
     return components_to_concentrations_;
   }
+
+  void SequenceSegmentHandler::setExcludedComponentsToConcentrations(
+    const std::map<std::string, std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>> components_to_concentrations
+  )
+  {
+    excluded_components_to_concentrations_ = components_to_concentrations;
+  }
+
+  std::map<std::string, std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>>&
+    SequenceSegmentHandler::getExcludedComponentsToConcentrations()
+  {
+    return excluded_components_to_concentrations_;
+  }
+
+  const std::map<std::string, std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>>&
+    SequenceSegmentHandler::getExcludedComponentsToConcentrations() const
+  {
+    return excluded_components_to_concentrations_;
+  }
+
+  std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>
+    SequenceSegmentHandler::getFeatureConcentrationsPruned(const std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration> feature_concentrations) const
+  {
+    std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration> feature_concentrations_pruned;
+    for (const OpenMS::AbsoluteQuantitationStandards::featureConcentration& feature : feature_concentrations) {
+      if (feature.actual_concentration > 0.0) {
+        feature_concentrations_pruned.push_back(feature);
+      }
+    }
+    return feature_concentrations_pruned;
+  }
+
 }

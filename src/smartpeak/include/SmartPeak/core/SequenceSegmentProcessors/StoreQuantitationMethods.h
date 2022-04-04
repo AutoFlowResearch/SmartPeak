@@ -24,11 +24,12 @@
 #pragma once
 
 #include <SmartPeak/core/SequenceSegmentProcessor.h>
+#include <SmartPeak/iface/IFilePickerHandler.h>
 
 namespace SmartPeak
 {
 
-  struct StoreQuantitationMethods : SequenceSegmentProcessor
+  struct StoreQuantitationMethods : SequenceSegmentProcessor, IFilePickerHandler
   {
     StoreQuantitationMethods(bool static_filenames = false)
       : static_filenames_(static_filenames) {}
@@ -39,11 +40,13 @@ namespace SmartPeak
     virtual std::string getDescription() const override { return "Write each transitions calibration model to disk for later use."; }
     virtual ParameterSet getParameterSchema() const override;
     virtual std::vector<std::string> getRequirements() const override;
+    virtual std::set<std::string> getOutputs() const override;
+    virtual std::set<std::string> getInputs() const override;
 
     /**
       Write the quantitation methods to disk.
     */
-    void process(
+    void doProcess(
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
@@ -52,6 +55,11 @@ namespace SmartPeak
 
     /* IFilenamesHandler */
     virtual void getFilenames(Filenames& filenames) const override;
+
+    /**
+    IFilePickerHandler
+    */
+    bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
   };
 
 }

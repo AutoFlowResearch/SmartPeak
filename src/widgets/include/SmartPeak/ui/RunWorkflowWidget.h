@@ -17,7 +17,7 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Douglas McCloskey $
+// $Maintainer: Douglas McCloskey, Ahmed Khalil $
 // $Authors: Douglas McCloskey, Bertrand Boudaud $
 // --------------------------------------------------------------------------
 #pragma once
@@ -26,13 +26,15 @@
 #include <SmartPeak/core/ApplicationHandler.h>
 #include <SmartPeak/core/WorkflowManager.h>
 #include <SmartPeak/ui/FilePicker.h>
+#include <SmartPeak/core/EventDispatcher.h>
 
 #include <string>
 #include <vector>
+#include <future>
 
 namespace SmartPeak
 {
-  class RunWorkflowWidget final : public Widget
+  class RunWorkflowWidget : public Widget
   {
   public:
     RunWorkflowWidget(ApplicationHandler& application_handler,
@@ -49,11 +51,16 @@ namespace SmartPeak
       sample_group_processor_observer_(sample_group_processor_observer),
       application_handler_(application_handler),
       session_handler_(session_handler),
-      workflow_manager_(workflow_manager)
+      workflow_manager_(workflow_manager),
+      show_serversession_popup_(false),
+      run_remote_workflow(false)
     {
     };
 
     void draw() override;
+
+  protected:
+    bool checkDirectories() const;
 
   protected:
     std::optional<std::tuple<std::string, std::shared_ptr<IFilePickerHandler>>> popup_file_picker_;
@@ -65,11 +72,20 @@ namespace SmartPeak
     ApplicationHandler& application_handler_;
     SessionHandler& session_handler_;
     WorkflowManager& workflow_manager_;
+    EventDispatcher event_dispatcher_;
     std::string mzML_dir_edit_;
     std::string features_in_dir_edit_;
     std::string features_out_dir_edit_;
     std::string mzML_dir_old_;
     std::string features_in_dir_old_;
     std::string features_out_dir_old_;
+    bool show_serversession_popup_;
+    
+  public:
+    std::string server_url;
+    std::string username;
+    std::string password;
+    bool server_fields_set;
+    bool run_remote_workflow;
   };
 }

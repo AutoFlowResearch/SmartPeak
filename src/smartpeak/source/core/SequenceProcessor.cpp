@@ -48,6 +48,21 @@
 namespace SmartPeak
 {
   
+  void SequenceProcessor::process(Filenames& filenames_I)
+  {
+    LOGD << "START " << getName();
+    try
+    {
+      doProcess(filenames_I);
+    }
+    catch (const std::exception& e)
+    {
+      LOGE << "END (ERROR) " << getName() << " " << e.what();
+      throw;
+    }
+    LOGD << "END " << getName();
+  }
+
   class WorkflowException : public std::exception
   {
   public:
@@ -75,50 +90,7 @@ namespace SmartPeak
     std::string msg_;
   };
 
-  int nbThreads(const std::vector<InjectionHandler> injections)
-  {
-    int n_threads = 6;
-    if (injections.size())
-    {
-      const auto& params = injections.front().getRawData().getParameters();
-      if (params.count("SequenceProcessor") && !params.at("SequenceProcessor").empty()) {
-        for (const auto& p : params.at("SequenceProcessor")) {
-          if (p.getName() == "n_thread") {
-            try {
-              n_threads = std::stoi(p.getValueAsString());
-              LOGI << "SequenceProcessor::n_threads set to " << n_threads;
-            }
-            catch (const std::exception& e) {
-              LOGE << e.what();
-            }
-          }
-        }
-      }
-    }
-    return n_threads;
-  }
-
-  ParameterSet ProcessSequence::getParameterSchemaStatic()
-  {
-    std::map<std::string, std::vector<std::map<std::string, std::string>>> param_struct({
-    {"SequenceProcessor", {
-      {
-        {"name", "n_thread"},
-        {"type", "int"},
-        {"value", "6"},
-        {"description", "number of working threads"},
-        {"min", "1"}
-      }
-    }} });
-    return ParameterSet(param_struct);
-  }
-
-  ParameterSet ProcessSequence::getParameterSchema() const
-  {
-    return ProcessSequence::getParameterSchemaStatic();
-  }
-
-  void ProcessSequence::process(Filenames& filenames_I)
+  void ProcessSequence::doProcess(Filenames& filenames_I)
   {
     // Check that there are raw data processing methods
     if (raw_data_processing_methods_.empty()) {
@@ -142,12 +114,11 @@ namespace SmartPeak
       filenames_,
       raw_data_processing_methods_,
       this);
-    int n_threads = nbThreads(injections);
-    manager.spawn_workers(n_threads);
+    manager.spawn_workers(number_of_threads_);
     notifySequenceProcessorEnd();
   }
 
-  void ProcessSequenceSegments::process(Filenames& filenames_I)
+  void ProcessSequenceSegments::doProcess(Filenames& filenames_I)
   {
     std::vector<SequenceSegmentHandler> sequence_segments;
 
@@ -177,9 +148,9 @@ namespace SmartPeak
       sequence_segment_processing_methods_,
       filenames_,
       this);
-    int n_threads = nbThreads(sequenceHandler_IO->getSequence());
-    manager.spawn_workers(n_threads);
+    manager.spawn_workers(number_of_threads_);
     sequenceHandler_IO->setSequenceSegments(sequence_segments);
+    sequenceHandler_IO->notifySequenceUpdated();
     notifySequenceSegmentProcessorEnd();
   }
 
@@ -208,7 +179,6 @@ namespace SmartPeak
       }
       catch (const std::exception& e)
       {
-        LOGE << e.what();
         WorkflowException we(sequence_segment.getSequenceSegmentName(), methods[i]->getName(), e.what());
         throw we;
       }
@@ -315,7 +285,7 @@ namespace SmartPeak
     }
   }
 
-  void ProcessSampleGroups::process(Filenames& filenames_I)
+  void ProcessSampleGroups::doProcess(Filenames& filenames_I)
   {
     std::vector<SampleGroupHandler> sample_groups;
 
@@ -342,8 +312,7 @@ namespace SmartPeak
       sample_group_processing_methods_,
       filenames_,
       this);
-    int n_threads = nbThreads(sequenceHandler_IO->getSequence());
-    manager.spawn_workers(n_threads);
+    manager.spawn_workers(number_of_threads_);
     sequenceHandler_IO->setSampleGroups(sample_groups);
     notifySampleGroupProcessorEnd();
   }
@@ -372,7 +341,6 @@ namespace SmartPeak
       }
       catch (const std::exception& e)
       {
-        LOGE << e.what();
         WorkflowException we(sample_group.getSampleGroupName(), methods[i]->getName(), e.what());
         throw we;
       }
@@ -541,7 +509,6 @@ namespace SmartPeak
       }
       catch (const std::exception& e)
       {
-        LOGE << e.what();
         WorkflowException we(inj_name, p->getName(), e.what());
         throw we;
       }
@@ -561,11 +528,10 @@ namespace SmartPeak
     filenames.addFileName("sequence", "${MAIN_DIR}/sequence.csv", "Injections", true, true);
   };
 
-  void LoadSequence::process(Filenames& filenames_I)
+  void LoadSequence::doProcess(Filenames& filenames_I)
   {
-    LOGD << "START LoadSequence";
     getFilenames(filenames_I);
-    if (!InputDataValidation::prepareToLoad(filenames_I, "sequence"))
+    if (!InputDataValidation::prepareToLoad(filenames_I, "sequence", true))
     {
       LOGD << "END " << getName();
       return;
@@ -660,7 +626,6 @@ namespace SmartPeak
     catch (const std::exception& e) {
       LOGE << e.what();
     }
-    LOGD << "END LoadSequence";
   }
 
   void StoreSequence::getFilenames(Filenames& filenames) const
@@ -676,10 +641,8 @@ namespace SmartPeak
     return true;
   }
 
-  void StoreSequence::process(Filenames& filenames_I)
+  void StoreSequence::doProcess(Filenames& filenames_I)
   {
-    LOGD << "START StoreSequence";
-
     if (!InputDataValidation::prepareToStore(filenames_I, "sequence"))
     {
       LOGD << "END " << getName();
@@ -752,7 +715,6 @@ namespace SmartPeak
       }
       SequenceParser::writeSequenceFileSmartPeak(*sequenceHandler_IO, filenames_I.getFullPath("sequence").generic_string().c_str());
     }
-    LOGD << "END StoreSequence";
   }
 
   bool LoadWorkflow::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
@@ -768,11 +730,10 @@ namespace SmartPeak
     filenames.addFileName("workflow", "${MAIN_DIR}/workflow.csv", "Workflow", true, true);
   };
 
-  void LoadWorkflow::process(Filenames& filenames_I)
+  void LoadWorkflow::doProcess(Filenames& filenames_I)
   {
-    LOGD << "START LoadWorkflow";
     getFilenames(filenames_I);
-    if (!InputDataValidation::prepareToLoad(filenames_I, "workflow"))
+    if (!InputDataValidation::prepareToLoad(filenames_I, "workflow", true))
     {
       LOGD << "END " << getName();
       return;
@@ -803,7 +764,12 @@ namespace SmartPeak
       }
       else
       {
-        io::CSVReader<1, io::trim_chars<>, io::no_quote_escape<','>> in(filenames_I.getFullPath("workflow").generic_string());
+        auto filename = filenames_I.getFullPath("workflow").generic_string();
+        if (Utilities::hasBOMMarker(filename))
+        {
+          throw std::invalid_argument("File has wrong encoding. only plain ASCII file is supported");
+        }
+        io::CSVReader<1, io::trim_chars<>, io::no_quote_escape<','>> in(filename);
         const std::string s_command_name{ "command_name" };
         in.read_header(
           io::ignore_extra_column,
@@ -829,7 +795,6 @@ namespace SmartPeak
     }
     sequenceHandler_IO->setWorkflow(res);
     sequenceHandler_IO->notifyWorkflowUpdated();
-    LOGD << "END LoadWorkflow";
   }
 
   void StoreWorkflow::getFilenames(Filenames& filenames) const
@@ -845,10 +810,8 @@ namespace SmartPeak
     return true;
   }
 
-  void StoreWorkflow::process(Filenames& filenames_I)
+  void StoreWorkflow::doProcess(Filenames& filenames_I)
   {
-    LOGD << "START StoreWorkflow";
-
     if (!InputDataValidation::prepareToStore(filenames_I, "workflow"))
     {
       LOGD << "END " << getName();
@@ -880,7 +843,7 @@ namespace SmartPeak
 
       std::vector<std::string> headers = { "command_name" };
       CSVWriter writer(filenames_I.getFullPath("workflow").generic_string(), ",");
-      const size_t cnt = writer.writeDataInRow(headers.cbegin(), headers.cend());
+      const std::optional<size_t> cnt = writer.writeDataInRow(headers.cbegin(), headers.cend());
 
       if (cnt < headers.size()) {
         LOGD << "END writeDataTableFromMetaValue";
@@ -899,6 +862,5 @@ namespace SmartPeak
         writer.writeDataInRow(line.cbegin(), line.cend());
       }
     }
-    LOGD << "END StoreWorkflow";
   }
 }

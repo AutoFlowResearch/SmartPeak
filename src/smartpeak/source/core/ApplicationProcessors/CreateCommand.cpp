@@ -27,7 +27,7 @@
 namespace SmartPeak
 {
 
-  bool CreateCommand::process() {
+  bool CreateCommand::doProcess() {
     // Enumerate the valid command keys
     std::vector<std::string> valid_commands_raw_data_processor;
     for (const auto& it: n_to_raw_data_method_) { valid_commands_raw_data_processor.push_back(it.first); }
@@ -58,8 +58,8 @@ namespace SmartPeak
         const std::string& key = sequence_segment.getSequenceSegmentName();
         cmd_.dynamic_filenames[key] = method_filenames;
         cmd_.dynamic_filenames[key].setTagValue(Filenames::Tag::INPUT_MZML_FILENAME, "");
-        cmd_.dynamic_filenames[key].setTagValue(Filenames::Tag::INPUT_INJECTION_NAME, key);
-        cmd_.dynamic_filenames[key].setTagValue(Filenames::Tag::OUTPUT_INJECTION_NAME, key);
+        cmd_.dynamic_filenames[key].setTagValue(Filenames::Tag::INPUT_SEQUENCE_SEGMENT_NAME, key);
+        cmd_.dynamic_filenames[key].setTagValue(Filenames::Tag::OUTPUT_SEQUENCE_SEGMENT_NAME, key);
         cmd_.dynamic_filenames[key].setTagValue(Filenames::Tag::INPUT_GROUP_NAME, key);
         cmd_.dynamic_filenames[key].setTagValue(Filenames::Tag::OUTPUT_GROUP_NAME, key);
       }

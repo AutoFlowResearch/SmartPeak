@@ -38,6 +38,16 @@
 namespace SmartPeak
 {
 
+  std::set<std::string> EstimateFeatureRSDs::getInputs() const
+  {
+    return { "Features", "Targeted Experiment" };
+  }
+
+  std::set<std::string> EstimateFeatureRSDs::getOutputs() const
+  {
+    return { "Feature RSD Filters" };
+  }
+
   std::vector<std::string> EstimateFeatureRSDs::getRequirements() const
   {
     return { "sequence", "traML" };
@@ -48,14 +58,13 @@ namespace SmartPeak
     return ParameterSet();
   }
 
-  void EstimateFeatureRSDs::process(
+  void EstimateFeatureRSDs::doProcess(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START EstimateFeatureRSDs";
     getFilenames(filenames_I);
 
     // get all QCs
@@ -85,8 +94,6 @@ namespace SmartPeak
       sequenceHandler_I.getSequence().front().getRawData().getTargetedExperiment() // Targeted experiment used by all injections in the sequence
     );
     sequenceSegmentHandler_IO.getFeatureRSDEstimations() = rsd_estimations; // Transfer over the estimations
-
-    LOGD << "END EstimateFeatureRSDs";
   }
 
 }

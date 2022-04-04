@@ -240,16 +240,21 @@ namespace SmartPeak
     explicit SequenceProcessor(SequenceHandler& sh) : sequenceHandler_IO(&sh) {}
     virtual ~SequenceProcessor() = default;
 
-    virtual void process(Filenames& filenames_I) = 0;
+    virtual void process(Filenames& filenames_I);
     
     /* IProcessorDescription */
     virtual ParameterSet getParameterSchema() const override { return ParameterSet(); };
     virtual std::vector<std::string> getRequirements() const override { return {}; };
+    virtual std::set<std::string> getInputs() const override { return {}; };
+    virtual std::set<std::string> getOutputs() const override { return {}; };
 
     /* IFilenamesHandler */
     virtual void getFilenames(Filenames& filenames) const override {};
 
     SequenceHandler* sequenceHandler_IO = nullptr; /// Sequence handler, used by all SequenceProcessor derived classes
+
+  protected:
+    virtual void doProcess(Filenames& filenames_I) = 0;
   };
 
   /**
@@ -265,16 +270,17 @@ namespace SmartPeak
     {
       addSequenceProcessorObserver(sequence_processor_observer);
     }
-    static ParameterSet getParameterSchemaStatic();
-    void process(Filenames& filenames_I) override;
+
+    void doProcess(Filenames& filenames_I) override;
 
     /* IProcessorDescription */
     virtual std::string getName() const override { return "PROCESS_SEQUENCE"; }
     virtual std::string getDescription() const override { return "Apply a processing workflow to all injections in a sequence"; }
-    ParameterSet getParameterSchema() const override;
 
     /* IFilenamesHandler */
     virtual void getFilenames(Filenames& filenames) const override {};
+
+    int number_of_threads_ = 1;
   };
 
   /**
@@ -290,11 +296,13 @@ namespace SmartPeak
     {
       addSequenceSegmentProcessorObserver(sequence_segment_processor_observer);
     }
-    void process(Filenames& filenames_I) override;
+    void doProcess(Filenames& filenames_I) override;
 
     /* IProcessorDescription */
     virtual std::string getName() const override { return "PROCESS_SEQUENCE_SEGMENTS"; }
     virtual std::string getDescription() const override { return "Apply a processing workflow to all injections in a sequence segment"; }
+
+    int number_of_threads_ = 1;
   };
 
   /**
@@ -310,11 +318,13 @@ namespace SmartPeak
     {
       addSampleGroupProcessorObserver(sample_group_processor_observer);
     }
-    void process(Filenames& filenames_I) override;
+    void doProcess(Filenames& filenames_I) override;
 
     /* IProcessorDescription */
     virtual std::string getName() const override { return "PROCESS_SAMPLE_GROUPS"; }
     virtual std::string getDescription() const override { return "Apply a processing workflow to all injections in a sample group"; }
+
+    int number_of_threads_ = 1;
   };
 
   struct LoadSequence : SequenceProcessor, IFilePickerHandler
@@ -326,7 +336,7 @@ namespace SmartPeak
 
     LoadSequence() = default;
     explicit LoadSequence(SequenceHandler& sh) : SequenceProcessor(sh) {}
-    void process(Filenames& filenames_I) override;
+    void doProcess(Filenames& filenames_I) override;
 
     /* IProcessorDescription */
     virtual std::string getName() const override { return "LOAD_SEQUENCE"; }
@@ -345,7 +355,7 @@ namespace SmartPeak
 
     StoreSequence() = default;
     explicit StoreSequence(SequenceHandler& sh) : SequenceProcessor(sh) {}
-    void process(Filenames& filenames_I) override;
+    void doProcess(Filenames& filenames_I) override;
 
     /* IProcessorDescription */
     virtual std::string getName() const override { return "STORE_SEQUENCE"; }
@@ -364,7 +374,7 @@ namespace SmartPeak
 
     LoadWorkflow() = default;
     explicit LoadWorkflow(SequenceHandler & sh) : SequenceProcessor(sh) {}
-    void process(Filenames& filenames_I) override;
+    void doProcess(Filenames& filenames_I) override;
 
     /* IProcessorDescription */
     virtual std::string getName() const override { return "LOAD_WORKFLOW"; }
@@ -383,7 +393,7 @@ namespace SmartPeak
 
     StoreWorkflow() = default;
     explicit StoreWorkflow(SequenceHandler& sh) : SequenceProcessor(sh) {}
-    void process(Filenames& filenames_I) override;
+    void doProcess(Filenames& filenames_I) override;
 
     /* IProcessorDescription */
     virtual std::string getName() const override { return "STORE_WORKFLOW"; }

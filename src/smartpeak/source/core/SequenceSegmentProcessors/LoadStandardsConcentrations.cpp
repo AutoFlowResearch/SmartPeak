@@ -35,8 +35,20 @@
 
 #include <plog/Log.h>
 
+#include <sstream>
+
 namespace SmartPeak
 {
+
+  std::set<std::string> LoadStandardsConcentrations::getInputs() const
+  {
+    return { };
+  }
+
+  std::set<std::string> LoadStandardsConcentrations::getOutputs() const
+  {
+    return { "Standards Concentrations" };
+  }
 
   std::vector<std::string> LoadStandardsConcentrations::getRequirements() const
   {
@@ -68,17 +80,16 @@ namespace SmartPeak
     filenames.addFileName("standardsConcentrations", constructFilename("standardsConcentrations.csv", static_filenames_), "Standards Concentrations", true, true);
   };
 
-  void LoadStandardsConcentrations::process(
+  void LoadStandardsConcentrations::doProcess(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START loadStandardsConcentrations";
     getFilenames(filenames_I);
 
-    if (!InputDataValidation::prepareToLoad(filenames_I, "standardsConcentrations"))
+    if (!InputDataValidation::prepareToLoad(filenames_I, "standardsConcentrations", true))
     {
       throw std::invalid_argument("Failed to load input file");
     }
@@ -120,16 +131,29 @@ namespace SmartPeak
       else
       {
         OpenMS::AbsoluteQuantitationStandardsFile AQSf;
-        AQSf.load(filenames_I.getFullPath("standardsConcentrations").generic_string(), sequenceSegmentHandler_IO.getStandardsConcentrations());
+        auto standards_concentrations_file = filenames_I.getFullPath("standardsConcentrations");
+        // Sanity checks - OpenMS will not check for missing columns
+        if (!Utilities::checkCSVHeader<','>(
+          standards_concentrations_file, 
+          "sample_name",
+          "component_name",
+          "IS_component_name",
+          "actual_concentration",
+          "IS_actual_concentration",
+          "concentration_units",
+          "dilution_factor"))
+        {
+          throw std::invalid_argument(std::string("Missing headers in file \"") + standards_concentrations_file.generic_string() + std::string("\""));
+        }
+        // load file
+        AQSf.load(standards_concentrations_file.generic_string(), sequenceSegmentHandler_IO.getStandardsConcentrations());
       }
     }
     catch (const std::exception& e) {
       sequenceSegmentHandler_IO.getStandardsConcentrations().clear();
       LOGI << "Standards concentrations clear";
-      throw e;
+      throw;
     }
-
-    LOGD << "END loadStandardsConcentrations";
   }
 
 }

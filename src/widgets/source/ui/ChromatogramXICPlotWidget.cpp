@@ -50,12 +50,6 @@ namespace SmartPeak
       input_component_names_ = transitions_names;
       refresh_needed_ = false;
     }
-    else if ((input_range_ != current_range_) || (input_mz_ != current_mz_)) // user zoom in/out
-    {
-      session_handler_.getChromatogramXIC(sequence_handler_, graph_viz_data_, current_range_, sample_names, transitions_names, current_mz_);
-      input_range_ = current_range_;
-      input_mz_ = current_mz_;
-    }
     graph_viz_data_.y_min_ = 0.0f; // bottom line will start from 0.0
   };
 

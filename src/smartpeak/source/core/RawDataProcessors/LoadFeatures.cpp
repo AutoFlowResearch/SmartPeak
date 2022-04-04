@@ -35,22 +35,30 @@
 
 namespace SmartPeak
 {
+  std::set<std::string> LoadFeatures::getInputs() const
+  {
+    return { };
+  }
+
+  std::set<std::string> LoadFeatures::getOutputs() const
+  {
+    return { "Features" };
+  }
 
   void LoadFeatures::getFilenames(Filenames& filenames) const
   {
     filenames.addFileName("featureXML_i", "${FEATURES_INPUT_PATH}/${INPUT_INJECTION_NAME}.featureXML");
   };
 
-  void LoadFeatures::process(
+  void LoadFeatures::doProcess(
     RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START LoadFeatures";
     getFilenames(filenames_I);
 
-    if (!InputDataValidation::prepareToLoad(filenames_I, "featureXML_i"))
+    if (!InputDataValidation::prepareToLoad(filenames_I, "featureXML_i", false))
     {
       throw std::invalid_argument("Failed to load input file");
     }
@@ -68,10 +76,8 @@ namespace SmartPeak
       rawDataHandler_IO.getFeatureMapHistory().clear();
       rawDataHandler_IO.getFeatureMap().clear();
       LOGE << "feature map clear";
-      throw e;
+      throw;
     }
-
-    LOGD << "END LoadFeatures";
   }
 
 }

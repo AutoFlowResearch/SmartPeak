@@ -36,6 +36,16 @@
 namespace SmartPeak
 {
 
+  std::set<std::string> QuantifyFeatures::getInputs() const
+  {
+    return { "Features", "Quantitation Methods" };
+  }
+
+  std::set<std::string> QuantifyFeatures::getOutputs() const
+  {
+    return { "Features" };
+  }
+
   std::vector<std::string> QuantifyFeatures::getRequirements() const
   {
     return { "quantitationMethods", "sequence"};
@@ -47,13 +57,12 @@ namespace SmartPeak
     return ParameterSet({ oms_params });
   }
 
-  void QuantifyFeatures::process(
+  void QuantifyFeatures::doProcess(
     RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START quantifyComponents";
     getFilenames(filenames_I);
     LOGI << "Processing # quantitation methods: " << rawDataHandler_IO.getQuantitationMethods().size();
 
@@ -61,8 +70,6 @@ namespace SmartPeak
     aq.setQuantMethods(rawDataHandler_IO.getQuantitationMethods());
     aq.quantifyComponents(rawDataHandler_IO.getFeatureMap());
     rawDataHandler_IO.updateFeatureMapHistory();
-
-    LOGD << "END quantifyComponents";
   }
 
 }

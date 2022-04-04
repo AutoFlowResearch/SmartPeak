@@ -36,6 +36,16 @@
 namespace SmartPeak
 {
 
+  std::set<std::string> SearchSpectrum::getInputs() const
+  {
+    return { "Features" };
+  }
+
+  std::set<std::string> SearchSpectrum::getOutputs() const
+  {
+    return { "Features" };
+  }
+
   std::vector<std::string> SearchSpectrum::getRequirements() const
   {
     return { "sequence", "traML" };
@@ -46,12 +56,11 @@ namespace SmartPeak
     OpenMS::TargetedSpectraExtractor oms_params;
     return ParameterSet({ oms_params });
   }
-  void SearchSpectrum::process(RawDataHandler& rawDataHandler_IO,
+  void SearchSpectrum::doProcess(RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START SearchSpectrum";
     getFilenames(filenames_I);
 
     // Complete user parameters with schema
@@ -69,8 +78,6 @@ namespace SmartPeak
     OpenMS::FeatureMap feat_map_output;
     targeted_spectra_extractor.searchSpectrum(rawDataHandler_IO.getFeatureMap(), feat_map_output);
     rawDataHandler_IO.setFeatureMap(feat_map_output);
-
-    LOGD << "END SearchSpectrum";
   }
 
 }

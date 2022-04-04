@@ -29,9 +29,12 @@
 #include <imgui_internal.h>
 #include <misc/cpp/imgui_stdlib.h>
 #include <plog/Log.h>
+#include <portable-file-dialogs.h>
 
 namespace SmartPeak
 {
+  bool FilePicker::use_native_file_picker_ = true;
+
   void FilePicker::updateContents(std::vector<ImEntry>& Im_directory_entries)
   {
     if (!files_scanned_)
@@ -53,6 +56,11 @@ namespace SmartPeak
 
   void FilePicker::draw()
   {
+    if (use_native_file_picker_)
+    {
+      return;
+    }
+
     if (!ImGui::BeginPopupModal(title_.c_str(), NULL, ImGuiWindowFlags_NoResize)) {
       return;
     }
@@ -226,7 +234,7 @@ namespace SmartPeak
     ImGui::EndChild();
     ImGui::Separator();
 
-    ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.9f);
+    ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.8f);
     if (mode_ == Mode::EDirectory)
     {
       ImGui::InputTextWithHint("", "Directory name", &selected_filename_);
@@ -238,10 +246,11 @@ namespace SmartPeak
     ImGui::PopItemWidth();
 
     ImGui::SameLine();
-    ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.5f);
-    if (ImGui::Button(open_button_text_.c_str()))
+    auto button_width = ImGui::GetContentRegionAvail().x * 0.5f;
+    if (ImGui::Button(open_button_text_.c_str(), ImVec2(button_width, 0)))
     {
-      picked_pathname_ = current_pathname_.string();      if (picked_pathname_.back() != '/')
+      picked_pathname_ = current_pathname_.string();
+      if (picked_pathname_.back() != '/')
       {
         picked_pathname_.append("/");
       }
@@ -255,18 +264,16 @@ namespace SmartPeak
         doOpenFile();
       }
     }
-    ImGui::PopItemWidth();
 
     ImGui::SameLine();
-    ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth());
-    if (ImGui::Button("Cancel"))
+    button_width = ImGui::GetContentRegionAvail().x;
+    if (ImGui::Button("Cancel", ImVec2(button_width, 0)))
     {
       picked_pathname_.clear();
       selected_entry_ = -1;
       visible_ = false;
       ImGui::CloseCurrentPopup();
     }
-    ImGui::PopItemWidth();
 
     if (show_confirmation_popup)
     {
@@ -335,22 +342,66 @@ namespace SmartPeak
     visible_ = true;
     selected_filename_ = default_file_name;
     files_scanned_ = false;
-    switch (mode)
+    picked_pathname_ = "";
+    if (use_native_file_picker_)
     {
-    case SmartPeak::FilePicker::Mode::EFileRead:
-      open_button_text_ = "Open";
-      break;
-    case SmartPeak::FilePicker::Mode::EFileCreate:
-      open_button_text_ = "Save";
-      break;
-    case SmartPeak::FilePicker::Mode::EDirectory:
-      open_button_text_ = "Select";
-      break;
-    default:
-      open_button_text_ = "Open";
-      break;
+      if (mode == FilePicker::Mode::EDirectory)
+      {
+        auto dir = pfd::select_folder(
+          title,
+          default_file_name
+        ).result();
+        LOGD << "Selected dir: " << dir;
+        picked_pathname_ = dir;
+      }
+      else if (mode == FilePicker::Mode::EFileRead)
+      {
+        auto file_list = pfd::open_file(
+          title,
+          default_file_name,
+          { "All Files", "*" }
+        ).result();
+        for (const auto& f : file_list) // we actually may have only for one file
+        {
+          LOGD << "Selected file: " << f;
+          picked_pathname_ = f;
+        }
+      }
+      else if (mode == FilePicker::Mode::EFileCreate)
+      {
+        auto f = pfd::save_file(
+          title,
+          default_file_name,
+          { "All Files", "*" }
+        ).result();
+        LOGD << "Selected file: " << f;
+        picked_pathname_ = f;
+      }
+      visible_ = false;
+      if (!picked_pathname_.empty())
+      {
+        runProcessor();
+      }
     }
-    ImGui::OpenPopup(title_.c_str());
+    else
+    {
+      switch (mode)
+      {
+      case SmartPeak::FilePicker::Mode::EFileRead:
+        open_button_text_ = "Open";
+        break;
+      case SmartPeak::FilePicker::Mode::EFileCreate:
+        open_button_text_ = "Save";
+        break;
+      case SmartPeak::FilePicker::Mode::EDirectory:
+        open_button_text_ = "Select";
+        break;
+      default:
+        open_button_text_ = "Open";
+        break;
+      }
+      ImGui::OpenPopup(title_.c_str());
+    }
   }
 
   void FilePicker::runProcessor()

@@ -10,23 +10,24 @@ jobs:
     working_directory: ~/SmartPeak
     resource_class: large
     steps:
-      - checkout
       - run: |
-          apt-get update
+          apt-get update &&
+          apt-get install -y git
+      - checkout
       - run:
           name: Installing required libraries
           command: |
             export DEBIAN_FRONTEND=noninteractive && apt-get install -y tzdata &&  
             ln -fs /usr/share/zoneinfo/UTC /etc/localtime &&
             dpkg-reconfigure --frontend noninteractive tzdata &&
-            apt-get install -y git cmake qt5-default libeigen3-dev &&
+            apt-get install -y cmake qt5-default libeigen3-dev &&
             apt-get install -y libboost-all-dev &&
             apt-get install -y libxerces-c-dev coinor-libcbc-dev libsvm-dev &&
             apt-get install -y libwildmagic-dev libsqlite3-dev &&
             apt-get install -y libglpk-dev seqan-dev libsdl2-dev libhdf5-dev
             apt-get install -y graphviz doxygen python3-pip &&
             apt-get install -y libpango1.0-dev gnuplot
-            apt-get install -y cppcheck &&
+            apt-get install -y cppcheck libssl-dev &&
             apt-get install -y python3-sphinx python3-breathe python3-sphinx-rtd-theme sphinx-doc doxygen-latex doxygen-doc gsfonts graphviz-doc libgd-tools xapian-tools &&
             pip3 install exhale && 
             pip3 install -r tools/smartpeak/requirements.txt
@@ -64,14 +65,13 @@ jobs:
           command: |
             mkdir ~/smartpeak_release_build
             cd ~/smartpeak_release_build
-            ls -l $HOME/SmartPeak/superbuild/Dependencies/Source/sqlite
-            cmake -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -G "Unix Makefiles" -DCMAKE_PREFIX_PATH=$HOME/OpenMS-build/ -DPLOG_INCLUDE_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/plog/include -DIMGUI_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/imgui -DIMPLOT_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/implot -DSQLite3_INCLUDE_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/sqlite -DSQLite3_LIBRARY=$HOME/SmartPeak/superbuild/Dependencies/Source/sqlite -DCMAKE_BUILD_TYPE=Release ~/SmartPeak
+            cmake -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -G "Unix Makefiles" -DCMAKE_PREFIX_PATH=$HOME/OpenMS-build/ -DPLOG_INCLUDE_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/plog/include -DIMGUI_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/imgui -DIMPLOT_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/implot -DPORTABLEFILEDIALOGS_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/portablefiledialogs  -DCMAKE_BUILD_TYPE=Release ~/SmartPeak
             make -j4
       - run:
           name: Running SmartPeak Class Tests
           command: |
             cd ~/smartpeak_release_build || exit 1
-            ctest -V
+            ctest -V -E "(example|example|absl|dfa|exhaustive|random|re2)"
             ls -l ~/SmartPeak/src/tests/class_tests/smartpeak/data
             cd ~/SmartPeak
             export PYTHONPATH="${PWD}/tools"
@@ -90,12 +90,16 @@ jobs:
             dpkg -c ~/smartpeak_release_build/*.deb
             mkdir -p /tmp/packages
             cp ~/smartpeak_release_build/*.deb /tmp/packages
-      - store_artifacts:
-          path: /tmp/packages
+      - when:
+          condition:
+            matches: { pattern: "^release/.*", value: << pipeline.git.branch >> }
+          steps:
+            - store_artifacts:
+                path: /tmp/packages
 
   build_macos:
     macos:
-      xcode: "11.2.1"
+      xcode: "12.5.1"
     resource_class: medium
     working_directory: ~/SmartPeak
     steps:
@@ -103,13 +107,12 @@ jobs:
       - run:
           name: Installing required libraries
           command: |
-            git -C /usr/local/Homebrew/Library/Taps/homebrew/homebrew-core fetch --unshallow
-            git -C /usr/local/Homebrew/Library/Taps/homebrew/homebrew-cask fetch --unshallow
             brew update
             brew remove yarn node
-            brew install cmake qt5 sdl2
+            brew install cmake qt5 sdl2 zlib
             brew install cppcheck gnuplot
             brew install libomp
+            brew install eigen
             pip3 install -r tools/smartpeak/requirements.txt
       - run:
           name: "Pull latest (only release)"
@@ -130,8 +133,9 @@ jobs:
             curl -C - -O https://abibuilder.informatik.uni-tuebingen.de/archive/openms/contrib/macOS/10.15.4/x64/appleclang-11.0.0/contrib_build.tar.gz
             tar -xzf contrib_build.tar.gz
             sed -i '' 's/std::auto_ptr/std::unique_ptr/g' include/seqan/basic/test_system.h
+            rm lib/libz.* && rm -rf lib/pkgconfig
             cd ~/OpenMS &&  mkdir openms_debug_build && cd openms_debug_build &&
-            cmake -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_STANDARD=14 -DCMAKE_CXX_EXTENSIONS=OFF -DCMAKE_PREFIX_PATH="$(brew --prefix qt5)" -DOPENMS_CONTRIB_LIBS=~/OpenMS/contrib_build/ -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Release -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF ..
+            cmake -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_STANDARD=14 -DCMAKE_CXX_EXTENSIONS=OFF -DCMAKE_PREFIX_PATH="$(brew --prefix qt5)" -DOPENMS_CONTRIB_LIBS=~/OpenMS/contrib_build/ -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Release -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF -DZLIB_ROOT=$(brew --prefix zlib) ..
             make -j4 OpenMS
       - run:
           name: Building SmartPeak (Including SuperBuild)
@@ -142,7 +146,7 @@ jobs:
             cd superbuild
             cmake -DUSE_SUPERBUILD=ON -DCMAKE_BUILD_TYPE=Release .. && make -j4
             cd ../smartpeak_release_build
-            cmake -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBOOST_USE_STATIC=OFF -DCMAKE_PREFIX_PATH="~/OpenMS/openms_debug_build/;~/OpenMS/contrib_build;$(brew --prefix qt5);(brew --prefix eigen)" -DPLOG_INCLUDE_DIR=~/SmartPeak/superbuild/Dependencies/Source/plog/include   -DIMGUI_DIR=~/SmartPeak/superbuild/Dependencies/Source/imgui  -DIMPLOT_DIR=~/SmartPeak/superbuild/Dependencies/Source/implot -DSQLite3_INCLUDE_DIR=~/SmartPeak/superbuild/Dependencies/Source/sqlite -DSQLite3_LIBRARY=~/SmartPeak/superbuild/Dependencies/Source/sqlite -DCMAKE_BUILD_TYPE=RelWithDebInfo -DOpenMP_CXX_FLAGS="-Xpreprocessor -fopenmp -I/usr/local/opt/libomp/include" -DOpenMP_CXX_LIB_NAMES="omp" -DOpenMP_omp_LIBRARY=/usr/local/opt/libomp/lib/libomp.dylib ~/SmartPeak
+            cmake -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBOOST_USE_STATIC=OFF -DCMAKE_PREFIX_PATH="~/OpenMS/openms_debug_build/;~/OpenMS/contrib_build;$(brew --prefix qt5);(brew --prefix eigen);$(brew --prefix zlib);$(brew --prefix openssl)" -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl -DOPENSSL_LIBRARIES=/usr/local/opt/openssl/lib -DPLOG_INCLUDE_DIR=~/SmartPeak/superbuild/Dependencies/Source/plog/include   -DIMGUI_DIR=~/SmartPeak/superbuild/Dependencies/Source/imgui  -DIMPLOT_DIR=~/SmartPeak/superbuild/Dependencies/Source/implot -DPORTABLEFILEDIALOGS_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/portablefiledialogs -DCMAKE_BUILD_TYPE=RelWithDebInfo -DOpenMP_CXX_FLAGS="-Xpreprocessor -fopenmp -I/usr/local/opt/libomp/include" -DOpenMP_CXX_LIB_NAMES="omp" -DOpenMP_omp_LIBRARY=/usr/local/opt/libomp/lib/libomp.dylib -DgRPC_ZLIB_PROVIDER=package ~/SmartPeak
             make -j4
       - run:
           name: Running SmartPeak Class Tests
@@ -150,7 +154,7 @@ jobs:
           command: |
             set -e -o pipefail
             cd ~/SmartPeak/smartpeak_release_build
-            ctest -VV -F --timeout 1200
+            ctest -VV -F -E "(example|absl|dfa|exhaustive|random|re2|charclass|compile|mimics|parse_possible|regexp|required_prefix|search|set|simplify|string_generator)" --timeout 1200
             cd ~/SmartPeak
             export PYTHONPATH="${PWD}/tools"
             python3 -m unittest discover -s ./tools/smartpeak
@@ -176,8 +180,12 @@ jobs:
           command: |
             mkdir -p /tmp/artifacts
             cp ~/SmartPeak/smartpeak_release_build/*.dmg /tmp/artifacts
-      - store_artifacts:
-          path: /tmp/artifacts
+      - when:
+          condition:
+            matches: { pattern: "^release/.*", value: << pipeline.git.branch >> }
+          steps:
+            - store_artifacts:
+                path: /tmp/artifacts
 
 
   build_windows:
@@ -269,7 +277,7 @@ jobs:
           name: Update PATH with OpenMS and Qt Binaries
           command: |
             Start-Process powershell -Verb runas
-            [Environment]::SetEnvironmentVariable("Path", $env:Path + ";C:\Users\circleci\OpenMS\openms_build\bin\Release;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\bin", [EnvironmentVariableTarget]::Machine)
+            [Environment]::SetEnvironmentVariable("Path", $env:Path + ";C:\Users\circleci\OpenMS\openms_build\bin\Release;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\bin;C:\lib\boost\boost_1_73_0\lib64-msvc-14.2;C:\Users\circleci\OpenMS\contrib_build\lib", [EnvironmentVariableTarget]::Machine)
             refreshenv
       - run:
           name: Building SmartPeak, running Class Tests and Packaging
@@ -288,13 +296,13 @@ jobs:
             cmake -DUSE_SUPERBUILD=ON -DCMAKE_BUILD_TYPE=Release ~/SmartPeak
             cmake --build .
             cd ~/SmartPeak/smartpeak_release_build
-            dir C:/Users/circleci/SmartPeak/superbuild/Dependencies/Source/sqlite
-            cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_CXX_EXTENSIONS=OFF -DCXX_STANDARD_REQUIRED=ON -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBoost_NO_SYSTEM_PATHS=ON -DBOOST_USE_STATIC=ON -DBOOST_ROOT="C:/lib/boost/boost_1_73_0" -DBOOST_INCLUDE_DIR="C:/lib/boost/boost_1_73_0" -DBOOST_LIBRARYDIR="C:/lib/boost/boost_1_73_0/lib64-msvc-14.2" -DCMAKE_PREFIX_PATH="C:/Users/circleci/OpenMS/openms_build/;C:/lib/Qt/qt-5.12.9-dynamic-msvc2019-x86_64;C:/lib/sdl2/SDL2-2.0.12" -DEIGEN3_INCLUDE_DIR=C:/Users/circleci/OpenMS/contrib_build/include/eigen3 -DPLOG_INCLUDE_DIR=C:/Users/circleci/SmartPeak/superbuild/Dependencies/Source/plog/include -DIMGUI_DIR=C:/Users/circleci/SmartPeak/superbuild/Dependencies/Source/imgui -DSQLite3_INCLUDE_DIR=C:/Users/circleci/SmartPeak/superbuild/Dependencies/Source/sqlite -DSQLite3_LIBRARY=C:/Users/circleci/SmartPeak/superbuild/Dependencies/Source/sqlite -DIMPLOT_DIR=C:/Users/circleci/SmartPeak/superbuild/Dependencies/Source/implot -DCMAKE_BUILD_TYPE=Release ~/SmartPeak
+            cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_CXX_EXTENSIONS=OFF -DCXX_STANDARD_REQUIRED=ON -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBoost_NO_SYSTEM_PATHS=ON -DBOOST_USE_STATIC=ON -DBOOST_ROOT="C:/lib/boost/boost_1_73_0" -DBOOST_INCLUDE_DIR="C:/lib/boost/boost_1_73_0" -DBOOST_LIBRARYDIR="C:/lib/boost/boost_1_73_0/lib64-msvc-14.2" -DCMAKE_PREFIX_PATH="C:/Users/circleci/OpenMS/openms_build/;C:/Users/circleci/OpenMS/contrib_build;C:/lib/Qt/qt-5.12.9-dynamic-msvc2019-x86_64;C:/lib/sdl2/SDL2-2.0.12" -DEIGEN3_INCLUDE_DIR=C:/Users/circleci/OpenMS/contrib_build/include/eigen3 -DPLOG_INCLUDE_DIR=C:/Users/circleci/SmartPeak/superbuild/Dependencies/Source/plog/include -DIMGUI_DIR=C:/Users/circleci/SmartPeak/superbuild/Dependencies/Source/imgui -DPORTABLEFILEDIALOGS_DIR=C:/Users/circleci/SmartPeak/superbuild/Dependencies/Source/portablefiledialogs  -DIMPLOT_DIR=C:/Users/circleci/SmartPeak/superbuild/Dependencies/Source/implot -DCMAKE_BUILD_TYPE=Release ~/SmartPeak
             msbuild src/SmartPeak_src.sln /verbosity:normal /maxcpucount /p:Configuration=Release
             msbuild src/smartpeak/SmartPeak.sln /verbosity:normal /maxcpucount /p:Configuration=Release
             msbuild src/examples/SmartPeak_class_examples_smartpeak.sln /maxcpucount /property:Configuration=Release
             refreshenv
-            & 'C:\Program Files\cmake\bin\ctest.exe' -VV -F
+            @("set(CMAKE_ERROR_ON_ABSOLUTE_INSTALL_DESTINATION FALSE)") +  (Get-Content ".\_deps\grpc-build\third_party\abseil-cpp\absl\base\cmake_install.cmake") | Set-Content ".\_deps\grpc-build\third_party\abseil-cpp\absl\base\cmake_install.cmake"
+            & 'C:\Program Files\cmake\bin\ctest.exe' -VV -F -E "(example|example|absl|dfa|exhaustive|random|re2|charclass|compile|mimics|parse|regexp|required_prefix|search|set|simplify|string_generator|possible)"
             ThrowOnFailure "CTest failed!"
             & 'C:\Program Files\cmake\bin\cpack.exe' -G NSIS64
             ThrowOnFailure "CPack failed!"
@@ -327,8 +335,12 @@ jobs:
           command: |
             mkdir -p ~/artifacts
             cp ~/SmartPeak/smartpeak_release_build/*.exe ~/artifacts
-      - store_artifacts:
-          path: ~/artifacts
+      - when:
+          condition:
+            matches: { pattern: "^release/.*", value: << pipeline.git.branch >> }
+          steps:
+            - store_artifacts:
+                path: ~/artifacts
 
   prepare_release:
     # This job is responsible for updating a package version stored in a configuration.

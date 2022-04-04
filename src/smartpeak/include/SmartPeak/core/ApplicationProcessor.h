@@ -43,28 +43,31 @@ namespace SmartPeak
     ApplicationProcessor& operator=(const ApplicationProcessor& other) = delete;
     virtual ~ApplicationProcessor() = default;
 
-    virtual bool process() = 0;
+    virtual bool process();
 
     /* IProcessorDescription */
     virtual std::string getDescription() const override { return ""; }
     virtual ParameterSet getParameterSchema() const override { return ParameterSet(); };
     virtual std::vector<std::string> getRequirements() const override { return {}; };
+    virtual std::set<std::string> getInputs() const override { return {}; };
+    virtual std::set<std::string> getOutputs() const override { return {}; };
 
   protected:
     ApplicationHandler& application_handler_;
 
   protected:
+    virtual bool doProcess() = 0;
     ApplicationProcessor() = default;
     ApplicationProcessor(ApplicationHandler& application_handler) : application_handler_(application_handler) {}
   };
 
   namespace ApplicationProcessors {
-    ParameterSet getParameterSchema();
     void processCommands(ApplicationHandler& application_handler, 
       std::vector<ApplicationHandler::Command> commands, 
       const std::set<std::string>& injection_names, 
       const std::set<std::string>& sequence_segment_names, 
       const std::set<std::string>& sample_group_names,
+      const int number_of_threads,
       IApplicationProcessorObserver* application_processor_observer = nullptr,
       ISequenceProcessorObserver* sequence_processor_observer = nullptr,
       ISequenceSegmentProcessorObserver* sequence_segment_processor_observer = nullptr,

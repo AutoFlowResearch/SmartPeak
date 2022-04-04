@@ -46,10 +46,12 @@ namespace SmartPeak
     virtual std::string getName() const override { return "STORE_FEATURE_QCS"; }
     virtual std::string getDescription() const override { return "Store the component and component group transition QC specifications from file."; }
     virtual std::vector<std::string> getRequirements() const override;
+    virtual std::set<std::string> getOutputs() const override;
+    virtual std::set<std::string> getInputs() const override;
 
     /** Store the component and component group transition QCs from file.
     */
-    void process(
+    void doProcess(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
       Filenames& filenames_I

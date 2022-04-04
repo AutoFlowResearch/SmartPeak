@@ -54,7 +54,7 @@ namespace SmartPeak
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
       Filenames& filenames_I
-    ) const = 0;
+    ) const;
 
     /**
       Return all injection indices that belong to a given sample type.
@@ -76,10 +76,19 @@ namespace SmartPeak
 
     /* IProcessorDescription */
     virtual std::vector<std::string> getRequirements() const override { return {}; };
+    virtual std::set<std::string> getInputs() const override { return {}; };
+    virtual std::set<std::string> getOutputs() const override { return {}; };
 
     SequenceSegmentObservable* sequence_segment_observable_ = nullptr;
 
   protected:
+    virtual void doProcess(
+      SequenceSegmentHandler& sequenceSegmentHandler_IO,
+      const SequenceHandler& sequenceHandler_I,
+      const ParameterSet& params_I,
+      Filenames& filenames_I
+    ) const = 0;
+
     // Forced to write this, because the other user-defined constructors inhibit
     // the implicit definition of a default constructor
     // Even though this class is abstract and hence can't be instantiated,

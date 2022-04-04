@@ -36,6 +36,15 @@
 namespace SmartPeak
 {
 
+  std::set<std::string> LoadFeatureRSDQCs::getInputs() const
+  {
+    return { };
+  }
+
+  std::set<std::string> LoadFeatureRSDQCs::getOutputs() const
+  {
+    return { "Feature RSD QCs" };
+  }
 
   std::vector<std::string> LoadFeatureRSDQCs::getRequirements() const
   {
@@ -86,14 +95,13 @@ namespace SmartPeak
     return true;
   }
 
-  void LoadFeatureRSDQCs::process(
+  void LoadFeatureRSDQCs::doProcess(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START loadFeatureRSDQC";
     getFilenames(filenames_I);
     FeatureFiltersUtils::loadFeatureFilters(
       "featureRSDQCComponents",
@@ -104,7 +112,6 @@ namespace SmartPeak
       [&]() { if (sequence_segment_observable_) sequence_segment_observable_->notifyFeatureRSDQCComponentGroupsUpdated(); },
       feature_filter_mode_
     );
-    LOGD << "END loadFeatureRSDQC";
   }
 
 }

@@ -45,6 +45,8 @@ namespace SmartPeak
     /* IProcessorDescription */
     virtual ParameterSet getParameterSchema() const override { return ParameterSet(); };
     virtual std::vector<std::string> getRequirements() const override { return {}; };
+    virtual std::set<std::string> getInputs() const override { return {}; };
+    virtual std::set<std::string> getOutputs() const override { return {}; };
 
     /** Interface to all raw data processing methods.
 
@@ -56,7 +58,7 @@ namespace SmartPeak
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
       Filenames& filenames_I
-    ) const = 0;
+    ) const;
 
     /* IFilenamesHandler */
     virtual void getFilenames(Filenames& filenames) const override { };
@@ -67,6 +69,12 @@ namespace SmartPeak
     // Even though this class is abstract and hence can't be instantiated,
     // derived classes will call the base's constructor
     RawDataProcessor() = default;
+
+    virtual void doProcess(
+      RawDataHandler& rawDataHandler_IO,
+      const ParameterSet& params_I,
+      Filenames& filenames_I
+    ) const = 0;
   };
 
 }

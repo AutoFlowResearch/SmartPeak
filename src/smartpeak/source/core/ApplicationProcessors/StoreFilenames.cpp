@@ -26,9 +26,8 @@
 namespace SmartPeak
 {
 
-  bool StoreFilenames::process()
+  bool StoreFilenames::doProcess()
   {
-    LOGD << "START StoreFilenames";
     auto db_context = application_handler_.filenames_.getSessionDB().beginWrite(
       "filenames",
       "file_id", "TEXT",
@@ -69,8 +68,6 @@ namespace SmartPeak
       );
     }
     application_handler_.filenames_.getSessionDB().endWrite(*db_context);
-
-    LOGD << "END StoreFilenames";
     return true;
   }
 

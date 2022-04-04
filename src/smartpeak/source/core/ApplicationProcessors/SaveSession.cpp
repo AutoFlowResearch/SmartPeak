@@ -36,10 +36,8 @@ namespace SmartPeak
     return true;
   }
 
-  bool SaveSession::process()
+  bool SaveSession::doProcess()
   {
-    LOGD << "START SaveSession";
-
     notifyApplicationProcessorStart({ getName() }); // we need to use the workflow manager to profit from the progressbar
     StoreFilenames store_filenames(application_handler_);
     store_filenames.process();
@@ -106,7 +104,6 @@ namespace SmartPeak
     }
 
     notifyApplicationProcessorEnd();
-    LOGD << "END SaveSession";
     return success;
   }
 

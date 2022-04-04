@@ -41,13 +41,12 @@ namespace SmartPeak
     filenames.addFileName("mzML_i", "${MZML_INPUT_PATH}/${INPUT_MZML_FILENAME}.mzML");
   };
 
-  void StoreRawData::process(
+  void StoreRawData::doProcess(
     RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START storeMzML";
     getFilenames(filenames_I);
 
     if (!InputDataValidation::prepareToStore(filenames_I, "mzML_i"))
@@ -63,8 +62,6 @@ namespace SmartPeak
     {
       mzmlfile.store(filenames_I.getFullPath("mzML_i").generic_string(), rawDataHandler_IO.getExperiment());
     }
-
-    LOGD << "END storeMzML";
   }
 
 }

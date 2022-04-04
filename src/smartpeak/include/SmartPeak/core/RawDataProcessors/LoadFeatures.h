@@ -38,10 +38,12 @@ namespace SmartPeak
     /* IProcessorDescription */
     virtual std::string getName() const override { return "LOAD_FEATURES"; }
     virtual std::string getDescription() const override { return "Read in the features from disk."; }
+    virtual std::set<std::string> getOutputs() const override;
+    virtual std::set<std::string> getInputs() const override;
 
     /** Read in the features from disk.
     */
-    void process(
+    void doProcess(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
       Filenames& filenames_I

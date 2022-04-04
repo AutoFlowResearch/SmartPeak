@@ -40,10 +40,12 @@ namespace SmartPeak
     virtual std::string getDescription() const override { return "Calculate MDVs."; }
     virtual ParameterSet getParameterSchema() const override;
     virtual std::vector<std::string> getRequirements() const override;
+    virtual std::set<std::string> getOutputs() const override;
+    virtual std::set<std::string> getInputs() const override;
 
     /** Calculate MDVs
      */
-    void process(
+    void doProcess(
                  RawDataHandler& rawDataHandler_IO,
                  const ParameterSet& params_I,
                  Filenames& filenames_I

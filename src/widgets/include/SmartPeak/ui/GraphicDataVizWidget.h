@@ -34,6 +34,8 @@
 #include <vector>
 #include <functional>
 #include <optional>
+#include <iomanip>
+#include <implot.h>
 
 namespace SmartPeak
 {
@@ -52,7 +54,13 @@ namespace SmartPeak
       session_handler_(session_handler),
       sequence_handler_(application_handler.sequenceHandler_),
       application_handler_(application_handler),
-      plot_title_(id) {};
+      plot_title_(id) 
+    {
+      plot_limits_.X.Min = 0.0;
+      plot_limits_.X.Max = 1.0;
+      plot_limits_.Y.Min = 0.0;
+      plot_limits_.Y.Max = 1.0;
+    };
 
     void draw() override;
 
@@ -66,13 +74,14 @@ namespace SmartPeak
   protected:
     virtual void setMarkerPosition(const std::optional<float>& marker_position);
     virtual std::optional<float> getMarkerPosition() const;
-    virtual void drawSliders();
+    virtual void drawGraphHeader();
     virtual void drawGraph();
     virtual void drawMarkers();
     virtual void updateData() = 0;
     virtual void showInstallationInstructions();
     virtual std::tuple<float, float, float, float> plotLimits() const;
     virtual void updateRanges();
+    virtual void plotHighestValue(int idx);
     
     // Utility methods
     std::set<std::string> getSelectedSampleNames() const;
@@ -90,16 +99,17 @@ namespace SmartPeak
     bool compact_view_ = true;
     SessionHandler::GraphVizData graph_viz_data_;
     bool refresh_needed_ = false;
-    std::pair<float, float> slider_min_max_ = { 0.0f, 0.0f };
-    std::pair<float, float> current_range_ = { 0.0f, 0.0f };
-    std::pair<float, float> input_range_ = { 0.0f, 0.0f };
-    std::optional<std::pair<float, float>> serialized_range_;
     int current_z_ = 0;
-    float sliders_height_ = 0.0f;
     std::optional<float> marker_position_;
     bool use_markers_ = false;
     bool is_spectra_ = false;
     bool show_installation_guide_ = false;
+    bool search_highest_value_ = false;
+    std::vector<float> highest_values_x_;
+    std::vector<float> highest_values_y_;
+    bool update_plot_range_ = true;
+    ImPlotLimits plot_limits_;
+    bool restore_plot_limits_ = false;
   };
 
 }

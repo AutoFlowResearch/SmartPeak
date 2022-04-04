@@ -36,6 +36,16 @@
 namespace SmartPeak
 {
 
+  std::set<std::string> LoadFeatureBackgroundFilters::getInputs() const
+  {
+    return { };
+  }
+
+  std::set<std::string> LoadFeatureBackgroundFilters::getOutputs() const
+  {
+    return { "Feature Background Filters" };
+  }
+
   std::vector<std::string> LoadFeatureBackgroundFilters::getRequirements() const
   {
     return { "sequence", "traML" };
@@ -85,14 +95,13 @@ namespace SmartPeak
     return true;
   }
 
-  void LoadFeatureBackgroundFilters::process(
+  void LoadFeatureBackgroundFilters::doProcess(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START loadFeatureBackgroundFilter";
     getFilenames(filenames_I);
     FeatureFiltersUtils::loadFeatureFilters(
       "featureBackgroundFilterComponents",
@@ -103,7 +112,6 @@ namespace SmartPeak
       [&]() { if (sequence_segment_observable_) sequence_segment_observable_->notifyFeatureBackgroundFilterComponentGroupsUpdated(); },
       feature_filter_mode_
     );
-    LOGD << "END loadFeatureBackgroundFilter";
   }
 
 }

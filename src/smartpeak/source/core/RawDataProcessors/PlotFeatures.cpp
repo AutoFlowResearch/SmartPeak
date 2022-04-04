@@ -39,14 +39,13 @@ namespace SmartPeak
     return { "sequence", "traML" };
   }
 
-  void PlotFeatures::process(
+  void PlotFeatures::doProcess(
     RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START PlotFeatures (NOT IMPLEMENTED)";
-    getFilenames(filenames_I);
+    LOGE << "(NOT IMPLEMENTED)";
     // TODO: Uncomment once FeaturePlotter is ready
 
     // if (FeaturePlotter_params_I.empty() || filename.empty())
@@ -60,7 +59,6 @@ namespace SmartPeak
     //   rawDataHandler_IO.getChromatogramMap(),
     //   rawDataHandler_IO.getFeatureMap()
     // );
-    LOGD << "END PlotFeatures (NOT IMPLEMENTED)";
   }
 
 }

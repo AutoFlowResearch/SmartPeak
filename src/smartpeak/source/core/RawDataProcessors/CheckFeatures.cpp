@@ -35,6 +35,16 @@
 namespace SmartPeak
 {
 
+  std::set<std::string> CheckFeatures::getInputs() const
+  {
+    return { "Features", "Targeted Experiment", "Features QCs"};
+  }
+
+  std::set<std::string> CheckFeatures::getOutputs() const
+  {
+    return { "Features" };
+  }
+
   std::vector<std::string> CheckFeatures::getRequirements() const
   {
     return { "sequence", "traML" };
@@ -46,13 +56,12 @@ namespace SmartPeak
     return ParameterSet({ oms_param });
   }
 
-  void CheckFeatures::process(
+  void CheckFeatures::doProcess(
     RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START checkFeatures";
     getFilenames(filenames_I);
     LOGI << "Feature Checker input size: " << rawDataHandler_IO.getFeatureMap().size();
 
@@ -68,7 +77,6 @@ namespace SmartPeak
     rawDataHandler_IO.updateFeatureMapHistory();
 
     LOGI << "Feature Checker output size: " << rawDataHandler_IO.getFeatureMap().size();
-    LOGD << "END checkFeatures";
   }
 
 }

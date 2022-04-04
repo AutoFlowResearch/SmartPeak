@@ -189,6 +189,7 @@ namespace SmartPeak
       sequence_segment_names,
       sample_group_names,
       buildCommandsFromNames.commands_,
+      1,
       application_processor_observer_,
       sequence_processor_observer_,
       sequence_segment_processor_observer_,
@@ -198,16 +199,19 @@ namespace SmartPeak
     return true;
   }
 
-  bool LoadSession::process()
+  bool LoadSession::doProcess()
   {
-    LOGD << "START LoadSession";
-
     if (!readFilenames())
     {
       return false;
     }
 
     if (!readInputFiles())
+    {
+      return false;
+    }
+
+    if (!overrideWorkflow())
     {
       return false;
     }
@@ -246,7 +250,6 @@ namespace SmartPeak
     }
 
     application_handler_.sequenceHandler_.notifySequenceUpdated();
-    LOGD << "END LoadSession";
     return true;
   }
 
@@ -327,6 +330,15 @@ namespace SmartPeak
           }
         }
       }
+    }
+    return true;
+  }
+
+  bool LoadSession::overrideWorkflow()
+  {
+    if (workflow_override_)
+    {
+      application_handler_.sequenceHandler_.setWorkflow(*workflow_override_);
     }
     return true;
   }

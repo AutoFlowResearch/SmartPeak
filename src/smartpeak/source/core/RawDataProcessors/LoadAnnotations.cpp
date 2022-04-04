@@ -36,21 +36,30 @@
 namespace SmartPeak
 {
 
+  std::set<std::string> LoadAnnotations::getInputs() const
+  {
+    return { };
+  }
+
+  std::set<std::string> LoadAnnotations::getOutputs() const
+  {
+    return { "Mz Tab" };
+  }
+
   void LoadAnnotations::getFilenames(Filenames& filenames) const
   {
     filenames.addFileName("mzTab_i", "${FEATURES_INPUT_PATH}/${INPUT_INJECTION_NAME}.mzTab");
   };
 
-  void LoadAnnotations::process(
+  void LoadAnnotations::doProcess(
     RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START LoadAnnotations";
     getFilenames(filenames_I);
 
-    if (!InputDataValidation::prepareToLoad(filenames_I, "mzTab_i"))
+    if (!InputDataValidation::prepareToLoad(filenames_I, "mzTab_i", false))
     {
       throw std::invalid_argument("Failed to load input file");
     }
@@ -64,10 +73,8 @@ namespace SmartPeak
       LOGE << e.what();
       rawDataHandler_IO.setMzTab(OpenMS::MzTab());
       LOGE << "feature map clear";
-      throw e;
+      throw;
     }
-
-    LOGD << "END LoadAnnotations";
   }
 
 }

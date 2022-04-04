@@ -20,6 +20,7 @@
 // $Maintainer: Douglas McCloskey $
 // $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
 // --------------------------------------------------------------------------
+
 #include <SmartPeak/core/RawDataProcessors/CalculateIsotopicPurities.h>
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/Utilities.h>
@@ -34,6 +35,16 @@
 
 namespace SmartPeak
 {
+
+  std::set<std::string> CalculateIsotopicPurities::getInputs() const
+  {
+    return { };
+  }
+
+  std::set<std::string> CalculateIsotopicPurities::getOutputs() const
+  {
+    return { "Features" };
+  }
 
   std::vector<std::string> CalculateIsotopicPurities::getRequirements() const
   {
@@ -60,13 +71,12 @@ namespace SmartPeak
     return ParameterSet(param_struct);
   }
 
-  void CalculateIsotopicPurities::process(
+  void CalculateIsotopicPurities::doProcess(
     RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START calculateIsotopicPurities";
     getFilenames(filenames_I);
 
     // Complete user parameters with schema
@@ -127,8 +137,6 @@ namespace SmartPeak
     isotopelabelingmdvs.calculateIsotopicPurities(normalized_featureMap, experiment_data_mat, isotopic_purity_names);
     rawDataHandler_IO.setFeatureMap(normalized_featureMap);
     rawDataHandler_IO.updateFeatureMapHistory();
-
-    LOGD << "END CalculateIsotopicPurities";
   }
 
 }

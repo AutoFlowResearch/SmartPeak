@@ -1,8 +1,28 @@
-
+# --------------------------------------------------------------------------
+#   SmartPeak -- Fast and Accurate CE-, GC- and LC-MS(/MS) Data Processing
+# --------------------------------------------------------------------------
+# Copyright The SmartPeak Team -- Novo Nordisk Foundation 
+# Center for Biosustainability, Technical University of Denmark 2018-2022.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL ANY OF THE AUTHORS OR THE CONTRIBUTING
+# INSTITUTIONS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+# EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+# PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+# OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+# OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+# ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+# --------------------------------------------------------------------------
+# $Maintainer: Ahmed Khalil, Bertrand Boudaud $
+# $Authors: Douglas McCloskey $
+# --------------------------------------------------------------------------
 
 cmake_minimum_required(VERSION 3.8.2 FATAL_ERROR)
 project("SmartPeak_class_examples_smartpeak")
-
 message(STATUS "building examples...")
 
 #------------------------------------------------------------------------------
@@ -18,9 +38,11 @@ include(executables.cmake)
 #------------------------------------------------------------------------------
 # Include directories for examples
 set(SMARTPEAK_EXAMPLES_INTERNAL_INCLUDE_DIRECTORIES "${PROJECT_BINARY_DIR}/include/")
+set(SMARTPEAK_SERVICES_INTERNAL_INCLUDE_DIRECTORIES "${PROJECT_BINARY_DIR}/source/service/")
 # add SmartPeak directories
 set(SMARTPEAK_EXAMPLES_EXTERNAL_INCLUDE_DIRECTORIES "${SmartPeak_INCLUDE_DIRECTORIES}" "${SmartPeakWidgets_INCLUDE_DIRECTORIES}")
 include_directories(${SMARTPEAK_EXAMPLES_INTERNAL_INCLUDE_DIRECTORIES})
+include_directories(${SMARTPEAK_SERVICES_INTERNAL_INCLUDE_DIRECTORIES})
 include_directories(SYSTEM ${SMARTPEAK_EXAMPLES_EXTERNAL_INCLUDE_DIRECTORIES})
 
 #------------------------------------------------------------------------------
@@ -28,33 +50,10 @@ include_directories(SYSTEM ${SMARTPEAK_EXAMPLES_EXTERNAL_INCLUDE_DIRECTORIES})
 #------------------------------------------------------------------------------
 find_package(OpenMS REQUIRED)
 
-# check whether the OpenMS package was found
-if (OpenMS_FOUND)
-  # check if the variable containing the include directories is defined
-  if(NOT OpenMS_INCLUDE_DIRECTORIES)
-    set(_message "The variable \${OpenMS_INCLUDE_DIRECTORIES} is not defined.")
-    set(_message "${_message}This CMakeLists.txt and your build of OpenMS seem incompatible.")
-    set(_message "${_message}Please use the latest version from the OpenMS release!")
-    message(FATAL_ERROR ${_message})
-  endif()
-  ## include directories for OpenMS headers (and contrib)
-  #       OpenMS_GUI -> ${OpenMS_GUI_INCLUDE_DIRECTORIES}
-  include_directories(${OpenMS_INCLUDE_DIRECTORIES})
-
-  ## append precompiler macros and compiler flags specific to OpenMS
-  ## Warning: this could be harmful to your project. Check this if problems occur.
-  ## Also, use this to add your own compiler flags, e.g. for OpenMP support.
-  ## e.g. for Visual Studio use /openmp
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OPENMS_ADDCXX_FLAGS}")
-
-else(OpenMS_FOUND)
-  message(FATAL_ERROR "OpenMSConfig.cmake file not found!")
-endif(OpenMS_FOUND)
-
 #------------------------------------------------------------------------------
 # OpenMS QT5 dependencies
 #------------------------------------------------------------------------------
-find_package(Qt5 COMPONENTS Core Network REQUIRED)
+find_package(Qt5 COMPONENTS Core Network Sql REQUIRED)
 
 if (NOT Qt5Network_FOUND)
   message(STATUS "[examples] : QtNetwork module not found!")
@@ -63,6 +62,11 @@ endif()
 
 if (NOT Qt5Core_FOUND)
   message(STATUS "[examples] : QtCore module not found!")
+  message(FATAL_ERROR "To find a custom Qt installation use: cmake <..more options..> -D QT_QMAKE_EXECUTABLE='<path_to_qmake(.exe)' <src-dir>")
+endif()
+
+if (NOT Qt5Sql_FOUND)
+  message(STATUS "[examples] : QtSql module not found!")
   message(FATAL_ERROR "To find a custom Qt installation use: cmake <..more options..> -D QT_QMAKE_EXECUTABLE='<path_to_qmake(.exe)' <src-dir>")
 endif()
 
@@ -105,6 +109,30 @@ find_package(ImPlot COMPONENTS Sources REQUIRED)
 include_directories(${IMPLOT_INCLUDE_DIR})
 
 #------------------------------------------------------------------------------
+# gRPC
+#------------------------------------------------------------------------------
+include(../../cmake/fetch_grpc.cmake)
+
+#------------------------------------------------------------------------------
+# Find OpenSSL
+#------------------------------------------------------------------------------
+find_package(OpenSSL REQUIRED) 
+if(OpenSSL_FOUND)
+  include_directories(${OPENSSL_INCLUDE_DIR})
+  message(">> OPENSSL_INCLUDE_DIR : ${OPENSSL_INCLUDE_DIR}")
+  link_directories(${OPENSSL_LIBRARIES})
+  message(STATUS "[examples] : Using OpenSSL ${OPENSSL_VERSION}")
+endif()
+
+#------------------------------------------------------------------------------
+# Find Boost
+#------------------------------------------------------------------------------
+find_package(Boost REQUIRED) 
+if(Boost_FOUND)
+  include_directories(${BOOST_INCLUDE_DIR})
+  link_directories(${BOOST_LIBRARYDIR})
+endif()
+
 # pipeline examples
 add_custom_target(PIPELINE_EXAMPLES)
 add_dependencies(PIPELINE_EXAMPLES ${pipeline_executables_list})
@@ -119,16 +147,21 @@ add_dependencies(INTERACTIVE_EXAMPLES ${interactive_executables_list})
 foreach(_examples ${EXAMPLE_executables})
   if (APPLE)
     if (${_examples} STREQUAL "SmartPeakGUI")
-      set(ASSETS ${SMARTPEAK_HOST_DIRECTORY}/cmake/MacOSX/sp.icns)
+      set(ASSETS ${PROJECT_SOURCE_DIR}/../../cmake/MacOSX/sp.icns)
       set_source_files_properties(${ASSETS} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
       source_group("Resources" FILES ${ASSETS})
       add_executable(${_examples} MACOSX_BUNDLE source/${_examples} ${ASSETS})
       target_link_libraries(${_examples} PUBLIC ${SmartPeakWidgets_LIBRARIES} ${SmartPeak_LIBRARIES} 
             OpenMS ${SDL2_LIBRARY} ${OPENGL_LIBRARIES} ImPlot::ImPlot ImGui::ImGui 
             ${COREFOUNDATION_LIBRARY} ${APPLICATIONSERVICES_LIBRARY}
-            PRIVATE ImPlot::Sources ImGui::Sources ImGui::Examples ImGui::SourcesMiscCpp)
-      # set_target_properties(${_examples} PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${SMARTPEAK_HOST_DIRECTORY}/cmake/MacOSX/Info.plist)
+            PRIVATE ImPlot::Sources ImGui::Sources ImGui::Examples ImGui::SourcesMiscCpp
+            ${grpc_required_libs} OpenSSL::SSL OpenSSL::Crypto)
       install(TARGETS ${_examples}  BUNDLE DESTINATION .  COMPONENT Applications)
+      target_include_directories(${_examples} SYSTEM INTERFACE  ${CMAKE_CURRENT_SOURCE_DIR}/source/service/)
+    elseif(${_examples} STREQUAL "SmartPeakServer")
+      add_executable(${_examples} source/${_examples})
+      target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} OpenMS PRIVATE ${grpc_required_libs})
+      target_include_directories(${_examples} SYSTEM INTERFACE  ${CMAKE_CURRENT_SOURCE_DIR}/source/service/)
     else()
       add_executable(${_examples} source/${_examples})
       target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} OpenMS)
@@ -140,7 +173,8 @@ foreach(_examples ${EXAMPLE_executables})
       add_executable(${_examples} source/${_examples})
       target_link_libraries(${_examples} PUBLIC ${SmartPeakWidgets_LIBRARIES} ${SmartPeak_LIBRARIES} 
           OpenMS ${SDL2_LIBRARIES} ${OPENGL_LIBRARIES} ImPlot::ImPlot ImGui::ImGui 
-          PRIVATE ImPlot::Sources ImGui::Sources ImGui::Examples ImGui::SourcesMiscCpp)
+          PRIVATE ImPlot::Sources ImGui::Sources ImGui::Examples ImGui::SourcesMiscCpp
+					${grpc_required_libs})
       install_tool(${_examples}) 
     
       file(GLOB_RECURSE OpenMSLibs ${OpenMS_DIR}/lib/*.so)
@@ -156,9 +190,13 @@ foreach(_examples ${EXAMPLE_executables})
       add_executable(${_examples} source/${_examples})
       target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} OpenMS)
       install_tool(${_examples}) 
+    elseif(${_examples} STREQUAL "SmartPeakServer")
+      add_executable(${_examples} source/${_examples})
+      target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} OpenMS PRIVATE ${grpc_required_libs})
+      target_include_directories(${_examples} SYSTEM INTERFACE  ${CMAKE_CURRENT_SOURCE_DIR}/source/service/)
     else()
       add_executable(${_examples} source/${_examples})
-      target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} OpenMS)
+      target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} OpenMS ${grpc_required_libs})
     endif()
 
   else() # Win
@@ -167,8 +205,13 @@ foreach(_examples ${EXAMPLE_executables})
       add_executable(${_examples} source/${_examples} ${CMAKE_SOURCE_DIR}/cmake/Windows/SmartPeakGUI.rc)
       target_link_libraries(${_examples} PUBLIC ${SmartPeakWidgets_LIBRARIES} ${SmartPeak_LIBRARIES} 
         OpenMS ${SDL2_LIBRARIES} ${OPENGL_LIBRARIES} ImPlot::ImPlot ImGui::ImGui 
-        PRIVATE ImPlot::Sources ImGui::Sources ImGui::Examples ImGui::SourcesMiscCpp)
+        PRIVATE ImPlot::Sources ImGui::Sources ImGui::Examples ImGui::SourcesMiscCpp
+        ${grpc_required_libs})
       install_tool(${_examples})
+    elseif(${_examples} STREQUAL "SmartPeakServer")
+      add_executable(${_examples} source/${_examples})
+      target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} OpenMS PRIVATE ${grpc_required_libs})
+      target_include_directories(${_examples} SYSTEM INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/source/service/)
     else()
       add_executable(${_examples} source/${_examples})
       target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} OpenMS)

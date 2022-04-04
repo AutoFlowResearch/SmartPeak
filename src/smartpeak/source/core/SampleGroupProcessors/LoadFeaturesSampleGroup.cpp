@@ -28,6 +28,11 @@
 namespace SmartPeak
 {
 
+  std::set<std::string> LoadFeaturesSampleGroup::getOutputs() const
+  {
+    return { "Sample Group Features" };
+  }
+  
   ParameterSet LoadFeaturesSampleGroup::getParameterSchema() const
   {
     return ParameterSet();
@@ -38,16 +43,15 @@ namespace SmartPeak
     filenames.addFileName("featureXMLSampleGroup_i", "${FEATURES_INPUT_PATH}/${INPUT_GROUP_NAME}.featureXML");
   };
 
-  void LoadFeaturesSampleGroup::process(SampleGroupHandler& sampleGroupHandler_IO,
+  void LoadFeaturesSampleGroup::doProcess(SampleGroupHandler& sampleGroupHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START LoadFeaturesSampleGroup";
     getFilenames(filenames_I);
 
-    if (!InputDataValidation::prepareToLoad(filenames_I, "featureXMLSampleGroup_i"))
+    if (!InputDataValidation::prepareToLoad(filenames_I, "featureXMLSampleGroup_i", false))
     {
       throw std::invalid_argument("Failed to load input file");
     }
@@ -60,10 +64,8 @@ namespace SmartPeak
       LOGE << e.what();
       sampleGroupHandler_IO.getFeatureMap().clear();
       LOGE << "feature map clear";
-      throw e;
+      throw;
     }
-
-    LOGD << "END LoadFeaturesSampleGroup";
   }
 
 }

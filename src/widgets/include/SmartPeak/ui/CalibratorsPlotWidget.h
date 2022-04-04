@@ -23,7 +23,12 @@
 
 #pragma once
 
+#include <SmartPeak/core/SessionHandler.h>
 #include <SmartPeak/ui/Widget.h>
+#include <SmartPeak/ui/ParameterEditorWidget.h>
+#include <SmartPeak/ui/ExplorerWidget.h>
+#include <SmartPeak/ui/ChromatogramPlotWidget.h>
+
 #include <string>
 #include <utility>
 #include <vector>
@@ -35,43 +40,105 @@ namespace SmartPeak
   /**
     @brief Class for Calibrators
   */
-  class CalibratorsPlotWidget : public GenericGraphicWidget
+  class CalibratorsPlotWidget : 
+    public GenericGraphicWidget,
+    public IParameterEditorWidgetObserver,
+    public ISequenceObserver
   {
   public:
-    CalibratorsPlotWidget(const std::string title = ""): GenericGraphicWidget(title) {};
-    void setValues(
-      const std::vector<std::vector<float>>* x_fit_data, const std::vector<std::vector<float>>* y_fit_data,
-      const std::vector<std::vector<float>>* x_raw_data, const std::vector<std::vector<float>>* y_raw_data, const std::vector<std::string>* series_names,
-      const std::string& x_axis_title, const std::string& y_axis_title, const float& x_min, const float& x_max, const float& y_min, const float& y_max,
-      const std::string& plot_title)
+    CalibratorsPlotWidget(SessionHandler& session_handler,
+                          SequenceHandler& sequence_handler,
+                          std::shared_ptr<ExplorerWidget> explorer_widget,
+                          std::shared_ptr<ChromatogramPlotWidget> chromatogram_widget,
+                          SequenceObservable& sequence_observable,
+                          const std::string title = "") :
+      GenericGraphicWidget(title),
+      session_handler_(session_handler),
+      sequence_handler_(sequence_handler),
+      parameter_editor_widget_(*this, false),
+      explorer_widget_(explorer_widget),
+      chromatogram_widget_(chromatogram_widget)
     {
-      x_fit_data_ = x_fit_data;
-      y_fit_data_ = y_fit_data;
-      x_raw_data_ = x_raw_data;
-      y_raw_data_ = y_raw_data;
-      series_names_ = series_names;
-      x_axis_title_ = x_axis_title;
-      y_axis_title_ = y_axis_title;
-      x_min_ = x_min;
-      x_max_ = x_max;
-      y_min_ = y_min;
-      y_max_ = y_max;
-      plot_title_ = plot_title;
-    }
+      sequence_observable.addSequenceObserver(this);
+    };
+
     void draw() override;
+
+    bool reset_layout_ = true;
+
+    /* IParameterEditorWidgetObserver */
+    virtual void onParameterSet(const std::string& function_parameter, const Parameter& parameter);
+    virtual void onParameterRemoved(const std::string& function_parameter, const Parameter& parameter) {};
+
+    /* ISequenceObserver */
+    virtual void onSequenceUpdated() override;
+
   protected:
-    const std::vector<std::vector<float>>* x_fit_data_ = nullptr;
-    const std::vector<std::vector<float>>* y_fit_data_ = nullptr;
-    const std::vector<std::vector<float>>* x_raw_data_ = nullptr;
-    const std::vector<std::vector<float>>* y_raw_data_ = nullptr;
-    const std::vector<std::string>* series_names_ = nullptr;
-    std::string x_axis_title_;
-    std::string y_axis_title_;
-    float x_min_;
-    float x_max_;
-    float y_min_;
-    float y_max_;
+    void setCalibrationData(const SessionHandler::CalibrationData& calibration_data, const std::string& plot_title);
+    bool isExcluded(const std::string& serie_name, const std::string& sample_name);
+    OpenMS::AbsoluteQuantitationMethod* getQuantitationMethod(const std::string& component_name);
+    void displayParameters();
+    void displayPlot();
+    void recomputeFitCalibration(const std::string& component_name);
+    void recomputeOptimizeCalibration();
+    void addParameterRow(std::shared_ptr<Parameter> param, bool editable);
+    void getSelectedPoint(ImVec2 point, ImVec2 threshold_point);
+    void showChromatogram(const std::string& sample_name);
+    void plotPoints(bool show_flag, const SessionHandler::CalibrationData::Points& points, int marker_style);
+    void plotSelectedPoint(
+      const std::optional<std::tuple<int, int>>& hovered_point,
+      const SessionHandler::CalibrationData::Points& points,
+      int marker_style);
+    std::tuple<std::string, std::string> getSampleNameAndSerieFromSelectedPoint(
+      const std::optional<std::tuple<int, int>>& matching_point, 
+      const std::optional<std::tuple<int, int>>& excluded_point) const;
+    std::optional<std::tuple<int, int>> getSelectedPoint(
+      ImVec2 point,
+      ImVec2 threshold_point,
+      const SessionHandler::CalibrationData::Points& points);
+    std::shared_ptr<Parameter> CalibratorParameterToSmartPeakParameter(const OpenMS::Param::ParamEntry& param);
+    void setIncludeExcludeParameter(const std::string& parameter_name, const std::vector<std::tuple<std::string, std::string>>& include_exclude_list);
+
+  protected:
+    SessionHandler::CalibrationData calibration_data_;
     std::string plot_title_; // used as the ID of the plot as well so this should be unique across the different Widgets
+    bool show_legend_ = true;
+    bool show_fit_line_ = true;
+    bool show_matching_points_ = true;
+    bool show_excluded_points_ = true;
+    std::string current_component_;
+    std::vector<std::string> components_;
+    std::vector<const char*> component_cstr_;
+    int selected_component_ = 0;
+    std::vector<std::string> sequence_segments_;
+    std::vector<const char*> sequence_segments_cstr_;
+    int selected_sequence_segment_ = 0;
+    enum Action
+    {
+      EActionFitCalibration,
+      EActionOptimizeCalibration
+    };
+    std::vector<const char*> actions_cstr_ = 
+    {
+      "Fit Calibration",
+      "Optimize Calibration"
+    };
+    int selected_action_ = EActionFitCalibration;
+    bool reset_zoom_ = true;
+    SessionHandler& session_handler_;
+    SequenceHandler& sequence_handler_;
+    ParameterEditorWidget parameter_editor_widget_;
+    std::shared_ptr<Parameter> param_to_edit_;
+    std::optional<std::tuple<int, int>> hovered_matching_point_;
+    std::optional<std::tuple<int, int>> hovered_excluded_point_;
+    std::optional<std::tuple<int, int>> clicked_matching_point_;
+    std::optional<std::tuple<int, int>> clicked_excluded_point_;
+    std::shared_ptr<ExplorerWidget> explorer_widget_;
+    std::shared_ptr<ChromatogramPlotWidget> chromatogram_widget_;
+    bool refresh_needed_ = true;
+    std::vector<bool> previous_transition_selection_;
+    std::vector<std::tuple<std::string, std::string>> user_excluded_points_;
+    std::vector<std::tuple<std::string, std::string>> user_included_points_;
   };
 
 }

@@ -51,8 +51,6 @@ void test_main_LCMS_MRM_Unknown()
   const std::vector<std::shared_ptr<RawDataProcessor>> methods;
   std::map<std::string, Filenames> filenames_map;
   SmartPeak::SequenceProcessorMultithread spMT(sequenceHandler.getSequence(), filenames_map, methods);
-  unsigned int n_threads = std::stoul(params->at("SequenceProcessor")[0].getValueAsString());
-  assert(spMT.getNumWorkers(n_threads)== 3 && "Defined n_threads parameter isn't 4");
 
 cout << "fm1 size: " << fm1.size() << endl;
 cout << "fm2 size: " << fm2.size() << endl;

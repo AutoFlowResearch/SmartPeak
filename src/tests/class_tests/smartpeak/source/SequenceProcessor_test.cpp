@@ -28,7 +28,7 @@
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/RawDataProcessors/LoadRawData.h>
 #include <SmartPeak/core/RawDataProcessors/LoadFeatures.h>
-#include <SmartPeak/core/SequenceSegmentProcessors/CalculateCalibration.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/OptimizeCalibration.h>
 #include <SmartPeak/core/SampleGroupProcessors/MergeInjections.h>
 #include <SmartPeak/core/ApplicationProcessors/LoadSession.h>
 #include <SmartPeak/core/ApplicationProcessors/SaveSession.h>
@@ -344,13 +344,6 @@ TEST(SequenceHandler, processSequence)
     n_chroms += sequenceHandler.getSequence().at(i).getRawData().getExperiment().getChromatograms().size();
   EXPECT_EQ(n_chroms, 2040); // loaded all injections
 
-  // Test multi threading parameters
-  ParameterSet const* params;
-  params = &rawDataHandler0.getParameters();
-  EXPECT_EQ(params->count("SequenceProcessor"), 1);
-  unsigned int n_threads = std::stoul(params->at("SequenceProcessor")[0].getValueAsString());
-  EXPECT_EQ(n_threads, 4);
-
   SmartPeak::SequenceProcessorMultithread spMT1(sequenceHandler.getSequence(),
     dynamic_filenames,
     raw_data_processing_methods);
@@ -387,7 +380,7 @@ TEST(SequenceHandler, processSequenceSegments)
   cs.process();
 
   const vector<std::shared_ptr<SequenceSegmentProcessor>> sequence_segment_processing_methods =
-    { std::make_shared<CalculateCalibration>() };
+    { std::make_shared<OptimizeCalibration>() };
 
   Filenames methods_filenames;
   const std::string path = SMARTPEAK_GET_TEST_DATA_PATH("");

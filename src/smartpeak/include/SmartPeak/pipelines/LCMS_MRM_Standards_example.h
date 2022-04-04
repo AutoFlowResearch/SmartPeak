@@ -36,7 +36,7 @@
 #include <SmartPeak/core/RawDataProcessors/StoreFeatures.h>
 #include <SmartPeak/core/RawDataProcessors/QuantifyFeatures.h>
 #include <SmartPeak/core/SequenceSegmentProcessors/StoreQuantitationMethods.h>
-#include <SmartPeak/core/SequenceSegmentProcessors/CalculateCalibration.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/OptimizeCalibration.h>
 #include <SmartPeak/core/ApplicationProcessors/LoadSession.h>
 
 using namespace SmartPeak;
@@ -89,7 +89,7 @@ void example_LCMS_MRM_Standards(
   ps.process(methods_filenames);
 
   const std::vector<std::shared_ptr<SequenceSegmentProcessor>> sequence_segment_processing_methods = {
-    std::make_shared<CalculateCalibration>(),
+    std::make_shared<OptimizeCalibration>(),
     std::make_shared<StoreQuantitationMethods>()
   };
 
@@ -97,8 +97,8 @@ void example_LCMS_MRM_Standards(
   for (const SequenceSegmentHandler& sequence_segment : application_handler.sequenceHandler_.getSequenceSegments()) {
     const std::string& key = sequence_segment.getSequenceSegmentName();
     dynamic_filenames2[key] = methods_filenames;
-    dynamic_filenames2[key].setTagValue(Filenames::Tag::INPUT_INJECTION_NAME, key);
-    dynamic_filenames2[key].setTagValue(Filenames::Tag::OUTPUT_INJECTION_NAME, key);
+    dynamic_filenames2[key].setTagValue(Filenames::Tag::INPUT_SEQUENCE_SEGMENT_NAME, key);
+    dynamic_filenames2[key].setTagValue(Filenames::Tag::OUTPUT_SEQUENCE_SEGMENT_NAME, key);
   }
 
   ProcessSequenceSegments pss(application_handler.sequenceHandler_);

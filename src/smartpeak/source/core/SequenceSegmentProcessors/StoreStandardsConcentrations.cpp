@@ -36,6 +36,16 @@
 namespace SmartPeak
 {
 
+  std::set<std::string> StoreStandardsConcentrations::getInputs() const
+  {
+    return { "Standards Concentrations" };
+  }
+
+  std::set<std::string> StoreStandardsConcentrations::getOutputs() const
+  {
+    return { };
+  }
+
   std::vector<std::string> StoreStandardsConcentrations::getRequirements() const
   {
     return { "sequence", "traML" };
@@ -54,7 +64,7 @@ namespace SmartPeak
       return false;
     }
     Filenames filenames;
-    filenames.setFullPath("quantitationMethods", filename);
+    filenames.setFullPath("standardsConcentrations", filename);
     sequence_segment_observable_ = &application_handler->sequenceHandler_;
     process(application_handler->sequenceHandler_.getSequenceSegments()[0], SequenceHandler(), {}, filenames);
     return true;
@@ -65,15 +75,13 @@ namespace SmartPeak
     filenames.addFileName("standardsConcentrations", constructFilename("standardsConcentrations.csv", static_filenames_), "Standards Concentrations", true, true);
   };
 
-  void StoreStandardsConcentrations::process(
+  void StoreStandardsConcentrations::doProcess(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START StoreStandardsConcentrations";
-
     if (!InputDataValidation::prepareToStore(filenames_I, "standardsConcentrations"))
     {
       throw std::invalid_argument("Failed to store output file");

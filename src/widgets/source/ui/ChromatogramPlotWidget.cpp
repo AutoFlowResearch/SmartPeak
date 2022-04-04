@@ -40,11 +40,6 @@ namespace SmartPeak
       input_component_names_ = component_names;
       refresh_needed_ = false;
     }
-    else if (input_range_ != current_range_) // user zoom in/out
-    {
-      session_handler_.getChromatogramScatterPlot(sequence_handler_, graph_viz_data_, current_range_, sample_names, component_names);
-      input_range_ = current_range_;
-    }
   };
 
   void ChromatogramPlotWidget::onSequenceUpdated()

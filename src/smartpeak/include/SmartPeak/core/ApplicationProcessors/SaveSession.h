@@ -34,7 +34,7 @@ namespace SmartPeak
     explicit SaveSession(ApplicationHandler& application_handler) : ApplicationProcessor(application_handler) {}
 
     /* ApplicationProcessor */
-    bool process() override;
+    virtual bool doProcess() override;
 
     /* IFilePickerHandler */
     bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;

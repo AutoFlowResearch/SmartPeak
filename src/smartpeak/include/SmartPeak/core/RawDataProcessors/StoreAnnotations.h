@@ -39,10 +39,12 @@ namespace SmartPeak
     virtual std::string getName() const override { return "STORE_ANNOTATIONS"; }
     virtual std::string getDescription() const override { return "Write the annotations to disk."; }
     virtual std::vector<std::string> getRequirements() const override;
+    virtual std::set<std::string> getOutputs() const override;
+    virtual std::set<std::string> getInputs() const override;
 
     /** Write the annotations to disk.
     */
-    void process(
+    void doProcess(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
       Filenames& filenames_I

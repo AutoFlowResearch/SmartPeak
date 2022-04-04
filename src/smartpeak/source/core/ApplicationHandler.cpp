@@ -174,6 +174,23 @@ namespace SmartPeak
     return (description ? description->getDescription() : "");
   }
 
+  std::set<std::string> ApplicationHandler::Command::getInputs() const
+  {
+    const auto description = getIProcessorDescription();
+    return (description ? description->getInputs() : std::set<std::string>());
+  }
+
+  std::set<std::string> ApplicationHandler::Command::getOutputs() const
+  {
+    const auto description = getIProcessorDescription();
+    return (description ? description->getOutputs() : std::set<std::string>());
+  }
+
+  ApplicationHandler::Command::CommandType ApplicationHandler::Command::getType() const
+  {
+    return type;
+  }
+
   const IProcessorDescription* ApplicationHandler::Command::getIProcessorDescription() const
   {
     switch (type)
@@ -230,7 +247,6 @@ namespace SmartPeak
     {
       schema_params.merge(command.getParameterSchema());
     }
-    schema_params.merge(ApplicationProcessors::getParameterSchema()); // Application processor will be used also
     schema_params.setAsSchema(true);
     return schema_params;
   }

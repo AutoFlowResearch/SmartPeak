@@ -35,6 +35,16 @@
 namespace SmartPeak
 {
 
+  std::set<std::string> CalculateMDVAccuracies::getInputs() const
+  {
+    return { "Targeted Experiment" };
+  }
+
+  std::set<std::string> CalculateMDVAccuracies::getOutputs() const
+  {
+    return { "Features" };
+  }
+
   std::vector<std::string> CalculateMDVAccuracies::getRequirements() const
   {
     return { "sequence", "traML" };
@@ -54,13 +64,12 @@ namespace SmartPeak
     return ParameterSet(param_struct);
   }
 
-  void CalculateMDVAccuracies::process(
+  void CalculateMDVAccuracies::doProcess(
     RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START CalculateMDVAccuracies";
     getFilenames(filenames_I);
 
     // Complete user parameters with schema
@@ -107,8 +116,6 @@ namespace SmartPeak
     isotopelabelingmdvs.calculateMDVAccuracies(featureMap_with_accuracy_info, feature_name, proteinName_to_SumFormula);
     rawDataHandler_IO.setFeatureMap(featureMap_with_accuracy_info);
     rawDataHandler_IO.updateFeatureMapHistory();
-
-    LOGD << "END CalculateMDVAccuracies";
   }
 
 }

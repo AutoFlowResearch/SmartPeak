@@ -97,13 +97,17 @@ namespace SmartPeak
     filenames.addFileName("mzML_i", "${MZML_INPUT_PATH}/${INPUT_MZML_FILENAME}.mzML");
   };
 
-  void LoadRawData::process(
+  std::set<std::string> LoadRawData::getOutputs() const
+  {
+    return { "Experiment", "Targeted Experiment", "Chromatogram", "Spectra"};
+  }
+
+  void LoadRawData::doProcess(
     RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START loadMSExperiment";
     getFilenames(filenames_I);
 
     // Note: unlike other processors,
@@ -200,16 +204,12 @@ namespace SmartPeak
       );
     }
     rawDataHandler_IO.setExperiment(chromatograms);
-
-    LOGD << "END loadMSExperiment";
   }
 
   void LoadRawData::extractMetaData(
     RawDataHandler& rawDataHandler_IO
   )
   {
-    LOGD << "START extractMetaData";
-
     std::string filename;
     std::string samplename;
 
@@ -271,7 +271,6 @@ namespace SmartPeak
       dt_int.tm_min = dt_uint.tm_min;
       dt_int.tm_sec = dt_uint.tm_sec;
     }
-    LOGD << "END extractMetaData";
   }
 
 }

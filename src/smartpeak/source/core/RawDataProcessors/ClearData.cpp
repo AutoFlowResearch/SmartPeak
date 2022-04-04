@@ -33,15 +33,13 @@
 namespace SmartPeak
 {
 
-  void ClearData::process(RawDataHandler& rawDataHandler_IO,
+  void ClearData::doProcess(RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START ClearData";
     getFilenames(filenames_I);
     rawDataHandler_IO.clearNonSharedData();
-    LOGD << "END ClearData";
   }
 
 }

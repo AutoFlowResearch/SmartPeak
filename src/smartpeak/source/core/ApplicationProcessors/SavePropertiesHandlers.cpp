@@ -26,15 +26,13 @@
 namespace SmartPeak
 {
 
-  bool SavePropertiesHandlers::process()
+  bool SavePropertiesHandlers::doProcess()
   {
-    LOGD << "START SavePropertiesHandlers";
     bool success = true;
     for (auto properties_handler : properties_handlers)
     {
       success &= application_handler_.filenames_.getSessionDB().writePropertiesHandler(*properties_handler);
     }
-    LOGD << "END SavePropertiesHandlers";
     return success;
   }
 

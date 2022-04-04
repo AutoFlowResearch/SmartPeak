@@ -38,6 +38,16 @@
 namespace SmartPeak
 {
 
+  std::set<std::string> EstimateFeatureQCValues::getInputs() const
+  {
+    return { "Features", "Targeted Experiment" };
+  }
+
+  std::set<std::string> EstimateFeatureQCValues::getOutputs() const
+  {
+    return { "Feature QCs" };
+  }
+
   std::vector<std::string> EstimateFeatureQCValues::getRequirements() const
   {
     return { "sequence", "traML" };
@@ -48,14 +58,13 @@ namespace SmartPeak
     return ParameterSet();
   }
 
-  void EstimateFeatureQCValues::process(
+  void EstimateFeatureQCValues::doProcess(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START estimateFeatureQCValues";
     getFilenames(filenames_I);
 
     std::vector<size_t> standards_indices, qcs_indices;
@@ -97,8 +106,6 @@ namespace SmartPeak
       sequenceHandler_I.getSequence().front().getRawData().getTargetedExperiment(), // Targeted experiment used by all injections in the sequence
       true
     );
-
-    LOGD << "END estimateFeatureQCValues";
   }
 
 }

@@ -17,15 +17,19 @@ set(sources_list
 	Parameters.cpp
 	ProgessInfo.cpp
 	RawDataHandler.cpp
+	RawDataProcessor.cpp
 	SampleGroupHandler.cpp
+	SampleGroupProcessor.cpp
 	SampleType.cpp
 	SequenceHandler.cpp
 	SequenceProcessor.cpp
 	SequenceSegmentHandler.cpp
 	SequenceSegmentProcessor.cpp
 	SessionHandler.cpp
+	ServerAppender.cpp
 	SessionLoaderGenerator.cpp
 	SharedProcessors.cpp
+	Server.cpp
 	Utilities.cpp
 	WorkflowManager.cpp
 )

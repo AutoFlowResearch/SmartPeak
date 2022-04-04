@@ -34,6 +34,17 @@
 namespace SmartPeak
 {
 
+
+  std::set<std::string> StoreValidationData::getInputs() const
+  {
+    return { "Reference Data" };
+  }
+
+  std::set<std::string> StoreValidationData::getOutputs() const
+  {
+    return { };
+  }
+
   std::vector<std::string> StoreValidationData::getRequirements() const
   {
     return { "sequence", "traML" };
@@ -58,14 +69,12 @@ namespace SmartPeak
     return true;
   }
 
-  void StoreValidationData::process(
+  void StoreValidationData::doProcess(
     RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START StoreValidationData";
-
     if (!InputDataValidation::prepareToStore(filenames_I, "referenceData"))
     {
       throw std::invalid_argument("Failed to load input file");
@@ -128,8 +137,6 @@ namespace SmartPeak
     {
       LOGE << "Not implemented";
     }
-
-    LOGD << "END StoreValidationData";
   }
 
 }

@@ -42,11 +42,13 @@ namespace SmartPeak
     virtual std::string getDescription() const override { return "Load each transitions calibration model defined in quantitationMethods from disk."; }
     virtual ParameterSet getParameterSchema() const override;
     virtual std::vector<std::string> getRequirements() const override;
+    virtual std::set<std::string> getOutputs() const override;
+    virtual std::set<std::string> getInputs() const override;
 
     /**
       Load the quantitation methods file.
     */
-    void process(
+    void doProcess(
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,

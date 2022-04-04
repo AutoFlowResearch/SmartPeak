@@ -42,7 +42,8 @@ namespace SmartPeak
     bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
 
     StoreValidationData() = default;
-    void process(
+
+    void doProcess(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
       Filenames& filenames_I
@@ -53,6 +54,8 @@ namespace SmartPeak
     virtual std::string getName() const override { return "STORE_VALIDATION_DATA"; }
     virtual std::string getDescription() const override { return "Store the validation data."; }
     virtual std::vector<std::string> getRequirements() const override;
+    virtual std::set<std::string> getOutputs() const override;
+    virtual std::set<std::string> getInputs() const override;
 
     /* IFilenamesHandler */
     virtual void getFilenames(Filenames& filenames) const override;

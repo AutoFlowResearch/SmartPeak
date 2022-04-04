@@ -41,7 +41,7 @@ namespace SmartPeak
 
     /** Clear all raw and process data
     */
-    void process(
+    void doProcess(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
       Filenames& filenames_I

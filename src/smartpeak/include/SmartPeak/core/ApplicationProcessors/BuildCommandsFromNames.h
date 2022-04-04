@@ -30,7 +30,7 @@ namespace SmartPeak
 
   struct BuildCommandsFromNames : ApplicationProcessor {
     BuildCommandsFromNames(ApplicationHandler& application_handler) : ApplicationProcessor(application_handler) {}
-    bool process() override;
+    virtual bool doProcess() override;
     std::vector<std::string> names_;
     std::vector<ApplicationHandler::Command> commands_;
     virtual std::string getName() const override { return "BuildCommandsFromNames"; };

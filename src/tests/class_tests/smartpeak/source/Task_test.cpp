@@ -31,23 +31,23 @@
 
 struct TaskFixture : public ::testing::Test
 {
-    /* ctor/dtor */
-    TaskFixture() 
-    {
-        std::string seq = std::string{SMARTPEAK_GET_TEST_DATA_PATH("SequenceProcessor_sequence.csv")};
-        m_args = std::vector<std::string>{
-            "Task_test", 
-                "--report", "featureDB", "pivottable",
-                "--report-metadata", "PeAk_aRea", "Mz", "rt",
-                "--report-sample-types", "stanDard", "Unknown", "double blank",
-                "--load-session", seq,
-                "--verbose",
-                "--allow-inconsistent",
-                "--log-dir", ".",
-                "--integrity", "SAMPLE", "is",
-                "--disable-colors"
-        };
-    }
+  /* ctor/dtor */
+  TaskFixture()
+  {
+    std::string seq = std::string{SMARTPEAK_GET_TEST_DATA_PATH("SequenceProcessor_sequence.csv")};
+    m_args = std::vector<std::string>{
+        "Task_test",
+            "--report", "featureDB", "pivottable",
+            "--report-metadata", "PeAk_aRea", "Mz", "rt",
+            "--report-sample-types", "stanDard", "Unknown", "double blank",
+            "--load-session", seq,
+            "--verbose",
+            "--allow-inconsistent",
+            "--log-dir", ".",
+            "--integrity", "SAMPLE", "is",
+            "--disable-colors"
+    };
+  }
 
 public:
     std::vector<std::string> m_args;
@@ -57,56 +57,54 @@ public:
 
 TEST_F(TaskFixture, Task_InitializeApplicationSettings)
 {
-    namespace cli = SmartPeak::cli;
-    {
-        auto pa = cli::Parser{m_args};
-        auto as = cli::ApplicationSettings{pa};
-        auto am = cli::ApplicationManager{as};
-        auto task = cli::InitializeApplicationSettings{};
-        EXPECT_TRUE(task(am));
-    }
-    {
-        auto argv = m_args;
-        argv[2] = "wrongvalue";
-        auto pa = cli::Parser{argv};
-        auto as = cli::ApplicationSettings{pa};
-        auto am = cli::ApplicationManager{as};
-        auto task = cli::InitializeApplicationSettings{};
-        EXPECT_NO_THROW(task(am));
-    }
-    {
-        auto argv = m_args;
-        argv[2] = "wrongvalue";
-        auto pa = cli::Parser{argv};
-        auto as = cli::ApplicationSettings{pa};
-        auto am = cli::ApplicationManager{as};
-        auto task = cli::InitializeApplicationSettings{};
-        EXPECT_TRUE(!task(am));
-    }
+  namespace cli = SmartPeak::cli;
+  {
+    auto pa = cli::Parser{m_args};
+    auto as = cli::ApplicationSettings{pa};
+    auto am = cli::ApplicationManager{as};
+    auto task = cli::InitializeApplicationSettings{};
+    EXPECT_TRUE(task(am));
+  }
+  {
+    auto argv = m_args;
+    argv[2] = "wrongvalue";
+    auto pa = cli::Parser{argv};
+    auto as = cli::ApplicationSettings{pa};
+    auto am = cli::ApplicationManager{as};
+    auto task = cli::InitializeApplicationSettings{};
+    EXPECT_NO_THROW(task(am));
+  }
+  {
+    auto argv = m_args;
+    argv[2] = "wrongvalue";
+    auto pa = cli::Parser{argv};
+    auto as = cli::ApplicationSettings{pa};
+    auto am = cli::ApplicationManager{as};
+    auto task = cli::InitializeApplicationSettings{};
+    EXPECT_TRUE(!task(am));
+  }
 }
 
 TEST_F(TaskFixture, Task_InitializeLogger)
 {
-    namespace cli = SmartPeak::cli;
-    {
-        auto pa = cli::Parser{m_args};
-        auto as = cli::ApplicationSettings{pa};
-        auto am = cli::ApplicationManager{as};
-        auto task = cli::InitializeLogger{};
-        // Can't init twice:
-        EXPECT_TRUE(task(am));
-        EXPECT_TRUE(!task(am));
-    }
+  namespace cli = SmartPeak::cli;
+  {
+    auto pa = cli::Parser{m_args};
+    auto as = cli::ApplicationSettings{pa};
+    auto am = cli::ApplicationManager{as};
+    auto task = cli::InitializeLogger{};
+    EXPECT_TRUE(task(am));
+  }
 }
 
 TEST_F(TaskFixture, Task_LoadSession)
 {
-    namespace cli = SmartPeak::cli;
-    auto pa = cli::Parser{m_args};
-    auto as = cli::ApplicationSettings{pa};
-    auto am = cli::ApplicationManager{as};
-    auto task = cli::LoadSession{};
-    EXPECT_TRUE(!task(am));
+  namespace cli = SmartPeak::cli;
+  auto pa = cli::Parser{m_args};
+  auto as = cli::ApplicationSettings{pa};
+  auto am = cli::ApplicationManager{as};
+  auto task = cli::LoadSession{};
+  EXPECT_TRUE(!task(am));
 }
 
 TEST(Task, Task_options_change_input_file)
@@ -114,13 +112,13 @@ TEST(Task, Task_options_change_input_file)
   namespace cli = SmartPeak::cli;
   std::string seq = std::string{ SMARTPEAK_GET_TEST_DATA_PATH("workflow_csv_files") };
   std::vector<std::string> args = std::vector<std::string>{
-      "Task_test",
-          "--load-session", seq,
-          "--verbose",
-          "--allow-inconsistent",
-          "--log-dir", ".",
-          "--disable-colors",
-          "--input-file", std::string("parameters=\"") + SMARTPEAK_GET_TEST_DATA_PATH("parameters_n_thread_42.csv") + std::string("\"")
+    "Task_test",
+        "--load-session", seq,
+        "--verbose",
+        "--allow-inconsistent",
+        "--log-dir", ".",
+        "--disable-colors",
+        "--input-file", std::string("parameters=\"") + SMARTPEAK_GET_TEST_DATA_PATH("parameters_n_thread_42.csv") + std::string("\"")
   };
   auto pa = cli::Parser{ args };
   auto as = cli::ApplicationSettings{ pa };
@@ -169,7 +167,8 @@ TEST(Task, Task_options_change_parameter)
           "--allow-inconsistent",
           "--log-dir", ".",
           "--disable-colors",
-          "--parameter", "SequenceProcessor:n_thread=42"
+          "--workflow", "PICK_MRM_FEATURES",
+          "--parameter", "MRMFeatureFinderScoring:add_up_spectra=42"
   };
   auto pa = cli::Parser{ args };
   auto as = cli::ApplicationSettings{ pa };
@@ -180,7 +179,7 @@ TEST(Task, Task_options_change_parameter)
   EXPECT_TRUE(ls(am));
   ASSERT_GT(am.get_application_handler().sequenceHandler_.getSequence().size(), 0);
   auto parameters = am.get_application_handler().sequenceHandler_.getSequence().at(0).getRawData().getParameters();
-  auto parameter = parameters.findParameter("SequenceProcessor", "n_thread");
+  auto parameter = parameters.findParameter("MRMFeatureFinderScoring", "add_up_spectra");
   ASSERT_NE(parameter, nullptr);
   ASSERT_EQ(parameter->getValueAsString(), "42");
 }
@@ -190,13 +189,13 @@ TEST(Task, Task_options_invalid_parameter)
   namespace cli = SmartPeak::cli;
   std::string seq = std::string{ SMARTPEAK_GET_TEST_DATA_PATH("workflow_csv_files") };
   std::vector<std::string> args = std::vector<std::string>{
-      "Task_test",
-          "--load-session", seq,
-          "--verbose",
-          "--allow-inconsistent",
-          "--log-dir", ".",
-          "--disable-colors",
-          "--parameter", "NonExistingFunction:NonExistingPrameter=\"my_value\""
+    "Task_test",
+        "--load-session", seq,
+        "--verbose",
+        "--allow-inconsistent",
+        "--log-dir", ".",
+        "--disable-colors",
+        "--parameter", "NonExistingFunction:NonExistingPrameter=\"my_value\""
   };
   auto pa = cli::Parser{ args };
   auto as = cli::ApplicationSettings{ pa };
@@ -214,19 +213,18 @@ TEST(Task, Task_options_change_output_dirs)
   auto feature_output_dir = SmartPeak::Utilities::createEmptyTempDirectory();
   auto report_output_dir = SmartPeak::Utilities::createEmptyTempDirectory();
   std::vector<std::string> args = std::vector<std::string>{
-      "Task_test",
-          "--load-session", seq,
-          "--verbose",
-          "--allow-inconsistent",
-          "--log-dir", ".",
-          "--disable-colors",
-          "--workflow", "LOAD_FEATURES", "STORE_FEATURES",
-          "-no-pg",
-          "-o", feature_output_dir.generic_string(),
-          "--reports-out-dir", report_output_dir.generic_string(),
-          "--report", "featuredb",
-          "--report-metadata", "peak_area", "logSN", "RT",
-          "--parameter", "SequenceProcessor:n_thread=1"
+    "Task_test",
+        "--load-session", seq,
+        "--verbose",
+        "--allow-inconsistent",
+        "--log-dir", ".",
+        "--disable-colors",
+        "--workflow", "LOAD_FEATURES", "STORE_FEATURES",
+        "-no-pg",
+        "-o", feature_output_dir.generic_string(),
+        "--reports-out-dir", report_output_dir.generic_string(),
+        "--report", "featuredb",
+        "--report-metadata", "peak_area", "logSN", "RT"
   };
   auto pa = cli::Parser{ args };
   auto as = cli::ApplicationSettings{ pa };

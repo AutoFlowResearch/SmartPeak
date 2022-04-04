@@ -33,6 +33,120 @@
 
 namespace SmartPeak
 {
+
+  struct Canvas
+  {
+    virtual ImVec2 getScreenPosition();
+    virtual ImVec2 getSize();
+    virtual float getWidth() { return 0; };
+    virtual float getHeight() { return 0; };
+    virtual bool isMouseIn();
+
+    std::weak_ptr<Canvas> parent_;
+    ImVec2 pos_;
+  };
+
+  struct WorfklowStepNodeIO : Canvas
+  {
+    ImVec2 getInputLinkScreenPosition();
+    ImVec2 getOuputLinkScreenPosition();
+    virtual float getWidth() override;
+    virtual float getHeight() override;
+    virtual void draw(bool enable);
+    std::string text_;
+  };
+
+  struct WorfklowStepNode : public Canvas
+  {
+    virtual ImVec2 getScreenPosition() override;
+    virtual float getWidth() override;
+    virtual float getHeight() override;
+    virtual void draw(bool enable);
+    void layout();
+    
+    virtual std::string getName() const { return ""; };
+    virtual std::string getDescription() const { return ""; };
+    virtual ImU32 getColor(float alpha) const { return IM_COL32(255, 0, 255, alpha); };
+    virtual std::string getType() const { return ""; };
+
+    int width_;
+    ImVec2 drag_draging_mouse_position_;
+    bool is_dragging_ = false;
+    bool is_mouse_down_ = false;
+    std::vector<WorfklowStepNodeIO> outputs_;
+    std::vector<WorfklowStepNodeIO> inputs_;
+    bool is_close_button_mouse_in_ = false;
+    int node_index_;
+
+  protected:
+    bool isCloseButtonMouseIn();
+    std::tuple<int, int, int, int> getCloseButtonPosition();
+  };
+
+  struct WorfklowStepNodeSession : public WorfklowStepNode
+  {
+    virtual std::string getName() const override;
+    virtual ImU32 getColor(float alpha) const override;
+    virtual std::string getType() const override;
+  };
+
+  struct WorfklowStepNodeCommand : public WorfklowStepNode
+  {
+    virtual std::string getDescription() const override;
+    virtual std::string getName() const override;
+    virtual ImU32 getColor(float alpha) const override;
+    virtual std::string getType() const override;
+    ApplicationHandler::Command command_;
+  };
+
+  struct WorfklowStepNodePlaceHolder : public WorfklowStepNodeCommand
+  {
+    virtual void draw(bool enable);
+  };
+
+  struct WorfklowStepNodeGraphContainer : public Canvas
+  {
+    virtual ImVec2 getSize() override;
+    std::vector<std::shared_ptr<WorfklowStepNode>> to_display_;
+    void draw(bool enable);
+    void layout();
+    std::string type_;
+  protected:
+    std::string getHeaderText() const;
+  };
+
+  struct WorfklowStepNodeGraph
+  {
+    WorfklowStepNodeGraph(ApplicationHandler& application_handler, WorkflowManager& workflow_manager)
+      : application_handler_(application_handler),
+       workflow_manager_(workflow_manager),
+       buildCommandsFromNames_(application_handler)
+    {
+      place_holder_ = std::make_shared< WorfklowStepNodePlaceHolder>();
+    };
+    std::vector<std::shared_ptr<WorfklowStepNode>> nodes;
+    void draw();
+  
+  protected:
+    virtual void updatecommands();
+    void createContainers();
+    void layout();
+    void setupCurrentSessionNode();
+
+  protected:
+    std::shared_ptr<WorfklowStepNode> current_session_node_;
+    std::vector<std::shared_ptr<WorfklowStepNode>> to_display_;
+    std::vector<std::shared_ptr<WorfklowStepNodeGraphContainer>> containers_;
+    std::shared_ptr<WorfklowStepNodeCommand> dragging_node_;
+    int place_holder_node_index_ = 0;
+    std::shared_ptr<WorfklowStepNodePlaceHolder> place_holder_;
+    WorkflowManager& workflow_manager_;
+    ApplicationHandler& application_handler_;
+    BuildCommandsFromNames buildCommandsFromNames_;
+    bool error_building_commands_ = false;
+    bool is_graph_hovered_ = false;
+  };
+
   class WorkflowWidget : public Widget
   {
   public:
@@ -42,20 +156,16 @@ namespace SmartPeak
       application_handler_(application_handler),
       workflow_step_widget_(application_handler),
       workflow_manager_(workflow_manager),
-      buildCommandsFromNames_(application_handler)
+      workflow_node_graph_(application_handler, workflow_manager)
     {
     };
 
     void draw() override;
 
   protected:
-    virtual void updatecommands();
-
-  protected:
     ApplicationHandler& application_handler_;
     WorkflowStepWidget workflow_step_widget_;
     WorkflowManager& workflow_manager_;
-    BuildCommandsFromNames buildCommandsFromNames_;
-    bool error_building_commands_ = false;
+    WorfklowStepNodeGraph workflow_node_graph_;
   };
 }

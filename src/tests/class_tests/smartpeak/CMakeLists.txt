@@ -1,4 +1,25 @@
-
+# --------------------------------------------------------------------------
+#   SmartPeak -- Fast and Accurate CE-, GC- and LC-MS(/MS) Data Processing
+# --------------------------------------------------------------------------
+# Copyright The SmartPeak Team -- Novo Nordisk Foundation 
+# Center for Biosustainability, Technical University of Denmark 2018-2022.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL ANY OF THE AUTHORS OR THE CONTRIBUTING
+# INSTITUTIONS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+# EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+# PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+# OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+# OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+# ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+# --------------------------------------------------------------------------
+# $Maintainer: Ahmed Khalil, Bertrand Boudaud $
+# $Authors: Douglas McCloskey $
+# --------------------------------------------------------------------------
 
 cmake_minimum_required(VERSION 3.8.2 FATAL_ERROR)
 project("SmartPeak_class_tests_smartpeak")
@@ -14,33 +35,10 @@ configure_file(${PROJECT_SOURCE_DIR}/include/SmartPeak/test_config.h.in ${CONFIG
 #------------------------------------------------------------------------------
 find_package(OpenMS REQUIRED)
 
-# check whether the OpenMS package was found
-if (OpenMS_FOUND)
-  # check if the variable containing the include directories is defined
-  if(NOT OpenMS_INCLUDE_DIRECTORIES)
-    set(_message "The variable \${OpenMS_INCLUDE_DIRECTORIES} is not defined.")
-    set(_message "${_message}This CMakeLists.txt and your build of OpenMS seem incompatible.")
-    set(_message "${_message}Please use the latest version from the OpenMS release!")
-    message(FATAL_ERROR ${_message})
-  endif()
-  ## include directories for OpenMS headers (and contrib)
-  #       OpenMS_GUI -> ${OpenMS_GUI_INCLUDE_DIRECTORIES}
-  include_directories(${OpenMS_INCLUDE_DIRECTORIES})
-
-  ## append precompiler macros and compiler flags specific to OpenMS
-  ## Warning: this could be harmful to your project. Check this if problems occur.
-  ## Also, use this to add your own compiler flags, e.g. for OpenMP support.
-  ## e.g. for Visual Studio use /openmp
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OPENMS_ADDCXX_FLAGS}")
-
-else(OpenMS_FOUND)
-  message(FATAL_ERROR "OpenMSConfig.cmake file not found!")
-endif(OpenMS_FOUND)
-
 #------------------------------------------------------------------------------
 # OpenMS QT5 dependencies
 #------------------------------------------------------------------------------
-find_package(Qt5 COMPONENTS Core Network REQUIRED)
+find_package(Qt5 COMPONENTS Core Network Sql REQUIRED)
 
 if (NOT Qt5Network_FOUND)
   message(STATUS "[class_tests] : QtNetwork module not found!")
@@ -52,30 +50,14 @@ if (NOT Qt5Core_FOUND)
   message(FATAL_ERROR "To find a custom Qt installation use: cmake <..more options..> -D QT_QMAKE_EXECUTABLE='<path_to_qmake(.exe)' <src-dir>")
 endif()
 
+if (NOT Qt5Sql_FOUND)
+  message(STATUS "[class_tests] : QtSql module not found!")
+  message(FATAL_ERROR "To find a custom Qt installation use: cmake <..more options..> -D QT_QMAKE_EXECUTABLE='<path_to_qmake(.exe)' <src-dir>")
+endif()
+
 #------------------------------------------------------------------------------
 # get the test executables
 include(executables.cmake)
-
-#------------------------------------------------------------------------------
-# googletest
-include(FetchContent)
-FetchContent_Declare(
-  googletest
-  GIT_REPOSITORY https://github.com/google/googletest.git
-  GIT_TAG release-1.10.0
-)
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-FetchContent_MakeAvailable(googletest)
-
-include(FetchContent)
-if(NOT googletest_POPULATED)
-  FetchContent_Populate(googletest)
-  add_subdirectory(
-    ${googletest_SOURCE_DIR}
-    ${googletest_BINARY_DIR}
-  )
-endif()
-include(GoogleTest)
 
 #------------------------------------------------------------------------------
 # Include directories for tests
@@ -107,7 +89,31 @@ endif()
 #------------------------------------------------------------------------------
 find_package(ImPlot COMPONENTS Sources REQUIRED)
 include_directories(${IMPLOT_INCLUDE_DIR})
+
 #------------------------------------------------------------------------------
+# OpenSSL
+#------------------------------------------------------------------------------
+find_package(OpenSSL REQUIRED) 
+if(OpenSSL_FOUND)
+  include_directories(${OPENSSL_INCLUDE_DIR})
+  link_directories(${OPENSSL_LIBRARIES})
+  message(STATUS "[class_tests] : Using OpenSSL ${OPENSSL_VERSION}")
+endif()
+
+#------------------------------------------------------------------------------
+# SQLITE
+#------------------------------------------------------------------------------
+find_path(SQLite3_INCLUDE_DIR NAMES sqlite3.h PATH_SUFFIXES "sqlite")
+find_package(SQLite3 3.15.0 REQUIRED)
+
+#------------------------------------------------------------------------------
+# Find Boost
+#------------------------------------------------------------------------------
+find_package(Boost REQUIRED) 
+if(Boost_FOUND)
+  include_directories(${BOOST_INCLUDE_DIR})
+  link_directories(${BOOST_LIBRARYDIR})
+endif()
 
 #------------------------------------------------------------------------------
 # core
@@ -139,10 +145,10 @@ foreach(_class_test ${TEST_executables})
       OR ${_class_test} STREQUAL "PlotExporter_test"
       OR ${_class_test} STREQUAL "WindowSizesAndPositions_test"
       OR ${_class_test} STREQUAL "UIUtilities_test" ))
-      target_link_libraries(${_class_test} PUBLIC ${SmartPeakWidgets_LIBRARIES} ${SmartPeak_LIBRARIES} OpenMS  ${OPENGL_LIBRARIES} ImGui::ImGui ImPlot::ImPlot 
+      target_link_libraries(${_class_test} PUBLIC ${SmartPeakWidgets_LIBRARIES} ${SmartPeak_LIBRARIES} OpenMS ${SQLite3_LIBRARY} ${OPENGL_LIBRARIES} ImGui::ImGui ImPlot::ImPlot 
       PRIVATE gtest_main gmock_main ImGui::Sources ImPlot::Sources ImGui::SourcesMiscCpp)
   else()
-    target_link_libraries(${_class_test} PUBLIC ${SmartPeak_LIBRARIES} OpenMS PRIVATE gtest_main gmock_main)
+    target_link_libraries(${_class_test} PUBLIC ${SmartPeak_LIBRARIES} OpenMS ${SQLite3_LIBRARY} PRIVATE gtest_main gmock_main)
   endif()
   add_test(${_class_test} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${_class_test})
   # only add OPENMP flags to gcc linker (execpt Mac OS X, due to compiler bug

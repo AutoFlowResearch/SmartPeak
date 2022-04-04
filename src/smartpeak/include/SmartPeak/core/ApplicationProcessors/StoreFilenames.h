@@ -34,7 +34,7 @@ namespace SmartPeak
     explicit StoreFilenames(ApplicationHandler& application_handler) : ApplicationProcessor(application_handler) {}
 
     /* ApplicationProcessor */
-    bool process() override;
+    virtual bool doProcess() override;
 
     /* IProcessorDescription */
     virtual std::string getName() const override { return "STORE_FILENAMES"; }

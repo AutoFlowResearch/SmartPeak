@@ -36,6 +36,10 @@
 
 namespace SmartPeak
 {
+  std::set<std::string> LoadTransitions::getOutputs() const
+  {
+    return { "Targeted Experiment" };
+  }
 
   bool LoadTransitions::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
   {
@@ -72,19 +76,18 @@ namespace SmartPeak
     filenames.addFileName("traML", "${MAIN_DIR}/traML.csv", "Transitions", false, false);
   };
 
-  void LoadTransitions::process(
+  void LoadTransitions::doProcess(
     RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START loadTraML";
     getFilenames(filenames_I);
     // Complete user parameters with schema
     ParameterSet params(params_I);
     params.merge(getParameterSchema());
 
-    if (!InputDataValidation::prepareToLoad(filenames_I, "traML"))
+    if (!InputDataValidation::prepareToLoad(filenames_I, "traML", true))
     {
       throw std::invalid_argument("Failed to load input file");
     }
@@ -131,10 +134,8 @@ namespace SmartPeak
       LOGE << e.what();
       rawDataHandler_IO.getTargetedExperiment().clear(true);
       LOGI << "targeted experiment clear";
-      throw e;
+      throw;
     }
-
-    LOGD << "END loadTraML";
   }
 
 }

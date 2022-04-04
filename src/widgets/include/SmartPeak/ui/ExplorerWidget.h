@@ -92,6 +92,12 @@ namespace SmartPeak
     std::map<int, std::vector<bool>> serialized_checkboxes_;
 
     ImGuiTextFilter filter_;
+
+    /*
+      @brief if checkboxes have been set by another window, we need to reset some internal states
+    */
+    void onCheckboxesChanged();
+
   };
 
 }

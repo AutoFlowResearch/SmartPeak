@@ -39,6 +39,11 @@
 namespace SmartPeak
 {
 
+  std::set<std::string> LoadValidationData::getOutputs() const
+  {
+    return { "Reference Data" };
+  }
+
   void LoadValidationData::getFilenames(Filenames& filenames) const
   {
     filenames.addFileName("referenceData", "${MAIN_DIR}/referenceData.csv", "Reference data", true, true);
@@ -58,15 +63,14 @@ namespace SmartPeak
     return true;
   }
 
-  void LoadValidationData::process(
+  void LoadValidationData::doProcess(
     RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START loadValidationData";
     getFilenames(filenames_I);
-    if (!InputDataValidation::prepareToLoad(filenames_I, "referenceData"))
+    if (!InputDataValidation::prepareToLoad(filenames_I, "referenceData", true))
     {
       throw std::invalid_argument("Failed to load input file");
     }
@@ -187,7 +191,12 @@ namespace SmartPeak
       }
       else
       {
-        io::CSVReader<17, io::trim_chars<>, io::no_quote_escape<','>> in(filenames_I.getFullPath("referenceData").generic_string());
+        auto filename = filenames_I.getFullPath("referenceData").generic_string();
+        if (Utilities::hasBOMMarker(filename))
+        {
+          throw std::invalid_argument("File has wrong encoding. only plain ASCII file is supported");
+        }
+        io::CSVReader<17, io::trim_chars<>, io::no_quote_escape<','>> in(filename);
         in.read_header(
           io::ignore_extra_column,
           s_sample_index,
@@ -263,9 +272,8 @@ namespace SmartPeak
       LOGE << e.what();
       rawDataHandler_IO.getReferenceData().clear();
       LOGI << "RefereceData clear";
-      throw e;
+      throw;
     }
-    LOGD << "END loadValidationData";
   }
 
 }

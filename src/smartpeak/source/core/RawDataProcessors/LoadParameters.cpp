@@ -60,15 +60,14 @@ namespace SmartPeak
     return true;
   }
 
-  void LoadParameters::process(
+  void LoadParameters::doProcess(
     RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START LoadParameters";
     getFilenames(filenames_I);
-    if (!InputDataValidation::prepareToLoad(filenames_I, "parameters"))
+    if (!InputDataValidation::prepareToLoad(filenames_I, "parameters", true))
     {
       throw std::invalid_argument("Failed to load input file");
     }
@@ -117,8 +116,6 @@ namespace SmartPeak
 
     sanitizeParameters(rawDataHandler_IO.getParameters());
     if (parameters_observable_) parameters_observable_->notifyParametersUpdated();
-
-    LOGD << "END LoadParameters";
   }
 
   void LoadParameters::sanitizeParameters(

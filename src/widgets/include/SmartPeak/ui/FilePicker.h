@@ -59,6 +59,8 @@ namespace SmartPeak
     bool fileLoadingIsDone() { return loading_is_done_; };
     bool errorLoadingFile() { return error_loading_file_; };
 
+    static bool use_native_file_picker_;
+
   protected:
     std::array<std::vector<std::string>, 4> pathname_content_;
     std::filesystem::path current_pathname_ = std::filesystem::current_path();

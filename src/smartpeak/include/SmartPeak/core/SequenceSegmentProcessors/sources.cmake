@@ -3,11 +3,11 @@ set(directory include/SmartPeak/core/SequenceSegmentProcessors)
 
 ### list all header files of the directory here
 set(sources_list_h
-	CalculateCalibration.h
 	EstimateFeatureBackgroundInterferences.h
 	EstimateFeatureFilterValues.h
 	EstimateFeatureQCValues.h
 	EstimateFeatureRSDs.h
+	FitCalibration.h
 	LoadFeatureBackgroundEstimations.h
 	LoadFeatureBackgroundFilters.h
 	LoadFeatureBackgroundQCs.h
@@ -18,6 +18,7 @@ set(sources_list_h
 	LoadFeatureRSDQCs.h
 	LoadQuantitationMethods.h
 	LoadStandardsConcentrations.h
+	OptimizeCalibration.h
 	StoreFeatureBackgroundEstimations.h
 	StoreFeatureBackgroundFilters.h
 	StoreFeatureBackgroundQCs.h

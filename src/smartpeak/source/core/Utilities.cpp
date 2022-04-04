@@ -41,6 +41,7 @@
 #include <unordered_set>
 #include <chrono>
 #include <plog/Log.h>
+#include <fstream>
 
 namespace SmartPeak
 {
@@ -250,6 +251,23 @@ namespace SmartPeak
     }
   }
 
+  bool Utilities::isList(const std::string& str, const std::regex& re)
+  {
+    auto items = Utilities::splitString(str, ',');
+    if (items.empty())
+    {
+      return false;
+    }
+    for (const auto& item : items)
+    {
+      if (!std::regex_match(item, re))
+      {
+        return false;
+      }
+    }
+    return true;
+  }
+
   void Utilities::parseString(const std::string& str_I, CastValue& cast)
   {
     std::regex re_integer_number("[+-]?\\d+");
@@ -279,16 +297,13 @@ namespace SmartPeak
           if (c != ' ')
             stripped.push_back(c);
         });
-        const std::regex re_integer_list("[+-]?\\d+(?:,[+-]?\\d+)*");
-        const std::regex re_float_list("[+-]?\\d+(?:\\.\\d+)?(?:,[+-]?\\d+(?:\\.\\d+)?)*");
-        const std::regex re_bool_list("(?:true|false)(?:,(?:true|false))*", std::regex::icase);
-        if (std::regex_match(stripped, re_integer_list)) {
+        if (Utilities::isList(stripped, re_integer_number)) {
           cast = std::vector<int>();
           parseList(stripped, re_integer_number, cast);
-        } else if (std::regex_match(stripped, re_float_list)) {
+        } else if (Utilities::isList(stripped, re_float_number)) {
           cast = std::vector<float>();
           parseList(stripped, re_float_number, cast);
-        } else if (std::regex_match(stripped, re_bool_list)) {
+        } else if (Utilities::isList(stripped, re_bool)) {
           cast = std::vector<bool>();
           parseList(stripped, re_bool, cast);
         } else {
@@ -805,6 +820,26 @@ namespace SmartPeak
     return tmp_dir_path;
   }
 
+  std::string Utilities::replaceAll(const std::string& str, const std::string search, const std::string& replace)
+  {
+    std::string result = str;
+    size_t pos = 0;
+    while (true)
+    {
+      pos = result.find(search, pos);
+      if (pos != std::string::npos)
+      {
+        result.replace(pos, search.length(), replace);
+        pos += replace.length();
+      }
+      else
+      {
+        break;
+      }
+    }
+    return result;
+  }
+
   void Utilities::prepareFileParameter(
     ParameterSet& parameter_set,
     const std::string& function_parameter,
@@ -878,6 +913,141 @@ namespace SmartPeak
     }
     os << "]";
     parameter->setValueFromString(os.str());
+  }
+
+  std::string Utilities::getCurrentTime()
+  {
+    const std::time_t current_time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+    char time_str[64]; strftime(time_str, 64, "%H-%M-%S_%d-%m-%Y", std::localtime(&current_time));
+    return std::string(time_str);
+  }
+
+  std::string Utilities::sha256(const std::string str)
+  {
+    unsigned char hash[SHA256_DIGEST_LENGTH];
+    SHA256_CTX sha256;
+    SHA256_Init(&sha256);
+    SHA256_Update(&sha256, str.c_str(), str.size());
+    SHA256_Final(hash, &sha256);
+    std::stringstream ss;
+    for (int i = 0; i < SHA256_DIGEST_LENGTH; i++)
+    {
+      ss << std::hex << std::setw(2) << std::setfill('0') << (int)hash[i];
+    }
+    return ss.str();
+  }
+
+  void Utilities::createServerSessionFile(std::filesystem::path file_path)
+  {
+    if (!std::filesystem::exists(file_path / ".serversession.ssi")) {
+      std::ofstream serversession_file(file_path / ".serversession.ssi");
+      serversession_file << "usr_id,dataset_name,workflow_status,started_at,finished_at,path_to_exports,log_file" << std::endl;
+      serversession_file.close();
+    }
+  }
+
+  void Utilities::writeToServerSessionFile(std::filesystem::path file_path,
+                                           std::string usr_id, std::string dataset_name, std::string workflow_status,
+                                           std::string started_at, std::string finished_at, std::string path_to_exports,
+                                           std::string log_file)
+  {
+    Utilities::createServerSessionFile(file_path);
+    std::ofstream serversession_file;
+    serversession_file.open(file_path / ".serversession.ssi", std::ios_base::app);
+    serversession_file  << usr_id << "," << dataset_name << "," << workflow_status << ","
+    << started_at << "," << finished_at << "," << path_to_exports << "," << log_file << std::endl;
+    serversession_file.close();
+    
+  }
+
+  bool Utilities::checkLastServerWorkflowRun(std::filesystem::path file_path, std::string& username)
+  {
+    bool load_last_run = false;
+    const auto serversession_file_path = file_path / ".serversession.ssi";
+    if (std::filesystem::exists(serversession_file_path))
+    {
+      io::CSVReader<7, io::trim_chars<' ','\t'>, io::no_quote_escape<','>, io::no_comment> serversession(serversession_file_path.string());
+      
+      serversession.read_header(io::ignore_extra_column,
+                                "usr_id","dataset_name","workflow_status",
+                                "started_at","finished_at","path_to_exports","log_file");
+      
+      std::string usr_id; std::string dataset_name; std::string workflow_status;
+      std::string started_at; std::string finished_at; std::string path_to_exports; std::string log_file;
+      while (serversession.read_row(usr_id, dataset_name, workflow_status, started_at, finished_at, path_to_exports, log_file))
+      {
+        if (username == usr_id && workflow_status == "YES") {
+          LOGI  << "Loading workflow processed for : " << usr_id
+                << ", started : " << started_at << ", finished : " << finished_at << std::endl;
+          return true;
+        }
+      }
+    }
+    return load_last_run;
+  }
+
+  void Utilities::loadRawDataAndFeatures(ApplicationHandler& application_handler, SessionHandler& session_handler,
+                              WorkflowManager& workflow_manager, EventDispatcher& event_dispatcher)
+  {
+    BuildCommandsFromNames buildCommandsFromNames(application_handler);
+    buildCommandsFromNames.names_ = {"LOAD_RAW_DATA","LOAD_FEATURES","MAP_CHROMATOGRAMS"};
+    if (!buildCommandsFromNames.process()) {
+      LOGE << "Failed to create Commands, aborting.";
+    } else {
+      for (auto& cmd : buildCommandsFromNames.commands_) {
+        for (auto& p : cmd.dynamic_filenames) {
+          p.second.setTagValue(Filenames::Tag::MAIN_DIR, application_handler.main_dir_.generic_string());
+          p.second.setTagValue(Filenames::Tag::MZML_INPUT_PATH, application_handler.filenames_.getTagValue(Filenames::Tag::MZML_INPUT_PATH));
+          p.second.setTagValue(Filenames::Tag::FEATURES_INPUT_PATH, application_handler.filenames_.getTagValue(Filenames::Tag::FEATURES_INPUT_PATH));
+          p.second.setTagValue(Filenames::Tag::FEATURES_OUTPUT_PATH, application_handler.filenames_.getTagValue(Filenames::Tag::FEATURES_OUTPUT_PATH));
+        }
+      }
+      const std::set<std::string> injection_names = session_handler.getSelectInjectionNamesWorkflow(application_handler.sequenceHandler_);
+      const std::set<std::string> sequence_segment_names = session_handler.getSelectSequenceSegmentNamesWorkflow(application_handler.sequenceHandler_);
+      const std::set<std::string> sample_group_names = session_handler.getSelectSampleGroupNamesWorkflow(application_handler.sequenceHandler_);
+      
+      workflow_manager.addWorkflow(
+        application_handler,
+        injection_names,
+        sequence_segment_names,
+        sample_group_names,
+        buildCommandsFromNames.commands_,
+        1,
+        &event_dispatcher,
+        &event_dispatcher,
+        &event_dispatcher,
+        &event_dispatcher);
+    }
+  }
+
+  bool Utilities::hasBOMMarker(const std::filesystem::path& filename)
+  {
+    char buffer[4] = {0};
+    std::ifstream myFile(filename.generic_string().c_str(), std::ios::in | std::ios::binary);
+    if (!myFile || !myFile.read(buffer, 4)) {
+      return false;
+    }
+    if ((buffer[0] == '\xFF') && (buffer[1] == '\xFE'))
+    {
+      // UTF-16 LE or UTF-32 LE
+      return true;
+    }
+    else if ((buffer[0] == '\xFE') && (buffer[1] == '\xFF'))
+    {
+      // UTF-16 BE
+      return true;
+    }
+    else if ((buffer[0] == '\xEF') && (buffer[1] == '\xBB') && (buffer[2] == '\xBF'))
+    {
+      // UTF-8 
+      return true;
+    }
+    else if ((buffer[0] == '\x00') && (buffer[1] == '\x00') && (buffer[2] == '\xFE') && (buffer[3] == '\xFF'))
+    {
+      // UTF-32 BE
+      return true;
+    }
+    return false;
   }
 
 }

@@ -37,6 +37,16 @@
 namespace SmartPeak
 {
 
+  std::set<std::string> StoreFeatureRSDEstimations::getInputs() const
+  {
+    return { "Feature RSD Estimations" };
+  }
+
+  std::set<std::string> StoreFeatureRSDEstimations::getOutputs() const
+  {
+    return { };
+  }
+
   bool StoreFeatureRSDEstimations::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
   {
     Filenames filenames;
@@ -85,14 +95,13 @@ namespace SmartPeak
     }
   };
 
-  void StoreFeatureRSDEstimations::process(
+  void StoreFeatureRSDEstimations::doProcess(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    LOGD << "START storeFeatureRSDEstimation";
     getFilenames(filenames_I);
     FeatureFiltersUtils::storeFeatureFilters(
       "featureRSDEstimationComponents",
@@ -100,7 +109,6 @@ namespace SmartPeak
       filenames_I,
       sequenceSegmentHandler_IO.getFeatureRSDEstimations(),
       feature_filter_mode_);
-    LOGD << "END storeFeatureRSDEstimation";
   }
 
 }

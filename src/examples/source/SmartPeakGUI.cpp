@@ -41,6 +41,7 @@
 #include <SmartPeak/ui/ChromatogramTICPlotWidget.h>
 #include <SmartPeak/ui/ChromatogramXICPlotWidget.h>
 #include <SmartPeak/ui/SpectraPlotWidget.h>
+#include <SmartPeak/ui/OptionsWidget.h>
 #include <SmartPeak/ui/SpectraMSMSPlotWidget.h>
 #include <SmartPeak/ui/ParametersTableWidget.h>
 #include <SmartPeak/ui/Report.h>
@@ -80,10 +81,12 @@
 #include <backends/imgui_impl_sdl.h>
 #include <backends/imgui_impl_opengl2.h>
 #include <misc/cpp/imgui_stdlib.h>
+#include "service/services.hpp"
 
 using namespace SmartPeak;
 
 bool SmartPeak::enable_quick_help = true;
+bool SmartPeak::run_on_server = false;
 
 void initializeDataDirs(ApplicationHandler& state);
 
@@ -104,14 +107,17 @@ int main(int argc, char** argv)
   // to disable buttons, display info, and update the session cache
   bool workflow_is_done_ = true;
   bool file_loading_is_done_ = true;
-  bool exceeding_plot_points_ = false;
   bool exceeding_table_size_ = false;
   bool ran_integrity_check_ = false;
   bool integrity_check_failed_ = false;
+  bool RawDataAndFeatures_loaded_ = false;
+  bool run_remote_workflow_ = true;
   ApplicationHandler application_handler_;
   SessionHandler session_handler_;
   WorkflowManager workflow_manager_;
   GuiAppender appender_;
+  WorkflowClient workflow_client_;
+  std::future<std::string> runworkflow_future_;
   SplitWindow split_window;
   LayoutLoader layout_loader(application_handler_);
 
@@ -139,6 +145,7 @@ int main(int argc, char** argv)
     event_dispatcher,
     event_dispatcher);
   auto about_widget_ = std::make_shared<AboutWidget>();
+  auto options_widget_ = std::make_shared<OptionsWidget>();
   auto report_ = std::make_shared<Report>(application_handler_);
 
   auto load_session_wizard_ = std::make_shared<LoadSessionWizard>(
@@ -171,8 +178,14 @@ int main(int argc, char** argv)
   auto heatmap_plot_widget_ = std::make_shared<Heatmap2DWidget>(session_handler_, application_handler_, "Heatmap Main Window", "Features (heatmap)", event_dispatcher);
   auto spectra_plot_widget_ = std::make_shared<SpectraPlotWidget>(session_handler_, application_handler_, "Spectra Main Window", "Spectra", event_dispatcher);
   auto feature_line_plot_ = std::make_shared<LinePlot2DWidget>("Features (line)");
-  auto calibrators_line_plot_ = std::make_shared<CalibratorsPlotWidget>("Calibrators");
   auto injections_explorer_window_ = std::make_shared<ExplorerWidget>("InjectionsExplorerWindow", "Injections", &event_dispatcher);
+  auto calibrators_line_plot_ = std::make_shared<CalibratorsPlotWidget>(
+    session_handler_, 
+    application_handler_.sequenceHandler_, 
+    injections_explorer_window_, 
+    chromatogram_plot_widget_,
+    event_dispatcher,
+    "Calibrators");
   auto transitions_explorer_window_ = std::make_shared<ExplorerWidget>("TransitionsExplorerWindow", "Transitions", &event_dispatcher);
   auto features_explorer_window_ = std::make_shared<ExplorerWidget>("FeaturesExplorerWindow", "Features", &event_dispatcher);
   auto spectrum_explorer_window_ = std::make_shared<ExplorerWidget>("SpectrumExplorerWindow", "Scans", &event_dispatcher);
@@ -301,6 +314,7 @@ int main(int argc, char** argv)
       session_files_widget_modify_,
       create_session_widget_,
       run_workflow_widget_,
+      options_widget_,
       about_widget_,
       report_,
       load_session_wizard_->set_input_output_widget
@@ -375,10 +389,12 @@ int main(int argc, char** argv)
   SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
-  SDL_DisplayMode current;
-  SDL_GetCurrentDisplayMode(0, &current);
+  SDL_DisplayMode display_mode;
+  SDL_GetCurrentDisplayMode(0, &display_mode);
+  auto starting_window_width = display_mode.w * 0.75;
+  auto starting_window_height = display_mode.h * 0.75;
   SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
-  SDL_Window* window = SDL_CreateWindow(getMainWindowTitle(application_handler_).c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, window_flags);
+  SDL_Window* window = SDL_CreateWindow(getMainWindowTitle(application_handler_).c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, starting_window_width, starting_window_height, window_flags);
   SDL_GLContext gl_context = SDL_GL_CreateContext(window);
   SDL_GL_SetSwapInterval(1); // Enable vsync
 
@@ -387,6 +403,7 @@ int main(int argc, char** argv)
   ImGui::CreateContext();
   ImGuiIO& io = ImGui::GetIO(); (void)io;
   ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+  ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
   //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
 
   // Setup Dear ImGui style
@@ -410,6 +427,8 @@ int main(int argc, char** argv)
       ImGui_ImplSDL2_ProcessEvent(&event);
       if (event.type == SDL_QUIT)
         done = true;
+      if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(window))
+        done = true;
     }
 
     // Start the Dear ImGui frame
@@ -432,7 +451,6 @@ int main(int argc, char** argv)
 
     // Make the quick info text
     quickInfoText_->clearErrorMessages();
-    if (exceeding_plot_points_) quickInfoText_->addErrorMessage("Plot rendering limit reached.  Not plotting all selected data.");
     if (exceeding_table_size_) quickInfoText_->addErrorMessage("Table rendering limit reached.  Not showing all selected data.");
     if (ran_integrity_check_ && integrity_check_failed_) quickInfoText_->addErrorMessage("Integrity check failed.  Check the `Information` log.");
     if (ran_integrity_check_ && !integrity_check_failed_) quickInfoText_->addErrorMessage("Integrity check passed.");
@@ -444,7 +462,10 @@ int main(int argc, char** argv)
     {
       if (popup->visible_)
       {
-        ImGui::OpenPopup(popup->title_.c_str());
+        if (!ImGui::IsPopupOpen(popup->title_.c_str()))
+        {
+          ImGui::OpenPopup(popup->title_.c_str());
+        }
         popup->draw();
       }
     }
@@ -490,35 +511,36 @@ int main(int argc, char** argv)
         }
         if (ImGui::BeginMenu("Export File"))
         {
-          static std::vector<std::shared_ptr<IFilenamesHandler>> export_processors =
+          // List of tuple: IFilenamesHandler, and a boolean (true for file selection, false for directory selection)
+          static std::vector<std::tuple<std::shared_ptr<IFilenamesHandler>, bool>> export_processors =
           {
-            std::make_shared<StoreSequence>(application_handler_.sequenceHandler_),
-            std::make_shared<StoreSequenceFileAnalyst>(),
-            std::make_shared<StoreSequenceFileMasshunter>(),
-            std::make_shared<StoreSequenceFileXcalibur>(),
-            std::make_shared<StoreParameters>(),
-            std::make_shared<StoreWorkflow>(application_handler_.sequenceHandler_),
-            std::make_shared<StoreValidationData>(),
-            std::make_shared<StoreStandardsConcentrations>(),
-            std::make_shared<StoreQuantitationMethods>(),
-            std::make_shared<StoreFeatureFilters>(FeatureFiltersUtilsMode::EFeatureFiltersModeComponent, true),
-            std::make_shared<StoreFeatureFilters>(FeatureFiltersUtilsMode::EFeatureFiltersModeGroup, true),
-            std::make_shared<StoreFeatureQCs>(FeatureFiltersUtilsMode::EFeatureFiltersModeComponent, true),
-            std::make_shared<StoreFeatureQCs>(FeatureFiltersUtilsMode::EFeatureFiltersModeGroup, true),
-            std::make_shared<StoreFeatureRSDFilters>(FeatureFiltersUtilsMode::EFeatureFiltersModeComponent, true),
-            std::make_shared<StoreFeatureRSDFilters>(FeatureFiltersUtilsMode::EFeatureFiltersModeGroup, true),
-            std::make_shared<StoreFeatureRSDQCs>(FeatureFiltersUtilsMode::EFeatureFiltersModeComponent, true),
-            std::make_shared<StoreFeatureRSDQCs>(FeatureFiltersUtilsMode::EFeatureFiltersModeGroup, true),
-            std::make_shared<StoreFeatureBackgroundFilters>(FeatureFiltersUtilsMode::EFeatureFiltersModeComponent, true),
-            std::make_shared<StoreFeatureBackgroundFilters>(FeatureFiltersUtilsMode::EFeatureFiltersModeGroup, true),
-            std::make_shared<StoreFeatureBackgroundQCs>(FeatureFiltersUtilsMode::EFeatureFiltersModeComponent, true),
-            std::make_shared<StoreFeatureBackgroundQCs>(FeatureFiltersUtilsMode::EFeatureFiltersModeGroup, true),
-            std::make_shared<StoreFeatureRSDEstimations>(FeatureFiltersUtilsMode::EFeatureFiltersModeComponent, true),
-            std::make_shared<StoreFeatureRSDEstimations>(FeatureFiltersUtilsMode::EFeatureFiltersModeGroup, true),
-            std::make_shared<StoreFeatureBackgroundEstimations>(FeatureFiltersUtilsMode::EFeatureFiltersModeComponent, true),
-            std::make_shared<StoreFeatureBackgroundEstimations>(FeatureFiltersUtilsMode::EFeatureFiltersModeGroup, true)
+            {std::make_shared<StoreSequence>(application_handler_.sequenceHandler_), true},
+            {std::make_shared<StoreSequenceFileAnalyst>(), true},
+            {std::make_shared<StoreSequenceFileMasshunter>(), true},
+            {std::make_shared<StoreSequenceFileXcalibur>(), true},
+            {std::make_shared<StoreParameters>(), true},
+            {std::make_shared<StoreWorkflow>(application_handler_.sequenceHandler_), true},
+            {std::make_shared<StoreValidationData>(), true},
+            // {std::make_shared<StoreStandardsConcentrations>(), true}, // not implemented
+            {std::make_shared<StoreQuantitationMethods>(true), false},
+            {std::make_shared<StoreFeatureFilters>(FeatureFiltersUtilsMode::EFeatureFiltersModeComponent, true), true},
+            {std::make_shared<StoreFeatureFilters>(FeatureFiltersUtilsMode::EFeatureFiltersModeGroup, true), true},
+            {std::make_shared<StoreFeatureQCs>(FeatureFiltersUtilsMode::EFeatureFiltersModeComponent, true), true},
+            {std::make_shared<StoreFeatureQCs>(FeatureFiltersUtilsMode::EFeatureFiltersModeGroup, true), true},
+            {std::make_shared<StoreFeatureRSDFilters>(FeatureFiltersUtilsMode::EFeatureFiltersModeComponent, true), true},
+            {std::make_shared<StoreFeatureRSDFilters>(FeatureFiltersUtilsMode::EFeatureFiltersModeGroup, true), true},
+            {std::make_shared<StoreFeatureRSDQCs>(FeatureFiltersUtilsMode::EFeatureFiltersModeComponent, true), true},
+            {std::make_shared<StoreFeatureRSDQCs>(FeatureFiltersUtilsMode::EFeatureFiltersModeGroup, true), true},
+            {std::make_shared<StoreFeatureBackgroundFilters>(FeatureFiltersUtilsMode::EFeatureFiltersModeComponent, true), true},
+            {std::make_shared<StoreFeatureBackgroundFilters>(FeatureFiltersUtilsMode::EFeatureFiltersModeGroup, true), true},
+            {std::make_shared<StoreFeatureBackgroundQCs>(FeatureFiltersUtilsMode::EFeatureFiltersModeComponent, true), true},
+            {std::make_shared<StoreFeatureBackgroundQCs>(FeatureFiltersUtilsMode::EFeatureFiltersModeGroup, true), true},
+            {std::make_shared<StoreFeatureRSDEstimations>(FeatureFiltersUtilsMode::EFeatureFiltersModeComponent, true), true},
+            {std::make_shared<StoreFeatureRSDEstimations>(FeatureFiltersUtilsMode::EFeatureFiltersModeGroup, true), true},
+            {std::make_shared<StoreFeatureBackgroundEstimations>(FeatureFiltersUtilsMode::EFeatureFiltersModeComponent, true), true},
+            {std::make_shared<StoreFeatureBackgroundEstimations>(FeatureFiltersUtilsMode::EFeatureFiltersModeGroup, true), true}
           };
-          for (const auto& export_processor : export_processors)
+          for (const auto& [export_processor, export_as_file] : export_processors)
           {
             Filenames filenames;
             export_processor->getFilenames(filenames);
@@ -527,20 +549,24 @@ int main(int argc, char** argv)
               auto file_picker_handler = std::dynamic_pointer_cast<IFilePickerHandler>(export_processor);
               if (file_picker_handler)
               {
+                FilePicker::Mode file_picker_mode = export_as_file ? FilePicker::Mode::EFileCreate : FilePicker::Mode::EDirectory;
                 if (ImGui::MenuItem(filenames.getDescription(file_id).c_str(), NULL, false, workflow_is_done_))
                 {
-                  file_picker_->open(filenames.getDescription(file_id),
+                  file_picker_->open(std::string("Export ") + filenames.getDescription(file_id),
                     file_picker_handler,
-                    FilePicker::Mode::EFileCreate,
+                    file_picker_mode,
                     application_handler_,
                     filenames.getFullPath(file_id).filename().generic_string()
                   );
-                  file_picker_->visible_ = true;
                 }
               }
             }
           }
           ImGui::EndMenu();
+        }
+        ImGui::Separator();
+        if (ImGui::MenuItem("Exit")) {
+          done = true;
         }
         ImGui::EndMenu();
         showQuickHelpToolTip("export_file");
@@ -642,6 +668,15 @@ int main(int argc, char** argv)
         }
         showQuickHelpToolTip("run_workflow");
         
+        if (ImGui::MenuItem("Cancel Workflow"))
+        {
+          if (run_on_server) {
+            if (workflow_client_.isChannelSet()) {
+              workflow_client_.stopRunningWorkflow();
+            }
+          }
+        }
+        
         if (ImGui::BeginMenu("Integrity checks"))
         {
           if (ImGui::MenuItem("Sample consistency")) {
@@ -677,7 +712,14 @@ int main(int argc, char** argv)
         if (ImGui::MenuItem("Reset Window Layout"))
         {
           split_window.reset_layout_ = true;
+          calibrators_line_plot_->reset_layout_ = true;
         }
+        ImGui::EndMenu();
+      }
+
+      if (ImGui::BeginMenu("Tools"))
+      {
+        ImGui::MenuItem("Options", NULL, &options_widget_->visible_);
         ImGui::EndMenu();
       }
 
@@ -694,7 +736,47 @@ int main(int argc, char** argv)
       
       ImGui::EndMainMenuBar();
     }
+      
+    // ======================================
+    // Server-Side Execution
+    // ======================================
+      if (run_workflow_widget_->server_fields_set)
+      {
+        if (run_workflow_widget_->run_remote_workflow)
+        {
+          workflow_client_.setChannel(grpc::CreateChannel(
+            run_workflow_widget_->server_url,
+            grpc::InsecureChannelCredentials()));
 
+          runworkflow_future_ = std::async(
+            std::launch::async,
+            &WorkflowClient::runWorkflow,
+            &workflow_client_,
+            application_handler_.filenames_.getTagValue(Filenames::Tag::MAIN_DIR),
+            run_workflow_widget_->username,
+            Utilities::sha256(run_workflow_widget_->password)
+          );
+        }
+        
+        run_workflow_widget_->server_fields_set = false;
+        RawDataAndFeatures_loaded_ = false;
+      }
+      
+      if (run_workflow_widget_->run_remote_workflow)
+      {
+        if (runworkflow_future_.valid())
+        {
+          workflow_client_.getEvent(
+            &event_dispatcher, &event_dispatcher, &event_dispatcher,
+            &event_dispatcher, &event_dispatcher, &event_dispatcher);
+          workflow_client_.getLogstream();
+          
+          ::serv::processRemoteWorkflow(
+            runworkflow_future_, run_workflow_widget_->username,
+            application_handler_, session_handler_, workflow_manager_,
+            event_dispatcher, RawDataAndFeatures_loaded_);
+        }
+      }
     // ======================================
     // Data updates
     //
@@ -804,17 +886,6 @@ int main(int argc, char** argv)
       spectrum_explorer_window_->checkbox_columns_ = &session_handler_.spectrum_explorer_data.checkbox_body;
     }
 
-    // calibrators
-    if (calibrators_line_plot_->visible_)
-    {
-      exceeding_plot_points_ = !session_handler_.setCalibratorsScatterLinePlot(application_handler_.sequenceHandler_);
-      calibrators_line_plot_->setValues(&session_handler_.calibrators_conc_fit_data, &session_handler_.calibrators_feature_fit_data,
-        &session_handler_.calibrators_conc_raw_data, &session_handler_.calibrators_feature_raw_data, &session_handler_.calibrators_series_names,
-        session_handler_.calibrators_x_axis_title, session_handler_.calibrators_y_axis_title, session_handler_.calibrators_conc_min, session_handler_.calibrators_conc_max,
-        session_handler_.calibrators_feature_min, session_handler_.calibrators_feature_max,
-        "CalibratorsMainWindow");
-    }
-
     // ======================================
     // Windows display
     // ======================================
@@ -834,6 +905,18 @@ int main(int argc, char** argv)
     glClear(GL_COLOR_BUFFER_BIT);
     //glUseProgram(0); // You may want this if using this code in an OpenGL 3+ context where shaders may be bound
     ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
+
+    // Update and Render additional Platform Windows
+    // (Platform functions may change the current OpenGL context, so we save/restore it to make it easier to paste this code elsewhere.
+    //  For this specific demo app we could also call SDL_GL_MakeCurrent(window, gl_context) directly)
+    if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+    {
+      SDL_Window* backup_current_window = SDL_GL_GetCurrentWindow();
+      SDL_GLContext backup_current_context = SDL_GL_GetCurrentContext();
+      ImGui::UpdatePlatformWindows();
+      ImGui::RenderPlatformWindowsDefault();
+      SDL_GL_MakeCurrent(backup_current_window, backup_current_context);
+    }
     SDL_GL_SwapWindow(window);
   }
 

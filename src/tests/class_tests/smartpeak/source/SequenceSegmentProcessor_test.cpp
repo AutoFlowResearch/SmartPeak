@@ -24,7 +24,7 @@
 #include <gtest/gtest.h>
 #include <SmartPeak/test_config.h>
 #include <SmartPeak/core/SequenceSegmentProcessor.h>
-#include <SmartPeak/core/SequenceSegmentProcessors/CalculateCalibration.h>
+#include <SmartPeak/core/SequenceSegmentProcessors/OptimizeCalibration.h>
 #include <SmartPeak/core/SequenceSegmentProcessors/EstimateFeatureBackgroundInterferences.h>
 #include <SmartPeak/core/SequenceSegmentProcessors/EstimateFeatureFilterValues.h>
 #include <SmartPeak/core/SequenceSegmentProcessors/EstimateFeatureQCValues.h>
@@ -499,24 +499,24 @@ void addQCFeatures(SequenceHandler& sequenceHandler_IO) {
   }
 }
 
-TEST(CalculateCalibration, constructorCalculateCalibration)
+TEST(OptimizeCalibration, constructorOptimizeCalibration)
 {
-  CalculateCalibration* ptrCalculateCalibration = nullptr;
-  CalculateCalibration* nullPointerCalculateCalibration = nullptr;
-  EXPECT_EQ(ptrCalculateCalibration, nullPointerCalculateCalibration);
+  OptimizeCalibration* ptrOptimizeCalibration = nullptr;
+  OptimizeCalibration* nullPointerOptimizeCalibration = nullptr;
+  EXPECT_EQ(ptrOptimizeCalibration, nullPointerOptimizeCalibration);
 }
 
-TEST(CalculateCalibration, destructorCalculateCalibration)
+TEST(OptimizeCalibration, destructorOptimizeCalibration)
 {
-  CalculateCalibration* ptrCalculateCalibration = nullptr;
-  ptrCalculateCalibration = new CalculateCalibration();
-  delete ptrCalculateCalibration;
+  OptimizeCalibration* ptrOptimizeCalibration = nullptr;
+  ptrOptimizeCalibration = new OptimizeCalibration();
+  delete ptrOptimizeCalibration;
 }
 
-TEST(CalculateCalibration, gettersCalculateCalibration)
+TEST(OptimizeCalibration, gettersOptimizeCalibration)
 {
-  CalculateCalibration processor;
-  EXPECT_EQ(processor.getName(), "CALCULATE_CALIBRATION");
+  OptimizeCalibration processor;
+  EXPECT_EQ(processor.getName(), "OPTIMIZE_CALIBRATION");
 }
 
 TEST(SequenceSegmentProcessor, getSampleIndicesBySampleType)
@@ -576,7 +576,7 @@ TEST(SequenceSegmentProcessor, getSampleIndicesBySampleType)
   EXPECT_EQ(sample_indices[1], 2);
 }
 
-TEST(SequenceSegmentProcessor, processCalculateCalibration)
+TEST(SequenceSegmentProcessor, processOptimizeCalibration)
 {
   // Pre-requisites: set up the parameters and data structures for testing
   const map<string, vector<map<string, string>>> absquant_params = {{"AbsoluteQuantitation", {
@@ -653,9 +653,9 @@ TEST(SequenceSegmentProcessor, processCalculateCalibration)
   sequenceSegmentHandler.setSampleIndices(indices);
 
   // Test calculate calibration
-  CalculateCalibration calculateCalibration;
+  OptimizeCalibration optimizeCalibration;
   Filenames filenames;
-  calculateCalibration.process(sequenceSegmentHandler, sequenceHandler, absquant_params, filenames);
+  optimizeCalibration.process(sequenceSegmentHandler, sequenceHandler, absquant_params, filenames);
 
   const std::vector<OpenMS::AbsoluteQuantitationMethod>& AQMs = sequenceSegmentHandler.getQuantitationMethods();
 
@@ -723,6 +723,27 @@ TEST(SequenceSegmentProcessor, processCalculateCalibration)
   EXPECT_NEAR(static_cast<double>(AQMs_rdh[2].getCorrelationCoefficient()), 0.9993200722867581, 1e-6);
   EXPECT_NEAR(static_cast<double>(AQMs_rdh[2].getLLOQ()), 0.04, 1e-6);
   EXPECT_NEAR(static_cast<double>(AQMs_rdh[2].getULOQ()), 200.0, 1e-6);
+
+  const auto& component_to_concentrations = sequenceSegmentHandler.getComponentsToConcentrations();
+  EXPECT_EQ(component_to_concentrations.size(), 3);
+  ASSERT_EQ(component_to_concentrations.count("ser-L.ser-L_1.Light"), 1);
+  const auto& component_to_concentration = component_to_concentrations.at("ser-L.ser-L_1.Light");
+  ASSERT_EQ(component_to_concentration.size(), 11);
+  EXPECT_FLOAT_EQ(component_to_concentration[0].actual_concentration, 0.039999999);
+  EXPECT_EQ(component_to_concentration[0].concentration_units, std::string("uM"));
+  EXPECT_FLOAT_EQ(component_to_concentration[0].dilution_factor, 1);
+  EXPECT_FLOAT_EQ(component_to_concentration[0].IS_actual_concentration, 1);
+/*
+  const auto& outlier_component_to_concentrations = sequenceSegmentHandler.getOutlierComponentsToConcentrations();
+  ASSERT_EQ(outlier_component_to_concentrations.size(), 3);
+  ASSERT_EQ(outlier_component_to_concentrations.count("ser-L.ser-L_1.Light"), 1);
+  const auto& outlier_component_to_concentration = outlier_component_to_concentrations.at("ser-L.ser-L_1.Light");
+  ASSERT_EQ(outlier_component_to_concentration.size(), 3);
+  EXPECT_FLOAT_EQ(outlier_component_to_concentration[0].actual_concentration, 0.0099999998);
+  EXPECT_EQ(outlier_component_to_concentration[0].concentration_units, std::string("uM"));
+  EXPECT_FLOAT_EQ(outlier_component_to_concentration[0].dilution_factor, 1);
+  EXPECT_FLOAT_EQ(outlier_component_to_concentration[0].IS_actual_concentration, 1);
+*/
 }
 
 /**
@@ -782,6 +803,29 @@ TEST(SequenceSegmentProcessor, processLoadStandardsConcentrations)
   EXPECT_NEAR(rc[7].IS_actual_concentration, 1.0, 1e-6);
   EXPECT_EQ(rc[7].concentration_units, "uM");
   EXPECT_NEAR(rc[7].dilution_factor, 1.0, 1e-6);
+}
+
+TEST(SequenceSegmentProcessor, processLoadStandardsConcentrationsWrongHeaders)
+{
+  Filenames filenames;
+  filenames.setFullPath("standardsConcentrations", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_standardsConcentrations_wrong.csv"));
+  SequenceSegmentHandler ssh;
+  LoadStandardsConcentrations loadStandardsConcentrations;
+  try
+  {
+    loadStandardsConcentrations.process(ssh, SequenceHandler(), {}, filenames);
+    FAIL() << "loadStandardsConcentrations() should throw an error\n";
+  }
+  catch (const std::invalid_argument& exception)
+  {
+    std::ostringstream expected_message;
+    expected_message << "Missing headers in file \"" << SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_standardsConcentrations_wrong.csv") << "\"";
+    EXPECT_EQ(std::string(exception.what()), expected_message.str());
+  }
+  catch (...)
+  {
+    FAIL() << "ERROR: Unexpected exception thrown: " << std::current_exception << std::endl;
+  }
 }
 
 /**
@@ -847,6 +891,29 @@ TEST(SequenceSegmentProcessor, processLoadQuantitationMethods)
   const OpenMS::Param params2 = aqm[106].getTransformationModelParams();
   EXPECT_NEAR(static_cast<double>(params2.getValue("slope")), 1.084995619, 1e-6);
   EXPECT_NEAR(static_cast<double>(params2.getValue("intercept")), -0.00224781, 1e-6);
+}
+
+TEST(SequenceSegmentProcessor, processLoadQuantitationMethodsWrongHeaders)
+{
+  Filenames filenames;
+  filenames.setFullPath("quantitationMethods", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_quantitationMethods_wrong.csv"));
+  SequenceSegmentHandler ssh;
+  LoadQuantitationMethods loadQuantitationMethods;
+  try
+  {
+    loadQuantitationMethods.process(ssh, SequenceHandler(), {}, filenames);
+    FAIL() << "loadQuantitationMethods() should throw an error\n";
+  }
+  catch (const std::invalid_argument& exception)
+  {
+    std::ostringstream expected_message;
+    expected_message << "Missing headers in file \"" << SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_quantitationMethods_wrong.csv") << "\"";
+    EXPECT_EQ(std::string(exception.what()), expected_message.str());
+  }
+  catch (...)
+  {
+    FAIL() << "ERROR: Unexpected exception thrown: " << std::current_exception << std::endl;
+  }
 }
 
 /**

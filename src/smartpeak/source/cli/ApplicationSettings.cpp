@@ -76,6 +76,8 @@ void ApplicationSettings::define_options()
         "Override input file. Ex: -f featureQCComponents=\"./featureQCComponents_new.csv\".");
     m_parser.set_optional<std::vector<std::string>>("p", "parameter", {},
         "Override parameter. Ex: '-p MRMFeatureFinderScoring:TransitionGroupPicker:peak_integration=smoothed'.");
+    m_parser.set_optional<int>("nt", "nb-threads", 0,
+        "Number of threads used to run the workflow. 0 means use as many as possible.");
     m_parser.run_and_exit_if_error();
 }
 
@@ -98,6 +100,7 @@ void ApplicationSettings::load_options()
     parameters              = m_parser.get<std::vector<std::string>>("p");
     mzml_dir                = m_parser.get<std::string>("z");
     reports_out_dir         = m_parser.get<std::string>("ro");
+    nb_threads              = m_parser.get<int>("nt");
 }
 
 void ApplicationSettings::process_options()
