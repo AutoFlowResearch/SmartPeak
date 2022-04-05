@@ -71,17 +71,12 @@ namespace SmartPeak
 
   bool StoreQuantitationMethods::onFilePicked(const std::filesystem::path& directory, ApplicationHandler* application_handler)
   {
-    if (application_handler->sequenceHandler_.getSequenceSegments().size() == 0)
-    {
-      LOGE << "File cannot be written without first loading the sequence.";
-      return false;
-    }
+    Filenames filenames;
+    filenames.setTagValue(Filenames::Tag::FEATURES_OUTPUT_PATH, directory.generic_string());
+    static_filenames_ = false;
     for (auto& sequence_segment : application_handler->sequenceHandler_.getSequenceSegments())
     {
-      Filenames filenames;
-      filenames.setTagValue(Filenames::Tag::FEATURES_OUTPUT_PATH, directory.generic_string());
       filenames.setTagValue(Filenames::Tag::OUTPUT_SEQUENCE_SEGMENT_NAME, sequence_segment.getSequenceSegmentName());
-      static_filenames_ = false;
       process(sequence_segment, application_handler->sequenceHandler_, {}, filenames);
     }
     return true;

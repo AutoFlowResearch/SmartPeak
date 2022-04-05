@@ -523,22 +523,22 @@ int main(int argc, char** argv)
             {std::make_shared<StoreValidationData>(), true},
             // {std::make_shared<StoreStandardsConcentrations>(), true}, // not implemented
             {std::make_shared<StoreQuantitationMethods>(true), false},
-            {std::make_shared<StoreFeatureFilters>(FeatureFiltersUtilsMode::EFeatureFiltersModeComponent, true), true},
-            {std::make_shared<StoreFeatureFilters>(FeatureFiltersUtilsMode::EFeatureFiltersModeGroup, true), true},
-            {std::make_shared<StoreFeatureQCs>(FeatureFiltersUtilsMode::EFeatureFiltersModeComponent, true), true},
-            {std::make_shared<StoreFeatureQCs>(FeatureFiltersUtilsMode::EFeatureFiltersModeGroup, true), true},
-            {std::make_shared<StoreFeatureRSDFilters>(FeatureFiltersUtilsMode::EFeatureFiltersModeComponent, true), true},
-            {std::make_shared<StoreFeatureRSDFilters>(FeatureFiltersUtilsMode::EFeatureFiltersModeGroup, true), true},
-            {std::make_shared<StoreFeatureRSDQCs>(FeatureFiltersUtilsMode::EFeatureFiltersModeComponent, true), true},
-            {std::make_shared<StoreFeatureRSDQCs>(FeatureFiltersUtilsMode::EFeatureFiltersModeGroup, true), true},
-            {std::make_shared<StoreFeatureBackgroundFilters>(FeatureFiltersUtilsMode::EFeatureFiltersModeComponent, true), true},
-            {std::make_shared<StoreFeatureBackgroundFilters>(FeatureFiltersUtilsMode::EFeatureFiltersModeGroup, true), true},
-            {std::make_shared<StoreFeatureBackgroundQCs>(FeatureFiltersUtilsMode::EFeatureFiltersModeComponent, true), true},
-            {std::make_shared<StoreFeatureBackgroundQCs>(FeatureFiltersUtilsMode::EFeatureFiltersModeGroup, true), true},
-            {std::make_shared<StoreFeatureRSDEstimations>(FeatureFiltersUtilsMode::EFeatureFiltersModeComponent, true), true},
-            {std::make_shared<StoreFeatureRSDEstimations>(FeatureFiltersUtilsMode::EFeatureFiltersModeGroup, true), true},
-            {std::make_shared<StoreFeatureBackgroundEstimations>(FeatureFiltersUtilsMode::EFeatureFiltersModeComponent, true), true},
-            {std::make_shared<StoreFeatureBackgroundEstimations>(FeatureFiltersUtilsMode::EFeatureFiltersModeGroup, true), true}
+            {std::make_shared<StoreFeatureFilters>(FeatureFiltersUtilsMode::EFeatureFiltersModeComponent, true), false},
+            {std::make_shared<StoreFeatureFilters>(FeatureFiltersUtilsMode::EFeatureFiltersModeGroup, true), false},
+            {std::make_shared<StoreFeatureQCs>(FeatureFiltersUtilsMode::EFeatureFiltersModeComponent, true), false},
+            {std::make_shared<StoreFeatureQCs>(FeatureFiltersUtilsMode::EFeatureFiltersModeGroup, true), false},
+            {std::make_shared<StoreFeatureRSDFilters>(FeatureFiltersUtilsMode::EFeatureFiltersModeComponent, false), false},
+            {std::make_shared<StoreFeatureRSDFilters>(FeatureFiltersUtilsMode::EFeatureFiltersModeGroup, true), false},
+            {std::make_shared<StoreFeatureRSDQCs>(FeatureFiltersUtilsMode::EFeatureFiltersModeComponent, true), false},
+            {std::make_shared<StoreFeatureRSDQCs>(FeatureFiltersUtilsMode::EFeatureFiltersModeGroup, true), false},
+            {std::make_shared<StoreFeatureBackgroundFilters>(FeatureFiltersUtilsMode::EFeatureFiltersModeComponent, true), false},
+            {std::make_shared<StoreFeatureBackgroundFilters>(FeatureFiltersUtilsMode::EFeatureFiltersModeGroup, true), false},
+            {std::make_shared<StoreFeatureBackgroundQCs>(FeatureFiltersUtilsMode::EFeatureFiltersModeComponent, true), false},
+            {std::make_shared<StoreFeatureBackgroundQCs>(FeatureFiltersUtilsMode::EFeatureFiltersModeGroup, true), false},
+            {std::make_shared<StoreFeatureRSDEstimations>(FeatureFiltersUtilsMode::EFeatureFiltersModeComponent, true), false},
+            {std::make_shared<StoreFeatureRSDEstimations>(FeatureFiltersUtilsMode::EFeatureFiltersModeGroup, true), false},
+            {std::make_shared<StoreFeatureBackgroundEstimations>(FeatureFiltersUtilsMode::EFeatureFiltersModeComponent, true), false},
+            {std::make_shared<StoreFeatureBackgroundEstimations>(FeatureFiltersUtilsMode::EFeatureFiltersModeGroup, true), false}
           };
           for (const auto& [export_processor, export_as_file] : export_processors)
           {

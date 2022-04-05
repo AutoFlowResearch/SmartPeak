@@ -57,21 +57,16 @@ namespace SmartPeak
     return ParameterSet();
   }
 
-  bool StoreFeatureBackgroundQCs::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
+  bool StoreFeatureBackgroundQCs::onFilePicked(const std::filesystem::path& directory, ApplicationHandler* application_handler)
   {
     Filenames filenames;
-    if (!FeatureFiltersUtils::onFilePicked(
-      filename,
-      application_handler,
-      filenames,
-      "featureBackgroundQCComponents",
-      "featureBackgroundQCComponentGroups",
-      feature_filter_mode_))
+    filenames.setTagValue(Filenames::Tag::FEATURES_OUTPUT_PATH, directory.generic_string());
+    static_filenames_ = false;
+    for (auto& sequence_segment : application_handler->sequenceHandler_.getSequenceSegments())
     {
-      return false;
+      filenames.setTagValue(Filenames::Tag::OUTPUT_SEQUENCE_SEGMENT_NAME, sequence_segment.getSequenceSegmentName());
+      process(sequence_segment, application_handler->sequenceHandler_, {}, filenames);
     }
-    sequence_segment_observable_ = &application_handler->sequenceHandler_;
-    process(application_handler->sequenceHandler_.getSequenceSegments()[0], SequenceHandler(), {}, filenames);
     return true;
   }
 

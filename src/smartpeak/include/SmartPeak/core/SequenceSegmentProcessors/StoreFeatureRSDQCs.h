@@ -56,7 +56,7 @@ namespace SmartPeak
     /* IFilenamesHandler */
     virtual void getFilenames(Filenames& filenames) const override;
 
-    /* IProcessorDescription */
+    /* IFilePickerHandler */
     virtual bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
   };
 

@@ -56,17 +56,16 @@ namespace SmartPeak
     return ParameterSet();
   }
 
-  bool StoreStandardsConcentrations::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
+  bool StoreStandardsConcentrations::onFilePicked(const std::filesystem::path& directory, ApplicationHandler* application_handler)
   {
-    if (application_handler->sequenceHandler_.getSequence().size() == 0)
-    {
-      LOGE << "File cannot be loaded without first loading the sequence.";
-      return false;
-    }
     Filenames filenames;
-    filenames.setFullPath("standardsConcentrations", filename);
-    sequence_segment_observable_ = &application_handler->sequenceHandler_;
-    process(application_handler->sequenceHandler_.getSequenceSegments()[0], SequenceHandler(), {}, filenames);
+    filenames.setTagValue(Filenames::Tag::FEATURES_OUTPUT_PATH, directory.generic_string());
+    static_filenames_ = false;
+    for (auto& sequence_segment : application_handler->sequenceHandler_.getSequenceSegments())
+    {
+      filenames.setTagValue(Filenames::Tag::OUTPUT_SEQUENCE_SEGMENT_NAME, sequence_segment.getSequenceSegmentName());
+      process(sequence_segment, application_handler->sequenceHandler_, {}, filenames);
+    }
     return true;
   }
 
