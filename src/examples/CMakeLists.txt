@@ -111,7 +111,19 @@ include_directories(${IMPLOT_INCLUDE_DIR})
 #------------------------------------------------------------------------------
 # gRPC
 #------------------------------------------------------------------------------
-include(../../cmake/fetch_grpc.cmake)
+find_package(gRPC REQUIRED)
+include_directories(${GRPC_INCLUDE_DIR})
+link_directories(${GRPC_DIR}/lib)
+set(grpc_required_libs 
+    libprotobuf grpc++ 
+    grpc++_reflection 
+    grpc++_unsecure grpc_unsecure
+    grpc++_error_details
+    grpc gpr
+    absl_flags
+    crypto
+    address_sorting
+    grpc_plugin_support grpcpp_channelz)
 
 #------------------------------------------------------------------------------
 # Find OpenSSL
