@@ -15,11 +15,11 @@
 #
 # The find module tries to find ``gRPC`` the C++ sources.
 # You can supply their location via an ``GRPC_DIR`` variable.\ ly.
-#set(CMAKE_FIND_DEBUG_MODE TRUE)
 find_path(GRPC_INCLUDE_DIR 
 	NAMES "grpc/grpc.h"
 	HINTS ${gRPC_DIR}
 	NO_CMAKE_FIND_ROOT_PATH
+	PATH_SUFFIXES include
 )
 mark_as_advanced(GRPC_INCLUDE_DIR)
 

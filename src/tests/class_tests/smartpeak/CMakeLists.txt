@@ -67,7 +67,9 @@ set(SMARTPEAK_CLASS_TESTS_EXTERNAL_INCLUDE_DIRECTORIES "${SmartPeak_INCLUDE_DIRE
 include_directories(${SMARTPEAK_CLASS_TESTS_INTERNAL_INCLUDE_DIRECTORIES})
 include_directories(SYSTEM ${SMARTPEAK_CLASS_TESTS_EXTERNAL_INCLUDE_DIRECTORIES})
 
+#------------------------------------------------------------------------------
 # googletest
+#------------------------------------------------------------------------------
 include(FetchContent)
 FetchContent_Declare(
   googletest
@@ -87,7 +89,6 @@ if(NOT googletest_POPULATED)
 endif()
 include(GoogleTest)
 
-#------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
 # OpenGL
 #------------------------------------------------------------------------------

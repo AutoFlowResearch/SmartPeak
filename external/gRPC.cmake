@@ -26,5 +26,6 @@ ExternalProject_Add(gRPC
     -DABSL_USE_GOOGLETEST_HEAD=OFF
     -DABSL_USE_EXTERNAL_GOOGLETEST=OFF
     -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/install
-  INSTALL_COMMAND cmake --install . --config Debug --prefix "${CMAKE_CURRENT_BINARY_DIR}/install"
+  BUILD_COMMAND cmake --build . --config Release
+  INSTALL_COMMAND cmake --install . --config Release --prefix "${CMAKE_CURRENT_BINARY_DIR}/install"
 )
