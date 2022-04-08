@@ -111,74 +111,76 @@ include_directories(${IMPLOT_INCLUDE_DIR})
 #------------------------------------------------------------------------------
 # gRPC
 #------------------------------------------------------------------------------
-find_package(gRPC REQUIRED)
+find_package(protobuf CONFIG REQUIRED)
+find_package(absl CONFIG REQUIRED)
+find_package(gRPC CONFIG REQUIRED)
 include_directories(${GRPC_INCLUDE_DIR})
 link_directories(${gRPC_DIR}/lib)
 set(grpc_required_libs 
 	libprotobuf
-	gpr
-	grpc
+	#gpr
+	# grpc
 	grpc++
 	grpc++_reflection
-	address_sorting
-	cares
-	zlibstatic
-	upb
-	ssl
-	crypto
-	absl_bad_any_cast_impl
-	absl_bad_optional_access
-	absl_bad_variant_access
-	absl_base
-	absl_city
-	absl_civil_time
-	absl_cord
-	absl_debugging_internal
-	absl_demangle_internal
-	absl_examine_stack
-	absl_exponential_biased
-	absl_failure_signal_handler
-	absl_flags
-	absl_flags_config
-	absl_flags_internal
-	absl_flags_marshalling
-	absl_flags_parse
-	absl_flags_program_name
-	absl_flags_usage
-	absl_flags_usage_internal
-	absl_graphcycles_internal
-	absl_hash
-	absl_hashtablez_sampler
-	absl_int128
-	absl_leak_check
-	absl_leak_check_disable
-	absl_log_severity
-	absl_malloc_internal
-	absl_periodic_sampler
-	absl_random_distributions
-	absl_random_internal_distribution_test_util
-	absl_random_internal_pool_urbg
-	absl_random_internal_randen
-	absl_random_internal_randen_hwaes
-	absl_random_internal_randen_hwaes_impl
-	absl_random_internal_randen_slow
-	absl_random_internal_seed_material
-	absl_random_seed_gen_exception
-	absl_random_seed_sequences
-	absl_raw_hash_set
-	absl_raw_logging_internal
-	absl_scoped_set_env
-	absl_spinlock_wait
-	absl_stacktrace
-	absl_status
-	absl_strings
-	absl_strings_internal
-	absl_str_format_internal
-	absl_symbolize
-	absl_synchronization
-	absl_throw_delegate
-	absl_time
-	absl_time_zone
+	# address_sorting
+	# cares
+	# zlibstatic
+	# upb
+	# ssl
+	# crypto
+	# absl_bad_any_cast_impl
+	# absl_bad_optional_access
+	# absl_bad_variant_access
+	# absl_base
+	# absl_city
+	# absl_civil_time
+	# absl_cord
+	# absl_debugging_internal
+	# absl_demangle_internal
+	# absl_examine_stack
+	# absl_exponential_biased
+	# absl_failure_signal_handler
+	# absl_flags
+	# absl_flags_config
+	# absl_flags_internal
+	# absl_flags_marshalling
+	# absl_flags_parse
+	# absl_flags_program_name
+	# absl_flags_usage
+	# absl_flags_usage_internal
+	# absl_graphcycles_internal
+	# absl_hash
+	# absl_hashtablez_sampler
+	# absl_int128
+	# absl_leak_check
+	# absl_leak_check_disable
+	# absl_log_severity
+	# absl_malloc_internal
+	# absl_periodic_sampler
+	# absl_random_distributions
+	# absl_random_internal_distribution_test_util
+	# absl_random_internal_pool_urbg
+	# absl_random_internal_randen
+	# absl_random_internal_randen_hwaes
+	# absl_random_internal_randen_hwaes_impl
+	# absl_random_internal_randen_slow
+	# absl_random_internal_seed_material
+	# absl_random_seed_gen_exception
+	# absl_random_seed_sequences
+	# absl_raw_hash_set
+	# absl_raw_logging_internal
+	# absl_scoped_set_env
+	# absl_spinlock_wait
+	# absl_stacktrace
+	# absl_status
+	# absl_strings
+	# absl_strings_internal
+	# absl_str_format_internal
+	# absl_symbolize
+	# absl_synchronization
+	# absl_throw_delegate
+	# absl_time
+	# absl_time_zone
 )
 #	absl_dynamic_annotations
 #	absl_flags_registry
