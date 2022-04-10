@@ -117,11 +117,11 @@ find_package(gRPC CONFIG REQUIRED)
 include_directories(${GRPC_INCLUDE_DIR})
 link_directories(${gRPC_DIR}/lib)
 set(grpc_required_libs 
-	libprotobuf
+	protobuf::libprotobuf
 	#gpr
 	# grpc
-	grpc++
-	grpc++_reflection
+	grpc::grpc++
+	grpc::grpc++_reflection
 	# address_sorting
 	# cares
 	# zlibstatic
