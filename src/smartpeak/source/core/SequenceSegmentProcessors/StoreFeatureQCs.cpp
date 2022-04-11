@@ -71,6 +71,7 @@ namespace SmartPeak
       return false;
     }
     sequence_segment_observable_ = &application_handler->sequenceHandler_;
+    // have only one copy per sequence, so just take the 1st one
     process(application_handler->sequenceHandler_.getSequenceSegments()[0], SequenceHandler(), {}, filenames);
     return true;
   }
