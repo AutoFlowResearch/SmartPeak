@@ -65,6 +65,7 @@ jobs:
           command: |
             mkdir ~/smartpeak_release_build
             cd ~/smartpeak_release_build
+            find $HOME/SmartPeak/superbuild -name 'protobuf*.cmake'
             cmake -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -G "Unix Makefiles" -DCMAKE_PREFIX_PATH=$HOME/OpenMS-build/ -DPLOG_INCLUDE_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/plog/include -DIMGUI_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/imgui -DIMPLOT_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/implot -DPORTABLEFILEDIALOGS_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/portablefiledialogs -DgRPC_DIR=$HOME/SmartPeak/superbuild/install/lib/cmake/grpc -Dprotobuf_DIR=$HOME/SmartPeak/superbuild/install/cmake -Dabsl_DIR=$HOME/SmartPeak/superbuild/install/lib/cmake/absl -DCMAKE_BUILD_TYPE=Release -DCMAKE_BUILD_TYPE=Release ~/SmartPeak
             make -j4
       - run:
