@@ -1,6 +1,20 @@
 SmartPeak Changelog
 ===================
 
+v1.22.0 (2022-04-12)
+--------------------
+
+Features
+~~~~~~~~
+- Number of running threads is now an input on the Run Workflow Dialog `(#529) <https://github.com/AutoFlowResearch/SmartPeak/pull/529>`_
+- Log messages improved `(#528) <https://github.com/AutoFlowResearch/SmartPeak/pull/528>`_
+- Create output folder `(#527) <https://github.com/AutoFlowResearch/SmartPeak/pull/527>`_
+
+Fix
+~~~
+- Fix loading and exporting for FeatureBackgroundEstimations, FeatureRSDEstimations, QuantitationMethods and StandardsConcentrations `(#532) <https://github.com/AutoFlowResearch/SmartPeak/pull/532>`_
+- Fix inclusion/exclusion of points for multiple Calibration display `(#531) <https://github.com/AutoFlowResearch/SmartPeak/pull/531>`_
+
 v1.21.0 (2022-03-21)
 --------------------
 
