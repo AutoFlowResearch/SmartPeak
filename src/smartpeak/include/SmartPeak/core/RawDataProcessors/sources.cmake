@@ -10,8 +10,9 @@ set(sources_list_h
 	CheckFeaturesBackgroundInterferences.h
 	CheckFeaturesRSDs.h
 	ClearData.h
-	DDA.h
+	ConstructTransitionsList.h
 	ExtractChromatogramWindows.h
+	ExtractSpectraNonTargeted.h
 	ExtractSpectraWindows.h
 	FilterFeatures.h
 	FilterFeaturesBackgroundInterferences.h
@@ -27,20 +28,24 @@ set(sources_list_h
 	LoadTransitions.h
 	LoadValidationData.h
 	MapChromatograms.h
-	MergeFeatures.h
+	MatchSpectra.h
+	MergeFeaturesMS1.h
+	MergeFeaturesMS2.h
 	MergeSpectra.h
+	Pick2DFeatures.h
+	Pick3DFeatures.h
 	PickMRMFeatures.h
-	PickMS1Features.h
-	PickMS2Features.h
 	PlotFeatures.h
 	QuantifyFeatures.h
 	SearchAccurateMass.h
-	SearchSpectrum.h
+	SearchSpectrumMS1.h
+	SearchSpectrumMS2.h
 	SelectFeatures.h
 	StoreAnnotations.h
 	StoreFeatureFiltersRDP.h
 	StoreFeatureQCsRDP.h
 	StoreFeatures.h
+	StoreMSP.h
 	StoreParameters.h
 	StoreRawData.h
 	StoreValidationData.h

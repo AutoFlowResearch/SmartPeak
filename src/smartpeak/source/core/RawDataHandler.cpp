@@ -59,6 +59,21 @@ namespace SmartPeak
     return feature_map_;
   }
 
+  void RawDataHandler::setFeatureMap(const std::string& name, const OpenMS::FeatureMap& feature_map)
+  {
+    named_feature_maps_.insert_or_assign(name, feature_map);
+  }
+
+  OpenMS::FeatureMap& RawDataHandler::getFeatureMap(const std::string& name)
+  {
+    return named_feature_maps_.at(name);
+  }
+
+  const OpenMS::FeatureMap& RawDataHandler::getFeatureMap(const std::string& name) const
+  {
+    return named_feature_maps_.at(name);
+  }
+
   void RawDataHandler::setMetaData(const MetaDataHandler& meta_data)
   {
     meta_data_.reset(new MetaDataHandler(meta_data));
