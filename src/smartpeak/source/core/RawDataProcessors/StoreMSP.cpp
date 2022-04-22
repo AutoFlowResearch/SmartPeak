@@ -78,19 +78,30 @@ namespace SmartPeak
     OpenMS::TargetedSpectraExtractor targeted_spectra_extractor;
     Utilities::setUserParameters(targeted_spectra_extractor, params);
 
-    // Assign a name of the experiment, if not set.
-    auto& experiment = rawDataHandler_IO.getExperiment();
-    auto& spectra = experiment.getSpectra();
-    int cpt = 0;
-    for (auto& spectrum : spectra)
+    //// Annotate spectra with missing names
+    //auto& experiment = rawDataHandler_IO.getExperiment();
+    //auto& spectra = experiment.getSpectra();
+    //int cpt = 0;
+    //for (auto& spectrum : spectra)
+    //{
+    //  if (spectrum.getName().empty())
+    //  {
+    //    std::ostringstream os;
+    //    os << rawDataHandler_IO.getMetaData().getInjectionName() << "_" << ++cpt;
+    //    spectrum.setName(os.str());
+    //  }
+    //}
+    // Remove unannotated spectra
+    auto experiment = rawDataHandler_IO.getExperiment();
+    std::vector<OpenMS::MSSpectrum> annotated_spectra;
+    for (auto& spectrum : rawDataHandler_IO.getExperiment().getSpectra())
     {
-      if (spectrum.getName().empty())
+      if (!spectrum.getName().empty())
       {
-        std::ostringstream os;
-        os << rawDataHandler_IO.getMetaData().getInjectionName() << "_" << ++cpt;
-        spectrum.setName(os.str());
+        annotated_spectra.push_back(spectrum);
       }
     }
+    experiment.setSpectra(annotated_spectra);
 
     auto output_ms2 = filenames_I.getFullPath("output_ms2").generic_string();
     targeted_spectra_extractor.storeSpectraMSP(output_ms2, experiment);

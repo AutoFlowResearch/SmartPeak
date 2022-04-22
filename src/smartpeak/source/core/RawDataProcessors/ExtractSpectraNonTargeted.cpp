@@ -76,6 +76,10 @@ namespace SmartPeak
     targeted_spectra_extractor.extractSpectra(rawDataHandler_IO.getExperiment(), rawDataHandler_IO.getFeatureMap(), annotated_spectra, selected_features, true);
 
     rawDataHandler_IO.setFeatureMap(selected_features);
+    // rawDataHandler_IO.getExperiment().setSpectra(annotated_spectra);
+    for (auto& s : annotated_spectra) {
+      rawDataHandler_IO.getExperiment().addSpectrum(s);
+    }
     rawDataHandler_IO.updateFeatureMapHistory();
   }
 
