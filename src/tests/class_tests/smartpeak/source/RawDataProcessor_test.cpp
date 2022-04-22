@@ -3193,9 +3193,9 @@ TEST(RawDataProcessor, SearchSpectrumMS2)
   const auto& feature_map = rawDataHandler.getFeatureMap();
   ASSERT_EQ(feature_map.size(), 1);
   const auto& feature_1 = feature_map.at(0);
-  EXPECT_EQ(std::string(feature_1.getMetaValue("PeptideRef")), std::string("149.025"));
+  EXPECT_EQ(std::string(feature_1.getMetaValue("PeptideRef")), std::string("HMDB:HMDB0000001"));
   const auto& sub_features = feature_1.getSubordinates();
   ASSERT_EQ(sub_features.size(), 1);
   const auto& sub_feature_1 = feature_map.at(0);
-  EXPECT_EQ(std::string(sub_feature_1.getMetaValue("PeptideRef")), std::string("149.025"));
+  EXPECT_EQ(std::string(sub_feature_1.getMetaValue("PeptideRef")), std::string("HMDB:HMDB0000001"));
 }
