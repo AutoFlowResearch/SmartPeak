@@ -91,20 +91,19 @@ namespace SmartPeak
     //    spectrum.setName(os.str());
     //  }
     //}
-    // Remove unannotated spectra
-    auto experiment = rawDataHandler_IO.getExperiment();
-    std::vector<OpenMS::MSSpectrum> annotated_spectra;
-    for (auto& spectrum : rawDataHandler_IO.getExperiment().getSpectra())
-    {
-      if (!spectrum.getName().empty())
-      {
-        annotated_spectra.push_back(spectrum);
-      }
-    }
-    experiment.setSpectra(annotated_spectra);
+    //// Remove unannotated spectra
+    //auto experiment = rawDataHandler_IO.getExperiment();
+    //std::vector<OpenMS::MSSpectrum> annotated_spectra;
+    //for (auto& spectrum : rawDataHandler_IO.getExperiment().getSpectra())
+    //{
+    //  if (!spectrum.getName().empty())
+    //  {
+    //    annotated_spectra.push_back(spectrum);
+    //  }
+    //}
+    //experiment.setSpectra(annotated_spectra);
 
     auto output_ms2 = filenames_I.getFullPath("output_ms2").generic_string();
-    targeted_spectra_extractor.storeSpectraMSP(output_ms2, experiment);
+    targeted_spectra_extractor.storeSpectraMSP(output_ms2, rawDataHandler_IO.getChromatogramMap());
   }
-
 }

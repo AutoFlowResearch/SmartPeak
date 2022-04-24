@@ -123,22 +123,21 @@ namespace SmartPeak
       transition_tsv_file.convertTargetedExperimentToTSV(transitions_filename.c_str(), t_exp);
     }
 
-    // build MS1/MS2 features
-    OpenMS::FeatureMap ms1_ms2_features;
-    for (const auto& ms1_feature : ms1_merged_features)
-    {
-      OpenMS::Feature ms_level_annotated_feature = ms1_feature;
-      ms_level_annotated_feature.setMetaValue("ms_level", 1);
-      ms1_ms2_features.push_back(ms_level_annotated_feature);
-    }
-    for (const auto& ms2_feature : ms2_merged_features)
-    {
-      OpenMS::Feature ms_level_annotated_feature = ms2_feature;
-      ms_level_annotated_feature.setMetaValue("ms_level", 2);
-      ms1_ms2_features.push_back(ms_level_annotated_feature);
-    }
-    rawDataHandler_IO.setFeatureMap(ms1_ms2_features);
-    rawDataHandler_IO.updateFeatureMapHistory();
+    //// build MS1/MS2 features
+    //OpenMS::FeatureMap ms1_ms2_features;
+    //for (const auto& ms1_feature : ms1_merged_features)
+    //{
+    //  OpenMS::Feature ms_level_annotated_feature = ms1_feature;
+    //  ms_level_annotated_feature.setMetaValue("ms_level", 1);
+    //  ms1_ms2_features.push_back(ms_level_annotated_feature);
+    //}
+    //for (const auto& ms2_feature : ms2_merged_features)
+    //{
+    //  OpenMS::Feature ms_level_annotated_feature = ms2_feature;
+    //  ms_level_annotated_feature.setMetaValue("ms_level", 2);
+    //  ms1_ms2_features.push_back(ms_level_annotated_feature);
+    //}
+    //rawDataHandler_IO.setFeatureMap(ms1_ms2_features);
+    //rawDataHandler_IO.updateFeatureMapHistory();
   }
-
 }

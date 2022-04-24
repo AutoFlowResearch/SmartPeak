@@ -204,7 +204,9 @@ namespace SmartPeak
         f.setMZ(it->getMZ());
         f.setRT(0);
         f.setMetaValue("native_id", spec.getNativeID());
-        f.setMetaValue("PeptideRef", "Unknown");
+        std::ostringstream mass_of_the_peak;
+        mass_of_the_peak << f.getMZ();
+        f.setMetaValue("PeptideRef", mass_of_the_peak.str());
         f.setMetaValue("scan_polarity", rawDataHandler_IO.getMetaData().scan_polarity);
         f.setMetaValue("logSN", std::log(e.get_noise_value(it->getMZ())));
         f.setMetaValue("leftWidth", boundaries.at(i).mz_min);

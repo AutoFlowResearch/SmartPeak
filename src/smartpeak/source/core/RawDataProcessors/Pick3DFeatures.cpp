@@ -270,6 +270,7 @@ namespace SmartPeak
     feat_map.erase(remove_it, feat_map.end());
 
     // store ionization mode of spectra (useful for post-processing by AccurateMassSearch tool)
+    // add in additional metadata for downstream processing
     if (!feat_map.empty())
     {
       std::set<OpenMS::IonSource::Polarity> pols;
@@ -283,9 +284,36 @@ namespace SmartPeak
       {
         sl_pols.push_back(OpenMS::String(OpenMS::IonSource::NamesOfPolarity[pol]));
       }
-      feat_map[0].setMetaValue("scan_polarity", OpenMS::ListUtils::concatenate(sl_pols, ";"));
+      for (auto& feat : feat_map)
+      {
+        // [UNIT TEST] Test for complete metadata
+        feat.setMetaValue("scan_polarity", OpenMS::ListUtils::concatenate(sl_pols, ";"));
+        std::ostringstream mass_of_the_peak;
+        mass_of_the_peak << feat.getMZ();
+        feat.setMetaValue("PeptideRef", mass_of_the_peak.str());
+        //feat.setMetaValue("leftWidth", chrom.getMinRT());
+        //feat.setMetaValue("rightWidth", chrom.getMaxRT());
+        feat.setMetaValue("peak_apex_int", feat.getIntensity());
+        feat.setMetaValue("peak_apex_position", feat.getPosition()[0]);
+        feat.setMetaValue("native_id", feat.getMetaValue("label"));
+
+        // Update the native_id with the chromatogram_id
+        for (const auto& chrom : merged_chromatograms) 
+        {
+          auto chromatogram_id = chrom.getNativeID();
+          auto pos = chromatogram_id.find("_");
+          if (pos != std::string::npos)
+          {
+            chromatogram_id = chromatogram_id.substr(0, pos);
+          }
+          if (chromatogram_id == OpenMS::String(feat.getUniqueId())) {
+            feat.setMetaValue("native_id", chromatogram_id);
+          }
+        }
+      }
     }
 
+    // NOTE: setPrimaryMSRunPath() is needed for calculate_calibration
     feat_map.setPrimaryMSRunPath({ rawDataHandler_IO.getMetaData().getFilename() });
     LOGD << "setPrimaryMSRunPath: " << rawDataHandler_IO.getMetaData().getFilename();
 

@@ -75,12 +75,51 @@ namespace SmartPeak
     OpenMS::FeatureMap selected_features;
     targeted_spectra_extractor.extractSpectra(rawDataHandler_IO.getExperiment(), rawDataHandler_IO.getFeatureMap(), annotated_spectra, selected_features, true);
 
-    rawDataHandler_IO.setFeatureMap(selected_features);
-    // rawDataHandler_IO.getExperiment().setSpectra(annotated_spectra);
-    for (auto& s : annotated_spectra) {
-      rawDataHandler_IO.getExperiment().addSpectrum(s);
-    }
-    rawDataHandler_IO.updateFeatureMapHistory();
-  }
+    // Update the features
+    rawDataHandler_IO.setFeatureMap("extracted_spectra", selected_features); // [UNIT TEST] test for named feature
+    // NOTE: useful only for DDA using MRM trigger scans and not for DDA untargeted applications
+    
+    // Create the featureMap from the annotated/picked/scored spectra
+    OpenMS::FeatureMap featureMap;
+    for (const OpenMS::MSSpectrum& spec : annotated_spectra) {
+      for (auto it = spec.begin(); it != spec.end(); ++it)
+      {
+        // set the metadata
+        OpenMS::Feature f;
+        f.setUniqueId();
+        f.setMZ(it->getMZ());
+        f.setRT(spec.getRT());
+        std::ostringstream mass_of_the_peak;
+        mass_of_the_peak << f.getMZ();
+        std::string native_id = std::string(spec.getNativeID()) + std::string("_") + mass_of_the_peak.str();
+        f.setMetaValue("native_id", native_id);
+        f.setMetaValue("PeptideRef",spec.getName());
+        f.setMetaValue("scan_polarity", rawDataHandler_IO.getMetaData().scan_polarity);
+        f.setMetaValue("ms_level", 2);
 
+        //// Ignoring LeftWidth and RightWidth for now...
+        //f.setMetaValue("leftWidth", );
+        //f.setMetaValue("rightWidth", );
+
+        // Calculate the peak area (See Pick2D Features for using OpenMS::PeakIntegrator::PeakArea)
+        f.setIntensity(it->getIntensity());
+        f.setMetaValue("peak_apex_int", it->getIntensity());
+        f.setMetaValue("peak_apex_position", it->getMZ());
+
+        // Calculate peak shape metrics that will be used for later QC (See Pick2D Features for using OpenMS::PeakIntegrator::PeakShapeMetrics)
+        // Ignore for now...
+
+        // Extract out the convex hull (See Pick2DFeatures for using OpenMS::PeakIntegrator::PeakArea)
+        // Ignoring the extraction of the convex hull for now...
+
+        featureMap.push_back(f);
+      }
+    }
+
+    rawDataHandler_IO.setFeatureMap(featureMap);
+    rawDataHandler_IO.updateFeatureMapHistory();
+    
+    // Update the spectrum with the picked/scored/annotated spectrum
+    rawDataHandler_IO.getChromatogramMap().setSpectra(annotated_spectra); // [UNIT TEST] Test for updated annotation
+  }
 }
