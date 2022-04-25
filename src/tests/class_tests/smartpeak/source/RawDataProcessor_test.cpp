@@ -3068,7 +3068,6 @@ TEST(RawDataProcessor, getterExtractSpectraNonTargeted)
   EXPECT_EQ(processor.getName(), "EXTRACT_SPECTRA_NON_TARGETED");
 }
 
-
 TEST(RawDataProcessor, ExtractSpectraNonTargeted)
 {
   Filenames filenames;
@@ -3092,13 +3091,12 @@ TEST(RawDataProcessor, ExtractSpectraNonTargeted)
   ExtractSpectraNonTargeted extract_spectra_non_targeted;
   extract_spectra_non_targeted.process(rawDataHandler, params, filenames);
   const auto& feature_map = rawDataHandler.getFeatureMap();
-  ASSERT_EQ(feature_map.size(), 1);
+  ASSERT_EQ(feature_map.size(), 10);
   const auto& feature = feature_map.begin();
   EXPECT_FLOAT_EQ(feature->getRT(), 390.259);
-  EXPECT_FLOAT_EQ(feature->getMZ(), 149.02496);
-  EXPECT_EQ(feature->getMetaValue("transition_name"), std::string("HMDB:HMDB0000001"));
+  EXPECT_FLOAT_EQ(feature->getMZ(), 93.034767);
+  EXPECT_EQ(feature->getMetaValue("PeptideRef"), std::string("HMDB:HMDB0000001"));
 }
-
 
 TEST(RawDataProcessor, ConstructTransitionsList_csv)
 {
