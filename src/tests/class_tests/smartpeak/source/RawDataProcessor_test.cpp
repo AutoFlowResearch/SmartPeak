@@ -1356,7 +1356,7 @@ TEST(RawDataProcessor, pick2DFeatures)
 
   const OpenMS::Feature& feature1 = rawDataHandler.getFeatureMap().at(0); // feature_map_
   EXPECT_EQ(feature1.getMetaValue("native_id"), "spectrum=0");
-  EXPECT_EQ(feature1.getMetaValue("PeptideRef").toString(), "Unknown");
+  EXPECT_EQ(feature1.getMetaValue("PeptideRef").toString(), "109.951");
   EXPECT_NEAR(static_cast<double>(feature1.getMetaValue("logSN")), 10.439937656615268, 1e-6);
   EXPECT_NEAR(static_cast<double>(feature1.getMetaValue("peak_apex_int")), 1930.90576171875, 1e-6);
   EXPECT_EQ(feature1.getMetaValue("scan_polarity"), "positive");
@@ -1369,7 +1369,7 @@ TEST(RawDataProcessor, pick2DFeatures)
   EXPECT_NEAR(static_cast<double>(feature1.getIntensity()), 2.2940683364868164, 1e-6);
 
   const OpenMS::Feature& feature2 = rawDataHandler.getFeatureMap().back();
-  EXPECT_EQ(feature2.getMetaValue("PeptideRef").toString(), "Unknown");
+  EXPECT_EQ(feature2.getMetaValue("PeptideRef").toString(), "109.994");
   EXPECT_NEAR(static_cast<double>(feature2.getMetaValue("logSN")), 10.439937656615268, 1e-6);
   EXPECT_NEAR(static_cast<double>(feature2.getMetaValue("peak_apex_int")), 1564.805908203125, 1e-6);
   EXPECT_EQ(feature2.getMetaValue("scan_polarity"), "positive");
@@ -1385,7 +1385,7 @@ TEST(RawDataProcessor, pick2DFeatures)
 
   const OpenMS::Feature& hfeature1 = rawDataHandler.getFeatureMapHistory().at(0); // feature_map_history_
   EXPECT_EQ(hfeature1.getMetaValue("native_id"), "spectrum=0");
-  EXPECT_EQ(hfeature1.getMetaValue("PeptideRef").toString(), "Unknown");
+  EXPECT_EQ(hfeature1.getMetaValue("PeptideRef").toString(), "109.951");
   EXPECT_NEAR(static_cast<double>(hfeature1.getMetaValue("logSN")), 10.439937656615268, 1e-6);
   EXPECT_NEAR(static_cast<double>(hfeature1.getMetaValue("peak_apex_int")), 1930.90576171875, 1e-6);
   EXPECT_EQ(hfeature1.getMetaValue("scan_polarity"), "positive");
@@ -1398,7 +1398,7 @@ TEST(RawDataProcessor, pick2DFeatures)
   EXPECT_NEAR(static_cast<double>(hfeature1.getIntensity()), 2.2940683364868164, 1e-6);
 
   const OpenMS::Feature& hfeature2 = rawDataHandler.getFeatureMapHistory().back();
-  EXPECT_EQ(hfeature2.getMetaValue("PeptideRef").toString(), "Unknown");
+  EXPECT_EQ(hfeature2.getMetaValue("PeptideRef").toString(), "109.994");
   EXPECT_NEAR(static_cast<double>(hfeature2.getMetaValue("logSN")), 10.439937656615268, 1e-6);
   EXPECT_NEAR(static_cast<double>(hfeature2.getMetaValue("peak_apex_int")), 1564.805908203125, 1e-6);
   EXPECT_EQ(hfeature2.getMetaValue("scan_polarity"), "positive");
