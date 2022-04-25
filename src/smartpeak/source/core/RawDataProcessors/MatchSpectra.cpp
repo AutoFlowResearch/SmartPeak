@@ -43,12 +43,12 @@ namespace SmartPeak
 
   std::set<std::string> MatchSpectra::getInputs() const
   {
-    return { };
+    return { "Extracted Spectra" };
   }
 
   std::set<std::string> MatchSpectra::getOutputs() const
   {
-    return { "Features" };
+    return { "Extracted Spectra" };
   }
 
   ParameterSet MatchSpectra::getParameterSchema() const

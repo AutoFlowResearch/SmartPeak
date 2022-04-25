@@ -47,7 +47,7 @@ namespace SmartPeak
 
   std::set<std::string> ExtractSpectraNonTargeted::getOutputs() const
   {
-    return { "Features" };
+    return { "Features", "Extracted Spectra"};
   }
 
   ParameterSet ExtractSpectraNonTargeted::getParameterSchema() const
