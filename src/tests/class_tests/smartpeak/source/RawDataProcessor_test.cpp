@@ -3035,18 +3035,17 @@ TEST(RawDataProcessor, StoreMSP)
   RawDataHandler rawDataHandler;
 
   Filenames filenames;
-  filenames.setFullPath("traML", SMARTPEAK_GET_TEST_DATA_PATH("dda_min_traML.csv"));
-  LoadTransitions loadTransitions;
-  loadTransitions.process(rawDataHandler, params_1, filenames);
-
-  filenames.setFullPath("mzML_i", SMARTPEAK_GET_TEST_DATA_PATH("dda_min.mzML"));
-  LoadRawData loadRawData;
-  loadRawData.process(rawDataHandler, params_1, filenames);
-  loadRawData.extractMetaData(rawDataHandler);
-
-  LoadFeatures loadFeatures;
-  filenames.setFullPath("featureXML_i", SMARTPEAK_GET_TEST_DATA_PATH("dda_min.featureXML"));
-  loadFeatures.process(rawDataHandler, params_1, filenames);
+  OpenMS::MSChromatogram chrom1;
+  chrom1.setName("chrom1");
+  rawDataHandler.getChromatogramMap().addChromatogram(chrom1);
+  OpenMS::MSSpectrum spectrum1;
+  spectrum1.setName("spectr1");
+  spectrum1.push_back(OpenMS::Peak1D(1.0f, 2.0f));
+  rawDataHandler.getChromatogramMap().addSpectrum(spectrum1);
+  OpenMS::MSSpectrum spectrum2;
+  spectrum1.setName("spectr2");
+  spectrum1.push_back(OpenMS::Peak1D(10.0f, 20.0f));
+  rawDataHandler.getChromatogramMap().addSpectrum(spectrum1);
 
   auto path_msp = std::tmpnam(nullptr);
   filenames.setFullPath("output_ms2", path_msp);
@@ -3057,7 +3056,7 @@ TEST(RawDataProcessor, StoreMSP)
   OpenMS::MSExperiment experiment;
   msp_file.load(path_msp, experiment);
 
-  ASSERT_EQ(experiment.size(), 926);
+  ASSERT_EQ(experiment.size(), 2);
 }
 
 /**
