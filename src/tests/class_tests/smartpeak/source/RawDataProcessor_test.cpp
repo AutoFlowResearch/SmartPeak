@@ -3131,29 +3131,27 @@ TEST(RawDataProcessor, ConstructTransitionsList_csv)
   construct_transitions_list.process(rawDataHandler, params, filenames);
 
   const auto& feature_map = rawDataHandler.getFeatureMap();
-  ASSERT_EQ(feature_map.size(), 2);
+  ASSERT_EQ(feature_map.size(), 10);
   const auto& feature_1 = feature_map.at(0);
-  EXPECT_FLOAT_EQ(feature_1.getRT(), 404.30066);
-  EXPECT_FLOAT_EQ(feature_1.getMZ(), 195.10199);
-  EXPECT_EQ(static_cast<int>(feature_1.getMetaValue("ms_level")), 1);
+  EXPECT_FLOAT_EQ(feature_1.getRT(), 390.259);
+  EXPECT_FLOAT_EQ(feature_1.getMZ(), 111.04565);
 
   const auto& feature_2 = feature_map.at(1);
   EXPECT_FLOAT_EQ(feature_2.getRT(), 390.259);
-  EXPECT_FLOAT_EQ(feature_2.getMZ(), 149.02496);
-  EXPECT_EQ(static_cast<int>(feature_2.getMetaValue("ms_level")), 2);
+  EXPECT_FLOAT_EQ(feature_2.getMZ(), 121.02983);
 
   // load and check transitions file
   LoadTransitions load_transition;
   filenames.setFullPath("traML", output_file_path);
   load_transition.process(rawDataHandler, params, filenames);
   const auto& transitions = rawDataHandler.getTargetedExperiment().getTransitions();
-  ASSERT_EQ(transitions.size(), 1);
+  ASSERT_EQ(transitions.size(), 10);
   const auto& transition = transitions.at(0);
-  EXPECT_EQ(std::string(transition.getName()), std::string("Unknown 1_HMDB:HMDB0000001"));
-  EXPECT_FLOAT_EQ(transition.getLibraryIntensity(), 90780);
+  EXPECT_EQ(std::string(transition.getName()), std::string("scan=463_111.046_HMDB:HMDB0000001"));
+  EXPECT_FLOAT_EQ(transition.getLibraryIntensity(), 2760);
   EXPECT_EQ(std::string(transition.getPeptideRef()), std::string("HMDB:HMDB0000001"));
   EXPECT_FLOAT_EQ(transition.getPrecursorMZ(), 195.102);
-  EXPECT_FLOAT_EQ(transition.getProductMZ(), 149.025);
+  EXPECT_FLOAT_EQ(transition.getProductMZ(), 111.04565);
 }
 
 /**
