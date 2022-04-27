@@ -18,7 +18,7 @@
 //
 // --------------------------------------------------------------------------
 // $Maintainer: Douglas McCloskey $
-// $Authors: Douglas McCloskey, Pasquale Domenico Colaianni, Svetlana Kutuzova, Ahmed Khalil $
+// $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
 // --------------------------------------------------------------------------
 
 #pragma once
