@@ -120,6 +120,6 @@ namespace SmartPeak
     rawDataHandler_IO.updateFeatureMapHistory();
     
     // Update the spectrum with the picked/scored/annotated spectrum
-    rawDataHandler_IO.getChromatogramMap().setSpectra(annotated_spectra); // [UNIT TEST] Test for updated annotation
+    rawDataHandler_IO.getChromatogramMap().setSpectra(annotated_spectra);
   }
 }
