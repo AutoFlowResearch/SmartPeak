@@ -18,7 +18,7 @@
 //
 // --------------------------------------------------------------------------
 // $Maintainer: Douglas McCloskey $
-// $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
+// $Authors: Douglas McCloskey, Bertrand Boudaud $
 // --------------------------------------------------------------------------
 #include <SmartPeak/core/RawDataProcessors/ExtractSpectraNonTargeted.h>
 #include <SmartPeak/core/Filenames.h>
