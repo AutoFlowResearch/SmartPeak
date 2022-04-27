@@ -76,7 +76,7 @@ namespace SmartPeak
     targeted_spectra_extractor.extractSpectra(rawDataHandler_IO.getExperiment(), rawDataHandler_IO.getFeatureMap(), annotated_spectra, selected_features, true);
 
     // Update the features
-    rawDataHandler_IO.setFeatureMap("extracted_spectra", selected_features); // [UNIT TEST] test for named feature
+    rawDataHandler_IO.setFeatureMap("extracted_spectra", selected_features);
     // NOTE: useful only for DDA using MRM trigger scans and not for DDA untargeted applications
     
     // Create the featureMap from the annotated/picked/scored spectra
