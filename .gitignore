@@ -35,6 +35,7 @@
 build*/
 smartpeak_build/
 smartpeak_superbuild/
+superbuild*/
 
 # VS
 .vscode/

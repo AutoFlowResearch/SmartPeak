@@ -44,16 +44,21 @@
 #include <SmartPeak/core/RawDataProcessors/FilterFeaturesBackgroundInterferences.h>
 #include <SmartPeak/core/RawDataProcessors/CheckFeaturesBackgroundInterferences.h>
 #include <SmartPeak/core/RawDataProcessors/ExtractSpectraWindows.h>
+#include <SmartPeak/core/RawDataProcessors/ExtractSpectraNonTargeted.h>
 #include <SmartPeak/core/RawDataProcessors/MergeSpectra.h>
-#include <SmartPeak/core/RawDataProcessors/PickMS1Features.h>
-#include <SmartPeak/core/RawDataProcessors/PickMS2Features.h>
+#include <SmartPeak/core/RawDataProcessors/Pick2DFeatures.h>
+#include <SmartPeak/core/RawDataProcessors/Pick3DFeatures.h>
 #include <SmartPeak/core/RawDataProcessors/SearchAccurateMass.h>
-#include <SmartPeak/core/RawDataProcessors/MergeFeatures.h>
+#include <SmartPeak/core/RawDataProcessors/MergeFeaturesMS1.h>
+#include <SmartPeak/core/RawDataProcessors/MergeFeaturesMS2.h>
+#include <SmartPeak/core/RawDataProcessors/MatchSpectra.h>
 #include <SmartPeak/core/RawDataProcessors/LoadAnnotations.h>
-#include <SmartPeak/core/RawDataProcessors/SearchSpectrum.h>
-#include <SmartPeak/core/RawDataProcessors/DDA.h>
+#include <SmartPeak/core/RawDataProcessors/SearchSpectrumMS1.h>
+#include <SmartPeak/core/RawDataProcessors/SearchSpectrumMS2.h>
+#include <SmartPeak/core/RawDataProcessors/ConstructTransitionsList.h>
 #include <SmartPeak/core/RawDataProcessors/StoreAnnotations.h>
 #include <SmartPeak/core/RawDataProcessors/ClearData.h>
+#include <SmartPeak/core/RawDataProcessors/StoreMSP.h>
 #include <SmartPeak/core/RawDataProcessors/StoreRawData.h>
 #include <SmartPeak/core/RawDataProcessors/CalculateMDVs.h>
 #include <SmartPeak/core/RawDataProcessors/IsotopicCorrections.h>
@@ -118,16 +123,21 @@ namespace SmartPeak {
     {"FILTER_FEATURES_BACKGROUND_INTERFERENCES",  std::make_shared<FilterFeaturesBackgroundInterferences>()},
     {"CHECK_FEATURES_BACKGROUND_INTERFERENCES",   std::make_shared<CheckFeaturesBackgroundInterferences>()},
     {"EXTRACT_SPECTRA_WINDOWS",                   std::make_shared<ExtractSpectraWindows>()},
+    {"EXTRACT_SPECTRA_NON_TARGETED",              std::make_shared<ExtractSpectraNonTargeted>()},
     {"MERGE_SPECTRA",                             std::make_shared<MergeSpectra>()},
-    {"PICK_MS1_FEATURES",                         std::make_shared<PickMS1Features>()},
-    {"PICK_MS2_FEATURES",                         std::make_shared<PickMS2Features>()},
+    {"PICK_2D_FEATURES",                          std::make_shared<Pick2DFeatures>()},
+    {"PICK_3D_FEATURES",                          std::make_shared<Pick3DFeatures>()},
     {"SEARCH_ACCURATE_MASS",                      std::make_shared<SearchAccurateMass>()},
-    {"MERGE_FEATURES",                            std::make_shared<MergeFeatures>()},
+    {"MERGE_FEATURES_MS1",                        std::make_shared<MergeFeaturesMS1>()},
+    {"MERGE_FEATURES_MS2",                        std::make_shared<MergeFeaturesMS2>()},
     {"LOAD_ANNOTATIONS",                          std::make_shared<LoadAnnotations>()},
-    {"SEARCH_SPECTRUM",                           std::make_shared<SearchSpectrum>()},
-    {"DDA",                                       std::make_shared<DDA>()},
+    {"SEARCH_SPECTRUM_MS1",                       std::make_shared<SearchSpectrumMS1>()},
+    {"SEARCH_SPECTRUM_MS2",                       std::make_shared<SearchSpectrumMS2>()},
+    {"MATCH_SPECTRA",                             std::make_shared<MatchSpectra>()},
+    {"CONSTRUCT_TRANSITIONS_LIST",                std::make_shared<ConstructTransitionsList>()},
     {"STORE_ANNOTATIONS",                         std::make_shared<StoreAnnotations>()},
     {"CLEAR_DATA",                                std::make_shared<ClearData>()},
+    {"STORE_MSP",                                 std::make_shared<StoreMSP>()},
     {"STORE_RAW_DATA",                            std::make_shared<StoreRawData>()},
     {"CALCULATE_MDVS",                            std::make_shared<CalculateMDVs>()},
     {"ISOTOPIC_CORRECTIONS",                      std::make_shared<IsotopicCorrections>()},
