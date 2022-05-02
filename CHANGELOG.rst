@@ -1,6 +1,18 @@
 SmartPeak Changelog
 ===================
 
+v1.23.0 (2022-04-28)
+--------------------
+
+Features
+~~~~~~~~
+- DDA Implementation `(#534) <https://github.com/AutoFlowResearch/SmartPeak/pull/534>`_
+    - Added "LCMS DDA Transitions Library Construction" workflow
+    - Added "LCMS DDA Spectra Library Construction" workflow
+    - Added "LCMS DDA Spectra Library Matching" workflow
+    - PickMS1Features renamed Pick2DFeatures 
+    - PickMS2Features renamed Pick3DFeatures
+
 v1.22.0 (2022-04-12)
 --------------------
 
