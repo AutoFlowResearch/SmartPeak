@@ -169,7 +169,7 @@ namespace SmartPeak {
     {"LOAD_FEATURE_BACKGROUND_QCS",               std::make_shared<LoadFeatureBackgroundQCs>()},
     {"STORE_FEATURE_RSD_ESTIMATIONS",             std::make_shared<StoreFeatureRSDEstimations>()},
     {"LOAD_FEATURE_RSD_ESTIMATIONS",              std::make_shared<LoadFeatureRSDEstimations>()},
-    {"STORE_FEATURE_BACKGROUND_ESTIMATIONS",      std::make_shared<StoreFeatureBackgroundEstimations>()},
+    {"STORE_FEATURE_BACKGROUND_ESTIMATIONS",      std::make_shared<StoreFeatureBackgroundEstimations>(FeatureFiltersUtilsMode::EFeatureFilterComponentAndGroup, false, true)},
     {"LOAD_FEATURE_BACKGROUND_ESTIMATIONS",       std::make_shared<LoadFeatureBackgroundEstimations>()}
   };
   const std::map<std::string, std::shared_ptr<SampleGroupProcessor>> n_to_sample_group_method_ {
