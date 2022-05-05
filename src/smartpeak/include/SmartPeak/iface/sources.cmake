@@ -4,6 +4,7 @@ set(directory include/SmartPeak/iface)
 ### list all header files of the directory here
 set(sources_list_h
   IApplicationProcessorObserver.h
+  IDataDescription.h
   IFeaturesObserver.h
   IFilenamesHandler.h
   IFilePickerHandler.h
