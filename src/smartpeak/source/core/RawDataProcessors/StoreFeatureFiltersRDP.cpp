@@ -76,7 +76,7 @@ namespace SmartPeak
     {
       filenames.addFileName("featureFilterComponentGroups", "${MAIN_DIR}/featureFilterComponentGroups.csv", "Components Group Filters", true, true);
     }
-    else if (feature_filter_mode_ & FeatureFiltersUtilsMode::EFeatureFiltersModeComponent)
+    if (feature_filter_mode_ & FeatureFiltersUtilsMode::EFeatureFiltersModeComponent)
     {
       filenames.addFileName("featureFilterComponents", "${MAIN_DIR}/featureFilterComponents.csv", "Components Filters", true, true);
     }

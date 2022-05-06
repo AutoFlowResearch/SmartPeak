@@ -51,7 +51,6 @@ namespace SmartPeak
   {
     Filenames filenames;
     filenames.setTagValue(Filenames::Tag::FEATURES_OUTPUT_PATH, directory.generic_string());
-    static_filenames_ = false;
     for (auto& sequence_segment : application_handler->sequenceHandler_.getSequenceSegments())
     {
       filenames.setTagValue(Filenames::Tag::OUTPUT_SEQUENCE_SEGMENT_NAME, sequence_segment.getSequenceSegmentName());
@@ -78,16 +77,18 @@ namespace SmartPeak
         constructFilename("featureBackgroundEstimationComponentGroups.csv", static_filenames_),
         "Feature Background Estimation Groups",
         true,
-        true
+        !export_,
+        export_
       );
     }
-    else if (feature_filter_mode_ & FeatureFiltersUtilsMode::EFeatureFiltersModeComponent)
+    if (feature_filter_mode_ & FeatureFiltersUtilsMode::EFeatureFiltersModeComponent)
     {
       filenames.addFileName("featureBackgroundEstimationComponents",
         constructFilename("featureBackgroundEstimationComponents.csv", static_filenames_),
         "Feature Background Estimation",
         true,
-        true
+        !export_,
+        export_
         );
     }
   };

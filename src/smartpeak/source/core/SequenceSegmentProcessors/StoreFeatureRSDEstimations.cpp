@@ -78,15 +78,17 @@ namespace SmartPeak
         constructFilename("featureRSDEstimationComponentGroups.csv", static_filenames_),
         "Feature RSD Estimation Component Groups",
         true,
-        true);
+        !export_,
+        export_);
     }
-    else if (feature_filter_mode_ & FeatureFiltersUtilsMode::EFeatureFiltersModeComponent)
+    if (feature_filter_mode_ & FeatureFiltersUtilsMode::EFeatureFiltersModeComponent)
     {
       filenames.addFileName("featureRSDEstimationComponents",
         constructFilename("featureRSDEstimationComponents.csv", static_filenames_),
         "Feature RSD Estimation Component",
         true,
-        true);
+        !export_,
+        export_);
     }
   };
 
