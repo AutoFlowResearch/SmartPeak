@@ -47,21 +47,15 @@ namespace SmartPeak
     return { };
   }
 
-  bool StoreFeatureBackgroundEstimations::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
+  bool StoreFeatureBackgroundEstimations::onFilePicked(const std::filesystem::path& directory, ApplicationHandler* application_handler)
   {
     Filenames filenames;
-    if (!FeatureFiltersUtils::onFilePicked(
-      filename,
-      application_handler,
-      filenames,
-      "featureBackgroundEstimationComponents",
-      "featureBackgroundEstimationComponentGroups",
-      feature_filter_mode_))
+    filenames.setTagValue(Filenames::Tag::FEATURES_OUTPUT_PATH, directory.generic_string());
+    for (auto& sequence_segment : application_handler->sequenceHandler_.getSequenceSegments())
     {
-      return false;
+      filenames.setTagValue(Filenames::Tag::OUTPUT_SEQUENCE_SEGMENT_NAME, sequence_segment.getSequenceSegmentName());
+      process(sequence_segment, application_handler->sequenceHandler_, {}, filenames);
     }
-    sequence_segment_observable_ = &application_handler->sequenceHandler_;
-    process(application_handler->sequenceHandler_.getSequenceSegments()[0], SequenceHandler(), {}, filenames);
     return true;
   }
 
@@ -83,16 +77,18 @@ namespace SmartPeak
         constructFilename("featureBackgroundEstimationComponentGroups.csv", static_filenames_),
         "Feature Background Estimation Groups",
         true,
-        true
+        !export_,
+        export_
       );
     }
-    else if (feature_filter_mode_ & FeatureFiltersUtilsMode::EFeatureFiltersModeComponent)
+    if (feature_filter_mode_ & FeatureFiltersUtilsMode::EFeatureFiltersModeComponent)
     {
       filenames.addFileName("featureBackgroundEstimationComponents",
         constructFilename("featureBackgroundEstimationComponents.csv", static_filenames_),
         "Feature Background Estimation",
         true,
-        true
+        !export_,
+        export_
         );
     }
   };

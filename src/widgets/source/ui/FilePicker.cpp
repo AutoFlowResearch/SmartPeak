@@ -349,7 +349,7 @@ namespace SmartPeak
       {
         auto dir = pfd::select_folder(
           title,
-          default_file_name
+          ""
         ).result();
         LOGD << "Selected dir: " << dir;
         picked_pathname_ = dir;

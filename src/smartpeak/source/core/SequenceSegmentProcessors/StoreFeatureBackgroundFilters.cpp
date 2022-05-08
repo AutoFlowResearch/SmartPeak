@@ -79,15 +79,23 @@ namespace SmartPeak
   {
     if (feature_filter_mode_ & FeatureFiltersUtilsMode::EFeatureFiltersModeGroup)
     {
-      filenames.addFileName("featureBackgroundFilterComponentGroups",
-                            constructFilename("featureBackgroundFilterComponentGroups.csv", static_filenames_),
-                            "Components Group % Background Filters");
+      filenames.addFileName(
+        "featureBackgroundFilterComponentGroups",
+        constructFilename("featureBackgroundFilterComponentGroups.csv", static_filenames_),
+        "Components Group % Background Filters",
+        true,
+        !export_,
+        export_);
     }
-    else if (feature_filter_mode_ & FeatureFiltersUtilsMode::EFeatureFiltersModeComponent)
+    if (feature_filter_mode_ & FeatureFiltersUtilsMode::EFeatureFiltersModeComponent)
     {
-      filenames.addFileName("featureBackgroundFilterComponents",
-                            constructFilename("featureBackgroundFilterComponents.csv", static_filenames_),
-                            "Components % Background Filters");
+      filenames.addFileName(
+        "featureBackgroundFilterComponents",
+        constructFilename("featureBackgroundFilterComponents.csv", static_filenames_),
+        "Components % Background Filters",
+        true,
+        !export_,
+        export_);
     }
   };
 

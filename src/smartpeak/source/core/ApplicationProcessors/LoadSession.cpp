@@ -121,17 +121,19 @@ namespace SmartPeak
         {
           if (!application_handler_.sequenceHandler_.getSequenceSegments().empty())
           {
-            SequenceSegmentHandler& sequenceSegmentHandler = application_handler_.sequenceHandler_.getSequenceSegments().at(0);
-            sequence_segment_processor->sequence_segment_observable_ = &application_handler_.sequenceHandler_;
-            try
+            for (auto& sequenceSegmentHandler : application_handler_.sequenceHandler_.getSequenceSegments())
             {
-              sequence_segment_processor->process(sequenceSegmentHandler, SequenceHandler(), {}, *filenames_);
-            }
-            catch (const std::exception& e)
-            {
-              LOGE << e.what();
-              notifyApplicationProcessorError(e.what());
-              return false;
+              sequence_segment_processor->sequence_segment_observable_ = &application_handler_.sequenceHandler_;
+              try
+              {
+                sequence_segment_processor->process(sequenceSegmentHandler, SequenceHandler(), {}, *filenames_);
+              }
+              catch (const std::exception& e)
+              {
+                LOGE << e.what();
+                notifyApplicationProcessorError(e.what());
+                return false;
+              }
             }
           }
           else

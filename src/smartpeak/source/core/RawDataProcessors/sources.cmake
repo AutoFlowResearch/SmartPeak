@@ -10,8 +10,9 @@ set(sources_list
 	CheckFeaturesBackgroundInterferences.cpp
 	CheckFeaturesRSDs.cpp
 	ClearData.cpp
-	DDA.cpp
+	ConstructTransitionsList.cpp
 	ExtractChromatogramWindows.cpp
+	ExtractSpectraNonTargeted.cpp
 	ExtractSpectraWindows.cpp
 	FilterFeatures.cpp
 	FilterFeaturesBackgroundInterferences.cpp
@@ -27,20 +28,25 @@ set(sources_list
 	LoadTransitions.cpp
 	LoadValidationData.cpp
 	MapChromatograms.cpp
-	MergeFeatures.cpp
+	MatchSpectra.cpp
+	MergeFeaturesMS1.cpp
+	MergeFeaturesMS2.cpp
+	MergeSpectra.cpp
 	MergeSpectra.cpp
 	PickMRMFeatures.cpp
-	PickMS1Features.cpp
-	PickMS2Features.cpp
+	Pick2DFeatures.cpp
+	Pick3DFeatures.cpp
 	PlotFeatures.cpp
 	QuantifyFeatures.cpp
 	SearchAccurateMass.cpp
-	SearchSpectrum.cpp
+	SearchSpectrumMS1.cpp
+	SearchSpectrumMS2.cpp
 	SelectFeatures.cpp
 	StoreAnnotations.cpp
 	StoreFeatureFiltersRDP.cpp
 	StoreFeatureQCsRDP.cpp
 	StoreFeatures.cpp
+	StoreMSP.cpp
 	StoreParameters.cpp
 	StoreRawData.cpp
 	StoreValidationData.cpp

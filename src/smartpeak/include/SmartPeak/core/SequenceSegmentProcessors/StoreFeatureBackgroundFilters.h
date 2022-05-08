@@ -31,10 +31,17 @@ namespace SmartPeak
 
   struct StoreFeatureBackgroundFilters : SequenceSegmentProcessor, IFilePickerHandler
   {
-    StoreFeatureBackgroundFilters(int feature_filter_mode = FeatureFiltersUtilsMode::EFeatureFilterComponentAndGroup, bool static_filenames = false)
-      : feature_filter_mode_(feature_filter_mode), static_filenames_(static_filenames) {}
+    StoreFeatureBackgroundFilters(
+      int feature_filter_mode = FeatureFiltersUtilsMode::EFeatureFilterComponentAndGroup,
+      bool static_filenames = false,
+      bool export__ = false)
+      : feature_filter_mode_(feature_filter_mode),
+      static_filenames_(static_filenames),
+      export_(export__) {}
+
     int feature_filter_mode_;
     bool static_filenames_;
+    bool export_;
 
     /* IProcessorDescription */
     virtual std::string getName() const override { return "STORE_FEATURE_BACKGROUND_FILTERS"; }
@@ -56,7 +63,7 @@ namespace SmartPeak
     /* IFilePickerHandler */
     virtual void getFilenames(Filenames& filenames) const override;
 
-    /* IProcessorDescription */
+    /* IFilePickerHandler */
     bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
   };
 

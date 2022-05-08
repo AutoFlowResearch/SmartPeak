@@ -869,7 +869,9 @@ namespace SmartPeak
     if (editable && ImGui::BeginCombo("Presets", NULL))
     {
       static const char* presets[] = {
-        "DDA",
+        "LCMS DDA Transitions Library Construction",
+        "LCMS DDA Spectra Library Construction",
+        "LCMS DDA Spectra Library Matching",
         "LCMS MRM Unknowns",
         "LCMS MRM Standards",
         "HPLC UV Unknowns",
@@ -885,12 +887,30 @@ namespace SmartPeak
         if (ImGui::Selectable(s))
         {
           std::vector<std::string> ids;
-          const std::string s_string{ s };
-          if (s_string == "DDA")
+          const std::string s_string { s };
+          if (s_string == "LCMS DDA Transitions Library Construction")
             ids = { "LOAD_RAW_DATA",
-                    "PICK_MS2_FEATURES",
-                    "SEARCH_SPECTRUM",
-                    "DDA",
+                    "PICK_3D_FEATURES",
+                    "SEARCH_SPECTRUM_MS1",
+                    "MERGE_FEATURES_MS1",
+                    "EXTRACT_SPECTRA_NON_TARGETED",
+                    "SEARCH_SPECTRUM_MS2",
+                    "MERGE_FEATURES_MS2",
+                    "CONSTRUCT_TRANSITIONS_LIST",
+                    "STORE_FEATURES"};
+          else if (s_string == "LCMS DDA Spectra Library Construction")
+            ids = { "LOAD_RAW_DATA",
+                    "PICK_3D_FEATURES",
+                    "SEARCH_SPECTRUM_MS1",
+                    "MERGE_FEATURES_MS1",
+                    "EXTRACT_SPECTRA_NON_TARGETED",
+                    "STORE_MSP",
+                    "STORE_FEATURES" };
+          else if (s_string == "LCMS DDA Spectra Library Matching")
+            ids = { "LOAD_RAW_DATA",
+                    "PICK_3D_FEATURES",
+                    "EXTRACT_SPECTRA_NON_TARGETED",
+                    "MATCH_SPECTRA",
                     "STORE_FEATURES" };
           else if (s_string == "LCMS MRM Unknowns")
             ids = { "LOAD_RAW_DATA",
@@ -974,14 +994,14 @@ namespace SmartPeak
             ids = { "LOAD_RAW_DATA",
                     "EXTRACT_SPECTRA_WINDOWS",
                     "MERGE_SPECTRA",
-                    "PICK_MS1_FEATURES",
+                    "PICK_2D_FEATURES",
                     "SEARCH_ACCURATE_MASS",
                     "STORE_ANNOTATIONS",
                     "STORE_FEATURES",
                     "ESTIMATE_FEATURE_BACKGROUND_INTERFERENCES",
                     "STORE_FEATURE_BACKGROUND_ESTIMATIONS",
                     "FILTER_FEATURES_BACKGROUND_INTERFERENCES",
-                    "MERGE_FEATURES",
+                    "MERGE_FEATURES_MS1",
                     "MERGE_INJECTIONS",
                     "STORE_FEATURES_SAMPLE_GROUP" };
           application_handler_.sequenceHandler_.setWorkflow(ids);

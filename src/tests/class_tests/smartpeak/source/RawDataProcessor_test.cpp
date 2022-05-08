@@ -46,21 +46,25 @@
 #include <SmartPeak/core/RawDataProcessors/FilterFeaturesBackgroundInterferences.h>
 #include <SmartPeak/core/RawDataProcessors/CheckFeaturesBackgroundInterferences.h>
 #include <SmartPeak/core/RawDataProcessors/ExtractSpectraWindows.h>
+#include <SmartPeak/core/RawDataProcessors/MatchSpectra.h>
 #include <SmartPeak/core/RawDataProcessors/MergeSpectra.h>
-#include <SmartPeak/core/RawDataProcessors/PickMS1Features.h>
-#include <SmartPeak/core/RawDataProcessors/PickMS2Features.h>
+#include <SmartPeak/core/RawDataProcessors/Pick2DFeatures.h>
+#include <SmartPeak/core/RawDataProcessors/Pick3DFeatures.h>
 #include <SmartPeak/core/RawDataProcessors/SearchAccurateMass.h>
-#include <SmartPeak/core/RawDataProcessors/MergeFeatures.h>
+#include <SmartPeak/core/RawDataProcessors/MergeFeaturesMS1.h>
+#include <SmartPeak/core/RawDataProcessors/MergeFeaturesMS2.h>
 #include <SmartPeak/core/RawDataProcessors/LoadAnnotations.h>
-#include <SmartPeak/core/RawDataProcessors/SearchSpectrum.h>
-#include <SmartPeak/core/RawDataProcessors/DDA.h>
+#include <SmartPeak/core/RawDataProcessors/SearchSpectrumMS1.h>
+#include <SmartPeak/core/RawDataProcessors/SearchSpectrumMS2.h>
 #include <SmartPeak/core/RawDataProcessors/StoreAnnotations.h>
+#include <SmartPeak/core/RawDataProcessors/StoreMSP.h>
 #include <SmartPeak/core/RawDataProcessors/ClearData.h>
 #include <SmartPeak/core/RawDataProcessors/StoreRawData.h>
 #include <SmartPeak/core/RawDataProcessors/CalculateMDVs.h>
 #include <SmartPeak/core/RawDataProcessors/IsotopicCorrections.h>
 #include <SmartPeak/core/RawDataProcessors/CalculateIsotopicPurities.h>
 #include <SmartPeak/core/RawDataProcessors/CalculateMDVAccuracies.h>
+#include <SmartPeak/core/RawDataProcessors/ConstructTransitionsList.h>
 #include <SmartPeak/core/RawDataProcessors/LoadParameters.h>
 #include <SmartPeak/core/RawDataProcessors/LoadFeatureFiltersRDP.h>
 #include <SmartPeak/core/RawDataProcessors/LoadFeatureQCsRDP.h>
@@ -68,6 +72,7 @@
 #include <SmartPeak/core/RawDataProcessors/StoreFeatureFiltersRDP.h>
 #include <SmartPeak/core/RawDataProcessors/StoreFeatureQCsRDP.h>
 #include <SmartPeak/core/RawDataProcessors/PlotFeatures.h>
+#include <SmartPeak/core/RawDataProcessors/ExtractSpectraNonTargeted.h>
 #include <SmartPeak/core/SequenceSegmentProcessors/LoadQuantitationMethods.h>
 
 #include <OpenMS/ANALYSIS/OPENSWATH/DATAACCESS/DataAccessHelper.h>
@@ -76,6 +81,7 @@
 #include <OpenMS/FORMAT/FeatureXMLFile.h>  // load/store featureXML
 #include <OpenMS/FORMAT/TraMLFile.h>
 #include <OpenMS/FORMAT/MzMLFile.h>
+#include <OpenMS/FORMAT/MSPGenericFile.h>
 
 using namespace SmartPeak;
 using namespace std;
@@ -1209,8 +1215,8 @@ TEST(RawDataProcessor, sanitizeRawDataProcessorParameters)
   EXPECT_EQ(params.count("MRMFeatureFilter.filter_MRMFeatures.qc"), 1);
   EXPECT_EQ(params.count("SequenceProcessor"), 1);
   EXPECT_EQ(params.count("FIAMS"), 1);
-  EXPECT_EQ(params.count("PickMS1Features"), 1);
-  EXPECT_EQ(params.count("PickMS2Features"), 1);
+  EXPECT_EQ(params.count("Pick2DFeatures"), 1);
+  EXPECT_EQ(params.count("Pick3DFeatures"), 1);
   EXPECT_EQ(params.count("AccurateMassSearchEngine"), 1);
   EXPECT_EQ(params.count("MergeInjections"), 1);
   EXPECT_EQ(params.at("SequenceSegmentPlotter").size(), 3);
@@ -1221,8 +1227,8 @@ TEST(RawDataProcessor, sanitizeRawDataProcessorParameters)
   EXPECT_EQ(params.at("MRMFeatureFilter.filter_MRMFeaturesRSDs.qc").size(), 0);
   EXPECT_EQ(params.at("SequenceProcessor").size(), 0);
   EXPECT_EQ(params.at("FIAMS").size(), 0);
-  EXPECT_EQ(params.at("PickMS1Features").size(), 0);
-  EXPECT_EQ(params.at("PickMS2Features").size(), 0);
+  EXPECT_EQ(params.at("Pick2DFeatures").size(), 0);
+  EXPECT_EQ(params.at("Pick3DFeatures").size(), 0);
   EXPECT_EQ(params.at("AccurateMassSearchEngine").size(), 0);
   EXPECT_EQ(params.at("MergeInjections").size(), 0);
 }
@@ -1305,29 +1311,29 @@ TEST(RawDataProcessor, pickFeaturesMRM)
 }
 
 /**
-  PickMS1Features Tests
+  Pick2DFeatures Tests
 */
-TEST(RawDataProcessor, constructorPickMS1Features)
+TEST(RawDataProcessor, constructorPick2DFeatures)
 {
-  PickMS1Features* ptrPickFeatures = nullptr;
-  PickMS1Features* nullPointerPickFeatures = nullptr;
+  Pick2DFeatures* ptrPickFeatures = nullptr;
+  Pick2DFeatures* nullPointerPickFeatures = nullptr;
   EXPECT_EQ(ptrPickFeatures, nullPointerPickFeatures);
 }
 
-TEST(RawDataProcessor, destructorPickMS1Features)
+TEST(RawDataProcessor, destructorPick2DFeatures)
 {
-  PickMS1Features* ptrPickFeatures = nullptr;
-  ptrPickFeatures = new PickMS1Features();
+  Pick2DFeatures* ptrPickFeatures = nullptr;
+  ptrPickFeatures = new Pick2DFeatures();
   delete ptrPickFeatures;
 }
 
-TEST(RawDataProcessor, gettersPickMS1Features)
+TEST(RawDataProcessor, gettersPick2DFeatures)
 {
-  PickMS1Features processor;
-  EXPECT_EQ(processor.getName(), "PICK_MS1_FEATURES");
+  Pick2DFeatures processor;
+  EXPECT_EQ(processor.getName(), "PICK_2D_FEATURES");
 }
 
-TEST(RawDataProcessor, pickMS1Features)
+TEST(RawDataProcessor, pick2DFeatures)
 {
   // Pre-requisites: load the parameters and associated raw data
   ParameterSet params_1;
@@ -1343,14 +1349,14 @@ TEST(RawDataProcessor, pickMS1Features)
   rawDataHandler.getMetaData().scan_polarity = "positive";
 
   // Test pick features
-  PickMS1Features pickFeatures;
+  Pick2DFeatures pickFeatures;
   pickFeatures.process(rawDataHandler, params_1, filenames);
 
   EXPECT_EQ(rawDataHandler.getFeatureMap().size(), 10);
 
   const OpenMS::Feature& feature1 = rawDataHandler.getFeatureMap().at(0); // feature_map_
   EXPECT_EQ(feature1.getMetaValue("native_id"), "spectrum=0");
-  EXPECT_EQ(feature1.getMetaValue("PeptideRef").toString(), "Unknown");
+  EXPECT_EQ(feature1.getMetaValue("PeptideRef").toString(), "109.951");
   EXPECT_NEAR(static_cast<double>(feature1.getMetaValue("logSN")), 10.439937656615268, 1e-6);
   EXPECT_NEAR(static_cast<double>(feature1.getMetaValue("peak_apex_int")), 1930.90576171875, 1e-6);
   EXPECT_EQ(feature1.getMetaValue("scan_polarity"), "positive");
@@ -1363,7 +1369,7 @@ TEST(RawDataProcessor, pickMS1Features)
   EXPECT_NEAR(static_cast<double>(feature1.getIntensity()), 2.2940683364868164, 1e-6);
 
   const OpenMS::Feature& feature2 = rawDataHandler.getFeatureMap().back();
-  EXPECT_EQ(feature2.getMetaValue("PeptideRef").toString(), "Unknown");
+  EXPECT_EQ(feature2.getMetaValue("PeptideRef").toString(), "109.994");
   EXPECT_NEAR(static_cast<double>(feature2.getMetaValue("logSN")), 10.439937656615268, 1e-6);
   EXPECT_NEAR(static_cast<double>(feature2.getMetaValue("peak_apex_int")), 1564.805908203125, 1e-6);
   EXPECT_EQ(feature2.getMetaValue("scan_polarity"), "positive");
@@ -1379,7 +1385,7 @@ TEST(RawDataProcessor, pickMS1Features)
 
   const OpenMS::Feature& hfeature1 = rawDataHandler.getFeatureMapHistory().at(0); // feature_map_history_
   EXPECT_EQ(hfeature1.getMetaValue("native_id"), "spectrum=0");
-  EXPECT_EQ(hfeature1.getMetaValue("PeptideRef").toString(), "Unknown");
+  EXPECT_EQ(hfeature1.getMetaValue("PeptideRef").toString(), "109.951");
   EXPECT_NEAR(static_cast<double>(hfeature1.getMetaValue("logSN")), 10.439937656615268, 1e-6);
   EXPECT_NEAR(static_cast<double>(hfeature1.getMetaValue("peak_apex_int")), 1930.90576171875, 1e-6);
   EXPECT_EQ(hfeature1.getMetaValue("scan_polarity"), "positive");
@@ -1392,7 +1398,7 @@ TEST(RawDataProcessor, pickMS1Features)
   EXPECT_NEAR(static_cast<double>(hfeature1.getIntensity()), 2.2940683364868164, 1e-6);
 
   const OpenMS::Feature& hfeature2 = rawDataHandler.getFeatureMapHistory().back();
-  EXPECT_EQ(hfeature2.getMetaValue("PeptideRef").toString(), "Unknown");
+  EXPECT_EQ(hfeature2.getMetaValue("PeptideRef").toString(), "109.994");
   EXPECT_NEAR(static_cast<double>(hfeature2.getMetaValue("logSN")), 10.439937656615268, 1e-6);
   EXPECT_NEAR(static_cast<double>(hfeature2.getMetaValue("peak_apex_int")), 1564.805908203125, 1e-6);
   EXPECT_EQ(hfeature2.getMetaValue("scan_polarity"), "positive");
@@ -1406,29 +1412,29 @@ TEST(RawDataProcessor, pickMS1Features)
 }
 
 /**
-  PickMS2Features Tests
+  Pick3DFeatures Tests
 */
-TEST(RawDataProcessor, constructorPickMS2Features)
+TEST(RawDataProcessor, constructorPick3DFeatures)
 {
-  PickMS2Features* ptrPickFeatures = nullptr;
-  PickMS2Features* nullPointerPickFeatures = nullptr;
+  Pick3DFeatures* ptrPickFeatures = nullptr;
+  Pick3DFeatures* nullPointerPickFeatures = nullptr;
   EXPECT_EQ(ptrPickFeatures, nullPointerPickFeatures);
 }
 
-TEST(RawDataProcessor, destructorPickMS2Features)
+TEST(RawDataProcessor, destructorPick3DFeatures)
 {
-  PickMS2Features* ptrPickFeatures = nullptr;
-  ptrPickFeatures = new PickMS2Features();
+  Pick3DFeatures* ptrPickFeatures = nullptr;
+  ptrPickFeatures = new Pick3DFeatures();
   delete ptrPickFeatures;
 }
 
-TEST(RawDataProcessor, gettersPickMS2Features)
+TEST(RawDataProcessor, gettersPick3DFeatures)
 {
-  PickMS2Features processor;
-  EXPECT_EQ(processor.getName(), "PICK_MS2_FEATURES");
+  Pick3DFeatures processor;
+  EXPECT_EQ(processor.getName(), "PICK_3D_FEATURES");
 }
 
-TEST(RawDataProcessor, pickMS2Features)
+TEST(RawDataProcessor, pick3DFeatures)
 {
   // Pre-requisites: load the parameters and associated raw data
   ParameterSet params_1;
@@ -1443,7 +1449,7 @@ TEST(RawDataProcessor, pickMS2Features)
   loadRawData.extractMetaData(rawDataHandler);
 
   // Test pick features
-  PickMS2Features pickFeatures;
+  Pick3DFeatures pickFeatures;
   map<std::string, vector<map<string, string>>> feat_params_struct({
   {"FeatureFindingMetabo", {
     { {"name", "report_chromatograms"}, {"type", "bool"}, {"value", "true"} },
@@ -1583,26 +1589,60 @@ TEST(RawDataProcessor, searchAccurateMass)
 }
 
 /**
-  MergeFeatures Tests
+  MergeFeaturesMS1 Tests
 */
-TEST(RawDataProcessor, constructorMergeFeatures)
+TEST(RawDataProcessor, constructorMergeFeaturesMS1)
 {
-  MergeFeatures* ptrPickFeatures = nullptr;
-  MergeFeatures* nullPointerPickFeatures = nullptr;
+  MergeFeaturesMS1* ptrPickFeatures = nullptr;
+  MergeFeaturesMS1* nullPointerPickFeatures = nullptr;
   EXPECT_EQ(ptrPickFeatures, nullPointerPickFeatures);
 }
 
-TEST(RawDataProcessor, destructorMergeFeatures)
+TEST(RawDataProcessor, destructorMergeFeaturesMS1)
 {
-  MergeFeatures* ptrPickFeatures = nullptr;
-  ptrPickFeatures = new MergeFeatures();
+  MergeFeaturesMS1* ptrPickFeatures = nullptr;
+  ptrPickFeatures = new MergeFeaturesMS1();
   delete ptrPickFeatures;
 }
 
-TEST(RawDataProcessor, gettersMergeFeatures)
+TEST(RawDataProcessor, gettersMergeFeaturesMS1)
 {
-  MergeFeatures processor;
-  EXPECT_EQ(processor.getName(), "MERGE_FEATURES");
+  MergeFeaturesMS1 processor;
+  EXPECT_EQ(processor.getName(), "MERGE_FEATURES_MS1");
+}
+
+TEST(RawDataProcessor, MergeFeaturesMS1)
+{
+  Filenames filenames;
+  RawDataHandler rawDataHandler;
+  ParameterSet params;
+  filenames.setTagValue(Filenames::Tag::MAIN_DIR, SMARTPEAK_GET_TEST_DATA_PATH("DDA"));
+
+  filenames.setFullPath("parameters", SMARTPEAK_GET_TEST_DATA_PATH("DDA/parameters.csv"));
+  LoadParameters load_parameters;
+  load_parameters.process(rawDataHandler, params, filenames);
+  params = rawDataHandler.getParameters();
+
+  filenames.setFullPath("mzML_i", SMARTPEAK_GET_TEST_DATA_PATH("DDA/Germicidin A standard.mzML"));
+  LoadRawData loadRawData;
+  loadRawData.process(rawDataHandler, params, filenames);
+  loadRawData.extractMetaData(rawDataHandler);
+
+  LoadFeatures loadFeatures;
+  filenames.setFullPath("featureXML_i", SMARTPEAK_GET_TEST_DATA_PATH("DDA/MergeFeaturesMS1/Germicidin A standard merge features ms1.featureXML"));
+  loadFeatures.process(rawDataHandler, params, filenames);
+
+  MergeFeaturesMS1 merge_features_ms1;
+  merge_features_ms1.process(rawDataHandler, params, filenames);
+
+  const auto& feature_map = rawDataHandler.getFeatureMap();
+  ASSERT_EQ(feature_map.size(), 1);
+  const auto& feature_1 = feature_map.at(0);
+  EXPECT_EQ(std::string(feature_1.getMetaValue("PeptideRef")), std::string("HMDB:HMDB0000001"));
+  const auto& sub_features = feature_1.getSubordinates();
+  ASSERT_EQ(sub_features.size(), 1);
+  const auto& sub_feature_1 = feature_map.at(0);
+  EXPECT_EQ(std::string(sub_feature_1.getMetaValue("PeptideRef")), std::string("HMDB:HMDB0000001"));
 }
 
 TEST(RawDataProcessor, consensusFeatures)
@@ -1619,7 +1659,7 @@ TEST(RawDataProcessor, consensusFeatures)
   loadFeatures.process(rawDataHandler, params_1, filenames);
 
   // Test accurate mass search
-  MergeFeatures makeConsensusFeatures;
+  MergeFeaturesMS1 makeConsensusFeatures;
   makeConsensusFeatures.process(rawDataHandler, params_1, filenames);
 
   EXPECT_EQ(rawDataHandler.getFeatureMap().size(), 4);
@@ -1680,6 +1720,63 @@ TEST(RawDataProcessor, consensusFeatures)
   EXPECT_NEAR(static_cast<double>(hhits2_sub1.getMetaValue("mz_error_ppm")), 0.449344462258211, 1e-6);
   EXPECT_NEAR(static_cast<double>(hhits2_sub1.getMetaValue("mz_error_Da")), 4.942764675774924e-05, 1e-6);
   EXPECT_EQ(static_cast<int>(hhits2_sub1.getCharge()), 3);
+}
+
+/**
+  MergeFeaturesMS1 Tests
+*/
+TEST(RawDataProcessor, constructorMergeFeaturesMS2)
+{
+  MergeFeaturesMS2* ptrPickFeatures = nullptr;
+  MergeFeaturesMS2* nullPointerPickFeatures = nullptr;
+  EXPECT_EQ(ptrPickFeatures, nullPointerPickFeatures);
+}
+
+TEST(RawDataProcessor, destructorMergeFeaturesMS2)
+{
+  MergeFeaturesMS2* ptrPickFeatures = nullptr;
+  ptrPickFeatures = new MergeFeaturesMS2();
+  delete ptrPickFeatures;
+}
+
+TEST(RawDataProcessor, gettersMergeFeaturesMS2)
+{
+  MergeFeaturesMS2 processor;
+  EXPECT_EQ(processor.getName(), "MERGE_FEATURES_MS2");
+}
+
+TEST(RawDataProcessor, MergeFeaturesMS2)
+{
+  Filenames filenames;
+  RawDataHandler rawDataHandler;
+  ParameterSet params;
+  filenames.setTagValue(Filenames::Tag::MAIN_DIR, SMARTPEAK_GET_TEST_DATA_PATH("DDA"));
+
+  filenames.setFullPath("parameters", SMARTPEAK_GET_TEST_DATA_PATH("DDA/parameters.csv"));
+  LoadParameters load_parameters;
+  load_parameters.process(rawDataHandler, params, filenames);
+  params = rawDataHandler.getParameters();
+
+  filenames.setFullPath("mzML_i", SMARTPEAK_GET_TEST_DATA_PATH("DDA/Germicidin A standard.mzML"));
+  LoadRawData loadRawData;
+  loadRawData.process(rawDataHandler, params, filenames);
+  loadRawData.extractMetaData(rawDataHandler);
+
+  LoadFeatures loadFeatures;
+  filenames.setFullPath("featureXML_i", SMARTPEAK_GET_TEST_DATA_PATH("DDA/MergeFeaturesMS2/Germicidin A standard merge features ms2.featureXML"));
+  loadFeatures.process(rawDataHandler, params, filenames);
+
+  MergeFeaturesMS2 merge_features_ms2;
+  merge_features_ms2.process(rawDataHandler, params, filenames);
+
+  const auto& feature_map = rawDataHandler.getFeatureMap();
+  ASSERT_EQ(feature_map.size(), 1);
+  const auto& feature_1 = feature_map.at(0);
+  EXPECT_EQ(std::string(feature_1.getMetaValue("PeptideRef")), std::string("Unknown 1"));
+  const auto& sub_features = feature_1.getSubordinates();
+  ASSERT_EQ(sub_features.size(), 1);
+  const auto& sub_feature_1 = feature_map.at(0);
+  EXPECT_EQ(std::string(sub_feature_1.getMetaValue("PeptideRef")), std::string("Unknown 1"));
 }
 
 /**
@@ -2852,15 +2949,15 @@ TEST(RawDataProcessor, calculateMDVAccuracies)
 }
 
 /**
-  SearchSpectrum Tests
+  SearchSpectrumMS1 Tests
 */
-TEST(RawDataProcessor, gettersSearchSpectrum)
+TEST(RawDataProcessor, gettersSearchSpectrumMS1)
 {
-  SearchSpectrum processor;
-  EXPECT_EQ(processor.getName(), "SEARCH_SPECTRUM");
+  SearchSpectrumMS1 processor;
+  EXPECT_EQ(processor.getName(), "SEARCH_SPECTRUM_MS1");
 }
 
-TEST(RawDataProcessor, SearchSpectrum)
+TEST(RawDataProcessor, SearchSpectrumMS1)
 {
   ParameterSet params_1;
   ParameterSet params_2;
@@ -2881,7 +2978,7 @@ TEST(RawDataProcessor, SearchSpectrum)
   filenames.setFullPath("featureXML_i", SMARTPEAK_GET_TEST_DATA_PATH("dda_min.featureXML"));
   loadFeatures.process(rawDataHandler, params_1, filenames);
 
-  SearchSpectrum searchSpectrum;
+  SearchSpectrumMS1 searchSpectrum;
   searchSpectrum.process(rawDataHandler, params_1, filenames);
 
   ASSERT_EQ(rawDataHandler.getFeatureMap().size(), 1986);
@@ -2900,15 +2997,37 @@ TEST(RawDataProcessor, SearchSpectrum)
 }
 
 /**
-  DDA Tests
+  Match Spectra Tests
 */
-TEST(RawDataProcessor, gettersDDA)
+TEST(RawDataProcessor, getterMatchSpectra)
 {
-  DDA processor;
-  EXPECT_EQ(processor.getName(), "DDA");
+  MatchSpectra processor;
+  EXPECT_EQ(processor.getName(), "MATCH_SPECTRA");
 }
 
-TEST(RawDataProcessor, DDA)
+TEST(RawDataProcessor, MatchSpectra)
+{
+  Filenames filenames;
+
+  ParameterSet params;
+  RawDataHandler rawDataHandler;
+  OpenMS::FeatureMap selected_features;
+  rawDataHandler.setFeatureMap("extracted_spectra", selected_features); // [UNIT TEST] test for named feature
+  filenames.setFullPath("cmp_spectra", SMARTPEAK_GET_TEST_DATA_PATH("Germicidin_A_standard.msp"));
+  MatchSpectra match_spectra;
+  match_spectra.process(rawDataHandler, params, filenames);
+}
+
+/**
+  Store MSP Tests
+*/
+TEST(RawDataProcessor, getterStoreMSP)
+{
+  StoreMSP processor;
+  EXPECT_EQ(processor.getName(), "STORE_MSP");
+}
+
+TEST(RawDataProcessor, StoreMSP)
 {
   ParameterSet params_1;
   ParameterSet params_2;
@@ -2916,38 +3035,164 @@ TEST(RawDataProcessor, DDA)
   RawDataHandler rawDataHandler;
 
   Filenames filenames;
-  filenames.setFullPath("traML", SMARTPEAK_GET_TEST_DATA_PATH("dda_min_traML.csv"));
-  LoadTransitions loadTransitions;
-  loadTransitions.process(rawDataHandler, params_1, filenames);
+  OpenMS::MSChromatogram chrom1;
+  chrom1.setName("chrom1");
+  rawDataHandler.getChromatogramMap().addChromatogram(chrom1);
+  OpenMS::MSSpectrum spectrum1;
+  spectrum1.setName("spectr1");
+  spectrum1.push_back(OpenMS::Peak1D(1.0f, 2.0f));
+  rawDataHandler.getChromatogramMap().addSpectrum(spectrum1);
+  OpenMS::MSSpectrum spectrum2;
+  spectrum1.setName("spectr2");
+  spectrum1.push_back(OpenMS::Peak1D(10.0f, 20.0f));
+  rawDataHandler.getChromatogramMap().addSpectrum(spectrum1);
 
-  filenames.setFullPath("mzML_i", SMARTPEAK_GET_TEST_DATA_PATH("dda_min.mzML"));
+  auto path_msp = std::tmpnam(nullptr);
+  filenames.setFullPath("output_ms2", path_msp);
+  StoreMSP store_msp;
+  store_msp.process(rawDataHandler, params_1, filenames);
+
+  OpenMS::MSPGenericFile msp_file;
+  OpenMS::MSExperiment experiment;
+  msp_file.load(path_msp, experiment);
+
+  ASSERT_EQ(experiment.size(), 2);
+}
+
+/**
+  Extract Spectra Non Targeted
+*/
+TEST(RawDataProcessor, getterExtractSpectraNonTargeted)
+{
+  ExtractSpectraNonTargeted processor;
+  EXPECT_EQ(processor.getName(), "EXTRACT_SPECTRA_NON_TARGETED");
+}
+
+TEST(RawDataProcessor, ExtractSpectraNonTargeted)
+{
+  Filenames filenames;
+  RawDataHandler rawDataHandler;
+  ParameterSet params;
+
+  filenames.setFullPath("parameters", SMARTPEAK_GET_TEST_DATA_PATH("DDA/parameters.csv"));
+  LoadParameters load_parameters;
+  load_parameters.process(rawDataHandler, params, filenames);
+  params = rawDataHandler.getParameters();
+
+  filenames.setFullPath("mzML_i", SMARTPEAK_GET_TEST_DATA_PATH("DDA/Germicidin A standard.mzML"));
   LoadRawData loadRawData;
-  loadRawData.process(rawDataHandler, params_1, filenames);
+  loadRawData.process(rawDataHandler, params, filenames);
   loadRawData.extractMetaData(rawDataHandler);
 
   LoadFeatures loadFeatures;
-  filenames.setFullPath("featureXML_i", SMARTPEAK_GET_TEST_DATA_PATH("dda_after_search.featureXML"));
-  loadFeatures.process(rawDataHandler, params_1, filenames);
+  filenames.setFullPath("featureXML_i", SMARTPEAK_GET_TEST_DATA_PATH("DDA/ExtractSpectraNonTargeted/Germicidin A standard.featureXML"));
+  loadFeatures.process(rawDataHandler, params, filenames);
 
-  filenames.setFullPath("output_traML", std::tmpnam(nullptr));
-  DDA dda;
-  dda.process(rawDataHandler, params_1, filenames);
+  ExtractSpectraNonTargeted extract_spectra_non_targeted;
+  extract_spectra_non_targeted.process(rawDataHandler, params, filenames);
+  const auto& feature_map = rawDataHandler.getFeatureMap();
+  ASSERT_EQ(feature_map.size(), 10);
+  const auto& feature = feature_map.begin();
+  EXPECT_FLOAT_EQ(feature->getRT(), 390.259);
+  EXPECT_FLOAT_EQ(feature->getMZ(), 93.034767);
+  EXPECT_EQ(feature->getMetaValue("PeptideRef"), std::string("HMDB:HMDB0000001"));
+}
 
-  EXPECT_TRUE(std::filesystem::exists(filenames.getFullPath("traML")));
-  ASSERT_EQ(rawDataHandler.getFeatureMap().size(), 8);
-  const auto& f = rawDataHandler.getFeatureMap()[0];
-  std::cout << f.getMetaValue("PeptideRef").toString() << std::endl;
-  EXPECT_EQ(f.getMetaValue("PeptideRef").toString(), "HMDB:HMDB0002362");
-  ASSERT_EQ(f.getSubordinates().size(), 1);
-  const auto& s = f.getSubordinates()[0];
-  std::cout << s.getMetaValue("PeptideRef").toString() << std::endl;
-  EXPECT_EQ(s.getMetaValue("PeptideRef").toString(), "HMDB:HMDB0002362");
-  std::cout << s.getMetaValue("native_id").toString() << std::endl;
-  EXPECT_EQ(s.getMetaValue("native_id").toString(), "C4H10N2O2;M+H+K;2+");
-  std::cout << s.getMetaValue("identifier").toString() << std::endl;
-  EXPECT_EQ(s.getMetaValue("identifier").toString(), "[HMDB:HMDB0002362, HMDB:HMDB0006284]");
-  std::cout << s.getMetaValue("modifications").toString() << std::endl;
-  EXPECT_EQ(s.getMetaValue("modifications").toString(), "M+H+K;2+");
-  std::cout << s.getMetaValue("chemical_formula").toString() << std::endl;
-  EXPECT_EQ(s.getMetaValue("chemical_formula").toString(), "C4H10N2O2");
+TEST(RawDataProcessor, ConstructTransitionsList_csv)
+{
+  Filenames filenames;
+  RawDataHandler rawDataHandler;
+  ParameterSet params;
+
+  filenames.setFullPath("parameters", SMARTPEAK_GET_TEST_DATA_PATH("DDA/parameters.csv"));
+  LoadParameters load_parameters;
+  load_parameters.process(rawDataHandler, params, filenames);
+  params = rawDataHandler.getParameters();
+
+  filenames.setFullPath("mzML_i", SMARTPEAK_GET_TEST_DATA_PATH("DDA/Germicidin A standard.mzML"));
+  LoadRawData loadRawData;
+  loadRawData.process(rawDataHandler, params, filenames);
+  loadRawData.extractMetaData(rawDataHandler);
+
+  LoadFeatures loadFeatures_ms1;
+  RawDataHandler rawDataHandler_ms1;
+  filenames.setFullPath("featureXML_i", SMARTPEAK_GET_TEST_DATA_PATH("DDA/ConstructTransitionsList/Germicidin A standard ms1 merged features.featureXML"));
+  loadFeatures_ms1.process(rawDataHandler_ms1, params, filenames);
+
+  LoadFeatures loadFeatures;
+  filenames.setFullPath("featureXML_i", SMARTPEAK_GET_TEST_DATA_PATH("DDA/ConstructTransitionsList/Germicidin A standard ms2 merged features.featureXML"));
+  loadFeatures.process(rawDataHandler, params, filenames);
+
+  rawDataHandler.setFeatureMap("ms1_merged_features", rawDataHandler_ms1.getFeatureMap());
+
+  std::string output_file_path = std::tmpnam(nullptr);
+  filenames.setFullPath("output_transitions_csv", output_file_path);
+  ConstructTransitionsList construct_transitions_list;
+  construct_transitions_list.process(rawDataHandler, params, filenames);
+
+  const auto& feature_map = rawDataHandler.getFeatureMap();
+  ASSERT_EQ(feature_map.size(), 10);
+  const auto& feature_1 = feature_map.at(0);
+  EXPECT_FLOAT_EQ(feature_1.getRT(), 390.259);
+  EXPECT_FLOAT_EQ(feature_1.getMZ(), 111.04565);
+
+  const auto& feature_2 = feature_map.at(1);
+  EXPECT_FLOAT_EQ(feature_2.getRT(), 390.259);
+  EXPECT_FLOAT_EQ(feature_2.getMZ(), 121.02983);
+
+  // load and check transitions file
+  LoadTransitions load_transition;
+  filenames.setFullPath("traML", output_file_path);
+  load_transition.process(rawDataHandler, params, filenames);
+  const auto& transitions = rawDataHandler.getTargetedExperiment().getTransitions();
+  ASSERT_EQ(transitions.size(), 10);
+  const auto& transition = transitions.at(0);
+  EXPECT_EQ(std::string(transition.getName()), std::string("scan=463_111.046_HMDB:HMDB0000001"));
+  EXPECT_FLOAT_EQ(transition.getLibraryIntensity(), 2760);
+  EXPECT_EQ(std::string(transition.getPeptideRef()), std::string("HMDB:HMDB0000001"));
+  EXPECT_FLOAT_EQ(transition.getPrecursorMZ(), 195.102);
+  EXPECT_FLOAT_EQ(transition.getProductMZ(), 111.04565);
+}
+
+/**
+  SearchSpectrumMS2 Tests
+*/
+TEST(RawDataProcessor, gettersSearchSpectrumMS2)
+{
+  SearchSpectrumMS2 processor;
+  EXPECT_EQ(processor.getName(), "SEARCH_SPECTRUM_MS2");
+}
+
+TEST(RawDataProcessor, SearchSpectrumMS2)
+{
+  Filenames filenames;
+  RawDataHandler rawDataHandler;
+  ParameterSet params;
+  filenames.setTagValue(Filenames::Tag::MAIN_DIR, SMARTPEAK_GET_TEST_DATA_PATH("DDA"));
+
+  filenames.setFullPath("parameters", SMARTPEAK_GET_TEST_DATA_PATH("DDA/parameters.csv"));
+  LoadParameters load_parameters;
+  load_parameters.process(rawDataHandler, params, filenames);
+  params = rawDataHandler.getParameters();
+
+  filenames.setFullPath("mzML_i", SMARTPEAK_GET_TEST_DATA_PATH("DDA/Germicidin A standard.mzML"));
+  LoadRawData loadRawData;
+  loadRawData.process(rawDataHandler, params, filenames);
+  loadRawData.extractMetaData(rawDataHandler);
+
+  LoadFeatures loadFeatures;
+  filenames.setFullPath("featureXML_i", SMARTPEAK_GET_TEST_DATA_PATH("DDA/SearchSpectrumMS2/Germicidin A standard search spectrum ms2.featureXML"));
+  loadFeatures.process(rawDataHandler, params, filenames);
+
+  SearchSpectrumMS2 search_spectrum_ms2;
+  search_spectrum_ms2.process(rawDataHandler, params, filenames);
+
+  const auto& feature_map = rawDataHandler.getFeatureMap();
+  ASSERT_EQ(feature_map.size(), 1);
+  const auto& feature_1 = feature_map.at(0);
+  EXPECT_EQ(std::string(feature_1.getMetaValue("PeptideRef")), std::string("HMDB:HMDB0000001"));
+  const auto& sub_features = feature_1.getSubordinates();
+  ASSERT_EQ(sub_features.size(), 1);
+  const auto& sub_feature_1 = feature_map.at(0);
+  EXPECT_EQ(std::string(sub_feature_1.getMetaValue("PeptideRef")), std::string("HMDB:HMDB0000001"));
 }

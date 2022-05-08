@@ -71,6 +71,7 @@ namespace SmartPeak
       return false;
     }
     sequence_segment_observable_ = &application_handler->sequenceHandler_;
+    // have only one copy per sequence, so just take the 1st one
     process(application_handler->sequenceHandler_.getSequenceSegments()[0], SequenceHandler(), {}, filenames);
     return true;
   }
@@ -81,7 +82,7 @@ namespace SmartPeak
     {
       filenames.addFileName("featureQCComponentGroups", constructFilename("featureQCComponentGroups.csv", static_filenames_), "Components Group QC", true, true);
     }
-    else if (feature_filter_mode_ & FeatureFiltersUtilsMode::EFeatureFiltersModeComponent)
+    if (feature_filter_mode_ & FeatureFiltersUtilsMode::EFeatureFiltersModeComponent)
     {
       filenames.addFileName("featureQCComponents", constructFilename("featureQCComponents.csv", static_filenames_), "Components QC", true, true);
     }
