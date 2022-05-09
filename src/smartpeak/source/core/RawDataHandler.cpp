@@ -689,6 +689,7 @@ namespace SmartPeak
       }
     }
   }
+
   void RawDataHandler::makeFeatureMapFromHistory()
   {
     // Current time stamp
@@ -740,5 +741,22 @@ namespace SmartPeak
         feature_map_.push_back(f);
       }
     }
-  }  
+  }
+
+  std::vector<std::string> RawDataHandler::getStructNames() const
+  {
+    std::vector<std::string> struct_names
+    {
+      "features"
+    };
+    return struct_names;
+  }
+
+  std::shared_ptr<IDataDescription> RawDataHandler::getStruct(const std::string& name) const
+  {
+    if (name == "features")
+    {
+      return 
+    }
+  }
 }

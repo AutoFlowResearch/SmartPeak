@@ -23,6 +23,11 @@
 
 #pragma once
 
+#include <SmartPeak/iface/IDataDescription.h>
+#include <SmartPeak/core/MetaDataHandler.h>
+#include <SmartPeak/core/CastValue.h>
+#include <SmartPeak/core/Parameters.h>
+
 #include <OpenMS/ANALYSIS/MAPMATCHING/TransformationDescription.h>
 #include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureQC.h>
 #include <OpenMS/ANALYSIS/QUANTITATION/AbsoluteQuantitationMethod.h>
@@ -31,19 +36,15 @@
 #include <OpenMS/KERNEL/MSExperiment.h>
 #include <OpenMS/FORMAT/MzTab.h>
 
-#include <SmartPeak/core/MetaDataHandler.h>
-#include <SmartPeak/core/CastValue.h>
-#include <SmartPeak/core/Parameters.h>
-
 #include <map>
 #include <vector>
 
 namespace SmartPeak
 {
 
-  class RawDataHandler
+  class RawDataHandler : public IDataDescription
   {
-public:
+  public:
     RawDataHandler(); ///< constructor required to initialize shared_ptr members
 
     void setFeatureMap(const OpenMS::FeatureMap& feature_map);
@@ -180,7 +181,15 @@ public:
     */
     void makeFeatureMapFromHistory();
 
-private:
+  public:
+    /* IProcessorDescription */
+    virtual std::string getName() const override { return "RawDataHandler"; };
+
+    virtual std::vector<std::string> getStructNames() const override;
+
+    virtual std::shared_ptr<IDataDescription> getStruct(const std::string& name) const;
+
+  private:
     // input
     OpenMS::MSExperiment experiment_;  ///< Raw MS data derived from the mzML file
     OpenMS::MSExperiment chromatogram_map_;  ///< MS data annotated with transition information derived from the TraML file

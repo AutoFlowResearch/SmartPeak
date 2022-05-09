@@ -17,22 +17,29 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Douglas McCloskey, Krzysztof Abram $
-// $Authors: Douglas McCloskey, Krzysztof Abram $
+// $Maintainer: Douglas McCloskey, Bertrand Boudaud $
+// $Authors: Douglas McCloskey, Bertrand Boudaud $
 // --------------------------------------------------------------------------
 
 #pragma once
+
 #include <memory>
+#include <vector>
+#include <string>
 
 namespace SmartPeak 
 {
-  struct IProcessorDescription 
+  struct IDataDescription 
   {
     /**
       Get the data name
     */
     virtual std::string getName() const = 0;
 
-    virtual ~IProcessorDescription() = default;
+    virtual std::vector<std::string> getStructNames() const = 0;
+
+    virtual std::shared_ptr<IDataDescription> getStruct(const std::string& name) const = 0;
+
+    virtual ~IDataDescription() = default;
   };
 }
