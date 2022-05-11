@@ -17,31 +17,26 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Douglas McCloskey, Bertrand Boudaud $
+// $Maintainer: Douglas McCloskey $
 // $Authors: Douglas McCloskey, Bertrand Boudaud $
 // --------------------------------------------------------------------------
 
-#pragma once
-
-#include <memory>
-#include <vector>
+#include <SmartPeak/core/FeatureMap.h>
+#include <map>
 #include <string>
 
-namespace SmartPeak 
+namespace SmartPeak
 {
-  struct IDataDescription 
+  std::vector<std::string> FeatureMap:::getHeaders() const
   {
-    /**
-      Get the data name
-    */
-    virtual std::string getName() const = 0;
+    std::vector<std::string> headers;
+    std::vector<OpenMS::String> keys;
+    feature_map_.getKeys(keys);
+    for (const auto& key : keys)
+    {
+      headers.push_back(key);
+    }
+    return headers;
+  }
 
-    virtual std::vector<std::string> getStructNames() const = 0;
-
-    virtual std::shared_ptr<IDataDescription> getStruct(const std::string& name) const = 0;
-
-    virtual std::vector<std::string> getHeaders() const = 0;
-
-    virtual ~IDataDescription() = default;
-  };
 }

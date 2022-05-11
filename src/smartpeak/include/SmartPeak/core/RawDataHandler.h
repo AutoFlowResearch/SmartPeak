@@ -27,6 +27,7 @@
 #include <SmartPeak/core/MetaDataHandler.h>
 #include <SmartPeak/core/CastValue.h>
 #include <SmartPeak/core/Parameters.h>
+#include <SmartPeak/core/FeatureMap.h>
 
 #include <OpenMS/ANALYSIS/MAPMATCHING/TransformationDescription.h>
 #include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureQC.h>
@@ -185,6 +186,8 @@ namespace SmartPeak
     /* IProcessorDescription */
     virtual std::string getName() const override { return "RawDataHandler"; };
 
+    virtual std::vector<std::string> getHeaders() const override;
+
     virtual std::vector<std::string> getStructNames() const override;
 
     virtual std::shared_ptr<IDataDescription> getStruct(const std::string& name) const;
@@ -197,7 +200,7 @@ namespace SmartPeak
     OpenMS::MSExperiment swath_;
 
     // output
-    OpenMS::FeatureMap feature_map_; ///< The most recently generated set of features for the experiment
+    FeatureMap feature_map_; ///< The most recently generated set of features for the experiment
     OpenMS::FeatureMap feature_map_history_; ///< A record of all changes that have occured to the features in the experiment
     std::shared_ptr<MetaDataHandler> meta_data_;  ///< sample meta data; shared between the injection handler and the raw data handler
     std::map<std::string, float> validation_metrics_;

@@ -9,6 +9,7 @@ set(sources_list
 	ConsoleHandler.cpp
 	EventDispatcher.cpp
 	FeatureFiltersUtils.cpp
+	FeatureMap.cpp
 	FeatureMetadata.cpp
 	Filenames.cpp
 	Helloworld.cpp

@@ -17,31 +17,45 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Douglas McCloskey, Bertrand Boudaud $
+// $Maintainer: Bertrand Boudaud $
 // $Authors: Douglas McCloskey, Bertrand Boudaud $
 // --------------------------------------------------------------------------
 
 #pragma once
 
-#include <memory>
-#include <vector>
+#include <SmartPeak/core/SampleType.h>
+
+#include <OpenMS/KERNEL/FeatureMap.h>
+
 #include <string>
+#include <ctime>
+#include <optional>
 
-namespace SmartPeak 
+namespace SmartPeak
 {
-  struct IDataDescription 
+
+  class FeatureMap : public IDataDescription
   {
-    /**
-      Get the data name
-    */
-    virtual std::string getName() const = 0;
+  public:
 
-    virtual std::vector<std::string> getStructNames() const = 0;
+  public:
+    /* IProcessorDescription */
+    virtual std::string getName() const override { return "OpenMSFeatureMap"; };
 
-    virtual std::shared_ptr<IDataDescription> getStruct(const std::string& name) const = 0;
+    virtual std::vector<std::string> getStructNames() const override
+    {
+      return {};
+    }
 
-    virtual std::vector<std::string> getHeaders() const = 0;
+    virtual std::shared_ptr<IDataDescription> getStruct(const std::string& name) const
+    {
+      return nullptr;
+    }
 
-    virtual ~IDataDescription() = default;
+    virtual std::vector<std::string> getHeaders() const;
+
+    OpenMS::FeatureMap feature_map_; ///< The most recently generated set of features for the experiment
+
   };
+
 }

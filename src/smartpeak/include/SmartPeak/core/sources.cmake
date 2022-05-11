@@ -13,6 +13,7 @@ set(sources_list_h
 	FeaturesObservable.h
 	FeatureFiltersUtils.h
 	FeatureFiltersUtilsMode.h
+	FeatureMap.h
 	FeatureMetadata.h
 	Helloworld.h
 	InjectionHandler.h

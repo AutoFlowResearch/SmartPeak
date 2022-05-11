@@ -46,17 +46,17 @@ namespace SmartPeak
 
   void RawDataHandler::setFeatureMap(const OpenMS::FeatureMap& feature_map)
   {
-    feature_map_ = feature_map;
+    feature_map_.feature_map_ = feature_map;
   }
 
   OpenMS::FeatureMap& RawDataHandler::getFeatureMap()
   {
-    return feature_map_;
+    return feature_map_.feature_map_;
   }
 
   const OpenMS::FeatureMap& RawDataHandler::getFeatureMap() const
   {
-    return feature_map_;
+    return feature_map_.feature_map_;
   }
 
   void RawDataHandler::setFeatureMap(const std::string& name, const OpenMS::FeatureMap& feature_map)
@@ -511,7 +511,7 @@ namespace SmartPeak
     chromatogram_map_.clear(true);
     trafo_ = OpenMS::TransformationDescription();
     swath_.clear(true);
-    feature_map_.clear(true);
+    getFeatureMap().clear(true);
     feature_map_history_.clear(true);
     if (meta_data_!=nullptr) meta_data_->clear();
     validation_metrics_.clear();
@@ -535,7 +535,7 @@ namespace SmartPeak
     chromatogram_map_.clear(true);
     trafo_ = OpenMS::TransformationDescription();
     swath_.clear(true);
-    feature_map_.clear(true);
+    getFeatureMap().clear(true);
     feature_map_history_.clear(true);
     validation_metrics_.clear();
     mz_tab_ = OpenMS::MzTab();
@@ -553,7 +553,7 @@ namespace SmartPeak
 
     // Case 1: Copy the current featuremap and timestamp
     if (feature_map_history_.empty()) {
-      feature_map_history_ = feature_map_; // ensures PrimaryMSRunPath is copied
+      feature_map_history_ = feature_map_.feature_map_; // ensures PrimaryMSRunPath is copied
       for (OpenMS::Feature& feature_new : feature_map_history_) {
         if (!feature_new.metaValueExists("used_")) { // prevents overwriting feature_maps with existing "used_" attributes
           feature_new.setMetaValue("used_", "true");
@@ -580,7 +580,8 @@ namespace SmartPeak
       for (const OpenMS::Feature& feature_copy : feature_map_history_) {
         unique_ids_feat_history.insert(feature_copy.getUniqueId());
       }
-      for (const OpenMS::Feature& feature_select : feature_map_) {
+      const auto& feature_map = getFeatureMap();
+      for (const OpenMS::Feature& feature_select : feature_map) {
         unique_ids_feat_select.insert(feature_select.getUniqueId());
         if (unique_ids_feat_history.count(feature_select.getUniqueId())) {
           continue;
@@ -606,7 +607,7 @@ namespace SmartPeak
           }
           continue; // move on to the next feature in the history
         }
-        for (const OpenMS::Feature& feature_select : feature_map_) {
+        for (const OpenMS::Feature& feature_select : feature_map) {
           // skip feature if any of the following is true:
           // - unique ids differ
           // - peptide refs differ
@@ -700,7 +701,7 @@ namespace SmartPeak
     std::strftime(timestamp_char, 64, "%Y-%m-%d-%H-%M-%S", &now_tm);
     std::string timestamp(timestamp_char);
 
-    feature_map_.clear();
+    getFeatureMap().clear();
     for (OpenMS::Feature& feature_new : feature_map_history_) {
       std::vector<OpenMS::Feature> subs;
       bool copy_feature = false;
@@ -738,7 +739,7 @@ namespace SmartPeak
       if (copy_feature) {
         OpenMS::Feature f = feature_new;
         f.setSubordinates(subs);
-        feature_map_.push_back(f);
+        getFeatureMap().push_back(f);
       }
     }
   }
@@ -756,7 +757,13 @@ namespace SmartPeak
   {
     if (name == "features")
     {
-      return 
+      return nullptr;
     }
   }
+
+  std::vector<std::string> RawDataHandler::getHeaders() const
+  {
+    return {};
+  }
+
 }
