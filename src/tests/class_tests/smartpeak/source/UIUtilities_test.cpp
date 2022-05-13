@@ -41,6 +41,6 @@ TEST(utilities, makeHumanReadable)
   EXPECT_STREQ(dir_entry_1.entry_contents[0].c_str(), "testfile.csv");
   EXPECT_STREQ(dir_entry_1.entry_contents[1].c_str(), "1.32 GB");
   EXPECT_STREQ(dir_entry_1.entry_contents[2].c_str(), "csv");
-  EXPECT_STREQ(dir_entry_1.entry_contents[3].c_str(), "Mon Mar 22 06:59:29 2021");
+  EXPECT_STREQ(dir_entry_1.entry_contents[3].c_str(), "Mon Mar 22 05:59:29 2021");
 }
 
