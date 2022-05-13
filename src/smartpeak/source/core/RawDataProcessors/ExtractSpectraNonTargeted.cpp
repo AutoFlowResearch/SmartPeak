@@ -73,7 +73,7 @@ namespace SmartPeak
 
     std::vector<OpenMS::MSSpectrum> annotated_spectra;
     OpenMS::FeatureMap selected_features;
-    targeted_spectra_extractor.extractSpectra(rawDataHandler_IO.getExperiment(), rawDataHandler_IO.getFeatureMap(), annotated_spectra, selected_features, true);
+    targeted_spectra_extractor.extractSpectra(rawDataHandler_IO.getExperiment(), rawDataHandler_IO.getFeatureMap(), annotated_spectra, selected_features);
 
     // Update the features
     rawDataHandler_IO.setFeatureMap("extracted_spectra", selected_features);
