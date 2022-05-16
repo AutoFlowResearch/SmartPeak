@@ -1721,8 +1721,7 @@ namespace SmartPeak
   void SessionHandler::getChromatogramTIC(const SequenceHandler& sequence_handler,
     GraphVizData& result,
     const std::pair<float, float>& chrom_time_range,
-    const std::set<std::string>& sample_names,
-    const std::set<std::string>& scan_names) const
+    const std::set<std::string>& sample_names) const
   {
     LOGD << "Making the chromatogram TIC data for plotting";
     // Set the axes titles and min/max defaults
@@ -1737,7 +1736,6 @@ namespace SmartPeak
         const auto ms_level = spectrum.getMSLevel();
         if (ms_level == 1)
         {
-          if (scan_names.count(spectrum.getNativeID()) == 0) continue;
           x_data.push_back(spectrum.getRT());
           y_data.push_back(spectrum.calculateTIC());
         }
@@ -1818,10 +1816,9 @@ namespace SmartPeak
     GraphVizData& result,
     const std::pair<float, float>& range,
     const std::set<std::string>& sample_names,
-    const std::set<std::string>& scan_names,
     const std::set<std::string>& component_group_names) const
   {
-    // Notes: native_id matches the spec NativeID (i.e., scan_names), PeptideRef matches the first annotation identifier
+    // Notes: PeptideRef matches the first annotation identifier
     if (sequence_handler.getSequence().size() > 0 &&
        (sequence_handler.getSequence().at(0).getRawData().getExperiment().getSpectra().size() > 0 ||
        sequence_handler.getSequence().at(0).getRawData().getFeatureMapHistory().size() > 0))
@@ -1833,7 +1830,6 @@ namespace SmartPeak
         if (sample_names.count(injection.getMetaData().getSampleName()) == 0) continue;
         // Extract out the raw data for plotting
         for (const auto& spectra : injection.getRawData().getExperiment().getSpectra()) {
-          if (scan_names.count(spectra.getNativeID()) == 0) continue;
           std::vector<float> x_data, y_data;
           for (auto point = spectra.PosBegin(range.first); point != spectra.PosEnd(range.second); ++point) {
             x_data.push_back(point->getMZ());
@@ -1874,7 +1870,6 @@ namespace SmartPeak
     GraphVizData& result,
     const std::pair<float, float>& range,
     const std::set<std::string>& sample_names,
-    const std::set<std::string>& scan_names,
     const std::set<std::string>& component_group_names,
     const float rt,
     const int ms_level) const
@@ -1895,7 +1890,6 @@ namespace SmartPeak
           if (spectra.getMSLevel() == ms_level)
           {
             result.z_data_area_.push_back(spectra.getRT());
-            if (scan_names.count(spectra.getNativeID()) == 0) continue;
             std::vector<float> x_data, y_data;
             const float rt_threashold = 0.50f;
             if ((!result.points_overflow_) && (abs(spectra.getRT()-rt)< rt_threashold))
