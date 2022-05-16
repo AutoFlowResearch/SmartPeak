@@ -188,7 +188,6 @@ int main(int argc, char** argv)
     "Calibrators");
   auto transitions_explorer_window_ = std::make_shared<ExplorerWidget>("TransitionsExplorerWindow", "Transitions", &event_dispatcher);
   auto features_explorer_window_ = std::make_shared<ExplorerWidget>("FeaturesExplorerWindow", "Features", &event_dispatcher);
-  auto spectrum_explorer_window_ = std::make_shared<ExplorerWidget>("SpectrumExplorerWindow", "Scans", &event_dispatcher);
   auto sequence_main_window_ = std::make_shared<SequenceTableWidget>("SequenceMainWindow", "Sequence",
                                                                       &session_handler_, &application_handler_.sequenceHandler_);
   auto transitions_main_window_ = std::make_shared<GenericTableWidget>("TransitionsMainWindow", "Transitions Table");
@@ -304,8 +303,7 @@ int main(int argc, char** argv)
   split_window.left_windows_ = {
     injections_explorer_window_,
     transitions_explorer_window_,
-    features_explorer_window_,
-    spectrum_explorer_window_
+    features_explorer_window_
   };
 
   std::vector<std::shared_ptr<Widget>> popups = {
@@ -579,7 +577,6 @@ int main(int argc, char** argv)
         if (ImGui::MenuItem("Injections", NULL, &injections_explorer_window_->visible_)) {}
         if (ImGui::MenuItem("Transitions", NULL, &transitions_explorer_window_->visible_)) {}
         if (ImGui::MenuItem("Features", NULL, &features_explorer_window_->visible_)) {}
-        if (ImGui::MenuItem("Scans", NULL, &spectrum_explorer_window_->visible_)) {}
         ImGui::Separator(); // Primary input
         ImGui::MenuItem("Main window (Tables)", NULL, false, false);
         if (ImGui::MenuItem("Sequence", NULL, &sequence_main_window_->visible_)) {}
@@ -874,16 +871,6 @@ int main(int argc, char** argv)
       features_explorer_window_->checked_rows_ = session_handler_.feature_explorer_data.checked_rows;
       features_explorer_window_->checkbox_headers_ = session_handler_.feature_explorer_data.checkbox_headers;
       features_explorer_window_->checkbox_columns_ = &session_handler_.feature_explorer_data.checkbox_body;
-    }
-
-    // spectrum
-    if (spectrum_explorer_window_->visible_)
-    {
-      spectrum_explorer_window_->table_data_.headers_ = session_handler_.getSpectrumExplorerHeader();
-      spectrum_explorer_window_->table_data_.body_ = session_handler_.getSpectrumExplorerBody();
-      spectrum_explorer_window_->checked_rows_ = session_handler_.spectrum_explorer_data.checked_rows;
-      spectrum_explorer_window_->checkbox_headers_ = session_handler_.spectrum_explorer_data.checkbox_headers;
-      spectrum_explorer_window_->checkbox_columns_ = &session_handler_.spectrum_explorer_data.checkbox_body;
     }
 
     // ======================================

@@ -249,13 +249,11 @@ namespace SmartPeak
     @param[out] result
     @param[in] range
     @param[in] sample_names
-    @param[in] component_names
     */
     void getChromatogramTIC(const SequenceHandler& sequence_handler,
       GraphVizData& result,
       const std::pair<float, float>& range,
-      const std::set<std::string>& sample_names,
-      const std::set<std::string>& component_names) const;
+      const std::set<std::string>& sample_names) const;
 
     /*
     @brief Gets the XIC chromatogram data
@@ -281,14 +279,12 @@ namespace SmartPeak
     @param[in] result
     @param[in] range
     @param[in] sample_names
-    @param[in] scan_names
     @param[in] component_group_names
     */
     void getSpectrumScatterPlot(const SequenceHandler& sequence_handler,
                                 GraphVizData& result,
                                 const std::pair<float, float>& range,
                                 const std::set<std::string>& sample_names,
-                                const std::set<std::string>& scan_names,
                                 const std::set<std::string>& component_group_names) const;
 
     /*
@@ -298,7 +294,6 @@ namespace SmartPeak
     @param[in] result
     @param[in] range
     @param[in] sample_names
-    @param[in] scan_names
     @param[in] component_group_names
     @param[in] rt
     @param[in] ms_level
@@ -307,7 +302,6 @@ namespace SmartPeak
       GraphVizData& result,
       const std::pair<float, float>& range,
       const std::set<std::string>& sample_names,
-      const std::set<std::string>& scan_names,
       const std::set<std::string>& component_group_names,
       const float rt,
       const int ms_level) const;

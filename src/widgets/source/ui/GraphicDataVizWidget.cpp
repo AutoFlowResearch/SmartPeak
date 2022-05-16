@@ -252,17 +252,6 @@ namespace SmartPeak
     return transitions_names;
   }
 
-  std::set<std::string> GraphicDataVizWidget::getSelectedSpectrum() const
-  {
-    std::set<std::string> scan_names;
-    Eigen::Tensor<std::string, 1> selected_scans = session_handler_.getSelectSpectrumPlot();
-    for (int i = 0; i < selected_scans.size(); ++i) {
-      if (!selected_scans(i).empty())
-        scan_names.insert(selected_scans(i));
-    }
-    return scan_names;
-  }
-
   std::set<std::string> GraphicDataVizWidget::getSelectedTransitionGroups() const
   {
     std::set<std::string> component_group_names;

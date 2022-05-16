@@ -29,17 +29,15 @@ namespace SmartPeak
   void SpectraPlotWidget::updateData()
   {
     const std::set<std::string> sample_names = getSelectedSampleNames();
-    const std::set<std::string> scan_names = getSelectedSpectrum();
     const std::set<std::string> component_group_names = getSelectedTransitionGroups();
 
     if ((refresh_needed_) || // data changed
-       ((input_sample_names_ != sample_names) || (input_scan_names_ != scan_names) || (input_component_group_names_ != component_group_names))) // user select different items
+       ((input_sample_names_ != sample_names) || (input_component_group_names_ != component_group_names))) // user select different items
     {
       // get the whole graph area
-      session_handler_.getSpectrumScatterPlot(sequence_handler_, graph_viz_data_, std::make_pair(0, 2000), sample_names, scan_names, component_group_names);
+      session_handler_.getSpectrumScatterPlot(sequence_handler_, graph_viz_data_, std::make_pair(0, 2000), sample_names, component_group_names);
       updateRanges();
       input_sample_names_ = sample_names;
-      input_scan_names_ = scan_names;
       input_component_group_names_ = component_group_names;
       refresh_needed_ = false;
     }

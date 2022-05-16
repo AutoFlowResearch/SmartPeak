@@ -708,9 +708,8 @@ TEST(SessionHandler, setSpectrumScatterPlot1)
   SessionHandler::GraphVizData result;
   const std::pair<float, float> range = std::make_pair(0, 2000);
   const std::set<std::string> sample_names;
-  const std::set<std::string> scan_names;
   const std::set<std::string> component_group_names;
-  session_handler.getSpectrumScatterPlot(testData.application_handler.sequenceHandler_, result, range, sample_names, scan_names, component_group_names);
+  session_handler.getSpectrumScatterPlot(testData.application_handler.sequenceHandler_, result, range, sample_names, component_group_names);
   EXPECT_FALSE(result.points_overflow_);
 }
 TEST(SessionHandler, setCalibratorsScatterLinePlot1)
