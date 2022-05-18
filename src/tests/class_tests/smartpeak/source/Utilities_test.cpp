@@ -833,7 +833,7 @@ TEST(utilities, checkCSVHeader)
   EXPECT_FALSE(Utilities::checkCSVHeader<';'>(filename, "sample_name", "non_existing_column", "sample_group_name"));
 }
 
-TEST(ParametersParser, hasBOMMarker)
+TEST(utilities, hasBOMMarker)
 {
   const string pathname_no_bom = SMARTPEAK_GET_TEST_DATA_PATH("FileReader_parameters.csv");
   EXPECT_FALSE(Utilities::hasBOMMarker(pathname_no_bom));
@@ -855,11 +855,60 @@ TEST(ParametersParser, hasBOMMarker)
 }
 
 
-TEST(Filenames, replaceAll)
+TEST(utilities, replaceAll)
 {
   std::string str = "apple strawberry apple peach ";
   auto result1 = Utilities::replaceAll(str, "apple", "banana");
   EXPECT_EQ(result1, "banana strawberry banana peach ");
   auto result2 = Utilities::replaceAll(str, "not found", "banana");
   EXPECT_EQ(result2, "apple strawberry apple peach ");
+}
+
+TEST(utilities, OpenMSDataValueToCastValue)
+{
+  OpenMS::DataValue v_int(42);
+  auto c_int = Utilities::OpenMSDataValueToCastValue(v_int);
+  EXPECT_EQ(c_int.getTag(), CastValue::Type::INT);
+  EXPECT_EQ(c_int.i_, 42);
+
+  std::vector<int> int_list{ 42, 43, 44 };
+  OpenMS::DataValue v_int_list(int_list);
+  auto c_int_list = Utilities::OpenMSDataValueToCastValue(v_int_list);
+  EXPECT_EQ(c_int_list.getTag(), CastValue::Type::INT_LIST);
+  for (int i=0; i< c_int_list.il_.size(); ++i)
+  {
+    EXPECT_EQ(c_int_list.il_.at(i), int_list.at(i));
+  }
+
+  OpenMS::DataValue v_double(3.14);
+  auto c_double = Utilities::OpenMSDataValueToCastValue(v_double);
+  EXPECT_EQ(c_double.getTag(), CastValue::Type::FLOAT);
+  EXPECT_FLOAT_EQ(c_double.f_, 3.14);
+
+  std::vector<double> double_list{ 3.14, 13.14, 103.14 };
+  OpenMS::DataValue v_double_list(double_list);
+  auto c_double_list = Utilities::OpenMSDataValueToCastValue(double_list);
+  EXPECT_EQ(c_double_list.getTag(), CastValue::Type::FLOAT_LIST);
+  for (int i = 0; i < c_double_list.il_.size(); ++i)
+  {
+    EXPECT_FLOAT_EQ(c_double_list.fl_.at(i), double_list.at(i));
+  }
+
+  OpenMS::DataValue v_string("apple");
+  auto c_string = Utilities::OpenMSDataValueToCastValue(v_string);
+  EXPECT_EQ(c_string.getTag(), CastValue::Type::STRING);
+  EXPECT_EQ(c_string.s_, "apple");
+
+  std::vector<std::string> string_list{ "apple", "banana", "strawberry"};
+  OpenMS::DataValue v_string_list(string_list);
+  auto c_string_list = Utilities::OpenMSDataValueToCastValue(v_string_list);
+  EXPECT_EQ(c_string_list.getTag(), CastValue::Type::STRING_LIST);
+  for (int i = 0; i < c_string_list.sl_.size(); ++i)
+  {
+    EXPECT_EQ(c_string_list.sl_.at(i), string_list.at(i));
+  }
+
+  OpenMS::DataValue v_empty;
+  auto c_empty = Utilities::OpenMSDataValueToCastValue(v_empty);
+  EXPECT_EQ(c_empty.getTag(), CastValue::Type::UNINITIALIZED);
 }

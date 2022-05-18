@@ -264,9 +264,6 @@ namespace SmartPeak
     case OpenMS::DataValue::DataType::DOUBLE_VALUE:
       cast = static_cast<float>(openms_datavalue);
       break;
-    case OpenMS::DataValue::DataType::EMPTY_VALUE:
-      cast = static_cast<float>(openms_datavalue);
-      break;
     case OpenMS::DataValue::DataType::INT_LIST:
       cast = openms_datavalue.toIntList();
       break;
@@ -296,7 +293,6 @@ namespace SmartPeak
       cast = static_cast<std::string>(openms_datavalue);
       break;
     default:
-      cast = static_cast<float>(openms_datavalue);
       break;
     }
     return cast;
