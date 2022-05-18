@@ -829,13 +829,21 @@ namespace SmartPeak
           for (const std::string& meta_value_name : meta_data)
           {
             CastValue datum = SequenceHandler::getMetaValue(feature, feature, meta_value_name);
-            if (datum.getTag() == CastValue::Type::FLOAT && datum.f_ != 0.0) {
-              // NOTE: to_string() rounds at 1e-6. Therefore, some precision might be lost.
-              row.push_back(std::to_string(datum.f_));
+            if (datum.getTag() == CastValue::Type::FLOAT)
+            {
+              if (datum.f_ != 0.0)
+              {
+                // NOTE: to_string() rounds at 1e-6. Therefore, some precision might be lost.
+                row.push_back(std::to_string(datum.f_));
+              }
+              else
+              {
+                row.push_back("");
+              }
             }
             else
             {
-              row.push_back("");
+              row.push_back(std::string(datum));
             }
           }
           rows_out.push_back(row);
@@ -861,13 +869,21 @@ namespace SmartPeak
           for (const std::string& meta_value_name : meta_data)
           {
             CastValue datum = SequenceHandler::getMetaValue(feature, subordinate, meta_value_name);
-            if (datum.getTag() == CastValue::Type::FLOAT && datum.f_ != 0.0) {
-              // NOTE: to_string() rounds at 1e-6. Therefore, some precision might be lost.
-              row.push_back(std::to_string(datum.f_));
+            if (datum.getTag() == CastValue::Type::FLOAT)
+            {
+              if (datum.f_ != 0.0)
+              {
+                // NOTE: to_string() rounds at 1e-6. Therefore, some precision might be lost.
+                row.push_back(std::to_string(datum.f_));
+              }
+              else
+              {
+                row.push_back("");
+              }
             }
             else
             {
-              row.push_back("");
+              row.push_back(std::string(datum));
             }
           }
           rows_out.push_back(row);
