@@ -1044,6 +1044,12 @@ namespace SmartPeak
               columns.insert(sample_name);
               rows.insert(row_tuple_name);
             }
+            else
+            {
+              data_dict[sample_name].emplace(row_tuple_name, 0.0f);
+              columns.insert(sample_name);
+              rows.insert(row_tuple_name);
+            }
           }
 
           // Case #2 Features and subordinates
@@ -1075,6 +1081,12 @@ namespace SmartPeak
             }
             if (datum.getTag() == CastValue::Type::FLOAT && !std::isnan(datum.f_)) { // Skip NAN (replaced by 0 later)
               data_dict[sample_name].emplace(row_tuple_name, datum.f_);
+              columns.insert(sample_name);
+              rows.insert(row_tuple_name);
+            }
+            else
+            {
+              data_dict[sample_name].emplace(row_tuple_name, 0.0f);
               columns.insert(sample_name);
               rows.insert(row_tuple_name);
             }
@@ -1213,6 +1225,12 @@ namespace SmartPeak
               columns.insert(sample_name);
               rows.insert(row_tuple_name);
             }
+            else
+            {
+              data_dict[sample_name].emplace(row_tuple_name, 0.0f);
+              columns.insert(sample_name);
+              rows.insert(row_tuple_name);
+            }
           }
 
           // Case #2 Features and subordinates
@@ -1238,6 +1256,12 @@ namespace SmartPeak
             }
             if (datum.getTag() == CastValue::Type::FLOAT && !std::isnan(datum.f_)) { // Skip NAN (replaced by 0 later)
               data_dict[sample_name].emplace(row_tuple_name, datum.f_);
+              columns.insert(sample_name);
+              rows.insert(row_tuple_name);
+            }
+            else
+            {
+              data_dict[sample_name].emplace(row_tuple_name, 0.0f);
               columns.insert(sample_name);
               rows.insert(row_tuple_name);
             }
