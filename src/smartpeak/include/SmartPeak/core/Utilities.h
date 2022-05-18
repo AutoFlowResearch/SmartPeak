@@ -111,6 +111,16 @@ public:
     );
 
     /**
+      Convert a OpenMS::DataValue to SmartPeak's CastValue.
+
+      @param[in] openms_datavalue OpenMSDataValue to convert
+      @return SmartPeak's CastValue
+    */
+    static CastValue OpenMSDataValueToCastValue(
+      const OpenMS::DataValue& openms_datavalue
+    );
+
+    /**
       Parse string and return the eval.
 
       The type check is case insensitive.

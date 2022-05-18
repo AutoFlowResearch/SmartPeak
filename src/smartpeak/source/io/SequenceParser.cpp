@@ -687,13 +687,21 @@ namespace SmartPeak
             else 
             {
               CastValue datum = SequenceHandler::getMetaValue(feature, feature, meta_value_name);
-              if (datum.getTag() == CastValue::Type::FLOAT && datum.f_ != 0.0) {
-                // NOTE: to_string() rounds at 1e-6. Therefore, some precision might be lost.
-                row.push_back(std::to_string(datum.f_));
-              }
-              else 
+              if (datum.getTag() == CastValue::Type::FLOAT)
               {
-                row.push_back("");
+                if (datum.f_ != 0.0)
+                {
+                  // NOTE: to_string() rounds at 1e-6. Therefore, some precision might be lost.
+                  row.push_back(std::to_string(datum.f_));
+                }
+                else
+                {
+                  row.push_back("");
+                }
+              }
+              else
+              {
+                row.push_back(std::string(datum));
               }
             }
           }
@@ -752,13 +760,21 @@ namespace SmartPeak
             else 
             {
               CastValue datum = SequenceHandler::getMetaValue(feature, subordinate, meta_value_name);
-              if (datum.getTag() == CastValue::Type::FLOAT && datum.f_ != 0.0) {
-                // NOTE: to_string() rounds at 1e-6. Therefore, some precision might be lost.
-                row.push_back(std::to_string(datum.f_));
-              } 
-              else 
+              if (datum.getTag() == CastValue::Type::FLOAT)
               {
-                row.push_back("");
+                if (datum.f_ != 0.0)
+                {
+                  // NOTE: to_string() rounds at 1e-6. Therefore, some precision might be lost.
+                  row.push_back(std::to_string(datum.f_));
+                }
+                else
+                {
+                  row.push_back("");
+                }
+              }
+              else
+              {
+                row.push_back(std::string(datum));
               }
             }
           }
