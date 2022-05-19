@@ -251,6 +251,53 @@ namespace SmartPeak
     }
   }
 
+  CastValue Utilities::OpenMSDataValueToCastValue(
+    const OpenMS::DataValue& openms_datavalue
+  )
+  {
+    CastValue cast;
+    switch (openms_datavalue.valueType())
+    {
+    case OpenMS::DataValue::DataType::INT_VALUE:
+      cast = static_cast<int>(openms_datavalue);
+      break;
+    case OpenMS::DataValue::DataType::DOUBLE_VALUE:
+      cast = static_cast<float>(openms_datavalue);
+      break;
+    case OpenMS::DataValue::DataType::INT_LIST:
+      cast = openms_datavalue.toIntList();
+      break;
+    case OpenMS::DataValue::DataType::DOUBLE_LIST:
+    {
+      auto openms_list = openms_datavalue.toDoubleList();
+      std::vector<float> float_list;
+      for (const auto& v : openms_list)
+      {
+        float_list.push_back(v);
+      }
+      cast = float_list;
+      break;
+    }
+    case OpenMS::DataValue::DataType::STRING_LIST:
+    {
+      auto openms_list = openms_datavalue.toStringList();
+      std::vector<std::string> string_list;
+      for (const auto& v : openms_list)
+      {
+        string_list.push_back(v);
+      }
+      cast = string_list;
+      break;
+    }
+    case OpenMS::DataValue::DataType::STRING_VALUE:
+      cast = static_cast<std::string>(openms_datavalue);
+      break;
+    default:
+      break;
+    }
+    return cast;
+  }
+
   bool Utilities::isList(const std::string& str, const std::regex& re)
   {
     auto items = Utilities::splitString(str, ',');

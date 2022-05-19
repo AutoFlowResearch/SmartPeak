@@ -687,13 +687,21 @@ namespace SmartPeak
             else 
             {
               CastValue datum = SequenceHandler::getMetaValue(feature, feature, meta_value_name);
-              if (datum.getTag() == CastValue::Type::FLOAT && datum.f_ != 0.0) {
-                // NOTE: to_string() rounds at 1e-6. Therefore, some precision might be lost.
-                row.push_back(std::to_string(datum.f_));
-              }
-              else 
+              if (datum.getTag() == CastValue::Type::FLOAT)
               {
-                row.push_back("");
+                if (datum.f_ != 0.0)
+                {
+                  // NOTE: to_string() rounds at 1e-6. Therefore, some precision might be lost.
+                  row.push_back(std::to_string(datum.f_));
+                }
+                else
+                {
+                  row.push_back("");
+                }
+              }
+              else
+              {
+                row.push_back(std::string(datum));
               }
             }
           }
@@ -752,13 +760,21 @@ namespace SmartPeak
             else 
             {
               CastValue datum = SequenceHandler::getMetaValue(feature, subordinate, meta_value_name);
-              if (datum.getTag() == CastValue::Type::FLOAT && datum.f_ != 0.0) {
-                // NOTE: to_string() rounds at 1e-6. Therefore, some precision might be lost.
-                row.push_back(std::to_string(datum.f_));
-              } 
-              else 
+              if (datum.getTag() == CastValue::Type::FLOAT)
               {
-                row.push_back("");
+                if (datum.f_ != 0.0)
+                {
+                  // NOTE: to_string() rounds at 1e-6. Therefore, some precision might be lost.
+                  row.push_back(std::to_string(datum.f_));
+                }
+                else
+                {
+                  row.push_back("");
+                }
+              }
+              else
+              {
+                row.push_back(std::string(datum));
               }
             }
           }
@@ -813,13 +829,21 @@ namespace SmartPeak
           for (const std::string& meta_value_name : meta_data)
           {
             CastValue datum = SequenceHandler::getMetaValue(feature, feature, meta_value_name);
-            if (datum.getTag() == CastValue::Type::FLOAT && datum.f_ != 0.0) {
-              // NOTE: to_string() rounds at 1e-6. Therefore, some precision might be lost.
-              row.push_back(std::to_string(datum.f_));
+            if (datum.getTag() == CastValue::Type::FLOAT)
+            {
+              if (datum.f_ != 0.0)
+              {
+                // NOTE: to_string() rounds at 1e-6. Therefore, some precision might be lost.
+                row.push_back(std::to_string(datum.f_));
+              }
+              else
+              {
+                row.push_back("");
+              }
             }
             else
             {
-              row.push_back("");
+              row.push_back(std::string(datum));
             }
           }
           rows_out.push_back(row);
@@ -845,13 +869,21 @@ namespace SmartPeak
           for (const std::string& meta_value_name : meta_data)
           {
             CastValue datum = SequenceHandler::getMetaValue(feature, subordinate, meta_value_name);
-            if (datum.getTag() == CastValue::Type::FLOAT && datum.f_ != 0.0) {
-              // NOTE: to_string() rounds at 1e-6. Therefore, some precision might be lost.
-              row.push_back(std::to_string(datum.f_));
+            if (datum.getTag() == CastValue::Type::FLOAT)
+            {
+              if (datum.f_ != 0.0)
+              {
+                // NOTE: to_string() rounds at 1e-6. Therefore, some precision might be lost.
+                row.push_back(std::to_string(datum.f_));
+              }
+              else
+              {
+                row.push_back("");
+              }
             }
             else
             {
-              row.push_back("");
+              row.push_back(std::string(datum));
             }
           }
           rows_out.push_back(row);
@@ -1012,6 +1044,12 @@ namespace SmartPeak
               columns.insert(sample_name);
               rows.insert(row_tuple_name);
             }
+            else
+            {
+              data_dict[sample_name].emplace(row_tuple_name, 0.0f);
+              columns.insert(sample_name);
+              rows.insert(row_tuple_name);
+            }
           }
 
           // Case #2 Features and subordinates
@@ -1043,6 +1081,12 @@ namespace SmartPeak
             }
             if (datum.getTag() == CastValue::Type::FLOAT && !std::isnan(datum.f_)) { // Skip NAN (replaced by 0 later)
               data_dict[sample_name].emplace(row_tuple_name, datum.f_);
+              columns.insert(sample_name);
+              rows.insert(row_tuple_name);
+            }
+            else
+            {
+              data_dict[sample_name].emplace(row_tuple_name, 0.0f);
               columns.insert(sample_name);
               rows.insert(row_tuple_name);
             }
@@ -1181,6 +1225,12 @@ namespace SmartPeak
               columns.insert(sample_name);
               rows.insert(row_tuple_name);
             }
+            else
+            {
+              data_dict[sample_name].emplace(row_tuple_name, 0.0f);
+              columns.insert(sample_name);
+              rows.insert(row_tuple_name);
+            }
           }
 
           // Case #2 Features and subordinates
@@ -1206,6 +1256,12 @@ namespace SmartPeak
             }
             if (datum.getTag() == CastValue::Type::FLOAT && !std::isnan(datum.f_)) { // Skip NAN (replaced by 0 later)
               data_dict[sample_name].emplace(row_tuple_name, datum.f_);
+              columns.insert(sample_name);
+              rows.insert(row_tuple_name);
+            }
+            else
+            {
+              data_dict[sample_name].emplace(row_tuple_name, 0.0f);
               columns.insert(sample_name);
               rows.insert(row_tuple_name);
             }
