@@ -1,6 +1,18 @@
 SmartPeak Changelog
 ===================
 
+v1.24.0 (2022-05-25)
+--------------------
+
+Features
+~~~~~~~~
+- Removed scan explorer window `(#540) <https://github.com/AutoFlowResearch/SmartPeak/pull/540>`_
+
+Fix
+~~~
+- Fix StoreFeatureBackgroundEstimations and generalized export to other storing processors `(#536) <https://github.com/AutoFlowResearch/SmartPeak/pull/536>`_
+- Fix/missing report metadata values `(#541) <https://github.com/AutoFlowResearch/SmartPeak/pull/541>`_
+
 v1.23.0 (2022-04-28)
 --------------------
 
