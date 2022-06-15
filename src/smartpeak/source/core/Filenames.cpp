@@ -131,15 +131,23 @@ namespace SmartPeak
     if (!filename.full_path_override_)
     {
       std::string file_pattern = filename.name_pattern_;
-      for (const auto& tag : string_to_tag_)
+      if (!file_pattern.empty())
       {
-        std::string search = "${" + tag.first + "}";
-        std::string replace_with;
-        if (string_to_tag_.count(tag.first))
+        for (const auto& tag : string_to_tag_)
         {
-          replace_with = tags_[string_to_tag_[tag.first]];
+          if (file_pattern.find('{') == std::string::npos)
+          {
+            // there is no tag in the pattern, we can stop searching
+            break;
+          }
+          std::string search = "${" + tag.first + "}";
+          std::string replace_with;
+          if (string_to_tag_.count(tag.first))
+          {
+            replace_with = tags_[string_to_tag_[tag.first]];
+          }
+          file_pattern = Utilities::replaceAll(file_pattern, search, replace_with);
         }
-        file_pattern = Utilities::replaceAll(file_pattern, search, replace_with);
       }
       filename.full_path_ = file_pattern;
     }
