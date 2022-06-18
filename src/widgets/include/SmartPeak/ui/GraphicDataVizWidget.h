@@ -86,7 +86,6 @@ namespace SmartPeak
     // Utility methods
     std::set<std::string> getSelectedSampleNames() const;
     std::set<std::string> getSelectedTransitions() const;
-    std::set<std::string> getSelectedSpectrum() const;
     std::set<std::string> getSelectedTransitionGroups() const;
     std::optional<float>  getNearestPoint(float in_x) const;
 

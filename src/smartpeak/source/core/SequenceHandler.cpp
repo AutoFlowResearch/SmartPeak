@@ -24,6 +24,7 @@
 #include <SmartPeak/core/CastValue.h>
 #include <SmartPeak/core/MetaDataHandler.h>
 #include <SmartPeak/core/SequenceHandler.h>
+#include <SmartPeak/core/Utilities.h>
 #include <plog/Log.h>
 
 namespace SmartPeak
@@ -307,14 +308,13 @@ namespace SmartPeak
     } else if (meta_value == "validation") { // The result of the validation
       cast = static_cast<std::string>(subordinate.getMetaValue(meta_value)); // Prioritize the subordinate over the feature
     } else if (subordinate.metaValueExists(meta_value) && !subordinate.getMetaValue(meta_value).isEmpty()) {
-      cast = static_cast<float>(subordinate.getMetaValue(meta_value));
+      cast = Utilities::OpenMSDataValueToCastValue(subordinate.getMetaValue(meta_value));
     } else if (feature.metaValueExists(meta_value) && !feature.getMetaValue(meta_value).isEmpty()) {
-      cast = static_cast<float>(feature.getMetaValue(meta_value));
+      cast = Utilities::OpenMSDataValueToCastValue(feature.getMetaValue(meta_value));
     } else {
       LOGV << "meta_value not found: " << meta_value;
       cast = "";
     }
-
     return cast;
   }
 

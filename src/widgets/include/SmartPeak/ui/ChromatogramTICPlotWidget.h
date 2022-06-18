@@ -72,7 +72,6 @@ namespace SmartPeak
   protected:
     // input used to create the graph
     std::set<std::string> input_sample_names_;
-    std::set<std::string> input_scan_names_;
     std::shared_ptr<SpectraMSMSPlotWidget> spectra_msms_plot_widget_;
   };
 }

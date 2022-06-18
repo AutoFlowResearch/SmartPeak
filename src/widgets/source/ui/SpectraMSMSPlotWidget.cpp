@@ -37,12 +37,11 @@ namespace SmartPeak
     }
 
     const std::set<std::string> sample_names = getSelectedSampleNames();    
-    const std::set<std::string> scan_names = getSelectedSpectrum();
     const std::set<std::string> component_group_names = getSelectedTransitionGroups();
 
     static const auto init_range = std::make_pair(0, 2000);
     if ((refresh_needed_) || // data changed
-       ((input_sample_names_ != sample_names) || (input_scan_names_ != scan_names) || (input_component_group_names_ != component_group_names)) || // user select different items
+       ((input_sample_names_ != sample_names) || (input_component_group_names_ != component_group_names)) || // user select different items
        (input_z_ != current_z_) // user select different rt
        ) 
     {
@@ -51,10 +50,9 @@ namespace SmartPeak
       {
         current_rt_ = graph_viz_data_.z_data_area_[current_z_];
       }
-      session_handler_.getSpectrumMSMSPlot(sequence_handler_, graph_viz_data_, init_range, sample_names, scan_names, component_group_names, current_rt_, ms_level_);
+      session_handler_.getSpectrumMSMSPlot(sequence_handler_, graph_viz_data_, init_range, sample_names, component_group_names, current_rt_, ms_level_);
       updateRanges();
       input_sample_names_ = sample_names;
-      input_scan_names_ = scan_names;
       input_component_group_names_ = component_group_names;
       current_z_ = getScanIndexFromRetentionTime(current_rt_);
       input_z_ = current_z_;
