@@ -17,50 +17,19 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Douglas McCloskey $
-// $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
+// $Maintainer: Douglas McCloskey, Bertrand Boudaud $
+// $Authors: Douglas McCloskey, Bertrand Boudaud $
 // --------------------------------------------------------------------------
 
 #pragma once
 
-#include <SmartPeak/core/RawDataProcessor.h>
-#include <SmartPeak/core/LibraryObservable.h>
-#include <SmartPeak/core/ApplicationHandler.h>
-
-#include <map>
-#include <vector>
-#include <regex>
-#include <sstream>
-
-namespace SmartPeak
+namespace SmartPeak 
 {
-
-  struct LoadMSP : RawDataProcessor, IFilePickerHandler
+  struct ILibraryObserver
   {
     /**
-    IFilePickerHandler
+      Library has been updated
     */
-    bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
-
-    /* IProcessorDescription */
-    virtual std::string getName() const override { return "LOAD_MSP"; }
-    virtual std::string getDescription() const override { return "Load MSP"; }
-    virtual std::vector<std::string> getRequirements() const override;
-    virtual std::set<std::string> getOutputs() const override;
-    virtual std::set<std::string> getInputs() const override;
-
-    /** Load spectral library from .msp file.
-    */
-    void doProcess(
-      RawDataHandler& rawDataHandler_IO,
-      const ParameterSet& params_I,
-      Filenames& filenames_I
-    ) const override;
-
-    /* IFilenamesHandler */
-    virtual void getFilenames(Filenames& filenames) const override;
-
-    LibraryObservable* library_observable_ = nullptr;
+    virtual void onLibraryUpdated() = 0;
   };
-
 }

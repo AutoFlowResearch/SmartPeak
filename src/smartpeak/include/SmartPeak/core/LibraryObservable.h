@@ -1,7 +1,7 @@
 // --------------------------------------------------------------------------
 //   SmartPeak -- Fast and Accurate CE-, GC- and LC-MS(/MS) Data Processing
 // --------------------------------------------------------------------------
-// Copyright The SmartPeak Team -- Novo Nordisk Foundation 
+// Copyright The SmartPeak Team -- Novo Nordisk Foundation
 // Center for Biosustainability, Technical University of Denmark 2018-2021.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -17,50 +17,44 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Douglas McCloskey $
-// $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
+// $Maintainer: Bertrand Boudaud, Douglas McCloskey $
+// $Authors: Douglas McCloskey, Bertrand Boudaud $
 // --------------------------------------------------------------------------
 
 #pragma once
 
-#include <SmartPeak/core/RawDataProcessor.h>
-#include <SmartPeak/core/LibraryObservable.h>
-#include <SmartPeak/core/ApplicationHandler.h>
-
-#include <map>
+#include <SmartPeak/iface/ILibraryObserver.h>
+#include <memory>
 #include <vector>
-#include <regex>
-#include <sstream>
+#include <algorithm>
 
 namespace SmartPeak
 {
-
-  struct LoadMSP : RawDataProcessor, IFilePickerHandler
+  class LibraryObservable
   {
-    /**
-    IFilePickerHandler
-    */
-    bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
-
-    /* IProcessorDescription */
-    virtual std::string getName() const override { return "LOAD_MSP"; }
-    virtual std::string getDescription() const override { return "Load MSP"; }
-    virtual std::vector<std::string> getRequirements() const override;
-    virtual std::set<std::string> getOutputs() const override;
-    virtual std::set<std::string> getInputs() const override;
-
-    /** Load spectral library from .msp file.
-    */
-    void doProcess(
-      RawDataHandler& rawDataHandler_IO,
-      const ParameterSet& params_I,
-      Filenames& filenames_I
-    ) const override;
-
-    /* IFilenamesHandler */
-    virtual void getFilenames(Filenames& filenames) const override;
-
-    LibraryObservable* library_observable_ = nullptr;
+  public:
+    virtual void addLibraryObserver(ILibraryObserver* observer)
+    { 
+      if (nullptr != observer)
+      {
+        observers_.push_back(observer);
+      }
+    }
+    virtual void removeLibraryObserver(ILibraryObserver* observer)
+    {
+      if (nullptr != observer)
+      {
+        observers_.erase(std::remove(observers_.begin(), observers_.end(), observer), observers_.end()); 
+      } 
+    }
+    void notifyLibraryUpdated()
+    {
+      for (auto& observer : observers_)
+      {
+        observer->onLibraryUpdated();
+      }
+    }
+  protected:
+    std::vector<ILibraryObserver*> observers_;
   };
-
 }

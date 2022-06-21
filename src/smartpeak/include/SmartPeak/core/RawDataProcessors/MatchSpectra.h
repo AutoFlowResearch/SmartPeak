@@ -50,9 +50,6 @@ namespace SmartPeak
       const ParameterSet& params_I,
       Filenames& filenames_I
     ) const override;
-
-    /* IFilenamesHandler */
-    virtual void getFilenames(Filenames& filenames) const override;
   };
 
 }

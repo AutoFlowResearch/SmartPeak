@@ -16,6 +16,7 @@ set(sources_list_h
 	FeatureMetadata.h
 	Helloworld.h
 	InjectionHandler.h
+	LibraryObservable.h
 	MetaDataHandler.h
 	Parameters.h
 	ParametersObservable.h

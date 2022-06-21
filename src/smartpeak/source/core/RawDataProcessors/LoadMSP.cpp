@@ -20,14 +20,12 @@
 // $Maintainer: Douglas McCloskey $
 // $Authors: Douglas McCloskey $
 // --------------------------------------------------------------------------
-#include <SmartPeak/core/RawDataProcessors/StoreMSP.h>
+#include <SmartPeak/core/RawDataProcessors/LoadMSP.h>
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/Utilities.h>
-#include <SmartPeak/core/FeatureFiltersUtils.h>
+#include <SmartPeak/io/InputDataValidation.h>
 
-#include <OpenMS/ANALYSIS/OPENSWATH/TargetedSpectraExtractor.h>
-#include <OpenMS/ANALYSIS/OPENSWATH/TransitionTSVFile.h>
-#include <OpenMS/FORMAT/TraMLFile.h>
+#include <OpenMS/FORMAT/MSPGenericFile.h>
 
 #include <plog/Log.h>
 
@@ -37,34 +35,42 @@
 namespace SmartPeak
 {
 
-  std::vector<std::string> StoreMSP::getRequirements() const
+  std::vector<std::string> LoadMSP::getRequirements() const
   {
-    return { "sequence", "traML" };
+    return { "sequence" };
   }
 
-  std::set<std::string> StoreMSP::getInputs() const
+  std::set<std::string> LoadMSP::getInputs() const
   {
-    return { "Experiment", "Spectra" };
+    return {  };
   }
 
-  std::set<std::string> StoreMSP::getOutputs() const
+  std::set<std::string> LoadMSP::getOutputs() const
   {
-    return { };
+    return { "Library" };
   }
 
-  ParameterSet StoreMSP::getParameterSchema() const
+  bool LoadMSP::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
   {
-    OpenMS::TargetedSpectraExtractor oms_params;
-    ParameterSet parameters({ oms_params });
-    return parameters;
+    if (application_handler->sequenceHandler_.getSequence().size() == 0)
+    {
+      LOGE << "File cannot be loaded without first loading the sequence.";
+      return false;
+    }
+    RawDataHandler& rawDataHandler = application_handler->sequenceHandler_.getSequence().at(0).getRawData();
+    //library_observable_ = &(application_handler->sequenceHandler_);
+    Filenames filenames;
+    filenames.setFullPath("msp", filename);
+    process(rawDataHandler, {}, filenames);
+    return true;
   }
 
-  void StoreMSP::getFilenames(Filenames& filenames) const
+  void LoadMSP::getFilenames(Filenames& filenames) const
   {
-    filenames.addFileName("output_ms2", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}.msp");
-  };
+    filenames.addFileName("msp", "${MAIN_DIR}/library.msp", "Library", false, false);
+  }
 
-  void StoreMSP::doProcess(RawDataHandler& rawDataHandler_IO,
+  void LoadMSP::doProcess(RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
@@ -75,35 +81,23 @@ namespace SmartPeak
     ParameterSet params(params_I);
     params.merge(getParameterSchema());
 
-    OpenMS::TargetedSpectraExtractor targeted_spectra_extractor;
-    Utilities::setUserParameters(targeted_spectra_extractor, params);
+    if (!InputDataValidation::prepareToLoad(filenames_I, "msp", true))
+    {
+      throw std::invalid_argument("Failed to load input file");
+    }
 
-    //// Annotate spectra with missing names
-    //auto& experiment = rawDataHandler_IO.getExperiment();
-    //auto& spectra = experiment.getSpectra();
-    //int cpt = 0;
-    //for (auto& spectrum : spectra)
-    //{
-    //  if (spectrum.getName().empty())
-    //  {
-    //    std::ostringstream os;
-    //    os << rawDataHandler_IO.getMetaData().getInjectionName() << "_" << ++cpt;
-    //    spectrum.setName(os.str());
-    //  }
-    //}
-    //// Remove unannotated spectra
-    //auto experiment = rawDataHandler_IO.getExperiment();
-    //std::vector<OpenMS::MSSpectrum> annotated_spectra;
-    //for (auto& spectrum : rawDataHandler_IO.getExperiment().getSpectra())
-    //{
-    //  if (!spectrum.getName().empty())
-    //  {
-    //    annotated_spectra.push_back(spectrum);
-    //  }
-    //}
-    //experiment.setSpectra(annotated_spectra);
-
-    auto output_ms2 = filenames_I.getFullPath("output_ms2").generic_string();
-    targeted_spectra_extractor.storeSpectraMSP(output_ms2, rawDataHandler_IO.getChromatogramMap());
+    try {
+      // Load spectral library for downstream spectral matching
+      OpenMS::MSPGenericFile msp_file;
+      OpenMS::MSExperiment library;
+      msp_file.load(filenames_I.getFullPath("msp").generic_string(), library);
+      library.sortSpectra();
+      rawDataHandler_IO.setLibrary(library);
+      if (library_observable_) library_observable_->notifyLibraryUpdated();
+    }
+    catch (const std::exception& e) {
+      LOGE << e.what();
+      throw;
+    }
   }
 }

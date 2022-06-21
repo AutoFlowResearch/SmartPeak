@@ -23,7 +23,6 @@
 #include <SmartPeak/core/RawDataProcessors/LoadTransitions.h>
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/Utilities.h>
-#include <SmartPeak/core/FeatureFiltersUtils.h>
 #include <SmartPeak/io/InputDataValidation.h>
 
 #include <OpenMS/FORMAT/TraMLFile.h>
