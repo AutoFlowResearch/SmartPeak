@@ -400,6 +400,31 @@ namespace SmartPeak
     return feature_background_estimations_;
   }
 
+  void RawDataHandler::setLibrary(const OpenMS::MSExperiment& library)
+  {
+    library_ = std::make_shared<OpenMS::MSExperiment>(OpenMS::MSExperiment(library));
+  }
+
+  void RawDataHandler::setLibrary(std::shared_ptr<OpenMS::MSExperiment>& library)
+  {
+    library_ = library;
+  }
+
+  OpenMS::MSExperiment& RawDataHandler::getLibrary()
+  {
+    return *(library_.get());
+  }
+
+  const OpenMS::MSExperiment& RawDataHandler::getLibrary() const
+  {
+    return *(library_.get());
+  }
+
+  std::shared_ptr<OpenMS::MSExperiment>& RawDataHandler::getLibraryShared()
+  {
+    return library_;
+  }
+
   void RawDataHandler::setFeatureMapHistory(const OpenMS::FeatureMap& feature_map_history)
   {
     feature_map_history_ = feature_map_history;
