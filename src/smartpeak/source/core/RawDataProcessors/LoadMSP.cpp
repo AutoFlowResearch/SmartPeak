@@ -47,7 +47,7 @@ namespace SmartPeak
 
   std::set<std::string> LoadMSP::getOutputs() const
   {
-    return { "Library" };
+    return { "SpectraLibrary" };
   }
 
   bool LoadMSP::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
@@ -92,7 +92,7 @@ namespace SmartPeak
       OpenMS::MSExperiment library;
       msp_file.load(filenames_I.getFullPath("msp").generic_string(), library);
       library.sortSpectra();
-      rawDataHandler_IO.setLibrary(library);
+      rawDataHandler_IO.setSpectraLibrary(library);
       if (library_observable_) library_observable_->notifyLibraryUpdated();
     }
     catch (const std::exception& e) {

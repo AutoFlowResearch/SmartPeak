@@ -132,11 +132,11 @@ public:
     const OpenMS::MRMFeatureQC& getFeatureBackgroundEstimations() const;
     std::shared_ptr<OpenMS::MRMFeatureQC>& getFeatureBackgroundEstimationsShared();
 
-    void setLibrary(const OpenMS::MSExperiment& library);
-    void setLibrary(std::shared_ptr<OpenMS::MSExperiment>& library);
-    OpenMS::MSExperiment& getLibrary();
-    const OpenMS::MSExperiment& getLibrary() const;
-    std::shared_ptr<OpenMS::MSExperiment>& getLibraryShared();
+    void setSpectraLibrary(const OpenMS::MSExperiment& library);
+    void setSpectraLibrary(std::shared_ptr<OpenMS::MSExperiment>& library);
+    OpenMS::MSExperiment& getSpectraLibrary();
+    const OpenMS::MSExperiment& getSpectraLibrary() const;
+    std::shared_ptr<OpenMS::MSExperiment>& getSpectraLibraryShared();
 
     void setFeatureMapHistory(const OpenMS::FeatureMap& feature_map_history);
     OpenMS::FeatureMap& getFeatureMapHistory();
@@ -214,6 +214,6 @@ private:
     std::shared_ptr<OpenMS::MRMFeatureQC> feature_background_qc_ = nullptr;  ///< Feature QCs; shared between all raw data handlers in the sequence segment
     std::shared_ptr<OpenMS::MRMFeatureQC> feature_rsd_estimations_ = nullptr;  ///< Percent RSD estimations; shared between all raw data handlers in the sequence segment
     std::shared_ptr<OpenMS::MRMFeatureQC> feature_background_estimations_ = nullptr;  ///< Background interference estimations; shared between all raw data handlers in the sequence segment
-    std::shared_ptr<OpenMS::MSExperiment> library_;  ///< MS data derived from a (spectral) database used for annotation
+    std::shared_ptr<OpenMS::MSExperiment> spectra_library_;  ///< MS data derived from a (spectral) database used for annotation
   };
 }

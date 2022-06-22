@@ -400,29 +400,29 @@ namespace SmartPeak
     return feature_background_estimations_;
   }
 
-  void RawDataHandler::setLibrary(const OpenMS::MSExperiment& library)
+  void RawDataHandler::setSpectraLibrary(const OpenMS::MSExperiment& library)
   {
-    library_ = std::make_shared<OpenMS::MSExperiment>(OpenMS::MSExperiment(library));
+    spectra_library_ = std::make_shared<OpenMS::MSExperiment>(OpenMS::MSExperiment(library));
   }
 
-  void RawDataHandler::setLibrary(std::shared_ptr<OpenMS::MSExperiment>& library)
+  void RawDataHandler::setSpectraLibrary(std::shared_ptr<OpenMS::MSExperiment>& library)
   {
-    library_ = library;
+    spectra_library_ = library;
   }
 
-  OpenMS::MSExperiment& RawDataHandler::getLibrary()
+  OpenMS::MSExperiment& RawDataHandler::getSpectraLibrary()
   {
-    return *(library_.get());
+    return *(spectra_library_.get());
   }
 
-  const OpenMS::MSExperiment& RawDataHandler::getLibrary() const
+  const OpenMS::MSExperiment& RawDataHandler::getSpectraLibrary() const
   {
-    return *(library_.get());
+    return *(spectra_library_.get());
   }
 
-  std::shared_ptr<OpenMS::MSExperiment>& RawDataHandler::getLibraryShared()
+  std::shared_ptr<OpenMS::MSExperiment>& RawDataHandler::getSpectraLibraryShared()
   {
-    return library_;
+    return spectra_library_;
   }
 
   void RawDataHandler::setFeatureMapHistory(const OpenMS::FeatureMap& feature_map_history)

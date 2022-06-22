@@ -1199,7 +1199,7 @@ TEST(RawDataProcessor, processLoadMSP)
   LoadMSP loadLibrary;
   loadLibrary.process(rawDataHandler, {}, filenames);
 
-  std::vector<OpenMS::MSSpectrum> spectrum = rawDataHandler.getLibrary().getSpectra();
+  std::vector<OpenMS::MSSpectrum> spectrum = rawDataHandler.getSpectraLibrary().getSpectra();
 
   ASSERT_EQ(spectrum.size(), 2);
 }

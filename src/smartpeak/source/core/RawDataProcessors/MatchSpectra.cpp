@@ -43,7 +43,7 @@ namespace SmartPeak
 
   std::set<std::string> MatchSpectra::getInputs() const
   {
-    return { "Extracted Spectra", "Library"};
+    return { "Extracted Spectra", "SpectraLibrary"};
   }
 
   std::set<std::string> MatchSpectra::getOutputs() const
@@ -73,7 +73,7 @@ namespace SmartPeak
     // Compare
     OpenMS::TargetedSpectraExtractor::BinnedSpectrumComparator cmp;
     std::map<OpenMS::String, OpenMS::DataValue> options;
-    cmp.init(rawDataHandler_IO.getLibrary().getSpectra(), options);
+    cmp.init(rawDataHandler_IO.getSpectraLibrary().getSpectra(), options);
     targeted_spectra_extractor.targetedMatching(rawDataHandler_IO.getChromatogramMap().getSpectra(), cmp, rawDataHandler_IO.getFeatureMap("extracted_spectra"));
 
     rawDataHandler_IO.setFeatureMap(rawDataHandler_IO.getFeatureMap("extracted_spectra"));
