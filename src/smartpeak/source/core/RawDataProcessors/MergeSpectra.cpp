@@ -87,7 +87,7 @@ namespace SmartPeak
     return ParameterSet(param_struct);
   }
 
-  std::vector<std::string> MergeSpectra::getRequirements() const
+  std::vector<std::string> MergeSpectra::getFilenameRequirements() const
   {
     return { "sequence", "traML" };
   }

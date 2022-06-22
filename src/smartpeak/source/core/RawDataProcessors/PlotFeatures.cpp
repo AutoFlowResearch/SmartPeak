@@ -34,7 +34,7 @@
 namespace SmartPeak
 {
 
-  std::vector<std::string> PlotFeatures::getRequirements() const
+  std::vector<std::string> PlotFeatures::getFilenameRequirements() const
   {
     return { "sequence", "traML" };
   }

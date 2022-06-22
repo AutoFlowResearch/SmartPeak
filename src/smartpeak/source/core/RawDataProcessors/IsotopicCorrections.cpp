@@ -45,7 +45,7 @@ namespace SmartPeak
     return { "Features" };
   }
 
-  std::vector<std::string> IsotopicCorrections::getRequirements() const
+  std::vector<std::string> IsotopicCorrections::getFilenameRequirements() const
   {
     return { "sequence", "traML" };
   }

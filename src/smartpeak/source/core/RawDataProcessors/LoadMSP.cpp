@@ -35,7 +35,7 @@
 namespace SmartPeak
 {
 
-  std::vector<std::string> LoadMSP::getRequirements() const
+  std::vector<std::string> LoadMSP::getFilenameRequirements() const
   {
     return { "sequence" };
   }

@@ -46,7 +46,7 @@ namespace SmartPeak
     return { "Features" };
   }
 
-  std::vector<std::string> CalculateIsotopicPurities::getRequirements() const
+  std::vector<std::string> CalculateIsotopicPurities::getFilenameRequirements() const
   {
     return { "sequence", "traML" };
   }

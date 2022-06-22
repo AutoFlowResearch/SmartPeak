@@ -49,7 +49,7 @@ namespace SmartPeak
     return { "Quantitation Methods" };
   }
 
-  std::vector<std::string> LoadQuantitationMethods::getRequirements() const
+  std::vector<std::string> LoadQuantitationMethods::getFilenameRequirements() const
   {
     return { "sequence", "traML" };
   }

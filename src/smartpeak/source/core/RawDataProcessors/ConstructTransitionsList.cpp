@@ -37,7 +37,7 @@
 namespace SmartPeak
 {
 
-  std::vector<std::string> ConstructTransitionsList::getRequirements() const
+  std::vector<std::string> ConstructTransitionsList::getFilenameRequirements() const
   {
     return { "sequence", "traML" };
   }

@@ -86,7 +86,7 @@ namespace SmartPeak
     return { "Spectra" };
   }
 
-  std::vector<std::string> ExtractSpectraWindows::getRequirements() const
+  std::vector<std::string> ExtractSpectraWindows::getFilenameRequirements() const
   {
     return { "sequence", "traML" };
   }

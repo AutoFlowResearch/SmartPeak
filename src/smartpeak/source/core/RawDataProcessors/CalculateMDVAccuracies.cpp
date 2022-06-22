@@ -45,7 +45,7 @@ namespace SmartPeak
     return { "Features" };
   }
 
-  std::vector<std::string> CalculateMDVAccuracies::getRequirements() const
+  std::vector<std::string> CalculateMDVAccuracies::getFilenameRequirements() const
   {
     return { "sequence", "traML" };
   }

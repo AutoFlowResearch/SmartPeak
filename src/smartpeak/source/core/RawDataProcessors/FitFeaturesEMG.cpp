@@ -46,7 +46,7 @@ namespace SmartPeak
     return { "Features" };
   }
 
-  std::vector<std::string> FitFeaturesEMG::getRequirements() const
+  std::vector<std::string> FitFeaturesEMG::getFilenameRequirements() const
   {
     return { "sequence", "traML" };
   }

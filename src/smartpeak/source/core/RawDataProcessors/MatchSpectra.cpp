@@ -36,14 +36,14 @@
 namespace SmartPeak
 {
 
-  std::vector<std::string> MatchSpectra::getRequirements() const
+  std::vector<std::string> MatchSpectra::getFilenameRequirements() const
   {
     return { "sequence", "traML", "msp"};
   }
 
   std::set<std::string> MatchSpectra::getInputs() const
   {
-    return { "Extracted Spectra" };
+    return { "Extracted Spectra", "Library"};
   }
 
   std::set<std::string> MatchSpectra::getOutputs() const

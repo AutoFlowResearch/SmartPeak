@@ -48,7 +48,7 @@ namespace SmartPeak
     return { "Features" };
   }
 
-  std::vector<std::string> Pick3DFeatures::getRequirements() const
+  std::vector<std::string> Pick3DFeatures::getFilenameRequirements() const
   {
     return { "sequence", "traML" };
   }

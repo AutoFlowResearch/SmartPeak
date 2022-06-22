@@ -47,7 +47,7 @@ namespace SmartPeak
     return { };
   }
 
-  std::vector<std::string> StoreFeatureRSDFilters::getRequirements() const
+  std::vector<std::string> StoreFeatureRSDFilters::getFilenameRequirements() const
   {
     return { "sequence", "traML" };
   }
