@@ -25,11 +25,11 @@
 
 namespace SmartPeak 
 {
-  struct ILibraryObserver
+  struct ISpectraLibraryObserver
   {
     /**
       Library has been updated
     */
-    virtual void onLibraryUpdated() = 0;
+    virtual void onSpectraLibraryUpdated() = 0;
   };
 }

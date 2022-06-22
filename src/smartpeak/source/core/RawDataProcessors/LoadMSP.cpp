@@ -58,7 +58,7 @@ namespace SmartPeak
       return false;
     }
     RawDataHandler& rawDataHandler = application_handler->sequenceHandler_.getSequence().at(0).getRawData();
-    //library_observable_ = &(application_handler->sequenceHandler_);
+    spectra_library_observable_ = &(application_handler->sequenceHandler_);
     Filenames filenames;
     filenames.setFullPath("msp", filename);
     process(rawDataHandler, {}, filenames);
@@ -93,7 +93,7 @@ namespace SmartPeak
       msp_file.load(filenames_I.getFullPath("msp").generic_string(), library);
       library.sortSpectra();
       rawDataHandler_IO.setSpectraLibrary(library);
-      if (library_observable_) library_observable_->notifyLibraryUpdated();
+      if (spectra_library_observable_) spectra_library_observable_->notifySpectraLibraryUpdated();
     }
     catch (const std::exception& e) {
       LOGE << e.what();

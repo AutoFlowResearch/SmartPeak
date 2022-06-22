@@ -39,15 +39,15 @@
 						<pt x="48.670000000000002" y="1637.803507527760985" />
 						<pt x="49.081999999999994" y="1990.60157431720927" />
 						<pt x="49.492999999999995" y="2347.738987309236563" />
-						<pt x="49.903999999999996" y="2688.694406151445492" />
-						<pt x="50.314999999999998" y="2991.157278168955145" />
+						<pt x="49.904000000000004" y="2688.694406151445492" />
+						<pt x="50.314999999999998" y="2991.1572781689556" />
 						<pt x="50.725999999999999" y="3234.408088127559495" />
 						<pt x="51.137" y="3403.018450709324952" />
 						<pt x="51.549" y="3494.724148493637131" />
-						<pt x="51.961999999999996" y="3522.991832602973318" />
-						<pt x="52.397999999999996" y="3510.993295966690312" />
+						<pt x="51.962000000000003" y="3522.991832602973318" />
+						<pt x="52.398000000000003" y="3510.993295966690312" />
 						<pt x="52.829999999999998" y="3485.079464214777545" />
-						<pt x="53.261000000000003" y="3462.074391093436134" />
+						<pt x="53.261000000000003" y="3462.074391093435679" />
 						<pt x="53.692" y="3437.318869792843088" />
 						<pt x="54.265999999999998" y="3367.906881185745988" />
 						<pt x="54.838999999999999" y="3204.049026245883397" />
@@ -56,28 +56,28 @@
 						<pt x="56.600000000000001" y="2057.945189068827403" />
 						<pt x="57.248000000000005" y="1590.136817106187209" />
 						<pt x="57.893999999999998" y="1233.408254128107501" />
-						<pt x="58.574999999999996" y="1029.44555757808962" />
+						<pt x="58.575000000000003" y="1029.44555757808962" />
 						<pt x="59.256" y="999.310665711266779" />
 					</convexhull>
 					<UserParam type="float" name="MZ" value="131.0"/>
-					<UserParam type="float" name="peak_apex_position" value="51.961999999999996"/>
+					<UserParam type="float" name="peak_apex_position" value="51.962000000000003"/>
 					<UserParam type="string" name="native_id" value="arg-L.arg-L_1.Light"/>
 					<UserParam type="float" name="peak_apex_int" value="3522.991832602973318"/>
 					<UserParam type="float" name="total_xic" value="3.8114e05"/>
 					<UserParam type="float" name="width_at_50" value="8.578000000000003"/>
-					<UserParam type="float" name="width_at_5" value="11.408000000000001"/>
-					<UserParam type="float" name="width_at_10" value="11.408000000000001"/>
+					<UserParam type="float" name="width_at_5" value="11.408"/>
+					<UserParam type="float" name="width_at_10" value="11.408"/>
 					<UserParam type="float" name="start_position_at_5" value="47.847999999999999"/>
 					<UserParam type="float" name="start_position_at_10" value="47.847999999999999"/>
 					<UserParam type="float" name="start_position_at_50" value="48.670000000000002"/>
 					<UserParam type="float" name="end_position_at_5" value="59.256"/>
 					<UserParam type="float" name="end_position_at_10" value="59.256"/>
 					<UserParam type="float" name="end_position_at_50" value="57.248000000000005"/>
-					<UserParam type="float" name="total_width" value="11.408000000000001"/>
+					<UserParam type="float" name="total_width" value="11.408"/>
 					<UserParam type="float" name="tailing_factor" value="1.38648517258143"/>
 					<UserParam type="float" name="asymmetry_factor" value="1.772970345162861"/>
 					<UserParam type="float" name="slope_of_baseline" value="-29.426853314865753"/>
-					<UserParam type="float" name="baseline_delta_2_height" value="-8.352802025409076e-03"/>
+					<UserParam type="float" name="baseline_delta_2_height" value="-8.352802025409074e-03"/>
 					<UserParam type="int" name="points_across_baseline" value="24"/>
 					<UserParam type="int" name="points_across_half_height" value="17"/>
 					<UserParam type="float" name="logSN" value="0.793678085408723"/>
@@ -95,12 +95,12 @@
 				<PeptideHit score="0.16166631972865" sequence="" charge="1" protein_refs="PH_0">
 				</PeptideHit>
 			</PeptideIdentification>
+			<UserParam type="float" name="total_xic" value="3.8114e05"/>
 			<UserParam type="string" name="potentialOutlier" value="arg-L.arg-L_1.Light"/>
 			<UserParam type="float" name="initialPeakQuality" value="0.5"/>
-			<UserParam type="float" name="total_xic" value="3.8114e05"/>
 			<UserParam type="string" name="PeptideRef" value="arg-L"/>
 			<UserParam type="float" name="leftWidth" value="47.847999572753906"/>
-			<UserParam type="float" name="rightWidth" value="59.256000518798828"/>
+			<UserParam type="float" name="rightWidth" value="59.256000518798835"/>
 			<UserParam type="float" name="peak_apices_sum" value="3522.991832602973318"/>
 			<UserParam type="float" name="delta_rt" value="5.919746815269001"/>
 			<UserParam type="float" name="assay_rt" value="46.089666479999998"/>
@@ -145,13 +145,13 @@
 						<pt x="48.670000000000002" y="2380.04594124562891" />
 						<pt x="49.081999999999994" y="2842.445769110165202" />
 						<pt x="49.492999999999995" y="3231.126295608259625" />
-						<pt x="49.903999999999996" y="3512.900079143403218" />
+						<pt x="49.904000000000004" y="3512.900079143403218" />
 						<pt x="50.314999999999998" y="3676.075518332578213" />
-						<pt x="50.725999999999999" y="3729.85792559220954" />
+						<pt x="50.725999999999999" y="3729.857925592209085" />
 						<pt x="51.137" y="3697.405615567588939" />
 						<pt x="51.549" y="3604.907169769305256" />
-						<pt x="51.961999999999996" y="3475.11341649056385" />
-						<pt x="52.397999999999996" y="3317.956483915012996" />
+						<pt x="51.962000000000003" y="3475.11341649056385" />
+						<pt x="52.398000000000003" y="3317.956483915012996" />
 						<pt x="52.829999999999998" y="3161.473881186139806" />
 						<pt x="53.261000000000003" y="3022.055307637899659" />
 						<pt x="53.692" y="2912.896534236185289" />
@@ -163,7 +163,7 @@
 					<UserParam type="float" name="MZ" value="114.0"/>
 					<UserParam type="float" name="peak_apex_position" value="50.725999999999999"/>
 					<UserParam type="string" name="native_id" value="asn-L.asn-L_1.Light"/>
-					<UserParam type="float" name="peak_apex_int" value="3729.85792559220954"/>
+					<UserParam type="float" name="peak_apex_int" value="3729.857925592209085"/>
 					<UserParam type="float" name="total_xic" value="1.24393e05"/>
 					<UserParam type="float" name="width_at_50" value="8.155999999999999"/>
 					<UserParam type="float" name="width_at_5" value="8.155999999999999"/>
@@ -205,13 +205,13 @@
 						<pt x="48.670000000000002" y="0.0" />
 						<pt x="49.081999999999994" y="0.0" />
 						<pt x="49.492999999999995" y="0.0" />
-						<pt x="49.903999999999996" y="0.0" />
+						<pt x="49.904000000000004" y="0.0" />
 						<pt x="50.314999999999998" y="0.0" />
 						<pt x="50.725999999999999" y="0.0" />
 						<pt x="51.137" y="0.0" />
 						<pt x="51.549" y="0.0" />
-						<pt x="51.961999999999996" y="0.0" />
-						<pt x="52.397999999999996" y="0.0" />
+						<pt x="51.962000000000003" y="0.0" />
+						<pt x="52.398000000000003" y="0.0" />
 						<pt x="52.829999999999998" y="0.0" />
 						<pt x="53.261000000000003" y="0.0" />
 						<pt x="53.692" y="0.0" />
@@ -228,12 +228,12 @@
 					<UserParam type="float" name="width_at_50" value="0.436"/>
 					<UserParam type="float" name="width_at_5" value="0.436"/>
 					<UserParam type="float" name="width_at_10" value="0.436"/>
-					<UserParam type="float" name="start_position_at_5" value="51.961999999999996"/>
-					<UserParam type="float" name="start_position_at_10" value="51.961999999999996"/>
-					<UserParam type="float" name="start_position_at_50" value="51.961999999999996"/>
-					<UserParam type="float" name="end_position_at_5" value="52.397999999999996"/>
-					<UserParam type="float" name="end_position_at_10" value="52.397999999999996"/>
-					<UserParam type="float" name="end_position_at_50" value="52.397999999999996"/>
+					<UserParam type="float" name="start_position_at_5" value="51.962000000000003"/>
+					<UserParam type="float" name="start_position_at_10" value="51.962000000000003"/>
+					<UserParam type="float" name="start_position_at_50" value="51.962000000000003"/>
+					<UserParam type="float" name="end_position_at_5" value="52.398000000000003"/>
+					<UserParam type="float" name="end_position_at_10" value="52.398000000000003"/>
+					<UserParam type="float" name="end_position_at_50" value="52.398000000000003"/>
 					<UserParam type="float" name="total_width" value="8.155999999999999"/>
 					<UserParam type="float" name="tailing_factor" value="0.8320641700865"/>
 					<UserParam type="float" name="asymmetry_factor" value="0.664128340172999"/>
@@ -256,13 +256,13 @@
 				<PeptideHit score="-0.547133320365818" sequence="" charge="1" protein_refs="PH_2">
 				</PeptideHit>
 			</PeptideIdentification>
+			<UserParam type="float" name="total_xic" value="1.24393e05"/>
 			<UserParam type="string" name="potentialOutlier" value="asn-L.asn-L_1.Light"/>
 			<UserParam type="float" name="initialPeakQuality" value="0.0"/>
-			<UserParam type="float" name="total_xic" value="1.24393e05"/>
 			<UserParam type="string" name="PeptideRef" value="asn-L"/>
 			<UserParam type="float" name="leftWidth" value="47.847999572753906"/>
 			<UserParam type="float" name="rightWidth" value="56.599998474121094"/>
-			<UserParam type="float" name="peak_apices_sum" value="3729.85792559220954"/>
+			<UserParam type="float" name="peak_apices_sum" value="3729.857925592209085"/>
 			<UserParam type="float" name="delta_rt" value="-7.827682588912047"/>
 			<UserParam type="float" name="assay_rt" value="58.583745540000003"/>
 			<UserParam type="float" name="norm_RT" value="50.756062951087955"/>
@@ -302,24 +302,24 @@
 					<charge>0</charge>
 					<convexhull nr="0">
 						<pt x="49.492999999999995" y="651.697801083661261" />
-						<pt x="49.903999999999996" y="760.441726580111663" />
+						<pt x="49.904000000000004" y="760.441726580111663" />
 						<pt x="50.314999999999998" y="865.525517405834421" />
 						<pt x="50.725999999999999" y="963.915636630117092" />
 						<pt x="51.137" y="1053.778661177381082" />
 						<pt x="51.549" y="1133.935919572362309" />
-						<pt x="51.961999999999996" y="1203.251833830854366" />
-						<pt x="52.397999999999996" y="1265.14000452687219" />
+						<pt x="51.962000000000003" y="1203.251833830854366" />
+						<pt x="52.398000000000003" y="1265.14000452687219" />
 						<pt x="52.829999999999998" y="1317.967625411995414" />
 						<pt x="53.261000000000003" y="1370.967178801841328" />
 						<pt x="53.692" y="1439.662649103699096" />
 						<pt x="54.265999999999998" y="1579.306309693787853" />
-						<pt x="54.838999999999999" y="1785.50226061778676" />
+						<pt x="54.838999999999999" y="1785.502260617786988" />
 						<pt x="55.411999999999999" y="2037.68704783004614" />
 						<pt x="56.003999999999998" y="2300.050226043914336" />
 						<pt x="56.600000000000001" y="2515.59063587921537" />
 						<pt x="57.248000000000005" y="2650.082889624185555" />
 						<pt x="57.893999999999998" y="2673.87702814341219" />
-						<pt x="58.574999999999996" y="2624.082579844128304" />
+						<pt x="58.575000000000003" y="2624.082579844128304" />
 						<pt x="59.256" y="2551.828576794962373" />
 						<pt x="59.936999999999998" y="2458.55855633070496" />
 						<pt x="60.597999999999999" y="2328.914456295003674" />
@@ -330,8 +330,8 @@
 						<pt x="64.213999999999999" y="2008.148534994916645" />
 						<pt x="64.997" y="1968.956014189173857" />
 						<pt x="65.778999999999996" y="1867.124535155486001" />
-						<pt x="66.599000000000004" y="1674.278999642847111" />
-						<pt x="67.417999999999992" y="1436.889376776107383" />
+						<pt x="66.599000000000004" y="1674.278999642847339" />
+						<pt x="67.417999999999992" y="1436.889376776107156" />
 						<pt x="68.200000000000003" y="1240.65404396837107" />
 						<pt x="68.97999999999999" y="1107.268363068102644" />
 						<pt x="69.762999999999991" y="785.5448892506123" />
@@ -372,9 +372,9 @@
 				<PeptideHit score="0.0350324474498744" sequence="" charge="1" protein_refs="PH_1">
 				</PeptideHit>
 			</PeptideIdentification>
+			<UserParam type="float" name="total_xic" value="7.9923e04"/>
 			<UserParam type="string" name="potentialOutlier" value="orn.orn_1.Light"/>
 			<UserParam type="float" name="initialPeakQuality" value="0.5"/>
-			<UserParam type="float" name="total_xic" value="7.9923e04"/>
 			<UserParam type="string" name="PeptideRef" value="orn"/>
 			<UserParam type="float" name="leftWidth" value="49.082000732421875"/>
 			<UserParam type="float" name="rightWidth" value="69.76300048828125"/>
@@ -417,15 +417,15 @@
 					<overallquality>0.0</overallquality>
 					<charge>0</charge>
 					<convexhull nr="0">
-						<pt x="49.903999999999996" y="299.029909965554793" />
+						<pt x="49.904000000000004" y="299.029909965554793" />
 						<pt x="50.314999999999998" y="363.095598284682808" />
 						<pt x="50.725999999999999" y="417.61339243446298" />
-						<pt x="51.137" y="456.398022412153694" />
-						<pt x="51.549" y="478.384932795678367" />
-						<pt x="51.961999999999996" y="487.60759357573852" />
-						<pt x="52.397999999999996" y="496.286213871500934" />
+						<pt x="51.137" y="456.398022412153637" />
+						<pt x="51.549" y="478.38493279567831" />
+						<pt x="51.962000000000003" y="487.607593575738576" />
+						<pt x="52.398000000000003" y="496.286213871500934" />
 						<pt x="52.829999999999998" y="521.697994083317099" />
-						<pt x="53.261000000000003" y="587.223921009813694" />
+						<pt x="53.261000000000003" y="587.22392100981358" />
 						<pt x="53.692" y="733.719752414819482" />
 						<pt x="54.265999999999998" y="1130.88390532286644" />
 						<pt x="54.838999999999999" y="1866.51124756617287" />
@@ -434,7 +434,7 @@
 						<pt x="56.600000000000001" y="6095.333533886249825" />
 						<pt x="57.248000000000005" y="7484.866556057381786" />
 						<pt x="57.893999999999998" y="8202.435868492560985" />
-						<pt x="58.574999999999996" y="8152.82359067741163" />
+						<pt x="58.575000000000003" y="8152.82359067741163" />
 						<pt x="59.256" y="7454.613727443226708" />
 						<pt x="59.936999999999998" y="6402.3683140942112" />
 						<pt x="60.597999999999999" y="5263.930207845241966" />
@@ -453,7 +453,7 @@
 						<pt x="70.489000000000004" y="489.833135539778027" />
 						<pt x="71.153000000000006" y="409.193561537549499" />
 						<pt x="71.757000000000005" y="325.41867376483151" />
-						<pt x="72.304999999999993" y="261.391004072317116" />
+						<pt x="72.305000000000007" y="261.391004072317116" />
 					</convexhull>
 					<UserParam type="float" name="MZ" value="74.0"/>
 					<UserParam type="float" name="peak_apex_position" value="57.893999999999998"/>
@@ -495,13 +495,13 @@
 					<overallquality>0.0</overallquality>
 					<charge>0</charge>
 					<convexhull nr="0">
-						<pt x="49.903999999999996" y="0.0" />
+						<pt x="49.904000000000004" y="0.0" />
 						<pt x="50.314999999999998" y="0.0" />
 						<pt x="50.725999999999999" y="0.0" />
 						<pt x="51.137" y="0.0" />
 						<pt x="51.549" y="0.0" />
-						<pt x="51.961999999999996" y="0.0" />
-						<pt x="52.397999999999996" y="0.0" />
+						<pt x="51.962000000000003" y="0.0" />
+						<pt x="52.398000000000003" y="0.0" />
 						<pt x="52.829999999999998" y="0.0" />
 						<pt x="53.261000000000003" y="0.0" />
 						<pt x="53.692" y="0.0" />
@@ -512,10 +512,10 @@
 						<pt x="56.600000000000001" y="0.0" />
 						<pt x="57.248000000000005" y="328.392700043160914" />
 						<pt x="57.893999999999998" y="309.207532324925012" />
-						<pt x="58.574999999999996" y="390.420716104787573" />
+						<pt x="58.575000000000003" y="390.420716104787573" />
 						<pt x="59.256" y="530.552163005373359" />
 						<pt x="59.936999999999998" y="730.794763398801933" />
-						<pt x="60.597999999999999" y="967.43967581772506" />
+						<pt x="60.597999999999999" y="967.439675817725174" />
 						<pt x="61.280999999999999" y="2283.0408469013787" />
 						<pt x="61.975999999999999" y="0.0" />
 						<pt x="62.722999999999999" y="0.0" />
@@ -531,7 +531,7 @@
 						<pt x="70.489000000000004" y="0.0" />
 						<pt x="71.153000000000006" y="0.0" />
 						<pt x="71.757000000000005" y="0.0" />
-						<pt x="72.304999999999993" y="0.0" />
+						<pt x="72.305000000000007" y="0.0" />
 					</convexhull>
 					<UserParam type="float" name="MZ" value="42.0"/>
 					<UserParam type="float" name="peak_apex_position" value="61.280999999999999"/>
@@ -569,9 +569,9 @@
 				<PeptideHit score="2.57767528350857" sequence="" charge="1" protein_refs="PH_3">
 				</PeptideHit>
 			</PeptideIdentification>
+			<UserParam type="float" name="total_xic" value="9.681100000000001e04"/>
 			<UserParam type="string" name="potentialOutlier" value="ser-L.ser-L_1.Light"/>
 			<UserParam type="float" name="initialPeakQuality" value="-0.545163162062752"/>
-			<UserParam type="float" name="total_xic" value="9.681100000000001e04"/>
 			<UserParam type="string" name="PeptideRef" value="ser-L"/>
 			<UserParam type="float" name="leftWidth" value="49.493000030517578"/>
 			<UserParam type="float" name="rightWidth" value="72.305000305175781"/>

@@ -7,7 +7,6 @@ set(sources_list_h
   IFeaturesObserver.h
   IFilenamesHandler.h
   IFilePickerHandler.h
-  ILibraryObserver.h
   IParametersObserver.h
   IProcessorDescription.h
   IPropertiesHandler.h
@@ -16,6 +15,7 @@ set(sources_list_h
   ISequenceProcessorObserver.h
   ISequenceSegmentObserver.h
   ISequenceSegmentProcessorObserver.h
+  ISpectraLibraryObserver.h
   ITransitionsObserver.h
   IWorkflowObserver.h
 )

@@ -1192,11 +1192,12 @@ TEST(RawDataProcessor, processLoadMSP)
   rawDataHandler.getChromatogramMap().addSpectrum(spectrum1);
 
   auto path_msp = std::tmpnam(nullptr);
-  filenames.setFullPath("msp", path_msp);
+  filenames.setFullPath("output_ms2", path_msp);
   StoreMSP store_msp;
   store_msp.process(rawDataHandler, params_1, filenames);
 
   LoadMSP loadLibrary;
+  filenames.setFullPath("msp", path_msp);
   loadLibrary.process(rawDataHandler, {}, filenames);
 
   std::vector<OpenMS::MSSpectrum> spectrum = rawDataHandler.getSpectraLibrary().getSpectra();
@@ -3070,7 +3071,10 @@ TEST(RawDataProcessor, MatchSpectra)
   RawDataHandler rawDataHandler;
   OpenMS::FeatureMap selected_features;
   rawDataHandler.setFeatureMap("extracted_spectra", selected_features); // [UNIT TEST] test for named feature
-  filenames.setFullPath("cmp_spectra", SMARTPEAK_GET_TEST_DATA_PATH("Germicidin_A_standard.msp"));
+  filenames.setFullPath("msp", SMARTPEAK_GET_TEST_DATA_PATH("Germicidin_A_standard.msp"));
+  LoadMSP loadLibrary;
+  loadLibrary.process(rawDataHandler, {}, filenames);
+
   MatchSpectra match_spectra;
   match_spectra.process(rawDataHandler, params, filenames);
 }

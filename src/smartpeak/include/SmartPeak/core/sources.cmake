@@ -16,7 +16,6 @@ set(sources_list_h
 	FeatureMetadata.h
 	Helloworld.h
 	InjectionHandler.h
-	LibraryObservable.h
 	MetaDataHandler.h
 	Parameters.h
 	ParametersObservable.h
@@ -40,6 +39,7 @@ set(sources_list_h
 	SessionLoaderGenerator.h
 	SharedProcessors.h
 	Server.h
+	SpectraLibraryObservable.h
 	TransitionsObservable.h
 	Utilities.h
 	WorkflowManager.h

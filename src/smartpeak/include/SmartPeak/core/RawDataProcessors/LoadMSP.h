@@ -24,7 +24,7 @@
 #pragma once
 
 #include <SmartPeak/core/RawDataProcessor.h>
-#include <SmartPeak/core/LibraryObservable.h>
+#include <SmartPeak/core/SpectraLibraryObservable.h>
 #include <SmartPeak/core/ApplicationHandler.h>
 
 #include <map>
@@ -60,7 +60,7 @@ namespace SmartPeak
     /* IFilenamesHandler */
     virtual void getFilenames(Filenames& filenames) const override;
 
-    LibraryObservable* library_observable_ = nullptr;
+    SpectraLibraryObservable* spectra_library_observable_ = nullptr;
   };
 
 }

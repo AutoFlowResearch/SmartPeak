@@ -23,38 +23,38 @@
 
 #pragma once
 
-#include <SmartPeak/iface/ILibraryObserver.h>
+#include <SmartPeak/iface/ISpectraLibraryObserver.h>
 #include <memory>
 #include <vector>
 #include <algorithm>
 
 namespace SmartPeak
 {
-  class LibraryObservable
+  class SpectraLibraryObservable
   {
   public:
-    virtual void addLibraryObserver(ILibraryObserver* observer)
+    virtual void addSpectraLibraryObserver(ISpectraLibraryObserver* observer)
     { 
       if (nullptr != observer)
       {
         observers_.push_back(observer);
       }
     }
-    virtual void removeLibraryObserver(ILibraryObserver* observer)
+    virtual void removeSpectraLibraryObserver(ISpectraLibraryObserver* observer)
     {
       if (nullptr != observer)
       {
         observers_.erase(std::remove(observers_.begin(), observers_.end(), observer), observers_.end()); 
       } 
     }
-    void notifyLibraryUpdated()
+    void notifySpectraLibraryUpdated()
     {
       for (auto& observer : observers_)
       {
-        observer->onLibraryUpdated();
+        observer->onSpectraLibraryUpdated();
       }
     }
   protected:
-    std::vector<ILibraryObserver*> observers_;
+    std::vector<ISpectraLibraryObserver*> observers_;
   };
 }
