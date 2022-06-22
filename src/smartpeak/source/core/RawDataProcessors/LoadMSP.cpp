@@ -58,7 +58,7 @@ namespace SmartPeak
       return false;
     }
     RawDataHandler& rawDataHandler = application_handler->sequenceHandler_.getSequence().at(0).getRawData();
-    //library_observable_ = &(application_handler->sequenceHandler_);
+    library_observable_ = &(application_handler->sequenceHandler_);
     Filenames filenames;
     filenames.setFullPath("msp", filename);
     process(rawDataHandler, {}, filenames);
