@@ -214,6 +214,6 @@ private:
     std::shared_ptr<OpenMS::MRMFeatureQC> feature_background_qc_ = nullptr;  ///< Feature QCs; shared between all raw data handlers in the sequence segment
     std::shared_ptr<OpenMS::MRMFeatureQC> feature_rsd_estimations_ = nullptr;  ///< Percent RSD estimations; shared between all raw data handlers in the sequence segment
     std::shared_ptr<OpenMS::MRMFeatureQC> feature_background_estimations_ = nullptr;  ///< Background interference estimations; shared between all raw data handlers in the sequence segment
-    std::shared_ptr<OpenMS::MSExperiment> spectra_library_;  ///< MS data derived from a (spectral) database used for annotation
+    std::shared_ptr<OpenMS::MSExperiment> spectra_library_;  ///< MS data derived from a (spectral) database used for annotation; shared between all raw data handlers in the sequence
   };
 }

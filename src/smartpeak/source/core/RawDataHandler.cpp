@@ -40,7 +40,8 @@ namespace SmartPeak
     feature_background_filter_(std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC())),
     feature_background_qc_(std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC())),
     feature_rsd_estimations_(std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC())),
-    feature_background_estimations_(std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC()))
+    feature_background_estimations_(std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC())),
+    spectra_library_(std::make_shared<OpenMS::MSExperiment>(OpenMS::MSExperiment()))
   {
   }
 
