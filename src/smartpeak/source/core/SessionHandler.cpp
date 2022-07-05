@@ -1872,44 +1872,67 @@ namespace SmartPeak
     const std::set<std::string>& sample_names,
     const std::set<std::string>& component_group_names,
     const float rt,
-    const int ms_level) const
+    const int ms_level,
+    const bool has_convex_hull_only) const
   {
-    if (sequence_handler.getSequence().size() > 0 &&
-      (sequence_handler.getSequence().at(0).getRawData().getExperiment().getSpectra().size() > 0 ||
-        sequence_handler.getSequence().at(0).getRawData().getFeatureMapHistory().size() > 0)) {
-      LOGD << "Making the spectra data for plotting";
-      // Set the axes titles and min/max defaults
-      result.reset("m/z (Da)", "Intensity (au)", "Retention Time (s)", max_nb_points);
-      int total_nb_points = 0;
-      for (const auto& injection : sequence_handler.getSequence())
+    LOGD << "Making the spectra data for plotting";
+    // Set the axes titles and min/max defaults
+    result.reset("m/z (Da)", "Intensity (au)", "Retention Time (s)", max_nb_points);
+    int total_nb_points = 0;
+    for (const auto& injection : sequence_handler.getSequence())
+    {
+      if (sample_names.count(injection.getMetaData().getSampleName()) == 0) continue;
+      // Extract out the raw data for plotting
+      for (const auto& spectra : injection.getRawData().getExperiment().getSpectra())
       {
-        if (sample_names.count(injection.getMetaData().getSampleName()) == 0) continue;
-        // Extract out the raw data for plotting
-        for (const auto& spectra : injection.getRawData().getExperiment().getSpectra())
+        if (spectra.getMSLevel() == ms_level)
         {
-          if (spectra.getMSLevel() == ms_level)
+          result.z_data_area_.push_back(spectra.getRT());
+          std::vector<float> x_data, y_data;
+          const float rt_threashold = 0.50f;
+          if ((!result.points_overflow_) && (abs(spectra.getRT()-rt)< rt_threashold))
           {
-            result.z_data_area_.push_back(spectra.getRT());
-            std::vector<float> x_data, y_data;
-            const float rt_threashold = 0.50f;
-            if ((!result.points_overflow_) && (abs(spectra.getRT()-rt)< rt_threashold))
+            for (auto point = spectra.PosBegin(range.first); point != spectra.PosEnd(range.second); ++point)
             {
-              for (auto point = spectra.PosBegin(range.first); point != spectra.PosEnd(range.second); ++point)
+              bool add_data = false;
+              if (has_convex_hull_only)
+              {
+                for (const auto& feature : injection.getRawData().getFeatureMapHistory())
+                {
+                  for (const auto& subordinate : feature.getSubordinates())
+                  {
+                    auto feature_mz = subordinate.getPosition()[1];
+                    if ((int)feature_mz == (int)(point->getMZ()))
+                    {
+                      add_data = subordinate.getConvexHull().getHullPoints().size();
+                      if (add_data)
+                      {
+                        break;
+                      }
+                    }
+                  }
+                }
+              }
+              else
+              {
+                add_data = true;
+              }
+              if (add_data)
               {
                 x_data.push_back(point->getMZ());
                 y_data.push_back(point->getIntensity());
               }
-              result.addData(x_data, y_data, injection.getMetaData().getSampleName() + "::" + spectra.getNativeID());
             }
+            result.addData(x_data, y_data, injection.getMetaData().getSampleName() + "::" + spectra.getNativeID());
           }
         }
       }
-      if (result.nb_points_ == 0)
-      {
-        // we will set the range to user's range
-        result.x_min_ = range.first;
-        result.x_max_ = range.second;
-      }
+    }
+    if (result.nb_points_ == 0)
+    {
+      // we will set the range to user's range
+      result.x_min_ = range.first;
+      result.x_max_ = range.second;
     }
   }
 

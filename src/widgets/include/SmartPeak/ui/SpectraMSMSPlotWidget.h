@@ -62,6 +62,7 @@ namespace SmartPeak
     */
     virtual void setMarkerPosition(const std::optional<float>& marker_position) override;
     virtual std::optional<float> getMarkerPosition() const override;
+    virtual void drawHeaderButtons() override;
 
     /**
       ISequenceObserver
@@ -74,18 +75,15 @@ namespace SmartPeak
   protected:
     virtual void updateData() override;
 
-  private:
-    int getScanIndexFromRetentionTime(const float& retention_time) const;
-
   protected:
     // input used to create the graph
     std::set<std::string> input_sample_names_;
     std::set<std::string> input_scan_names_;
     std::set<std::string> input_component_group_names_;
-    int input_z_ = 0;
     std::shared_ptr<ChromatogramXICPlotWidget> chromatogram_xic_widget_;
     int ms_level_;
     float current_rt_ = 0.0f;
+    bool has_convex_hull_ = false; // only show items that have convex hull attached
   };
 
 }

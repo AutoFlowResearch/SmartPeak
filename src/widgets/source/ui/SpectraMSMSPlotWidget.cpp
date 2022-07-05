@@ -27,6 +27,16 @@
 namespace SmartPeak
 {
 
+  void SpectraMSMSPlotWidget::drawHeaderButtons()
+  {
+    GraphicDataVizWidget::drawHeaderButtons();
+    ImGui::SameLine();
+    if (ImGui::Checkbox("Has Convex Hull", &has_convex_hull_))
+    {
+      refresh_needed_ = true;
+    }
+  }
+
   void SpectraMSMSPlotWidget::updateData()
   {
     // Update marker with sub graph's value
@@ -41,21 +51,21 @@ namespace SmartPeak
 
     static const auto init_range = std::make_pair(0, 2000);
     if ((refresh_needed_) || // data changed
-       ((input_sample_names_ != sample_names) || (input_component_group_names_ != component_group_names)) || // user select different items
-       (input_z_ != current_z_) // user select different rt
+       ((input_sample_names_ != sample_names) || (input_component_group_names_ != component_group_names)) // user select different items
        ) 
     {
       // get the whole graph area
-      if (graph_viz_data_.z_data_area_.size())
-      {
-        current_rt_ = graph_viz_data_.z_data_area_[current_z_];
-      }
-      session_handler_.getSpectrumMSMSPlot(sequence_handler_, graph_viz_data_, init_range, sample_names, component_group_names, current_rt_, ms_level_);
+      session_handler_.getSpectrumMSMSPlot(sequence_handler_, 
+                                           graph_viz_data_, 
+                                           init_range, 
+                                           sample_names, 
+                                           component_group_names, 
+                                           current_rt_, 
+                                           ms_level_,
+                                           has_convex_hull_);
       updateRanges();
       input_sample_names_ = sample_names;
       input_component_group_names_ = component_group_names;
-      current_z_ = getScanIndexFromRetentionTime(current_rt_);
-      input_z_ = current_z_;
       refresh_needed_ = false;
     }
     graph_viz_data_.y_min_ = 0.0f; // bottom line will start from 0.0
@@ -91,35 +101,8 @@ namespace SmartPeak
     }
   }
 
-  int SpectraMSMSPlotWidget::getScanIndexFromRetentionTime(const float& retention_time) const
-  {
-    if (graph_viz_data_.z_data_area_.empty())
-    {
-      return 0;
-    }
-    int result = 0;
-    float current_distance = std::numeric_limits<float>::max();
-    for (const auto& z : graph_viz_data_.z_data_area_)
-    {
-      auto distance = std::abs(z - retention_time);
-      if (distance > current_distance)
-      {
-        break;
-      }
-      current_distance = distance;
-      result++;
-    }
-    // out of range
-    if (result == graph_viz_data_.z_data_area_.size())
-    {
-      result = graph_viz_data_.z_data_area_.size() - 1;
-    }
-    return result;
-  }
-
   void SpectraMSMSPlotWidget::setCurrentRT(const float current_rt)
   {
-    current_z_ = getScanIndexFromRetentionTime(current_rt);
     current_rt_ = current_rt;
     refresh_needed_ = true;
   }

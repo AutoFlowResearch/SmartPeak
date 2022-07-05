@@ -297,6 +297,7 @@ namespace SmartPeak
     @param[in] component_group_names
     @param[in] rt
     @param[in] ms_level
+    @param[in] has_convex_hull_only
     */
     void getSpectrumMSMSPlot(const SequenceHandler& sequence_handler,
       GraphVizData& result,
@@ -304,7 +305,8 @@ namespace SmartPeak
       const std::set<std::string>& sample_names,
       const std::set<std::string>& component_group_names,
       const float rt,
-      const int ms_level) const;
+      const int ms_level,
+      const bool has_convex_hull_only) const;
 
     void setFeatureLinePlot();
 

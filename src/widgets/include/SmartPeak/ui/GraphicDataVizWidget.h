@@ -64,6 +64,8 @@ namespace SmartPeak
 
     void draw() override;
 
+    virtual void drawHeaderButtons();
+
     /**
       IPropertiesHandler
     */
