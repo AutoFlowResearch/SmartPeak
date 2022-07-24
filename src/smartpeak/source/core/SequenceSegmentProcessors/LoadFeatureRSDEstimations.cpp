@@ -47,7 +47,7 @@ namespace SmartPeak
     return { "Feature RSD Estimations" };
   }
 
-  std::vector<std::string> LoadFeatureRSDEstimations::getRequirements() const
+  std::vector<std::string> LoadFeatureRSDEstimations::getFilenameRequirements() const
   {
     return { "sequence", "traML" };
   }

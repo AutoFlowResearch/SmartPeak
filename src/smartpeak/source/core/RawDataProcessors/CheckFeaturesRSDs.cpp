@@ -45,7 +45,7 @@ namespace SmartPeak
     return { "Features" };
   }
 
-  std::vector<std::string> CheckFeaturesRSDs::getRequirements() const
+  std::vector<std::string> CheckFeaturesRSDs::getFilenameRequirements() const
   {
     return { "sequence", "traML" };
   }

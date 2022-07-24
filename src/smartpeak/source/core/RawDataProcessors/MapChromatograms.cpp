@@ -46,7 +46,7 @@ namespace SmartPeak
     return { "Chromatogram" };
   }
 
-  std::vector<std::string> MapChromatograms::getRequirements() const
+  std::vector<std::string> MapChromatograms::getFilenameRequirements() const
   {
     return { "sequence", "traML" };
   }

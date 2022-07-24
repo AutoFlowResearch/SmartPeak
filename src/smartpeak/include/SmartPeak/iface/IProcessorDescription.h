@@ -46,7 +46,7 @@ namespace SmartPeak
     /**
       Returns the list of file ids that has to be defined prior to be process.
     */
-    virtual std::vector<std::string> getRequirements() const = 0;
+    virtual std::vector<std::string> getFilenameRequirements() const = 0;
 
     /**
       Returns the list of data type accepted as input.

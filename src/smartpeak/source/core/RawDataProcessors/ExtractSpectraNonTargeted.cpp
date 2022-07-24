@@ -35,7 +35,7 @@
 namespace SmartPeak
 {
 
-  std::vector<std::string> ExtractSpectraNonTargeted::getRequirements() const
+  std::vector<std::string> ExtractSpectraNonTargeted::getFilenameRequirements() const
   {
     return { "sequence", "traML" };
   }

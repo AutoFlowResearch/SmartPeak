@@ -39,6 +39,7 @@ set(sources_list_h
 	SessionLoaderGenerator.h
 	SharedProcessors.h
 	Server.h
+	SpectraLibraryObservable.h
 	TransitionsObservable.h
 	Utilities.h
 	WorkflowManager.h

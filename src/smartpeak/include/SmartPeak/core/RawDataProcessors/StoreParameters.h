@@ -54,7 +54,7 @@ namespace SmartPeak
     /* IProcessorDescription */
     virtual std::string getName() const override { return "STORE_PARAMETERS"; }
     virtual std::string getDescription() const override { return "Store a parameters to file"; }
-    virtual std::vector<std::string> getRequirements() const override;
+    virtual std::vector<std::string> getFilenameRequirements() const override;
 
     /* IFilenamesHandler */
     virtual void getFilenames(Filenames& filenames) const override;

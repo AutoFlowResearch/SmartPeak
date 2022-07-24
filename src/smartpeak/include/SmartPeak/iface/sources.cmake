@@ -15,6 +15,7 @@ set(sources_list_h
   ISequenceProcessorObserver.h
   ISequenceSegmentObserver.h
   ISequenceSegmentProcessorObserver.h
+  ISpectraLibraryObserver.h
   ITransitionsObserver.h
   IWorkflowObserver.h
 )

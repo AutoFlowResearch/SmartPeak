@@ -48,7 +48,7 @@ namespace SmartPeak
     return { "Feature QCs" };
   }
 
-  std::vector<std::string> TransferLOQToFeatureQCs::getRequirements() const
+  std::vector<std::string> TransferLOQToFeatureQCs::getFilenameRequirements() const
   {
     return { "sequence", "traML" };
   }

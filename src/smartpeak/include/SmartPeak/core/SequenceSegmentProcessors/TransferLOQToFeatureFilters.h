@@ -34,7 +34,7 @@ namespace SmartPeak
     virtual std::string getName() const override { return "TRANSFER_LOQ_TO_FEATURE_FILTERS"; }
     virtual std::string getDescription() const override { return "Transfer the upper (u)/lower (l) limits of quantitation (LOQ) values from the quantitation methods to the calculated concentration bounds of the feature filters."; }
     virtual ParameterSet getParameterSchema() const override;
-    virtual std::vector<std::string> getRequirements() const override;
+    virtual std::vector<std::string> getFilenameRequirements() const override;
     virtual std::set<std::string> getOutputs() const override;
     virtual std::set<std::string> getInputs() const override;
 

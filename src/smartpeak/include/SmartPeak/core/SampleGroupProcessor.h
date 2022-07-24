@@ -57,7 +57,7 @@ namespace SmartPeak
     ) const;
 
     /* IProcessorDescription */
-    virtual std::vector<std::string> getRequirements() const override { return {}; };
+    virtual std::vector<std::string> getFilenameRequirements() const override { return {}; };
     virtual std::set<std::string> getInputs() const override { return {}; };
     virtual std::set<std::string> getOutputs() const override { return {}; };
 

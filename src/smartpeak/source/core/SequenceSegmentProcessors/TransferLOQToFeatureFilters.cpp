@@ -49,7 +49,7 @@ namespace SmartPeak
     return { "Feature Filters" };
   }
 
-  std::vector<std::string> TransferLOQToFeatureFilters::getRequirements() const
+  std::vector<std::string> TransferLOQToFeatureFilters::getFilenameRequirements() const
   {
     return { "sequence", "traML" };
   }

@@ -36,14 +36,14 @@
 namespace SmartPeak
 {
 
-  std::vector<std::string> MatchSpectra::getRequirements() const
+  std::vector<std::string> MatchSpectra::getFilenameRequirements() const
   {
-    return { "sequence", "traML" };
+    return { "sequence", "traML", "msp"};
   }
 
   std::set<std::string> MatchSpectra::getInputs() const
   {
-    return { "Extracted Spectra" };
+    return { "Extracted Spectra", "SpectraLibrary"};
   }
 
   std::set<std::string> MatchSpectra::getOutputs() const
@@ -58,18 +58,11 @@ namespace SmartPeak
     return parameters;
   }
 
-  void MatchSpectra::getFilenames(Filenames& filenames) const
-  {
-    filenames.addFileName("cmp_spectra", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}.msp");
-  };
-
   void MatchSpectra::doProcess(RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
     Filenames& filenames_I
   ) const
   {
-    getFilenames(filenames_I);
-
     // Complete user parameters with schema
     ParameterSet params(params_I);
     params.merge(getParameterSchema());
@@ -77,20 +70,13 @@ namespace SmartPeak
     OpenMS::TargetedSpectraExtractor targeted_spectra_extractor;
     Utilities::setUserParameters(targeted_spectra_extractor, params);
 
-    // Load spectra for comparison
-    auto cmp_spectra_file_name = filenames_I.getFullPath("cmp_spectra").generic_string();
-    OpenMS::MSPGenericFile msp_file;
-    OpenMS::MSExperiment library;
-    msp_file.load(cmp_spectra_file_name, library);
-    library.sortSpectra();
-
     // Compare
     OpenMS::TargetedSpectraExtractor::BinnedSpectrumComparator cmp;
     std::map<OpenMS::String, OpenMS::DataValue> options;
-    cmp.init(library.getSpectra(), options);
+    cmp.init(rawDataHandler_IO.getSpectraLibrary().getSpectra(), options);
     targeted_spectra_extractor.targetedMatching(rawDataHandler_IO.getChromatogramMap().getSpectra(), cmp, rawDataHandler_IO.getFeatureMap("extracted_spectra"));
 
+    rawDataHandler_IO.setFeatureMap(rawDataHandler_IO.getFeatureMap("extracted_spectra"));
     rawDataHandler_IO.updateFeatureMapHistory();
   }
-
 }

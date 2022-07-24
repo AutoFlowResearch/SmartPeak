@@ -49,7 +49,7 @@ namespace SmartPeak
     return { "Features" };
   }
 
-  std::vector<std::string> Pick2DFeatures::getRequirements() const
+  std::vector<std::string> Pick2DFeatures::getFilenameRequirements() const
   {
     return { "sequence", "traML" };
   }

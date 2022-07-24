@@ -40,7 +40,8 @@ namespace SmartPeak
     feature_background_filter_(std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC())),
     feature_background_qc_(std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC())),
     feature_rsd_estimations_(std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC())),
-    feature_background_estimations_(std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC()))
+    feature_background_estimations_(std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC())),
+    spectra_library_(std::make_shared<OpenMS::MSExperiment>(OpenMS::MSExperiment()))
   {
   }
 
@@ -398,6 +399,31 @@ namespace SmartPeak
   std::shared_ptr<OpenMS::MRMFeatureQC>& RawDataHandler::getFeatureBackgroundEstimationsShared()
   {
     return feature_background_estimations_;
+  }
+
+  void RawDataHandler::setSpectraLibrary(const OpenMS::MSExperiment& library)
+  {
+    spectra_library_ = std::make_shared<OpenMS::MSExperiment>(OpenMS::MSExperiment(library));
+  }
+
+  void RawDataHandler::setSpectraLibrary(std::shared_ptr<OpenMS::MSExperiment>& library)
+  {
+    spectra_library_ = library;
+  }
+
+  OpenMS::MSExperiment& RawDataHandler::getSpectraLibrary()
+  {
+    return *(spectra_library_.get());
+  }
+
+  const OpenMS::MSExperiment& RawDataHandler::getSpectraLibrary() const
+  {
+    return *(spectra_library_.get());
+  }
+
+  std::shared_ptr<OpenMS::MSExperiment>& RawDataHandler::getSpectraLibraryShared()
+  {
+    return spectra_library_;
   }
 
   void RawDataHandler::setFeatureMapHistory(const OpenMS::FeatureMap& feature_map_history)

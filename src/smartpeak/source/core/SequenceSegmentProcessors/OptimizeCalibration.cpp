@@ -47,7 +47,7 @@ namespace SmartPeak
     return { "Quantitation Methods" };
   }
 
-  std::vector<std::string> OptimizeCalibration::getRequirements() const
+  std::vector<std::string> OptimizeCalibration::getFilenameRequirements() const
   {
     return { "sequence", "traML" };
   }

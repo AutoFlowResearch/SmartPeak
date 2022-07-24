@@ -27,6 +27,7 @@
 #include <SmartPeak/core/RawDataProcessors/LoadTransitions.h>
 #include <SmartPeak/core/RawDataProcessors/LoadParameters.h>
 #include <SmartPeak/core/RawDataProcessors/LoadValidationData.h>
+#include <SmartPeak/core/RawDataProcessors/LoadMSP.h>
 #include <SmartPeak/core/RawDataProcessors/StoreParameters.h>
 #include <SmartPeak/core/RawDataProcessors/StoreValidationData.h>
 #include <SmartPeak/core/SequenceSegmentProcessors/LoadFeatureFilters.h>
@@ -66,6 +67,7 @@ namespace SmartPeak
         std::make_shared<LoadParameters>(),
         std::make_shared<LoadWorkflow>(sequenceHandler_),
         std::make_shared<LoadValidationData>(),
+        std::make_shared<LoadMSP>(),
         std::make_shared<LoadQuantitationMethods>(true),
         std::make_shared<LoadStandardsConcentrations>(true),
         std::make_shared<LoadFeatureFilters>(FeatureFiltersUtilsMode::EFeatureFiltersModeComponent, true),

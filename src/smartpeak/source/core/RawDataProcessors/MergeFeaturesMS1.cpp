@@ -36,7 +36,7 @@
 namespace SmartPeak
 {
 
-  std::vector<std::string> MergeFeaturesMS1::getRequirements() const
+  std::vector<std::string> MergeFeaturesMS1::getFilenameRequirements() const
   {
     return { "sequence", "traML" };
   }

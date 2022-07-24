@@ -119,11 +119,13 @@ namespace SmartPeak
     if (sequence_.size()) {
       auto parameters_ptr = sequence_.begin()->getRawDataShared()->getParametersShared();
       rdh.setParameters(parameters_ptr);
-
       auto transitions_ptr = sequence_.begin()->getRawDataShared()->getTargetedExperimentShared();
       rdh.setTargetedExperiment(transitions_ptr);
       auto reference_data_ptr = sequence_.begin()->getRawDataShared()->getReferenceDataShared();
       rdh.setReferenceData(reference_data_ptr);
+      auto spectra_library_ptr = sequence_.begin()->getRawDataShared()->getSpectraLibraryShared();
+      rdh.setSpectraLibrary(spectra_library_ptr);
+
       // look up the sequence segment, 
       // add the sample index to the sequence segment list of injection indices
       // and copy over the quantitation method

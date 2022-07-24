@@ -29,6 +29,7 @@
 #include <SmartPeak/core/SequenceObservable.h>
 #include <SmartPeak/core/TransitionsObservable.h>
 #include <SmartPeak/core/SequenceSegmentObservable.h>
+#include <SmartPeak/core/SpectraLibraryObservable.h>
 #include <SmartPeak/core/MetaDataHandler.h>
 #include <SmartPeak/core/SampleGroupHandler.h>
 #include <SmartPeak/core/InjectionHandler.h>
@@ -43,7 +44,8 @@ namespace SmartPeak
     public SequenceObservable,
     public TransitionsObservable,
     public FeaturesObservable,
-    public SequenceSegmentObservable
+    public SequenceSegmentObservable,
+    public SpectraLibraryObservable
   {
 public:
     void clear();

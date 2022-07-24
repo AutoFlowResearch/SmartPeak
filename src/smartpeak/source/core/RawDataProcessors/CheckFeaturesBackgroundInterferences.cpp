@@ -45,7 +45,7 @@ namespace SmartPeak
     return { "Features" };
   }
 
-  std::vector<std::string> CheckFeaturesBackgroundInterferences::getRequirements() const
+  std::vector<std::string> CheckFeaturesBackgroundInterferences::getFilenameRequirements() const
   {
     return { "sequence", "traML" };
   }

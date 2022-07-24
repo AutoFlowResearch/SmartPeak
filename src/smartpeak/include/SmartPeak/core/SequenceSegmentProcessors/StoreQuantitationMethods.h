@@ -39,7 +39,7 @@ namespace SmartPeak
     virtual std::string getName() const override { return "STORE_QUANTITATION_METHODS"; }
     virtual std::string getDescription() const override { return "Write each transitions calibration model to disk for later use."; }
     virtual ParameterSet getParameterSchema() const override;
-    virtual std::vector<std::string> getRequirements() const override;
+    virtual std::vector<std::string> getFilenameRequirements() const override;
     virtual std::set<std::string> getOutputs() const override;
     virtual std::set<std::string> getInputs() const override;
 

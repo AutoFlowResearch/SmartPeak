@@ -46,7 +46,7 @@ namespace SmartPeak
     return { "Features" };
   }
 
-  std::vector<std::string> PickMRMFeatures::getRequirements() const
+  std::vector<std::string> PickMRMFeatures::getFilenameRequirements() const
   {
     return { "sequence", "traML" };
   }

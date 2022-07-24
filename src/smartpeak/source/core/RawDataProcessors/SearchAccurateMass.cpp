@@ -46,7 +46,7 @@ namespace SmartPeak
     return { "Features", "Mz Tab"};
   }
 
-  std::vector<std::string> SearchAccurateMass::getRequirements() const
+  std::vector<std::string> SearchAccurateMass::getFilenameRequirements() const
   {
     return { "sequence", "traML" };
   }

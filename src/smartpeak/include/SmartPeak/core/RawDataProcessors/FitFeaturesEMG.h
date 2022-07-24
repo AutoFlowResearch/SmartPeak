@@ -39,7 +39,7 @@ namespace SmartPeak
     virtual std::string getName() const override { return "FIT_FEATURES_EMG"; }
     virtual std::string getDescription() const override { return "Reconstruct a peak from available data points."; }
     virtual ParameterSet getParameterSchema() const override;
-    virtual std::vector<std::string> getRequirements() const override;
+    virtual std::vector<std::string> getFilenameRequirements() const override;
     virtual std::set<std::string> getOutputs() const override;
     virtual std::set<std::string> getInputs() const override;
 

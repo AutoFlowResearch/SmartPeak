@@ -38,7 +38,7 @@ namespace SmartPeak
     /* IProcessorDescription */
     virtual std::string getName() const override { return "SELECT_FEATURES"; }
     virtual std::string getDescription() const override { return "Run the peak selection/alignment algorithm."; }
-    virtual std::vector<std::string> getRequirements() const override;
+    virtual std::vector<std::string> getFilenameRequirements() const override;
     virtual std::set<std::string> getOutputs() const override;
     virtual std::set<std::string> getInputs() const override;
 
