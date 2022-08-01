@@ -25,7 +25,7 @@
 
 namespace SmartPeak {
 
-  PlotLineProperties::PlotLineProperties(uint index)
+  PlotLineProperties::PlotLineProperties(unsigned int index)
   {
     if (index==0) {
       line_index_ = ++(PlotLineProperties::line_count_);
@@ -111,7 +111,7 @@ namespace SmartPeak {
     return style;
   }
 
-  uint PlotLineProperties::line_count_ = 0;
+  unsigned int PlotLineProperties::line_count_ = 0;
 
   void PlotLineProperties::resetLineCount()
   {
@@ -123,7 +123,7 @@ namespace SmartPeak {
     return (line_type_.compare("none") == 0) ? true : false;
   }
 
-  uint PlotLineProperties::getGridLineType()
+  unsigned int PlotLineProperties::getGridLineType()
   {
     return PlotLineProperties::linetype_cairo_term_.at(":");
   }
@@ -211,7 +211,7 @@ namespace SmartPeak {
            const std::vector<float> &x = graphvis_data_.x_data_area_.at(i);
            const std::vector<float> &y = graphvis_data_.y_data_area_.at(i);
            data_vals_file << "# PLOT " << (nr_plots_)++ << std::endl;
-           for (uint i = 0; i < x.size(); ++i) {
+           for (auto i = 0; i < x.size(); ++i) {
              data_vals_file << x[i] << "," << y[i] << std::endl;
            }
            data_vals_file << std::endl << std::endl;
@@ -343,7 +343,7 @@ namespace SmartPeak {
         if (with_grid_) {
           setGrid_(fout);
         }
-        for (uint i = 0; i < plotlines_properties_.size(); ++i) {
+        for (auto i = 0; i < plotlines_properties_.size(); ++i) {
           fout << plotlines_properties_[i].plotStyler() << std::endl;
         }
       } else {
@@ -353,7 +353,7 @@ namespace SmartPeak {
         if (with_grid_) {
           setGrid_(fout);
         }
-        for (uint i = 0; i < plotlines_properties_.size(); ++i) {
+        for (auto i = 0; i < plotlines_properties_.size(); ++i) {
           fout << plotlines_properties_[i].plotStyler() << std::endl;
         }
       }
@@ -379,7 +379,7 @@ namespace SmartPeak {
         if (with_grid_) {
           setGrid_(fout);
         }
-        for (uint i = 0; i < plotlines_properties_.size(); ++i) {
+        for (auto i = 0; i < plotlines_properties_.size(); ++i) {
           fout << plotlines_properties_[i].plotStyler() << std::endl;
         }
       }
@@ -466,7 +466,7 @@ namespace SmartPeak {
     fout << "set ylabel \"" << y_title_ << "\"" << std::endl;
     fout << "plot ";
 
-    for (uint i = 0; i < nr_plots_; ++i) {
+    for (auto i = 0; i < nr_plots_; ++i) {
       std::string filename = output_path_ + this->filename+".dat";
       fout  << "'" << filename << "' index " << i
             << " title \"" << legends[i]

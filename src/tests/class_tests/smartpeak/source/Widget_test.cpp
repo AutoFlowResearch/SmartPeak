@@ -186,10 +186,10 @@ TEST(Widget, GenericTableWidget_searcher)
   EXPECT_TRUE(is_scanned); // updateTableContents is successful
   
   const int         all_selected_entry = 0;
-  std::vector<uint> found_in;
+  std::vector<unsigned int> found_in;
   ImGuiTextFilter   filter("2mcit.2mcit_1.Heavy");
   
-  for (uint row = 0; row < Im_table_entries.size(); ++row) {
+  for (auto row = 0; row < Im_table_entries.size(); ++row) {
     if (!TestTable1.searcher(Im_table_entries, all_selected_entry, filter, row)) {
     }
   }
