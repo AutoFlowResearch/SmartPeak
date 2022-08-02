@@ -1,6 +1,24 @@
 SmartPeak Changelog
 ===================
 
+v1.25.0 (2022-08-02)
+--------------------
+
+Features
+~~~~~~~~
+- Added option to display only spectrogram data that contains convexhull `(#545) <https://github.com/AutoFlowResearch/SmartPeak/pull/545>`_
+
+Fix
+~~~
+- Optimized commands creations `(#543) <https://github.com/AutoFlowResearch/SmartPeak/pull/543>`_
+- prioritized the use of subordinate metadata when choosing between feature level and subordinate level `(#544) <https://github.com/AutoFlowResearch/SmartPeak/pull/544>`_
+- update to feature map after call to targetedMatching `(#544) <https://github.com/AutoFlowResearch/SmartPeak/pull/544>`_
+- added rawDataHandler member for Library `(#544) <https://github.com/AutoFlowResearch/SmartPeak/pull/544>`_
+- matchSpectra requirements for msp `(#544) <https://github.com/AutoFlowResearch/SmartPeak/pull/544>`_
+- changed getRequirements to getFilenameRequirements `(#544) <https://github.com/AutoFlowResearch/SmartPeak/pull/544>`_
+- renamed library to spectra library `(#544) <https://github.com/AutoFlowResearch/SmartPeak/pull/544>`_
+- updated RawDataHandler pointer logic for spectra_library `(#544) <https://github.com/AutoFlowResearch/SmartPeak/pull/544>`_
+
 v1.24.0 (2022-05-25)
 --------------------
 
