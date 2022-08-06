@@ -43,7 +43,7 @@ namespace SmartPeak {
   */
   class PlotLineProperties {
   public:
-    PlotLineProperties(uint index = 0);
+    PlotLineProperties(unsigned int index = 0);
     
     /*
     @brief styles plot
@@ -64,7 +64,7 @@ namespace SmartPeak {
 
     @param[out] grid line type
     */
-    static uint getGridLineType();
+    static unsigned int getGridLineType();
     
     /*
     @brief resets line count
@@ -87,8 +87,8 @@ namespace SmartPeak {
     void set(const std::pair<PlotLineSetting, std::string> &input);
 
   private:
-    uint        line_index_;
-    static uint line_count_;
+    unsigned int        line_index_;
+    static unsigned int line_count_;
     std::string colour_;
     double      line_width_ = 1;
     double      point_size_ = 1;
@@ -195,7 +195,7 @@ namespace SmartPeak {
     */
     void generatePlot_(std::ofstream &fout, const std::string &filename, const ExportedFormat exported_format);
     
-    uint            nr_plots_;
+    unsigned int    nr_plots_;
     bool            with_grid_;
     std::string     output_path_;
     std::string     filename = "smartpeak-exported-plot";
@@ -203,8 +203,8 @@ namespace SmartPeak {
     std::string     y_title_;
     std::string     plot_title_;
     std::string     gnuplot_path_;
-    uint            file_width_;
-    uint            file_height_;
+    unsigned int    file_width_;
+    unsigned int    file_height_;
     PlotType        plot_type_;
     ExportedFormat  exported_format_;
     

@@ -46,7 +46,7 @@ namespace SmartPeak
     return { "Features" };
   }
 
-  std::vector<std::string> SearchSpectrumMS1::getRequirements() const
+  std::vector<std::string> SearchSpectrumMS1::getFilenameRequirements() const
   {
     return { "sequence", "traML" };
   }

@@ -23,6 +23,7 @@ set(sources_list_h
 	LoadFeatureFiltersRDP.h
 	LoadFeatureQCsRDP.h
 	LoadFeatures.h
+	LoadMSP.h
 	LoadParameters.h
 	LoadRawData.h
 	LoadTransitions.h

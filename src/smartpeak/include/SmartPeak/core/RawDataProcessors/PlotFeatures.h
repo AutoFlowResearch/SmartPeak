@@ -38,7 +38,7 @@ namespace SmartPeak
     /* IProcessorDescription */
     virtual std::string getName() const override { return "PLOT_FEATURES"; }
     virtual std::string getDescription() const override { return "Plot the raw chromatogram with selected peaks overlaid."; }
-    virtual std::vector<std::string> getRequirements() const override;
+    virtual std::vector<std::string> getFilenameRequirements() const override;
 
     /** Validate the selected peaks against reference data.
     */

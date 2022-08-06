@@ -45,7 +45,7 @@ namespace SmartPeak
     return { "Features" };
   }
 
-  std::vector<std::string> FilterFeatures::getRequirements() const
+  std::vector<std::string> FilterFeatures::getFilenameRequirements() const
   {
     return { "sequence", "traML" };
   }

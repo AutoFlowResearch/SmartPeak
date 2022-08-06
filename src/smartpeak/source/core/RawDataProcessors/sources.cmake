@@ -23,6 +23,7 @@ set(sources_list
 	LoadFeatureFiltersRDP.cpp
 	LoadFeatureQCsRDP.cpp
 	LoadFeatures.cpp
+	LoadMSP.cpp
 	LoadParameters.cpp
 	LoadRawData.cpp
 	LoadTransitions.cpp

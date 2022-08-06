@@ -28,6 +28,7 @@
 #include <SmartPeak/core/RawDataProcessors/LoadRawData.h>
 #include <SmartPeak/core/RawDataProcessors/LoadFeatures.h>
 #include <SmartPeak/core/RawDataProcessors/LoadTransitions.h>
+#include <SmartPeak/core/RawDataProcessors/LoadMSP.h>
 #include <SmartPeak/core/RawDataProcessors/PickMRMFeatures.h>
 #include <SmartPeak/core/RawDataProcessors/FilterFeatures.h>
 #include <SmartPeak/core/RawDataProcessors/SelectFeatures.h>
@@ -107,6 +108,7 @@ namespace SmartPeak {
     {"LOAD_RAW_DATA",                             std::make_shared<LoadRawData>()},
     {"LOAD_FEATURES",                             std::make_shared<LoadFeatures>()},
     {"LOAD_TRANSITIONS",                          std::make_shared<LoadTransitions>()},
+    {"LOAD_MSP",                                  std::make_shared<LoadMSP>()},
     {"PICK_MRM_FEATURES",                         std::make_shared<PickMRMFeatures>()},
     {"FILTER_FEATURES",                           std::make_shared<FilterFeatures>()},
     {"SELECT_FEATURES",                           std::make_shared<SelectFeatures>()},

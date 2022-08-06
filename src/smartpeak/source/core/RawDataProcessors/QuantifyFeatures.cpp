@@ -46,7 +46,7 @@ namespace SmartPeak
     return { "Features" };
   }
 
-  std::vector<std::string> QuantifyFeatures::getRequirements() const
+  std::vector<std::string> QuantifyFeatures::getFilenameRequirements() const
   {
     return { "quantitationMethods", "sequence"};
   }

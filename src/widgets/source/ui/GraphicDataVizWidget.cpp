@@ -28,6 +28,17 @@
 
 namespace SmartPeak
 {
+  void GraphicDataVizWidget::drawHeaderButtons()
+  {
+    ImGui::Checkbox("Compact View", &compact_view_);
+    ImGui::SameLine();
+    ImGui::Checkbox("Legend", &show_legend_);
+    ImGui::SameLine();
+    if (ImGui::Button("Fit Zoom"))
+    {
+      update_plot_range_ = true;
+    }
+  }
 
   void GraphicDataVizWidget::draw()
   {
@@ -38,15 +49,7 @@ namespace SmartPeak
 
   void GraphicDataVizWidget::drawGraphHeader()
   {
-    float controls_pos_start_y = ImGui::GetCursorPosY();
-    ImGui::Checkbox("Compact View", &compact_view_);
-    ImGui::SameLine();
-    ImGui::Checkbox("Legend", &show_legend_);
-    ImGui::SameLine();
-    if (ImGui::Button("Fit Zoom"))
-    {
-      update_plot_range_ = true;
-    }
+    drawHeaderButtons();
 
     static FilePicker file_picker_;
     

@@ -154,7 +154,7 @@ namespace SmartPeak {
     source_app_handler = std::move(application_handler_);
   }
 
-  std::set<std::string> WorkflowManager::getRequirements(
+  std::set<std::string> WorkflowManager::getFilenameRequirements(
     const std::vector<ApplicationHandler::Command>& commands) const
   {
     std::set<std::string> requirements;
@@ -177,7 +177,7 @@ namespace SmartPeak {
       }
       if (processor_description)
       {
-        const auto processor_required = processor_description->getRequirements();
+        const auto processor_required = processor_description->getFilenameRequirements();
         for (const auto& req_file_id : processor_required)
         {
           requirements.insert(req_file_id);

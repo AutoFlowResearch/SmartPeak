@@ -443,6 +443,36 @@ TEST(RawDataHandler, set_get_FeatureBackgroundEstimations)
   EXPECT_EQ(fqc3shared->component_qcs[0].retention_time_l, rt_low);
 }
 
+TEST(RawDataHandler, set_get_Library)
+{
+  RawDataHandler rawDataHandler;
+
+  OpenMS::MSExperiment experiment;
+  experiment.setMetaValue("name", "foo");
+
+  rawDataHandler.setSpectraLibrary(experiment);
+
+  const OpenMS::MSExperiment& experiment2 = rawDataHandler.getSpectraLibrary(); // testing const getter
+  EXPECT_TRUE(experiment2.metaValueExists("name"));
+  EXPECT_STREQ(((std::string)experiment2.getMetaValue("name")).c_str(), "foo");
+  std::shared_ptr<OpenMS::MSExperiment>& experiment2shared = rawDataHandler.getSpectraLibraryShared(); // testing const getter
+  EXPECT_TRUE(experiment2shared->metaValueExists("name"));
+  EXPECT_STREQ(((std::string)experiment2shared->getMetaValue("name")).c_str(), "foo");
+
+  rawDataHandler.getSpectraLibrary().setMetaValue("name2", "bar"); // testing non-const getter
+
+  const OpenMS::MSExperiment& experiment3 = rawDataHandler.getSpectraLibrary();
+  EXPECT_TRUE(experiment3.metaValueExists("name"));
+  EXPECT_STREQ(((std::string)experiment3.getMetaValue("name")).c_str(), "foo");
+  EXPECT_TRUE(experiment3.metaValueExists("name2"));
+  EXPECT_STREQ(((std::string)experiment3.getMetaValue("name2")).c_str(), "bar");
+  std::shared_ptr<OpenMS::MSExperiment>& experiment3shared = rawDataHandler.getSpectraLibraryShared();
+  EXPECT_TRUE(experiment3shared->metaValueExists("name"));
+  EXPECT_STREQ(((std::string)experiment3shared->getMetaValue("name")).c_str(), "foo");
+  EXPECT_TRUE(experiment3shared->metaValueExists("name2"));
+  EXPECT_STREQ(((std::string)experiment3shared->getMetaValue("name2")).c_str(), "bar");
+}
+
 TEST(RawDataHandler, set_get_Experiment)
 {
   RawDataHandler rawDataHandler;

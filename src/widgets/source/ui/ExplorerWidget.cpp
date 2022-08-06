@@ -61,7 +61,7 @@ namespace SmartPeak
 
     ImGui::Combo("In Column(s)", &selected_col_, cols_.data(), cols_.size());
     
-    for (uint checkbox_header_idx = 0; checkbox_header_idx < checkbox_headers_.size(); ++checkbox_header_idx) {
+    for (auto checkbox_header_idx = 0; checkbox_header_idx < checkbox_headers_.size(); ++checkbox_header_idx) {
       if (checkbox_headers_(checkbox_header_idx) == "plot") checkbox_columns_plot_col_ = checkbox_header_idx;
     }
     table_entries_plot_col_ = (table_data_.headers_.size() + checkbox_columns_plot_col_);

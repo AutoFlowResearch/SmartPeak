@@ -105,6 +105,7 @@ TEST(SequenceHandler, addSampleToSequence)
   EXPECT_EQ(sequenceHandler.getSequence()[0].getRawData().getFeatureRSDEstimations().component_qcs.size(), 0);
   EXPECT_EQ(sequenceHandler.getSequence()[0].getRawData().getFeatureBackgroundEstimations().component_qcs.size(), 0);
   EXPECT_EQ(sequenceHandler.getSequence()[0].getRawData().getQuantitationMethods().size(), 0);
+  EXPECT_EQ(sequenceHandler.getSequence()[0].getRawData().getSpectraLibrary().size(), 0);
   EXPECT_STREQ(sequenceHandler.getSequence()[1].getMetaData().getSequenceSegmentName().c_str(), "sequence_segment2");
   EXPECT_STREQ(sequenceHandler.getSequence()[1].getMetaData().getReplicateGroupName().c_str(), "replicate_group_name2");
   EXPECT_STREQ(sequenceHandler.getSequence()[1].getMetaData().getSampleGroupName().c_str(), "sample");
@@ -123,6 +124,7 @@ TEST(SequenceHandler, addSampleToSequence)
   EXPECT_EQ(sequenceHandler.getSequence()[1].getRawData().getFeatureRSDEstimations().component_qcs.size(), 0);
   EXPECT_EQ(sequenceHandler.getSequence()[1].getRawData().getFeatureBackgroundEstimations().component_qcs.size(), 0);
   EXPECT_EQ(sequenceHandler.getSequence()[1].getRawData().getQuantitationMethods().size(), 0);
+  EXPECT_EQ(sequenceHandler.getSequence()[1].getRawData().getSpectraLibrary().size(), 0);
   EXPECT_TRUE(sequenceHandler.getSequence()[2].getMetaData().getSampleType() == SampleType::Unknown);
   EXPECT_STREQ(sequenceHandler.getSequence()[2].getMetaData().getSequenceSegmentName().c_str(), "sequence_segment2");
   EXPECT_STREQ(sequenceHandler.getSequence()[2].getMetaData().getReplicateGroupName().c_str(), "replicate_group_name2");
@@ -142,6 +144,7 @@ TEST(SequenceHandler, addSampleToSequence)
   EXPECT_EQ(sequenceHandler.getSequence()[2].getRawData().getFeatureRSDEstimations().component_qcs.size(), 0);
   EXPECT_EQ(sequenceHandler.getSequence()[2].getRawData().getFeatureBackgroundEstimations().component_qcs.size(), 0);
   EXPECT_EQ(sequenceHandler.getSequence()[2].getRawData().getQuantitationMethods().size(), 0);
+  EXPECT_EQ(sequenceHandler.getSequence()[2].getRawData().getSpectraLibrary().size(), 0);
 
   EXPECT_STREQ(sequenceHandler.getSequenceSegments()[0].getSequenceSegmentName().c_str(), "sequence_segment1");
   EXPECT_EQ(sequenceHandler.getSequenceSegments()[0].getQuantitationMethods().size(), 0);
@@ -202,6 +205,12 @@ TEST(SequenceHandler, addSampleToSequence)
   EXPECT_EQ(sequenceHandler.getSequence()[0].getRawData().getTargetedExperiment().getTransitions()[0].getPeptideRef(), "arg-L");
   EXPECT_EQ(sequenceHandler.getSequence()[1].getRawData().getTargetedExperiment().getTransitions()[0].getPeptideRef(), "arg-L");
   EXPECT_EQ(sequenceHandler.getSequence()[2].getRawData().getTargetedExperiment().getTransitions()[0].getPeptideRef(), "arg-L");
+  OpenMS::MSExperiment exp;
+  exp.setMetaValue("name", "foo");
+  injection0.getRawData().getSpectraLibrary() = exp;
+  EXPECT_EQ(sequenceHandler.getSequence()[0].getRawData().getSpectraLibrary().getMetaValue("name"), "foo");
+  EXPECT_EQ(sequenceHandler.getSequence()[1].getRawData().getSpectraLibrary().getMetaValue("name"), "foo");
+  EXPECT_EQ(sequenceHandler.getSequence()[2].getRawData().getSpectraLibrary().getMetaValue("name"), "foo");
 
   // Test shared resources across sequence segment handlers
   sequenceHandler.getSequenceSegments()[0].getQuantitationMethods().resize(1);

@@ -36,7 +36,7 @@ TEST(WorkflowManager, isWorkflowDone)
   EXPECT_TRUE(workflow_manager.isWorkflowDone());
 }
 
-TEST(WorkflowManager, getRequirements)
+TEST(WorkflowManager, getFilenameRequirements)
 {
   WorkflowManager workflow_manager;
   ApplicationHandler application_handler;
@@ -44,7 +44,7 @@ TEST(WorkflowManager, getRequirements)
   buildCommandsFromNames.names_ = { "LOAD_RAW_DATA", "LOAD_FEATURES", "PICK_MRM_FEATURES" };
   ASSERT_TRUE(buildCommandsFromNames.process());
 
-  auto requirements = workflow_manager.getRequirements(buildCommandsFromNames.commands_);
+  auto requirements = workflow_manager.getFilenameRequirements(buildCommandsFromNames.commands_);
   ASSERT_EQ(requirements, std::set<std::string>({"sequence", "traML"}));
   EXPECT_TRUE(workflow_manager.isWorkflowDone());
 }

@@ -30,6 +30,7 @@
 #include <SmartPeak/core/RawDataProcessors/LoadRawData.h>
 #include <SmartPeak/core/RawDataProcessors/LoadFeatures.h>
 #include <SmartPeak/core/RawDataProcessors/LoadTransitions.h>
+#include <SmartPeak/core/RawDataProcessors/LoadMSP.h>
 #include <SmartPeak/core/RawDataProcessors/PickMRMFeatures.h>
 #include <SmartPeak/core/RawDataProcessors/FilterFeatures.h>
 #include <SmartPeak/core/RawDataProcessors/SelectFeatures.h>
@@ -1145,6 +1146,63 @@ TEST(RawDataProcessor, processLoadValidationData)
   EXPECT_NEAR(ref_data[178].at("area").f_, 206951.3035, 1e-2);
   EXPECT_NEAR(ref_data[178].at("retention_time").f_, static_cast<float>(1.492980468), 1e-1);
   EXPECT_EQ(ref_data[178].at("acquisition_date_and_time").s_, "09-06-2015 17:14");
+}
+
+/**
+  LoadMSP Tests
+*/
+TEST(RawDataProcessor, constructorLoadMSP)
+{
+  LoadMSP* ptrLoadMSP = nullptr;
+  LoadMSP* nullPointerLoadMSP = nullptr;
+  EXPECT_EQ(ptrLoadMSP, nullPointerLoadMSP);
+}
+
+TEST(RawDataProcessor, destructorLoadMSP)
+{
+  LoadMSP* ptrLoadMSP = nullptr;
+  ptrLoadMSP = new LoadMSP();
+  delete ptrLoadMSP;
+}
+
+TEST(RawDataProcessor, gettersLoadMSP)
+{
+  LoadMSP processor;
+  EXPECT_EQ(processor.getName(), "LOAD_MSP");
+}
+
+TEST(RawDataProcessor, processLoadMSP)
+{
+  ParameterSet params_1;
+  ParameterSet params_2;
+  load_data(params_1, params_2);
+  RawDataHandler rawDataHandler;
+
+  Filenames filenames;
+  OpenMS::MSChromatogram chrom1;
+  chrom1.setName("chrom1");
+  rawDataHandler.getChromatogramMap().addChromatogram(chrom1);
+  OpenMS::MSSpectrum spectrum1;
+  spectrum1.setName("spectr1");
+  spectrum1.push_back(OpenMS::Peak1D(1.0f, 2.0f));
+  rawDataHandler.getChromatogramMap().addSpectrum(spectrum1);
+  OpenMS::MSSpectrum spectrum2;
+  spectrum1.setName("spectr2");
+  spectrum1.push_back(OpenMS::Peak1D(10.0f, 20.0f));
+  rawDataHandler.getChromatogramMap().addSpectrum(spectrum1);
+
+  auto path_msp = std::tmpnam(nullptr);
+  filenames.setFullPath("output_ms2", path_msp);
+  StoreMSP store_msp;
+  store_msp.process(rawDataHandler, params_1, filenames);
+
+  LoadMSP loadLibrary;
+  filenames.setFullPath("msp", path_msp);
+  loadLibrary.process(rawDataHandler, {}, filenames);
+
+  std::vector<OpenMS::MSSpectrum> spectrum = rawDataHandler.getSpectraLibrary().getSpectra();
+
+  ASSERT_EQ(spectrum.size(), 2);
 }
 
 /**
@@ -3013,7 +3071,10 @@ TEST(RawDataProcessor, MatchSpectra)
   RawDataHandler rawDataHandler;
   OpenMS::FeatureMap selected_features;
   rawDataHandler.setFeatureMap("extracted_spectra", selected_features); // [UNIT TEST] test for named feature
-  filenames.setFullPath("cmp_spectra", SMARTPEAK_GET_TEST_DATA_PATH("Germicidin_A_standard.msp"));
+  filenames.setFullPath("msp", SMARTPEAK_GET_TEST_DATA_PATH("Germicidin_A_standard.msp"));
+  LoadMSP loadLibrary;
+  loadLibrary.process(rawDataHandler, {}, filenames);
+
   MatchSpectra match_spectra;
   match_spectra.process(rawDataHandler, params, filenames);
 }

@@ -46,7 +46,7 @@ namespace SmartPeak
     return { "Feature Background QCs" };
   }
 
-  std::vector<std::string> LoadFeatureBackgroundQCs::getRequirements() const
+  std::vector<std::string> LoadFeatureBackgroundQCs::getFilenameRequirements() const
   {
     return { "sequence", "traML" };
   }

@@ -646,7 +646,7 @@ int main(int argc, char** argv)
           }
           else
           {
-            auto requirements = workflow_manager_.getRequirements(buildCommandsFromNames.commands_);
+            auto requirements = workflow_manager_.getFilenameRequirements(buildCommandsFromNames.commands_);
             bool missing_requirement = workflow_manager_.isMissingRequirements(application_handler_.filenames_, requirements);
             if (missing_requirement)
             {

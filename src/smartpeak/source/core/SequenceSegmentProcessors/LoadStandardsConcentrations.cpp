@@ -50,7 +50,7 @@ namespace SmartPeak
     return { "Standards Concentrations" };
   }
 
-  std::vector<std::string> LoadStandardsConcentrations::getRequirements() const
+  std::vector<std::string> LoadStandardsConcentrations::getFilenameRequirements() const
   {
     return { "sequence", "traML" };
   }

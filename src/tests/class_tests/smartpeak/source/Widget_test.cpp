@@ -186,10 +186,10 @@ TEST(Widget, GenericTableWidget_searcher)
   EXPECT_TRUE(is_scanned); // updateTableContents is successful
   
   const int         all_selected_entry = 0;
-  std::vector<uint> found_in;
+  std::vector<unsigned int> found_in;
   ImGuiTextFilter   filter("2mcit.2mcit_1.Heavy");
   
-  for (uint row = 0; row < Im_table_entries.size(); ++row) {
+  for (auto row = 0; row < Im_table_entries.size(); ++row) {
     if (!TestTable1.searcher(Im_table_entries, all_selected_entry, filter, row)) {
     }
   }
@@ -433,7 +433,7 @@ TEST(SessionFilesWidget, SessionFilesWidget_Create)
   
   session_widget_test.open(filenames);
   auto& file_editor_fields = session_widget_test.getEditorFileFields();
-  EXPECT_EQ(file_editor_fields.size(), 23);
+  EXPECT_EQ(file_editor_fields.size(), 24);
 
   // we only test fields that are displayed to the user
   auto& fef = file_editor_fields.at("parameters");
@@ -496,7 +496,7 @@ TEST(SessionFilesWidget, SessionFilesWidget_doUpdateSession)
 
   EXPECT_EQ(application_handler.sequenceHandler_.getSequence().size(), 2);
   const auto& app_filenames = application_handler.filenames_;
-  EXPECT_EQ(app_filenames.getFileIds().size(), 23);
+  EXPECT_EQ(app_filenames.getFileIds().size(), 24);
   EXPECT_EQ(application_handler.isFileSaved("parameters"), true);
 }
 
@@ -513,7 +513,7 @@ TEST(SessionFilesWidget, SessionFilesWidget_Modify_ChangeExternalFile)
   session_widget_test_modify.open(application_handler.filenames_);
 
   auto& file_editor_fields = session_widget_test_modify.getEditorFileFields();
-  EXPECT_EQ(file_editor_fields.size(), 23);
+  EXPECT_EQ(file_editor_fields.size(), 24);
 
   auto& fef = file_editor_fields.at("parameters");
   EXPECT_EQ(fef.text_editor_hint_, std::string("parameters.csv"));
@@ -551,7 +551,7 @@ TEST(SessionFilesWidget, SessionFilesWidget_Modify_ChangeFromExternalToEmbedded)
   session_widget_test_modify.open(application_handler.filenames_);
 
   auto& file_editor_fields = session_widget_test_modify.getEditorFileFields();
-  EXPECT_EQ(file_editor_fields.size(), 23);
+  EXPECT_EQ(file_editor_fields.size(), 24);
 
   auto& fef = file_editor_fields.at("parameters");
   EXPECT_EQ(fef.text_editor_hint_, std::string("parameters.csv"));
@@ -750,7 +750,7 @@ TEST(SessionFilesWidget, SessionFilesWidget_EmbedAllFiles)
   SessionFilesWidget_Test session_widget_test_create(application_handler, SessionFilesWidget::Mode::ECreation, workflow_manager);
   session_widget_test_create.open(filenames);
   auto& file_editor_fields = session_widget_test_create.getEditorFileFields();
-  EXPECT_EQ(file_editor_fields.size(), 23);
+  EXPECT_EQ(file_editor_fields.size(), 24);
 
   // embed files
   file_editor_fields.at("parameters").embedded_ = true;

@@ -23,11 +23,8 @@
 #include <SmartPeak/core/RawDataProcessors/StoreMSP.h>
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/Utilities.h>
-#include <SmartPeak/core/FeatureFiltersUtils.h>
 
 #include <OpenMS/ANALYSIS/OPENSWATH/TargetedSpectraExtractor.h>
-#include <OpenMS/ANALYSIS/OPENSWATH/TransitionTSVFile.h>
-#include <OpenMS/FORMAT/TraMLFile.h>
 
 #include <plog/Log.h>
 
@@ -37,7 +34,7 @@
 namespace SmartPeak
 {
 
-  std::vector<std::string> StoreMSP::getRequirements() const
+  std::vector<std::string> StoreMSP::getFilenameRequirements() const
   {
     return { "sequence", "traML" };
   }
@@ -77,31 +74,6 @@ namespace SmartPeak
 
     OpenMS::TargetedSpectraExtractor targeted_spectra_extractor;
     Utilities::setUserParameters(targeted_spectra_extractor, params);
-
-    //// Annotate spectra with missing names
-    //auto& experiment = rawDataHandler_IO.getExperiment();
-    //auto& spectra = experiment.getSpectra();
-    //int cpt = 0;
-    //for (auto& spectrum : spectra)
-    //{
-    //  if (spectrum.getName().empty())
-    //  {
-    //    std::ostringstream os;
-    //    os << rawDataHandler_IO.getMetaData().getInjectionName() << "_" << ++cpt;
-    //    spectrum.setName(os.str());
-    //  }
-    //}
-    //// Remove unannotated spectra
-    //auto experiment = rawDataHandler_IO.getExperiment();
-    //std::vector<OpenMS::MSSpectrum> annotated_spectra;
-    //for (auto& spectrum : rawDataHandler_IO.getExperiment().getSpectra())
-    //{
-    //  if (!spectrum.getName().empty())
-    //  {
-    //    annotated_spectra.push_back(spectrum);
-    //  }
-    //}
-    //experiment.setSpectra(annotated_spectra);
 
     auto output_ms2 = filenames_I.getFullPath("output_ms2").generic_string();
     targeted_spectra_extractor.storeSpectraMSP(output_ms2, rawDataHandler_IO.getChromatogramMap());
