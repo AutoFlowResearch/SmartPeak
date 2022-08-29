@@ -93,7 +93,7 @@ list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/Windows")
 # SmartPeak Version Information
 #------------------------------------------------------------------------------
 set(SMARTPEAK_PACKAGE_VERSION_MAJOR 1)
-set(SMARTPEAK_PACKAGE_VERSION_MINOR 25)
+set(SMARTPEAK_PACKAGE_VERSION_MINOR 26)
 set(SMARTPEAK_PACKAGE_VERSION_PATCH 0)
 
 #------------------------------------------------------------------------------

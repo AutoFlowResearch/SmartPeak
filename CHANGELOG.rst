@@ -1,6 +1,13 @@
 SmartPeak Changelog
 ===================
 
+v1.26.0 (2022-08-29)
+--------------------
+
+Fix
+~~~
+- Using latest OpenMS modifications related to DDA implementation
+
 v1.25.0 (2022-08-02)
 --------------------
 
