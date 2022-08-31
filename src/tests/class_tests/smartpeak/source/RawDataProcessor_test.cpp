@@ -3208,7 +3208,7 @@ TEST(RawDataProcessor, ConstructTransitionsList_csv)
   const auto& transitions = rawDataHandler.getTargetedExperiment().getTransitions();
   ASSERT_EQ(transitions.size(), 10);
   const auto& transition = transitions.at(0);
-  EXPECT_EQ(std::string(transition.getName()), std::string("scan=463_111.046_HMDB:HMDB0000001"));
+  EXPECT_EQ(std::string(transition.getName()), std::string("HMDB:HMDB0000001_scan=463_111.046_390.259"));
   EXPECT_FLOAT_EQ(transition.getLibraryIntensity(), 2760);
   EXPECT_EQ(std::string(transition.getPeptideRef()), std::string("HMDB:HMDB0000001"));
   EXPECT_FLOAT_EQ(transition.getPrecursorMZ(), 195.102);
