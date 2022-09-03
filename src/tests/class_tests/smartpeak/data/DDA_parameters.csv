@@ -12,5 +12,6 @@ TargetedSpectraExtractor,AccurateMassSearchEngine:negative_adducts,CHEMISTRY/Neg
 TargetedSpectraExtractor,relative_allowable_product_mass,50,TRUE,float,,Threshold m/z of a product relatively to the precurosor m/z (can be negative),
 TargetedSpectraExtractor,AccurateMassSearchEngine:ionization_mode,auto,TRUE,string,,"Positive or negative ionization mode? If 'auto' is used, the first feature of the input map must contain the meta-value 'scan_polarity'. If its missing, the tool will exit with error.",
 TargetedSpectraExtractor,AccurateMassSearchEngine:mass_error_value,10,TRUE,float,,Tolerance allowed for accurate mass search.,
-TargetedSpectraExtractor,rt_window,30,TRUE,float,,,
-TargetedSpectraExtractor,mz_tolerance,0.1,TRUE,float,,,
+TargetedSpectraExtractor,rt_window,60,TRUE,float,,,
+TargetedSpectraExtractor,mz_tolerance,0.001,TRUE,float,,,
+TargetedSpectraExtractor,AccurateMassSearchEngine:keep_unidentified_masses,TRUE,TRUE,bool,,,

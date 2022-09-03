@@ -1525,7 +1525,7 @@ TEST(RawDataProcessor, pick3DFeatures)
 
   pickFeatures.process(rawDataHandler, params_1, filenames);
 
-  EXPECT_EQ(rawDataHandler.getFeatureMap().size(), 2737);
+  EXPECT_EQ(rawDataHandler.getFeatureMap().size(), 848);
   EXPECT_EQ(rawDataHandler.getExperiment().getChromatograms().size(), 800);
 
   const OpenMS::Feature& feature1 = rawDataHandler.getFeatureMap().at(0); // feature_map_
@@ -1834,13 +1834,13 @@ TEST(RawDataProcessor, MergeFeaturesMS2)
   merge_features_ms2.process(rawDataHandler, params, filenames);
 
   const auto& feature_map = rawDataHandler.getFeatureMap();
-  ASSERT_EQ(feature_map.size(), 1);
+  ASSERT_EQ(feature_map.size(), 2);
   const auto& feature_1 = feature_map.at(0);
-  EXPECT_EQ(std::string(feature_1.getMetaValue("PeptideRef")), std::string("Unknown 1"));
+  EXPECT_EQ(std::string(feature_1.getMetaValue("PeptideRef")), std::string("HMDB:HMDB0000001"));
   const auto& sub_features = feature_1.getSubordinates();
   ASSERT_EQ(sub_features.size(), 1);
   const auto& sub_feature_1 = feature_map.at(0);
-  EXPECT_EQ(std::string(sub_feature_1.getMetaValue("PeptideRef")), std::string("Unknown 1"));
+  EXPECT_EQ(std::string(sub_feature_1.getMetaValue("PeptideRef")), std::string("HMDB:HMDB0000001"));
 }
 
 /**
@@ -3162,17 +3162,17 @@ TEST(RawDataProcessor, ExtractSpectraNonTargeted)
   ExtractSpectraNonTargeted extract_spectra_non_targeted;
   extract_spectra_non_targeted.process(rawDataHandler, params, filenames);
   const auto& feature_map = rawDataHandler.getFeatureMap();
-  ASSERT_EQ(feature_map.size(), 10);
+  ASSERT_EQ(feature_map.size(), 2);
   const auto& feature = feature_map.begin();
-  EXPECT_FLOAT_EQ(feature->getRT(), 390.259);
-  EXPECT_FLOAT_EQ(feature->getMZ(), 93.034767);
+  EXPECT_FLOAT_EQ(feature->getRT(), 370.34601);
+  EXPECT_FLOAT_EQ(feature->getMZ(), 134.95685);
   EXPECT_EQ(feature->getMetaValue("PeptideRef"), std::string("HMDB:HMDB0000001"));
 
   const auto& feature_map1 = rawDataHandler.getFeatureMap("extracted_spectra");
-  ASSERT_EQ(feature_map1.size(), 10);
+  ASSERT_EQ(feature_map1.size(), 1);
   const auto& feature1 = feature_map1.begin();
-  EXPECT_FLOAT_EQ(feature1->getRT(), 390.259);
-  EXPECT_FLOAT_EQ(feature1->getMZ(), 93.034767);
+  EXPECT_FLOAT_EQ(feature1->getRT(), 370.34601);
+  EXPECT_FLOAT_EQ(feature1->getMZ(), 219.10085);
   EXPECT_EQ(feature1->getMetaValue("PeptideRef"), std::string("HMDB:HMDB0000001"));
 }
 
@@ -3209,27 +3209,27 @@ TEST(RawDataProcessor, ConstructTransitionsList_csv)
   construct_transitions_list.process(rawDataHandler, params, filenames);
 
   const auto& feature_map = rawDataHandler.getFeatureMap();
-  ASSERT_EQ(feature_map.size(), 10);
+  ASSERT_EQ(feature_map.size(), 2);
   const auto& feature_1 = feature_map.at(0);
-  EXPECT_FLOAT_EQ(feature_1.getRT(), 390.259);
-  EXPECT_FLOAT_EQ(feature_1.getMZ(), 111.04565);
+  EXPECT_FLOAT_EQ(feature_1.getRT(), 370.34601);
+  EXPECT_FLOAT_EQ(feature_1.getMZ(), 134.95685);
 
   const auto& feature_2 = feature_map.at(1);
-  EXPECT_FLOAT_EQ(feature_2.getRT(), 390.259);
-  EXPECT_FLOAT_EQ(feature_2.getMZ(), 121.02983);
+  EXPECT_FLOAT_EQ(feature_2.getRT(), 370.34601);
+  EXPECT_FLOAT_EQ(feature_2.getMZ(), 217.10509);
 
   // load and check transitions file
   LoadTransitions load_transition;
   filenames.setFullPath("traML", output_file_path);
   load_transition.process(rawDataHandler, params, filenames);
   const auto& transitions = rawDataHandler.getTargetedExperiment().getTransitions();
-  ASSERT_EQ(transitions.size(), 10);
+  ASSERT_EQ(transitions.size(), 2);
   const auto& transition = transitions.at(0);
-  EXPECT_EQ(std::string(transition.getName()), std::string("HMDB:HMDB0000001_scan=463_111.046_390.259"));
-  EXPECT_FLOAT_EQ(transition.getLibraryIntensity(), 2760);
+  EXPECT_EQ(std::string(transition.getName()), std::string("HMDB:HMDB0000001_scan=440_134.957_370.346"));
+  EXPECT_FLOAT_EQ(transition.getLibraryIntensity(), 476);
   EXPECT_EQ(std::string(transition.getPeptideRef()), std::string("HMDB:HMDB0000001"));
-  EXPECT_FLOAT_EQ(transition.getPrecursorMZ(), 195.102);
-  EXPECT_FLOAT_EQ(transition.getProductMZ(), 111.04565);
+  EXPECT_FLOAT_EQ(transition.getPrecursorMZ(), 235.07477);
+  EXPECT_FLOAT_EQ(transition.getProductMZ(), 134.95685);
 }
 
 /**
@@ -3266,11 +3266,18 @@ TEST(RawDataProcessor, SearchSpectrumMS2)
   search_spectrum_ms2.process(rawDataHandler, params, filenames);
 
   const auto& feature_map = rawDataHandler.getFeatureMap();
-  ASSERT_EQ(feature_map.size(), 1);
+  ASSERT_EQ(feature_map.size(), 2);
   const auto& feature_1 = feature_map.at(0);
-  EXPECT_EQ(std::string(feature_1.getMetaValue("PeptideRef")), std::string("HMDB:HMDB0000001"));
+  EXPECT_EQ(feature_1.metaValueExists("PeptideRef"), false);
   const auto& sub_features = feature_1.getSubordinates();
   ASSERT_EQ(sub_features.size(), 1);
-  const auto& sub_feature_1 = feature_map.at(0);
+  const auto& sub_feature_1 = sub_features.at(0);
   EXPECT_EQ(std::string(sub_feature_1.getMetaValue("PeptideRef")), std::string("HMDB:HMDB0000001"));
+  EXPECT_EQ(sub_feature_1.getMetaValue("native_id").toString(), "scan=4420_134.957");
+  EXPECT_EQ(sub_feature_1.getMetaValue("identifier").toString(), "[134.957]");
+  EXPECT_EQ(sub_feature_1.getMetaValue("modifications").toString(), "");
+  EXPECT_NEAR(sub_feature_1.getMetaValue("dc_charge_adduct_mass"), 0.0, 1e-6);
+  EXPECT_EQ(sub_feature_1.getMetaValue("chemical_formula").toString(), "");
+  EXPECT_NEAR(sub_feature_1.getMetaValue("mz_error_ppm"), 0.0, 1e-6);
+  EXPECT_NEAR(sub_feature_1.getMetaValue("mz_error_Da"), 0.0, 1e-6);
 }

@@ -1,8 +1,7 @@
 Name: HMDB:HMDB0000001
-Retention Time: 390.259
-base peak intensity: 1.38524e05
-total ion current: 2.10504e05
-Num Peaks: 7
-93.0348:7280 111.046:2760 121.03:41376 122.033:3364 128.021:460 
-148.934:548 149.025:138524 
+Retention Time: 370.346
+base peak intensity: 476.0
+total ion current: 940.0
+Num Peaks: 2
+134.957:476 217.105:464 
 
