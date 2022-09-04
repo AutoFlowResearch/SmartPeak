@@ -3273,7 +3273,7 @@ TEST(RawDataProcessor, SearchSpectrumMS2)
   ASSERT_EQ(sub_features.size(), 1);
   const auto& sub_feature_1 = sub_features.at(0);
   EXPECT_EQ(std::string(sub_feature_1.getMetaValue("PeptideRef")), std::string("HMDB:HMDB0000001"));
-  EXPECT_EQ(sub_feature_1.getMetaValue("native_id").toString(), "scan=4420_134.957");
+  EXPECT_EQ(sub_feature_1.getMetaValue("native_id").toString(), "scan=440_134.957");
   EXPECT_EQ(sub_feature_1.getMetaValue("identifier").toString(), "[134.957]");
   EXPECT_EQ(sub_feature_1.getMetaValue("modifications").toString(), "");
   EXPECT_NEAR(sub_feature_1.getMetaValue("dc_charge_adduct_mass"), 0.0, 1e-6);

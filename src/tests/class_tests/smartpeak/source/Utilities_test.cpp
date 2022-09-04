@@ -32,7 +32,7 @@ using namespace SmartPeak;
 using namespace std;
 namespace fs = std::filesystem;
 
-const unsigned int nb_files_in_data_directory = 77;
+const unsigned int nb_files_in_data_directory = 82;
 
 TEST(utilities, castString)
 {
