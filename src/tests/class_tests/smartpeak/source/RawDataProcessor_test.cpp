@@ -1494,14 +1494,20 @@ TEST(RawDataProcessor, gettersPick3DFeatures)
 
 TEST(RawDataProcessor, pick3DFeatures)
 {
-  // Pre-requisites: load the parameters and associated raw data
   ParameterSet params_1;
-  ParameterSet params_2;
-  load_data(params_1, params_2);
   RawDataHandler rawDataHandler;
 
   Filenames filenames;
-  filenames.setFullPath("mzML_i", SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_germicidin.mzML"));
+  filenames.setFullPath("parameters", SMARTPEAK_GET_TEST_DATA_PATH("DDA_parameters.csv"));
+  LoadParameters loadParameters;
+  loadParameters.process(rawDataHandler, {}, filenames);
+  params_1 = rawDataHandler.getParameters();
+
+  filenames.setFullPath("traML", SMARTPEAK_GET_TEST_DATA_PATH("DDA_traML.csv"));
+  LoadTransitions loadTransitions;
+  loadTransitions.process(rawDataHandler, params_1, filenames);
+
+  filenames.setFullPath("mzML_i", SMARTPEAK_GET_TEST_DATA_PATH("DDA.mzML"));
   LoadRawData loadRawData;
   loadRawData.process(rawDataHandler, params_1, filenames);
   loadRawData.extractMetaData(rawDataHandler);
@@ -1519,46 +1525,46 @@ TEST(RawDataProcessor, pick3DFeatures)
 
   pickFeatures.process(rawDataHandler, params_1, filenames);
 
-  EXPECT_EQ(rawDataHandler.getFeatureMap().size(), 2737);
-  EXPECT_EQ(rawDataHandler.getExperiment().getChromatograms().size(), 2737);
+  EXPECT_EQ(rawDataHandler.getFeatureMap().size(), 848);
+  EXPECT_EQ(rawDataHandler.getExperiment().getChromatograms().size(), 800);
 
   const OpenMS::Feature& feature1 = rawDataHandler.getFeatureMap().at(0); // feature_map_
   EXPECT_EQ(feature1.getMetaValue("num_of_masstraces").toString(), "1");
   EXPECT_EQ(feature1.getMetaValue("scan_polarity"), "positive");
   ASSERT_TRUE(feature1.getConvexHulls().size() == 1);
-  EXPECT_NEAR(feature1.getConvexHull().getBoundingBox().minX(), 488.3000, 1e-3);
+  EXPECT_NEAR(feature1.getConvexHull().getBoundingBox().minX(), 32.892f, 1e-3);
   EXPECT_NEAR(feature1.getConvexHull().getBoundingBox().minY(), 79.021f, 1e-3);
   EXPECT_NEAR(feature1.getConvexHull().getBoundingBox().maxX(), 540.557f, 1e-3);
   EXPECT_NEAR(feature1.getConvexHull().getBoundingBox().maxY(), 79.023f, 1e-3);
-  EXPECT_NEAR(static_cast<double>(feature1.getRT()), 498.752999, 1e-6);
-  EXPECT_NEAR(static_cast<double>(feature1.getMZ()), 79.0221059, 1e-6);
-  EXPECT_NEAR(static_cast<double>(feature1.getIntensity()), 18283.1621093, 1e-6);
+  EXPECT_NEAR(static_cast<double>(feature1.getRT()), 112.22407579684845, 1e-6);
+  EXPECT_NEAR(static_cast<double>(feature1.getMZ()), 79.022345291936759, 1e-6);
+  EXPECT_NEAR(static_cast<double>(feature1.getIntensity()), 1046207.3125, 1e-6);
 
   const OpenMS::Feature& feature2 = rawDataHandler.getFeatureMap().back();
   EXPECT_EQ(feature2.getMetaValue("num_of_masstraces").toString(), "1");
   ASSERT_TRUE(feature2.getConvexHulls().size() == 1);
-  EXPECT_NEAR(feature2.getConvexHull().getBoundingBox().minX(), 631.136999f, 1e-2);
-  EXPECT_NEAR(feature2.getConvexHull().getBoundingBox().minY(), 848.624214f, 1e-3);
-  EXPECT_NEAR(feature2.getConvexHull().getBoundingBox().maxX(), 659.0080000f, 1e-3);
-  EXPECT_NEAR(feature2.getConvexHull().getBoundingBox().maxY(), 848.6381134f, 1e-3);
-  EXPECT_NEAR(static_cast<double>(feature2.getRT()), 648.5560000, 1e-6);
-  EXPECT_NEAR(static_cast<double>(feature2.getMZ()), 848.6336890, 1e-6);
-  EXPECT_NEAR(static_cast<double>(feature2.getIntensity()), 14291.36816406, 1e-6);
+  EXPECT_NEAR(feature2.getConvexHull().getBoundingBox().minX(), 547.52499999999998f, 1e-2);
+  EXPECT_NEAR(feature2.getConvexHull().getBoundingBox().minY(), 848.60522988829678f, 1e-3);
+  EXPECT_NEAR(feature2.getConvexHull().getBoundingBox().maxX(), 732.17200000000003f, 1e-3);
+  EXPECT_NEAR(feature2.getConvexHull().getBoundingBox().maxY(), 848.66061242083686f, 1e-3);
+  EXPECT_NEAR(static_cast<double>(feature2.getRT()), 613.74563136241022, 1e-6);
+  EXPECT_NEAR(static_cast<double>(feature2.getMZ()), 848.6332407226937, 1e-6);
+  EXPECT_NEAR(static_cast<double>(feature2.getIntensity()), 46520.29296875, 1e-6);
 
-  EXPECT_EQ(rawDataHandler.getFeatureMapHistory().size(), 2737);
+  EXPECT_EQ(rawDataHandler.getFeatureMapHistory().size(), 848);
 
   const OpenMS::Feature& hfeature1 = rawDataHandler.getFeatureMapHistory().at(0); // feature_map_history_
   EXPECT_EQ(hfeature1.getMetaValue("num_of_masstraces").toString(), "1");
   EXPECT_EQ(hfeature1.getMetaValue("scan_polarity"), "positive");
-  EXPECT_NEAR(static_cast<double>(hfeature1.getRT()), 498.752999, 1e-6);
-  EXPECT_NEAR(static_cast<double>(hfeature1.getMZ()), 79.02210591, 1e-6);
-  EXPECT_NEAR(static_cast<double>(hfeature1.getIntensity()), 18283.16210937, 1e-6);
+  EXPECT_NEAR(static_cast<double>(hfeature1.getRT()), 112.22407579684845, 1e-6);
+  EXPECT_NEAR(static_cast<double>(hfeature1.getMZ()), 79.022345291936759, 1e-6);
+  EXPECT_NEAR(static_cast<double>(hfeature1.getIntensity()), 1046207.3125, 1e-6);
 
   const OpenMS::Feature& hfeature2 = rawDataHandler.getFeatureMapHistory().back();
   EXPECT_EQ(hfeature2.getMetaValue("num_of_masstraces").toString(), "1");
-  EXPECT_NEAR(static_cast<double>(hfeature2.getRT()), 648.55600000, 1e-6);
-  EXPECT_NEAR(static_cast<double>(hfeature2.getMZ()), 848.6336890331, 1e-6);
-  EXPECT_NEAR(static_cast<double>(hfeature2.getIntensity()), 14291.36816406, 1e-6);
+  EXPECT_NEAR(static_cast<double>(hfeature2.getRT()), 613.74563136241022, 1e-6);
+  EXPECT_NEAR(static_cast<double>(hfeature2.getMZ()), 848.6332407226937, 1e-6);
+  EXPECT_NEAR(static_cast<double>(hfeature2.getIntensity()), 46520.29296875, 1e-6);
 }
 
 /**
@@ -1676,25 +1682,25 @@ TEST(RawDataProcessor, MergeFeaturesMS1)
   ParameterSet params;
   filenames.setTagValue(Filenames::Tag::MAIN_DIR, SMARTPEAK_GET_TEST_DATA_PATH("DDA"));
 
-  filenames.setFullPath("parameters", SMARTPEAK_GET_TEST_DATA_PATH("DDA/parameters.csv"));
+  filenames.setFullPath("parameters", SMARTPEAK_GET_TEST_DATA_PATH("DDA_parameters.csv"));
   LoadParameters load_parameters;
   load_parameters.process(rawDataHandler, params, filenames);
   params = rawDataHandler.getParameters();
 
-  filenames.setFullPath("mzML_i", SMARTPEAK_GET_TEST_DATA_PATH("DDA/Germicidin A standard.mzML"));
+  filenames.setFullPath("mzML_i", SMARTPEAK_GET_TEST_DATA_PATH("DDA.mzML"));
   LoadRawData loadRawData;
   loadRawData.process(rawDataHandler, params, filenames);
   loadRawData.extractMetaData(rawDataHandler);
 
   LoadFeatures loadFeatures;
-  filenames.setFullPath("featureXML_i", SMARTPEAK_GET_TEST_DATA_PATH("DDA/MergeFeaturesMS1/Germicidin A standard merge features ms1.featureXML"));
+  filenames.setFullPath("featureXML_i", SMARTPEAK_GET_TEST_DATA_PATH("DDA_SearchSpectrumMS1.featureXML"));
   loadFeatures.process(rawDataHandler, params, filenames);
 
   MergeFeaturesMS1 merge_features_ms1;
   merge_features_ms1.process(rawDataHandler, params, filenames);
 
   const auto& feature_map = rawDataHandler.getFeatureMap();
-  ASSERT_EQ(feature_map.size(), 1);
+  ASSERT_EQ(feature_map.size(), 4);
   const auto& feature_1 = feature_map.at(0);
   EXPECT_EQ(std::string(feature_1.getMetaValue("PeptideRef")), std::string("HMDB:HMDB0000001"));
   const auto& sub_features = feature_1.getSubordinates();
@@ -1810,31 +1816,31 @@ TEST(RawDataProcessor, MergeFeaturesMS2)
   ParameterSet params;
   filenames.setTagValue(Filenames::Tag::MAIN_DIR, SMARTPEAK_GET_TEST_DATA_PATH("DDA"));
 
-  filenames.setFullPath("parameters", SMARTPEAK_GET_TEST_DATA_PATH("DDA/parameters.csv"));
+  filenames.setFullPath("parameters", SMARTPEAK_GET_TEST_DATA_PATH("DDA_parameters.csv"));
   LoadParameters load_parameters;
   load_parameters.process(rawDataHandler, params, filenames);
   params = rawDataHandler.getParameters();
 
-  filenames.setFullPath("mzML_i", SMARTPEAK_GET_TEST_DATA_PATH("DDA/Germicidin A standard.mzML"));
+  filenames.setFullPath("mzML_i", SMARTPEAK_GET_TEST_DATA_PATH("DDA.mzML"));
   LoadRawData loadRawData;
   loadRawData.process(rawDataHandler, params, filenames);
   loadRawData.extractMetaData(rawDataHandler);
 
   LoadFeatures loadFeatures;
-  filenames.setFullPath("featureXML_i", SMARTPEAK_GET_TEST_DATA_PATH("DDA/MergeFeaturesMS2/Germicidin A standard merge features ms2.featureXML"));
+  filenames.setFullPath("featureXML_i", SMARTPEAK_GET_TEST_DATA_PATH("DDA_SearchSpectrumMS2.featureXML"));
   loadFeatures.process(rawDataHandler, params, filenames);
 
   MergeFeaturesMS2 merge_features_ms2;
   merge_features_ms2.process(rawDataHandler, params, filenames);
 
   const auto& feature_map = rawDataHandler.getFeatureMap();
-  ASSERT_EQ(feature_map.size(), 1);
+  ASSERT_EQ(feature_map.size(), 2);
   const auto& feature_1 = feature_map.at(0);
-  EXPECT_EQ(std::string(feature_1.getMetaValue("PeptideRef")), std::string("Unknown 1"));
+  EXPECT_EQ(std::string(feature_1.getMetaValue("PeptideRef")), std::string("HMDB:HMDB0000001"));
   const auto& sub_features = feature_1.getSubordinates();
   ASSERT_EQ(sub_features.size(), 1);
   const auto& sub_feature_1 = feature_map.at(0);
-  EXPECT_EQ(std::string(sub_feature_1.getMetaValue("PeptideRef")), std::string("Unknown 1"));
+  EXPECT_EQ(std::string(sub_feature_1.getMetaValue("PeptideRef")), std::string("HMDB:HMDB0000001"));
 }
 
 /**
@@ -3018,40 +3024,44 @@ TEST(RawDataProcessor, gettersSearchSpectrumMS1)
 TEST(RawDataProcessor, SearchSpectrumMS1)
 {
   ParameterSet params_1;
-  ParameterSet params_2;
-  load_data(params_1, params_2);
   RawDataHandler rawDataHandler;
 
   Filenames filenames;
-  filenames.setFullPath("traML", SMARTPEAK_GET_TEST_DATA_PATH("dda_min_traML.csv"));
+  filenames.setTagValue(Filenames::Tag::MAIN_DIR, SMARTPEAK_GET_TEST_DATA_PATH("DDA"));
+  filenames.setFullPath("parameters", SMARTPEAK_GET_TEST_DATA_PATH("DDA_parameters.csv"));
+  LoadParameters loadParameters;
+  loadParameters.process(rawDataHandler, {}, filenames);
+  params_1 = rawDataHandler.getParameters();
+
+  filenames.setFullPath("traML", SMARTPEAK_GET_TEST_DATA_PATH("DDA_traML.csv"));
   LoadTransitions loadTransitions;
   loadTransitions.process(rawDataHandler, params_1, filenames);
 
-  filenames.setFullPath("mzML_i", SMARTPEAK_GET_TEST_DATA_PATH("dda_min.mzML"));
+  filenames.setFullPath("mzML_i", SMARTPEAK_GET_TEST_DATA_PATH("DDA.mzML"));
   LoadRawData loadRawData;
   loadRawData.process(rawDataHandler, params_1, filenames);
   loadRawData.extractMetaData(rawDataHandler);
 
   LoadFeatures loadFeatures;
-  filenames.setFullPath("featureXML_i", SMARTPEAK_GET_TEST_DATA_PATH("dda_min.featureXML"));
+  filenames.setFullPath("featureXML_i", SMARTPEAK_GET_TEST_DATA_PATH("DDA_Pick3DFeatures.featureXML"));
   loadFeatures.process(rawDataHandler, params_1, filenames);
 
   SearchSpectrumMS1 searchSpectrum;
   searchSpectrum.process(rawDataHandler, params_1, filenames);
 
-  ASSERT_EQ(rawDataHandler.getFeatureMap().size(), 1986);
+  ASSERT_EQ(rawDataHandler.getFeatureMap().size(), 4);
   ASSERT_EQ(rawDataHandler.getFeatureMap()[0].getSubordinates().size(), 1);
   const auto& f = rawDataHandler.getFeatureMap()[0];
-  EXPECT_EQ(f.getMetaValue("PeptideRef").toString(), "HMDB:HMDB0002362");
+  EXPECT_EQ(f.getMetaValue("PeptideRef").toString(), "HMDB:HMDB0000001");
   const auto& s = rawDataHandler.getFeatureMap()[0].getSubordinates()[0];
-  EXPECT_EQ(s.getMetaValue("PeptideRef").toString(), "HMDB:HMDB0002362");
-  EXPECT_EQ(s.getMetaValue("native_id").toString(), "C4H10N2O2;M+H+K;2+");
-  EXPECT_EQ(s.getMetaValue("identifier").toString(), "[HMDB:HMDB0002362, HMDB:HMDB0006284]");
-  EXPECT_EQ(s.getMetaValue("modifications").toString(), "M+H+K;2+");
-  EXPECT_NEAR(s.getMetaValue("dc_charge_adduct_mass"), 39.97047649376457, 1e-6);
-  EXPECT_EQ(s.getMetaValue("chemical_formula").toString(), "C4H10N2O2");
-  EXPECT_NEAR(s.getMetaValue("mz_error_ppm"), 0.180061646746413, 1e-6);
-  EXPECT_NEAR(s.getMetaValue("mz_error_Da"), 1.4228891060952265e-05, 1e-6);
+  EXPECT_EQ(s.getMetaValue("PeptideRef").toString(), "HMDB:HMDB0000001");
+  EXPECT_EQ(s.getMetaValue("native_id").toString(), "C11H16O3;M+Na;1+");
+  EXPECT_EQ(s.getMetaValue("identifier").toString(), "[HMDB:HMDB0000001]");
+  EXPECT_EQ(s.getMetaValue("modifications").toString(), "M+Na;1+");
+  EXPECT_NEAR(s.getMetaValue("dc_charge_adduct_mass"), 22.992619516701694, 1e-6);
+  EXPECT_EQ(s.getMetaValue("chemical_formula").toString(), "C11H16O3");
+  EXPECT_NEAR(s.getMetaValue("mz_error_ppm"), 7.7588750838728746, 1e-6);
+  EXPECT_NEAR(s.getMetaValue("mz_error_Da"), 0.0016999630529994647, 1e-6);
 }
 
 /**
@@ -3135,28 +3145,35 @@ TEST(RawDataProcessor, ExtractSpectraNonTargeted)
   RawDataHandler rawDataHandler;
   ParameterSet params;
 
-  filenames.setFullPath("parameters", SMARTPEAK_GET_TEST_DATA_PATH("DDA/parameters.csv"));
+  filenames.setFullPath("parameters", SMARTPEAK_GET_TEST_DATA_PATH("DDA_parameters.csv"));
   LoadParameters load_parameters;
   load_parameters.process(rawDataHandler, params, filenames);
   params = rawDataHandler.getParameters();
 
-  filenames.setFullPath("mzML_i", SMARTPEAK_GET_TEST_DATA_PATH("DDA/Germicidin A standard.mzML"));
+  filenames.setFullPath("mzML_i", SMARTPEAK_GET_TEST_DATA_PATH("DDA.mzML"));
   LoadRawData loadRawData;
   loadRawData.process(rawDataHandler, params, filenames);
   loadRawData.extractMetaData(rawDataHandler);
 
   LoadFeatures loadFeatures;
-  filenames.setFullPath("featureXML_i", SMARTPEAK_GET_TEST_DATA_PATH("DDA/ExtractSpectraNonTargeted/Germicidin A standard.featureXML"));
+  filenames.setFullPath("featureXML_i", SMARTPEAK_GET_TEST_DATA_PATH("DDA_MergeFeaturesMS1.featureXML"));
   loadFeatures.process(rawDataHandler, params, filenames);
 
   ExtractSpectraNonTargeted extract_spectra_non_targeted;
   extract_spectra_non_targeted.process(rawDataHandler, params, filenames);
   const auto& feature_map = rawDataHandler.getFeatureMap();
-  ASSERT_EQ(feature_map.size(), 10);
+  ASSERT_EQ(feature_map.size(), 2);
   const auto& feature = feature_map.begin();
-  EXPECT_FLOAT_EQ(feature->getRT(), 390.259);
-  EXPECT_FLOAT_EQ(feature->getMZ(), 93.034767);
+  EXPECT_FLOAT_EQ(feature->getRT(), 370.34601);
+  EXPECT_FLOAT_EQ(feature->getMZ(), 134.95685);
   EXPECT_EQ(feature->getMetaValue("PeptideRef"), std::string("HMDB:HMDB0000001"));
+
+  const auto& feature_map1 = rawDataHandler.getFeatureMap("extracted_spectra");
+  ASSERT_EQ(feature_map1.size(), 1);
+  const auto& feature1 = feature_map1.begin();
+  EXPECT_FLOAT_EQ(feature1->getRT(), 370.34601);
+  EXPECT_FLOAT_EQ(feature1->getMZ(), 219.10085);
+  EXPECT_EQ(feature1->getMetaValue("PeptideRef"), std::string("HMDB:HMDB0000001"));
 }
 
 TEST(RawDataProcessor, ConstructTransitionsList_csv)
@@ -3165,23 +3182,23 @@ TEST(RawDataProcessor, ConstructTransitionsList_csv)
   RawDataHandler rawDataHandler;
   ParameterSet params;
 
-  filenames.setFullPath("parameters", SMARTPEAK_GET_TEST_DATA_PATH("DDA/parameters.csv"));
+  filenames.setFullPath("parameters", SMARTPEAK_GET_TEST_DATA_PATH("DDA_parameters.csv"));
   LoadParameters load_parameters;
   load_parameters.process(rawDataHandler, params, filenames);
   params = rawDataHandler.getParameters();
 
-  filenames.setFullPath("mzML_i", SMARTPEAK_GET_TEST_DATA_PATH("DDA/Germicidin A standard.mzML"));
+  filenames.setFullPath("mzML_i", SMARTPEAK_GET_TEST_DATA_PATH("DDA.mzML"));
   LoadRawData loadRawData;
   loadRawData.process(rawDataHandler, params, filenames);
   loadRawData.extractMetaData(rawDataHandler);
 
   LoadFeatures loadFeatures_ms1;
   RawDataHandler rawDataHandler_ms1;
-  filenames.setFullPath("featureXML_i", SMARTPEAK_GET_TEST_DATA_PATH("DDA/ConstructTransitionsList/Germicidin A standard ms1 merged features.featureXML"));
+  filenames.setFullPath("featureXML_i", SMARTPEAK_GET_TEST_DATA_PATH("DDA_MergeFeaturesMS1.featureXML"));
   loadFeatures_ms1.process(rawDataHandler_ms1, params, filenames);
 
   LoadFeatures loadFeatures;
-  filenames.setFullPath("featureXML_i", SMARTPEAK_GET_TEST_DATA_PATH("DDA/ConstructTransitionsList/Germicidin A standard ms2 merged features.featureXML"));
+  filenames.setFullPath("featureXML_i", SMARTPEAK_GET_TEST_DATA_PATH("DDA_MergeFeaturesMS2.featureXML"));
   loadFeatures.process(rawDataHandler, params, filenames);
 
   rawDataHandler.setFeatureMap("ms1_merged_features", rawDataHandler_ms1.getFeatureMap());
@@ -3192,27 +3209,27 @@ TEST(RawDataProcessor, ConstructTransitionsList_csv)
   construct_transitions_list.process(rawDataHandler, params, filenames);
 
   const auto& feature_map = rawDataHandler.getFeatureMap();
-  ASSERT_EQ(feature_map.size(), 10);
+  ASSERT_EQ(feature_map.size(), 2);
   const auto& feature_1 = feature_map.at(0);
-  EXPECT_FLOAT_EQ(feature_1.getRT(), 390.259);
-  EXPECT_FLOAT_EQ(feature_1.getMZ(), 111.04565);
+  EXPECT_FLOAT_EQ(feature_1.getRT(), 370.34601);
+  EXPECT_FLOAT_EQ(feature_1.getMZ(), 134.95685);
 
   const auto& feature_2 = feature_map.at(1);
-  EXPECT_FLOAT_EQ(feature_2.getRT(), 390.259);
-  EXPECT_FLOAT_EQ(feature_2.getMZ(), 121.02983);
+  EXPECT_FLOAT_EQ(feature_2.getRT(), 370.34601);
+  EXPECT_FLOAT_EQ(feature_2.getMZ(), 217.10509);
 
   // load and check transitions file
   LoadTransitions load_transition;
   filenames.setFullPath("traML", output_file_path);
   load_transition.process(rawDataHandler, params, filenames);
   const auto& transitions = rawDataHandler.getTargetedExperiment().getTransitions();
-  ASSERT_EQ(transitions.size(), 10);
+  ASSERT_EQ(transitions.size(), 2);
   const auto& transition = transitions.at(0);
-  EXPECT_EQ(std::string(transition.getName()), std::string("scan=463_111.046_HMDB:HMDB0000001"));
-  EXPECT_FLOAT_EQ(transition.getLibraryIntensity(), 2760);
+  EXPECT_EQ(std::string(transition.getName()), std::string("HMDB:HMDB0000001_scan=440_134.957_370.346"));
+  EXPECT_FLOAT_EQ(transition.getLibraryIntensity(), 476);
   EXPECT_EQ(std::string(transition.getPeptideRef()), std::string("HMDB:HMDB0000001"));
-  EXPECT_FLOAT_EQ(transition.getPrecursorMZ(), 195.102);
-  EXPECT_FLOAT_EQ(transition.getProductMZ(), 111.04565);
+  EXPECT_FLOAT_EQ(transition.getPrecursorMZ(), 235.07477);
+  EXPECT_FLOAT_EQ(transition.getProductMZ(), 134.95685);
 }
 
 /**
@@ -3231,29 +3248,36 @@ TEST(RawDataProcessor, SearchSpectrumMS2)
   ParameterSet params;
   filenames.setTagValue(Filenames::Tag::MAIN_DIR, SMARTPEAK_GET_TEST_DATA_PATH("DDA"));
 
-  filenames.setFullPath("parameters", SMARTPEAK_GET_TEST_DATA_PATH("DDA/parameters.csv"));
+  filenames.setFullPath("parameters", SMARTPEAK_GET_TEST_DATA_PATH("DDA_parameters.csv"));
   LoadParameters load_parameters;
   load_parameters.process(rawDataHandler, params, filenames);
   params = rawDataHandler.getParameters();
 
-  filenames.setFullPath("mzML_i", SMARTPEAK_GET_TEST_DATA_PATH("DDA/Germicidin A standard.mzML"));
+  filenames.setFullPath("mzML_i", SMARTPEAK_GET_TEST_DATA_PATH("DDA.mzML"));
   LoadRawData loadRawData;
   loadRawData.process(rawDataHandler, params, filenames);
   loadRawData.extractMetaData(rawDataHandler);
 
   LoadFeatures loadFeatures;
-  filenames.setFullPath("featureXML_i", SMARTPEAK_GET_TEST_DATA_PATH("DDA/SearchSpectrumMS2/Germicidin A standard search spectrum ms2.featureXML"));
+  filenames.setFullPath("featureXML_i", SMARTPEAK_GET_TEST_DATA_PATH("DDA_ExtractSpectraNontargeted.featureXML"));
   loadFeatures.process(rawDataHandler, params, filenames);
 
   SearchSpectrumMS2 search_spectrum_ms2;
   search_spectrum_ms2.process(rawDataHandler, params, filenames);
 
   const auto& feature_map = rawDataHandler.getFeatureMap();
-  ASSERT_EQ(feature_map.size(), 1);
+  ASSERT_EQ(feature_map.size(), 2);
   const auto& feature_1 = feature_map.at(0);
-  EXPECT_EQ(std::string(feature_1.getMetaValue("PeptideRef")), std::string("HMDB:HMDB0000001"));
+  EXPECT_EQ(feature_1.metaValueExists("PeptideRef"), false);
   const auto& sub_features = feature_1.getSubordinates();
   ASSERT_EQ(sub_features.size(), 1);
-  const auto& sub_feature_1 = feature_map.at(0);
+  const auto& sub_feature_1 = sub_features.at(0);
   EXPECT_EQ(std::string(sub_feature_1.getMetaValue("PeptideRef")), std::string("HMDB:HMDB0000001"));
+  EXPECT_EQ(sub_feature_1.getMetaValue("native_id").toString(), "scan=440_134.957");
+  EXPECT_EQ(sub_feature_1.getMetaValue("identifier").toString(), "[134.957]");
+  EXPECT_EQ(sub_feature_1.getMetaValue("modifications").toString(), "");
+  EXPECT_NEAR(sub_feature_1.getMetaValue("dc_charge_adduct_mass"), 0.0, 1e-6);
+  EXPECT_EQ(sub_feature_1.getMetaValue("chemical_formula").toString(), "");
+  EXPECT_NEAR(sub_feature_1.getMetaValue("mz_error_ppm"), 0.0, 1e-6);
+  EXPECT_NEAR(sub_feature_1.getMetaValue("mz_error_Da"), 0.0, 1e-6);
 }
