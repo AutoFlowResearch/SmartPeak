@@ -378,7 +378,7 @@ jobs:
             apt-key adv --keyserver keyserver.ubuntu.com --recv-key C99B11DEB97541F0
             apt-add-repository https://cli.github.com/packages
             apt-get update
-            apt-get install -y gh curl wget jq
+            apt-get install -y --allow-unauthenticated gh curl wget jq
             pip install -r tools/smartpeak/requirements.txt
             GHR_VERSION=0.13.0
             GHR_URL=https://github.com/tcnksm/ghr/releases/download/v${GHR_VERSION}/ghr_v${GHR_VERSION}_linux_amd64.tar.gz
