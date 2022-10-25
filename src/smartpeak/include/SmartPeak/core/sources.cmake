@@ -14,7 +14,6 @@ set(sources_list_h
 	FeatureFiltersUtils.h
 	FeatureFiltersUtilsMode.h
 	FeatureMetadata.h
-	Helloworld.h
 	InjectionHandler.h
 	MetaDataHandler.h
 	Parameters.h

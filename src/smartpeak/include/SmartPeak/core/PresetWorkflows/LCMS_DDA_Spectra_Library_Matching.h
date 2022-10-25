@@ -21,12 +21,30 @@
 // $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
 // --------------------------------------------------------------------------
 
-#include <SmartPeak/core/Helloworld.h>
+#pragma once
+
+#include <SmartPeak/core/PresetWorkflows/PresetWorkflow.h>
 
 namespace SmartPeak
 {
-  double Helloworld::addNumbers(const double& x, const double& y) const
-  {
-    return x + y;
-  }
+  struct LCMS_DDA_Spectra_Library_Matching : public PresetWorkflow {
+
+    virtual std::string getName() const override 
+    { 
+      return "LCMS DDA Spectra Library Matching";
+    };
+
+    virtual std::vector<std::string> getWorkflowSteps() const override
+    {
+      return
+      {
+        "LOAD_RAW_DATA",
+        "PICK_3D_FEATURES",
+        "EXTRACT_SPECTRA_NON_TARGETED",
+        "MATCH_SPECTRA",
+        "STORE_FEATURES"
+      };
+    };
+
+  };
 }

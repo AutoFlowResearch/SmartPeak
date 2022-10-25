@@ -27,6 +27,19 @@
 #include <plog/Log.h>
 #include <SmartPeak/core/SharedProcessors.h>
 
+#include <SmartPeak/core/PresetWorkflows/FIAMS_Unknowns.h>
+#include <SmartPeak/core/PresetWorkflows/GCMS_Full_Scan_Unknowns.h>
+#include <SmartPeak/core/PresetWorkflows/GCMS_SIM_Unknowns.h>
+#include <SmartPeak/core/PresetWorkflows/HPLC_UV_Standards.h>
+#include <SmartPeak/core/PresetWorkflows/HPLC_UV_Unknowns.h>
+#include <SmartPeak/core/PresetWorkflows/LCMS_DDA_Spectra_Library_Construction.h>
+#include <SmartPeak/core/PresetWorkflows/LCMS_DDA_Spectra_Library_Matching.h>
+#include <SmartPeak/core/PresetWorkflows/LCMS_DDA_Transitions_Library_Construction.h>
+#include <SmartPeak/core/PresetWorkflows/LCMS_MRM_Standards.h>
+#include <SmartPeak/core/PresetWorkflows/LCMS_MRM_Unknowns.h>
+#include <SmartPeak/core/PresetWorkflows/LCMS_MRM_Validation_LP.h>
+#include <SmartPeak/core/PresetWorkflows/LCMS_MRM_Validation_QMIP.h>
+
 #include <mutex> 
 
 namespace SmartPeak
@@ -868,142 +881,25 @@ namespace SmartPeak
     bool editable = workflow_manager_.isWorkflowDone();
     if (editable && ImGui::BeginCombo("Presets", NULL))
     {
-      static const char* presets[] = {
-        "LCMS DDA Transitions Library Construction",
-        "LCMS DDA Spectra Library Construction",
-        "LCMS DDA Spectra Library Matching",
-        "LCMS MRM Unknowns",
-        "LCMS MRM Standards",
-        "HPLC UV Unknowns",
-        "HPLC UV Standards",
-        "GCMS SIM Unknowns",
-        "GCMS Full Scan Unknowns",
-        "LCMS MRM Validation - QMIP",
-        "LCMS MRM Validation - LP",
-        "FIAMS Unknowns"
+      static const std::vector<std::shared_ptr<PresetWorkflow>> presets = {
+        std::make_shared<FIAMS_Unknowns>(),
+        std::make_shared<GCMS_Full_Scan_Unknowns>(),
+        std::make_shared<GCMS_SIM_Unknowns>(),
+        std::make_shared<HPLC_UV_Standards>(),
+        std::make_shared<HPLC_UV_Unknowns>(),
+        std::make_shared<LCMS_DDA_Spectra_Library_Construction>(),
+        std::make_shared<LCMS_DDA_Spectra_Library_Matching>(),
+        std::make_shared<LCMS_DDA_Transitions_Library_Construction>(),
+        std::make_shared<LCMS_MRM_Standards>(),
+        std::make_shared<LCMS_MRM_Unknowns>(),
+        std::make_shared<LCMS_MRM_Validation_LP>(),
+        std::make_shared<LCMS_MRM_Validation_QMIP>()
       };
-      for (const char* s : presets)
+      for (const auto& s : presets)
       {
-        if (ImGui::Selectable(s))
+        if (ImGui::Selectable(s->getName().c_str()))
         {
-          std::vector<std::string> ids;
-          const std::string s_string { s };
-          if (s_string == "LCMS DDA Transitions Library Construction")
-            ids = { "LOAD_RAW_DATA",
-                    "PICK_3D_FEATURES",
-                    "SEARCH_SPECTRUM_MS1",
-                    "MERGE_FEATURES_MS1",
-                    "EXTRACT_SPECTRA_NON_TARGETED",
-                    "SEARCH_SPECTRUM_MS2",
-                    "MERGE_FEATURES_MS2",
-                    "CONSTRUCT_TRANSITIONS_LIST",
-                    "STORE_FEATURES"};
-          else if (s_string == "LCMS DDA Spectra Library Construction")
-            ids = { "LOAD_RAW_DATA",
-                    "PICK_3D_FEATURES",
-                    "SEARCH_SPECTRUM_MS1",
-                    "MERGE_FEATURES_MS1",
-                    "EXTRACT_SPECTRA_NON_TARGETED",
-                    "STORE_MSP",
-                    "STORE_FEATURES" };
-          else if (s_string == "LCMS DDA Spectra Library Matching")
-            ids = { "LOAD_RAW_DATA",
-                    "PICK_3D_FEATURES",
-                    "EXTRACT_SPECTRA_NON_TARGETED",
-                    "MATCH_SPECTRA",
-                    "STORE_FEATURES" };
-          else if (s_string == "LCMS MRM Unknowns")
-            ids = { "LOAD_RAW_DATA",
-                    "MAP_CHROMATOGRAMS",
-                    "PICK_MRM_FEATURES",
-                    "QUANTIFY_FEATURES",
-                    "CHECK_FEATURES",
-                    "SELECT_FEATURES",
-                    "STORE_FEATURES" };
-          else if (s_string == "LCMS MRM Standards")
-            ids = { "LOAD_RAW_DATA",
-                    "MAP_CHROMATOGRAMS",
-                    "PICK_MRM_FEATURES",
-                    "CHECK_FEATURES",
-                    "SELECT_FEATURES",
-                    "OPTIMIZE_CALIBRATION",
-                    "STORE_QUANTITATION_METHODS",
-                    "QUANTIFY_FEATURES",
-                    "STORE_FEATURES" };
-          else if (s_string == "HPLC UV Unknowns")
-            ids = { "LOAD_RAW_DATA",
-                    "MAP_CHROMATOGRAMS",
-                    "EXTRACT_CHROMATOGRAM_WINDOWS",
-                    "ZERO_CHROMATOGRAM_BASELINE",
-                    "PICK_MRM_FEATURES",
-                    "QUANTIFY_FEATURES",
-                    "CHECK_FEATURES",
-                    "SELECT_FEATURES",
-                    "STORE_FEATURES" };
-          else if (s_string == "HPLC UV Standards")
-            ids = { "LOAD_RAW_DATA",
-                    "MAP_CHROMATOGRAMS",
-                    "EXTRACT_CHROMATOGRAM_WINDOWS",
-                    "ZERO_CHROMATOGRAM_BASELINE",
-                    "PICK_MRM_FEATURES",
-                    "CHECK_FEATURES",
-                    "SELECT_FEATURES",
-                    "OPTIMIZE_CALIBRATION",
-                    "STORE_QUANTITATION_METHODS",
-                    "QUANTIFY_FEATURES",
-                    "STORE_FEATURES" };
-          else if (s_string == "GCMS SIM Unknowns")
-            ids = { "LOAD_RAW_DATA",
-                    "MAP_CHROMATOGRAMS",
-                    "EXTRACT_CHROMATOGRAM_WINDOWS",
-                    "ZERO_CHROMATOGRAM_BASELINE",
-                    "PICK_MRM_FEATURES",
-                    "QUANTIFY_FEATURES",
-                    "CHECK_FEATURES",
-                    "SELECT_FEATURES",
-                    "STORE_FEATURES" };
-          else if (s_string == "GCMS Full Scan Unknowns")
-            ids = { "LOAD_RAW_DATA",
-                    "MAP_CHROMATOGRAMS",
-                    "EXTRACT_CHROMATOGRAM_WINDOWS",
-                    "ZERO_CHROMATOGRAM_BASELINE",
-                    "PICK_MRM_FEATURES",
-                    "QUANTIFY_FEATURES",
-                    "CHECK_FEATURES",
-                    "SELECT_FEATURES",
-                    "STORE_FEATURES" };
-          else if (s_string == "LCMS MRM Validation - LP")
-            ids = { "LOAD_RAW_DATA",
-                    "MAP_CHROMATOGRAMS",
-                    "EXTRACT_CHROMATOGRAM_WINDOWS",
-                    "PICK_MRM_FEATURES",
-                    "FILTER_FEATURES",
-                    "FILTER_FEATURES",
-                    "SELECT_FEATURES",
-                    "VALIDATE_FEATURES",
-                    "STORE_FEATURES" };
-          else if (s_string == "LCMS MRM Validation - QMIP")
-            ids = { "LOAD_RAW_DATA",
-                    "MAP_CHROMATOGRAMS",
-                    "PICK_MRM_FEATURES",
-                    "FILTER_FEATURES",
-                    "FILTER_FEATURES",
-                    "VALIDATE_FEATURES",
-                    "STORE_FEATURES" };
-          else if (s_string == "FIAMS Unknowns")
-            ids = { "LOAD_RAW_DATA",
-                    "EXTRACT_SPECTRA_WINDOWS",
-                    "MERGE_SPECTRA",
-                    "PICK_2D_FEATURES",
-                    "SEARCH_ACCURATE_MASS",
-                    "STORE_ANNOTATIONS",
-                    "STORE_FEATURES",
-                    "ESTIMATE_FEATURE_BACKGROUND_INTERFERENCES",
-                    "STORE_FEATURE_BACKGROUND_ESTIMATIONS",
-                    "FILTER_FEATURES_BACKGROUND_INTERFERENCES",
-                    "MERGE_FEATURES_MS1",
-                    "MERGE_INJECTIONS",
-                    "STORE_FEATURES_SAMPLE_GROUP" };
+          std::vector<std::string> ids = s->getWorkflowSteps();
           application_handler_.sequenceHandler_.setWorkflow(ids);
           application_handler_.sequenceHandler_.notifyWorkflowUpdated();
           LOGI << "Local workflow has been replaced";

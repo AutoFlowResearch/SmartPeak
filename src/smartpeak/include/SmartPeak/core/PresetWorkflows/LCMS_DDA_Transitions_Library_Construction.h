@@ -23,11 +23,30 @@
 
 #pragma once
 
+#include <SmartPeak/core/PresetWorkflows/PresetWorkflow.h>
+
 namespace SmartPeak
 {
-  class Helloworld
-  {
-public:
-    double addNumbers(const double& x, const double& y) const;
+  struct LCMS_DDA_Transitions_Library_Construction : public PresetWorkflow {
+
+    virtual std::string getName() const override 
+    { 
+      return "LCMS DDA Transitions Library Construction";
+    };
+
+    virtual std::vector<std::string> getWorkflowSteps() const override
+    {
+      return
+      {
+        "LOAD_RAW_DATA",
+        "PICK_3D_FEATURES",
+        "SEARCH_SPECTRUM_MS1",
+        "MERGE_FEATURES_MS1",
+        "EXTRACT_SPECTRA_NON_TARGETED",
+        "STORE_MSP",
+        "STORE_FEATURES"
+      };
+    };
+
   };
 }
