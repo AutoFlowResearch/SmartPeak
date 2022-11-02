@@ -46,5 +46,14 @@ namespace SmartPeak
       };
     };
 
+    virtual std::string getDescription() const override
+    {
+      return
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
+        "Nunc pellentesque sagittis lorem non interdum. Donec pulvinar laoreet velit, in cursus sapien lacinia quis. "
+        "Interdum et malesuada fames ac ante ipsum primis in faucibus. "
+        "Cras tincidunt suscipit sem, id placerat elit lobortis a.";
+    };
+
   };
 }

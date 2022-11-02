@@ -20,42 +20,41 @@
 // $Maintainer: Douglas McCloskey $
 // $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
 // --------------------------------------------------------------------------
-
 #pragma once
 
+#include <SmartPeak/ui/Widget.h>
 #include <SmartPeak/core/PresetWorkflows/PresetWorkflow.h>
+#include <SmartPeak/core/ApplicationHandler.h>
+#include <string>
+#include <vector>
 
 namespace SmartPeak
 {
-  struct LCMS_MRM_Unknowns : public PresetWorkflow {
+  struct IPresetWorkflowWidgetObserver
+  {
+    /**
+    * @brief User has set preset workflow and pressed ok button
+    */
+    virtual void onPresetWorkflowSelected(const PresetWorkflow& preset_workflow) = 0;
+  };
 
-    virtual std::string getName() const override 
-    { 
-      return "LCMS MRM Unknowns";
-    };
+  class PresetWorkflowWidget final : public Widget
+  {
+  public:
+    PresetWorkflowWidget(ApplicationHandler& application_handler,
+                         IPresetWorkflowWidgetObserver& preset_workflow_observer) :
+      application_handler_(application_handler),
+      preset_workflow_observer_(preset_workflow_observer),
+      selected_preset_index_(0)
+      {};
 
-    virtual std::vector<std::string> getWorkflowSteps() const override
-    {
-      return
-      {
-        "LOAD_RAW_DATA",
-        "MAP_CHROMATOGRAMS",
-        "PICK_MRM_FEATURES",
-        "QUANTIFY_FEATURES",
-        "CHECK_FEATURES",
-        "SELECT_FEATURES",
-        "STORE_FEATURES"
-      };
-    };
+    void draw() override;
 
-    virtual std::string getDescription() const override
-    {
-      return
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
-        "Nunc pellentesque sagittis lorem non interdum. Donec pulvinar laoreet velit, in cursus sapien lacinia quis. "
-        "Interdum et malesuada fames ac ante ipsum primis in faucibus. "
-        "Cras tincidunt suscipit sem, id placerat elit lobortis a.";
-    };
-
+  protected:
+    ApplicationHandler& application_handler_;
+    IPresetWorkflowWidgetObserver& preset_workflow_observer_;
+    std::string selected_method_type_;
+    std::string selected_method_;
+    int selected_preset_index_;
   };
 }

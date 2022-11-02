@@ -875,40 +875,26 @@ namespace SmartPeak
     }
   }
 
+  void WorkflowWidget::onPresetWorkflowSelected(const PresetWorkflow& preset_workflow)
+  {
+    std::vector<std::string> ids = preset_workflow.getWorkflowSteps();
+    application_handler_.sequenceHandler_.setWorkflow(ids);
+    application_handler_.sequenceHandler_.notifyWorkflowUpdated();
+    LOGI << "Local workflow has been replaced";
+  }
+
   void WorkflowWidget::draw()
   {
     workflow_step_widget_.draw();
+    preset_workflow_widget_.draw();
     bool editable = workflow_manager_.isWorkflowDone();
-    if (editable && ImGui::BeginCombo("Presets", NULL))
-    {
-      static const std::vector<std::shared_ptr<PresetWorkflow>> presets = {
-        std::make_shared<FIAMS_Unknowns>(),
-        std::make_shared<GCMS_Full_Scan_Unknowns>(),
-        std::make_shared<GCMS_SIM_Unknowns>(),
-        std::make_shared<HPLC_UV_Standards>(),
-        std::make_shared<HPLC_UV_Unknowns>(),
-        std::make_shared<LCMS_DDA_Spectra_Library_Construction>(),
-        std::make_shared<LCMS_DDA_Spectra_Library_Matching>(),
-        std::make_shared<LCMS_DDA_Transitions_Library_Construction>(),
-        std::make_shared<LCMS_MRM_Standards>(),
-        std::make_shared<LCMS_MRM_Unknowns>(),
-        std::make_shared<LCMS_MRM_Validation_LP>(),
-        std::make_shared<LCMS_MRM_Validation_QMIP>()
-      };
-      for (const auto& s : presets)
-      {
-        if (ImGui::Selectable(s->getName().c_str()))
-        {
-          std::vector<std::string> ids = s->getWorkflowSteps();
-          application_handler_.sequenceHandler_.setWorkflow(ids);
-          application_handler_.sequenceHandler_.notifyWorkflowUpdated();
-          LOGI << "Local workflow has been replaced";
-        }
-      }
-      ImGui::EndCombo();
-    }
     if (editable)
     {
+      if (ImGui::Button("Select from preset Worfklows"))
+      {
+        ImGui::OpenPopup("Select Preset Workflow");
+      }
+      ImGui::SameLine();
       if (ImGui::Button("Add step"))
       {
         ImGui::OpenPopup("Add workflow step");

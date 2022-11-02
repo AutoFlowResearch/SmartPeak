@@ -25,6 +25,7 @@
 
 #include <SmartPeak/ui/Widget.h>
 #include <SmartPeak/ui/WorkflowStepWidget.h>
+#include <SmartPeak/ui/PresetWorkflowWidget.h>
 #include <SmartPeak/core/ApplicationHandler.h>
 #include <SmartPeak/core/WorkflowManager.h>
 #include <SmartPeak/core/ApplicationProcessors/BuildCommandsFromNames.h>
@@ -147,7 +148,7 @@ namespace SmartPeak
     bool is_graph_hovered_ = false;
   };
 
-  class WorkflowWidget : public Widget
+  class WorkflowWidget : public Widget, public IPresetWorkflowWidgetObserver
   {
   public:
 
@@ -156,16 +157,21 @@ namespace SmartPeak
       application_handler_(application_handler),
       workflow_step_widget_(application_handler),
       workflow_manager_(workflow_manager),
-      workflow_node_graph_(application_handler, workflow_manager)
+      workflow_node_graph_(application_handler, workflow_manager),
+      preset_workflow_widget_(application_handler, *this)
     {
     };
 
     void draw() override;
+
+    // from IPresetWorkflowWidgetObserver
+    virtual void onPresetWorkflowSelected(const PresetWorkflow& preset_workflow) override;
 
   protected:
     ApplicationHandler& application_handler_;
     WorkflowStepWidget workflow_step_widget_;
     WorkflowManager& workflow_manager_;
     WorfklowStepNodeGraph workflow_node_graph_;
+    PresetWorkflowWidget preset_workflow_widget_;
   };
 }

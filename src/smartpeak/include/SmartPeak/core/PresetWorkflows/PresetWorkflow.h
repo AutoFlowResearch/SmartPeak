@@ -30,6 +30,7 @@ namespace SmartPeak
 {
   struct PresetWorkflow {
     virtual std::string getName() const = 0;
+    virtual std::string getDescription() const = 0;
     virtual std::vector<std::string> getWorkflowSteps() const = 0;
   };
 }
