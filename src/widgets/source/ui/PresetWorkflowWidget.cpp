@@ -47,16 +47,21 @@ namespace SmartPeak
   {
     showQuickHelpToolTip("WorkflowStepWindow");
 
-    float popup_width = 400;
-    float description_box_height = 200;
+    const float popup_width = 800;
+    const float popup_height = 600;
+    const float buttons_space = 50;
 
     static const char* raw_data_method_type_ = "Raw data methods";
     static const char* seq_seg_method_type_ = "Sequence segment methods";
     static const char* sample_group_method_type_ = "Sample group methods";
 
+    ImGui::SetNextWindowSize(ImVec2(popup_width, popup_height));
     if (!ImGui::BeginPopupModal("Select Preset Workflow", NULL)) {
       return;
     }
+
+    ImVec2 vMin = ImGui::GetWindowContentRegionMin();
+    ImVec2 vMax = ImGui::GetWindowContentRegionMax();
 
     static const std::vector<std::shared_ptr<PresetWorkflow>> presets = {
       std::make_shared<FIAMS_Unknowns>(),
@@ -72,29 +77,45 @@ namespace SmartPeak
       std::make_shared<LCMS_MRM_Validation_LP>(),
       std::make_shared<LCMS_MRM_Validation_QMIP>()
     };
+
+    ImVec2 preset_list_size = ImVec2(vMax.x * 0.3, vMax.y - buttons_space);
+    // compute the largest preset name
+    for (const auto& preset : presets)
+    {
+      ImVec2 preset_text_size = ImGui::CalcTextSize(preset->getName().c_str());
+      if (preset_text_size.x > preset_list_size.x)
+      {
+        preset_list_size.x = preset_text_size.x;
+      }
+    }
+    preset_list_size.x += ImGui::GetStyle().WindowPadding.x * 2;
+    ImGui::BeginChild(ImGui::GetID("preset_list"), preset_list_size, ImGuiWindowFlags_NoMove);
+    unsigned int counter = 0;
+    for (const auto& preset : presets)
+    {
+      if (ImGui::Selectable(preset->getName().c_str()))
+      {
+        selected_preset_index_ = counter;
+      }
+      ++counter;
+    }
+    ImGui::EndChild();
+
     const auto& current_preset = presets.at(selected_preset_index_);
 
+    ImVec2 preset_description_size = ImVec2(vMax.x - (preset_list_size.x + ImGui::GetStyle().WindowPadding.x * 2),
+                                            vMax.y - buttons_space);
+    auto window_pos = ImGui::GetCurrentWindow()->Pos;
+    ImGui::SetNextWindowPos(ImVec2((preset_list_size.x + ImGui::GetStyle().WindowPadding.x * 2) + window_pos.x, 
+                            0 + window_pos.y + vMin.y));
+    ImGui::BeginChild(ImGui::GetID("preset_description"), preset_description_size, ImGuiWindowFlags_NoMove);
     ImGui::PushTextWrapPos();
     ImGui::Text(current_preset->getName().c_str());
-
     ImGui::Separator();
-
     ImGui::PushTextWrapPos();
     ImGui::Text(current_preset->getDescription().c_str());
+    ImGui::EndChild();
 
-    ImGui::Separator();
-
-    if (ImGui::Button("Previous"))
-    {
-      selected_preset_index_ = ((--selected_preset_index_) % presets.size());
-    }
-    ImGui::SameLine();
-    if (ImGui::Button("Next"))
-    {
-      selected_preset_index_ = ((++selected_preset_index_) % presets.size());
-    }
-
-    ImGui::SameLine();
     if (ImGui::Button("Ok"))
     {
       preset_workflow_observer_.onPresetWorkflowSelected(*current_preset);
