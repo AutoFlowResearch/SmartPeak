@@ -256,6 +256,128 @@ int main(int argc, char** argv)
   transitions_explorer_window_->visible_ = true;
 
   // windows organization
+  split_window.calibrators_line_plot_ = calibrators_line_plot_;
+  split_window.quickInfoText_ = quickInfoText_;
+  split_window.log_widget_ = log_widget_;
+  split_window.spectra_msms_plot_widget_ = spectra_msms_plot_widget_;
+  split_window.spectra_ms2_plot_widget_ = spectra_ms2_plot_widget_;
+  split_window.injections_explorer_window_ = injections_explorer_window_;
+  split_window.transitions_explorer_window_ = transitions_explorer_window_;
+  split_window.features_explorer_window_ = features_explorer_window_;
+  split_window.statistics_ = statistics_;
+  split_window.sequence_main_window_ = sequence_main_window_;
+  split_window.transitions_main_window_ = transitions_main_window_;
+  split_window.spectrum_main_window_ = spectrum_main_window_;
+  split_window.workflow_ = workflow_;
+  split_window.parameters_table_widget_ = parameters_table_widget_;
+  split_window.quant_method_main_window_ = quant_method_main_window_;
+  split_window.stds_consc_main_window_ = stds_consc_main_window_;
+  split_window.comp_filters_main_window_ = comp_filters_main_window_;
+  split_window.comp_group_filters_main_window_ = comp_group_filters_main_window_;
+  split_window.comp_qc_main_window_ = comp_qc_main_window_;
+  split_window.comp_group_qc_main_window_ = comp_group_qc_main_window_;
+  split_window.comp_rsd_filters_main_window_ = comp_rsd_filters_main_window_;
+  split_window.comp_group_rds_filters_main_window_ = comp_group_rds_filters_main_window_;
+  split_window.comp_rsdcqcs_main_window_ = comp_rsdcqcs_main_window_;
+  split_window.comp_group_rsdqcs_main_window_ = comp_group_rsdqcs_main_window_;
+  split_window.comp_background_filters_main_window_ = comp_background_filters_main_window_;
+  split_window.comp_group_background_filters_main_window_ = comp_group_background_filters_main_window_;
+  split_window.comp_background_qcs_main_window_ = comp_background_qcs_main_window_;
+  split_window.comp_group_background_qcs_main_window_ = comp_group_background_qcs_main_window_;
+  split_window.comp_rsd_estimations_main_window_ = comp_rsd_estimations_main_window_;
+  split_window.comp_group_rsd_estimation_main_window_ = comp_group_rsd_estimation_main_window_;
+  split_window.comp_background_estimations_main_window_ = comp_background_estimations_main_window_;
+  split_window.comp_group_background_estimations_main_window_ = comp_group_background_estimations_main_window_;
+  split_window.features_table_main_window_ = features_table_main_window_;
+  split_window.feature_matrix_main_window_ = feature_matrix_main_window_;
+  split_window.chromatogram_plot_widget_ = chromatogram_plot_widget_;
+  split_window.chromatogram_tic_plot_widget_ = chromatogram_tic_plot_widget_;
+  split_window.chromatogram_ms1_xic_plot_widget_ = chromatogram_ms1_xic_plot_widget_;
+  split_window.chromatogram_ms2_xic_plot_widget_ = chromatogram_ms2_xic_plot_widget_;
+  split_window.spectra_plot_widget_ = spectra_plot_widget_;
+  split_window.feature_line_plot_ = feature_line_plot_;
+  split_window.heatmap_plot_widget_ = heatmap_plot_widget_;
+
+  /*
+  split_window.all_windows_ = {
+    statistics_,
+    sequence_main_window_,
+    transitions_main_window_,
+    spectrum_main_window_,
+    workflow_,
+    parameters_table_widget_,
+    quant_method_main_window_,
+    stds_consc_main_window_,
+    comp_filters_main_window_,
+    comp_group_filters_main_window_,
+    comp_qc_main_window_,
+    comp_group_qc_main_window_,
+    comp_rsd_filters_main_window_,
+    comp_group_rds_filters_main_window_,
+    comp_rsdcqcs_main_window_,
+    comp_group_rsdqcs_main_window_,
+    comp_background_filters_main_window_,
+    comp_group_background_filters_main_window_,
+    comp_background_qcs_main_window_,
+    comp_group_background_qcs_main_window_,
+    comp_rsd_estimations_main_window_,
+    comp_group_rsd_estimation_main_window_,
+    comp_background_estimations_main_window_,
+    comp_group_background_estimations_main_window_,
+    features_table_main_window_,
+    feature_matrix_main_window_,
+    chromatogram_plot_widget_,
+    chromatogram_tic_plot_widget_,
+    chromatogram_ms1_xic_plot_widget_,
+    chromatogram_ms2_xic_plot_widget_,
+    spectra_plot_widget_,
+    feature_line_plot_,
+    heatmap_plot_widget_,
+    calibrators_line_plot_,
+    quickInfoText_,
+    log_widget_,
+    spectra_msms_plot_widget_,
+    spectra_ms2_plot_widget_,
+    injections_explorer_window_,
+    transitions_explorer_window_,
+    features_explorer_window_,
+    statistics_,
+    sequence_main_window_,
+    transitions_main_window_,
+    spectrum_main_window_,
+    workflow_,
+    parameters_table_widget_,
+    quant_method_main_window_,
+    stds_consc_main_window_,
+    comp_filters_main_window_,
+    comp_group_filters_main_window_,
+    comp_qc_main_window_,
+    comp_group_qc_main_window_,
+    comp_rsd_filters_main_window_,
+    comp_group_rds_filters_main_window_,
+    comp_rsdcqcs_main_window_,
+    comp_group_rsdqcs_main_window_,
+    comp_background_filters_main_window_,
+    comp_group_background_filters_main_window_,
+    comp_background_qcs_main_window_,
+    comp_group_background_qcs_main_window_,
+    comp_rsd_estimations_main_window_,
+    comp_group_rsd_estimation_main_window_,
+    comp_background_estimations_main_window_,
+    comp_group_background_estimations_main_window_,
+    features_table_main_window_,
+    feature_matrix_main_window_,
+    chromatogram_plot_widget_,
+    chromatogram_tic_plot_widget_,
+    chromatogram_ms1_xic_plot_widget_,
+    chromatogram_ms2_xic_plot_widget_,
+    spectra_plot_widget_,
+    feature_line_plot_,
+    heatmap_plot_widget_,
+    calibrators_line_plot_
+  };
+  */
+
   split_window.top_windows_ = {
     statistics_,
     sequence_main_window_,
