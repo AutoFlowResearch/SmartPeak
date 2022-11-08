@@ -30,6 +30,10 @@ namespace SmartPeak
 
   void SplitWindow::setupLayoutLoader(LayoutLoader& layout_loader)
   {
+    const std::vector<std::shared_ptr<Widget>>& top_windows_ = default_layout_.at("top");
+    const std::vector<std::shared_ptr<Widget>>& bottom_windows_ = default_layout_.at("bottom");
+    const std::vector<std::shared_ptr<Widget>>& left_windows_ = default_layout_.at("left");
+
     for (auto& window : top_windows_)
     {
       layout_loader.properties_handlers_.push_back(window.get());
@@ -45,7 +49,7 @@ namespace SmartPeak
     layout_loader.properties_handlers_.push_back(&win_size_and_pos_);
   }
 
-  void SplitWindow::showWindows(std::vector<std::shared_ptr<Widget>>& windows)
+  void SplitWindow::showWindows(const std::vector<std::shared_ptr<Widget>>& windows)
   {
     for (auto& widget : windows)
     {
@@ -73,6 +77,10 @@ namespace SmartPeak
     static bool visible = true;
     if (ImGui::Begin("Splitter", &visible, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus))
     {
+      const std::vector<std::shared_ptr<Widget>>& top_windows_ = default_layout_.at("top");
+      const std::vector<std::shared_ptr<Widget>>& bottom_windows_ = default_layout_.at("bottom");
+      const std::vector<std::shared_ptr<Widget>>& left_windows_ = default_layout_.at("left");
+
       // Build default docking
       ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
       if (reset_layout_)

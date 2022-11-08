@@ -159,12 +159,12 @@ int main(int argc, char** argv)
     );
 
   // widgets: windows
-  auto quickInfoText_= std::make_shared<InfoWidget>("Info", application_handler_,
-                                                            event_dispatcher, 
-                                                            event_dispatcher,
-                                                            event_dispatcher,
-                                                            event_dispatcher,
-                                                            event_dispatcher);
+  auto quickInfoText_ = std::make_shared<InfoWidget>("Info", application_handler_,
+    event_dispatcher,
+    event_dispatcher,
+    event_dispatcher,
+    event_dispatcher,
+    event_dispatcher);
   auto workflow_ = std::make_shared<WorkflowWidget>("Workflow", application_handler_, workflow_manager_);
   auto statistics_ = std::make_shared<StatisticsWidget>("Statistics", application_handler_, event_dispatcher);
   auto log_widget_ = std::make_shared<LogWidget>(appender_, "Log");
@@ -180,72 +180,72 @@ int main(int argc, char** argv)
   auto feature_line_plot_ = std::make_shared<LinePlot2DWidget>("Features (line)");
   auto injections_explorer_window_ = std::make_shared<ExplorerWidget>("InjectionsExplorerWindow", "Injections", &event_dispatcher);
   auto calibrators_line_plot_ = std::make_shared<CalibratorsPlotWidget>(
-    session_handler_, 
-    application_handler_.sequenceHandler_, 
-    injections_explorer_window_, 
+    session_handler_,
+    application_handler_.sequenceHandler_,
+    injections_explorer_window_,
     chromatogram_plot_widget_,
     event_dispatcher,
     "Calibrators");
   auto transitions_explorer_window_ = std::make_shared<ExplorerWidget>("TransitionsExplorerWindow", "Transitions", &event_dispatcher);
   auto features_explorer_window_ = std::make_shared<ExplorerWidget>("FeaturesExplorerWindow", "Features", &event_dispatcher);
   auto sequence_main_window_ = std::make_shared<SequenceTableWidget>("SequenceMainWindow", "Sequence",
-                                                                      &session_handler_, &application_handler_.sequenceHandler_);
+    &session_handler_, &application_handler_.sequenceHandler_);
   auto transitions_main_window_ = std::make_shared<GenericTableWidget>("TransitionsMainWindow", "Transitions Table");
   auto spectrum_main_window_ = std::make_shared<GenericTableWidget>("SpectrumMainWindow", "Scans Table");
   auto quant_method_main_window_ = std::make_shared<SequenceSegmentWidget>("QuantMethodMainWindow", "Quantitation Method",
-                                   &session_handler_, &application_handler_.sequenceHandler_,
-                                   &SessionHandler::setQuantMethodTable, &SessionHandler::getFiltersTable, &application_handler_.sequenceHandler_);
+    &session_handler_, &application_handler_.sequenceHandler_,
+    &SessionHandler::setQuantMethodTable, &SessionHandler::getFiltersTable, &application_handler_.sequenceHandler_);
   auto stds_consc_main_window_ = std::make_shared<SequenceSegmentWidget>("StdsConcsMainWindow", "Standards Concentrations",
-                                   &session_handler_, &application_handler_.sequenceHandler_,
-                                   &SessionHandler::setStdsConcsTable, &SessionHandler::getFiltersTable, &application_handler_.sequenceHandler_);
+    &session_handler_, &application_handler_.sequenceHandler_,
+    &SessionHandler::setStdsConcsTable, &SessionHandler::getFiltersTable, &application_handler_.sequenceHandler_);
   auto comp_filters_main_window_ = std::make_shared<SequenceSegmentWidget>("CompFiltersMainWindow", "Component Filters",
-                                   &session_handler_, &application_handler_.sequenceHandler_,
-                                   &SessionHandler::setComponentFiltersTable, &SessionHandler::getFiltersTable, &application_handler_.sequenceHandler_);
+    &session_handler_, &application_handler_.sequenceHandler_,
+    &SessionHandler::setComponentFiltersTable, &SessionHandler::getFiltersTable, &application_handler_.sequenceHandler_);
   auto comp_group_filters_main_window_ = std::make_shared<SequenceSegmentWidget>("CompGroupFiltersMainWindow", "Component Group Filters",
-                                   &session_handler_, &application_handler_.sequenceHandler_,
-                                   &SessionHandler::setComponentGroupFiltersTable, &SessionHandler::getGroupFiltersTable, &application_handler_.sequenceHandler_);
+    &session_handler_, &application_handler_.sequenceHandler_,
+    &SessionHandler::setComponentGroupFiltersTable, &SessionHandler::getGroupFiltersTable, &application_handler_.sequenceHandler_);
   auto comp_qc_main_window_ = std::make_shared<SequenceSegmentWidget>("CompQCsMainWindow", "Component QCs",
-                                   &session_handler_, &application_handler_.sequenceHandler_,
-                                   &SessionHandler::setComponentQCsTable, &SessionHandler::getFiltersTable, &application_handler_.sequenceHandler_);
+    &session_handler_, &application_handler_.sequenceHandler_,
+    &SessionHandler::setComponentQCsTable, &SessionHandler::getFiltersTable, &application_handler_.sequenceHandler_);
   auto comp_group_qc_main_window_ = std::make_shared<SequenceSegmentWidget>("CompGroupQCsMainWindow", "Component Group QCs",
-                                   &session_handler_, &application_handler_.sequenceHandler_,
-                                   &SessionHandler::setComponentGroupQCsTable, &SessionHandler::getGroupFiltersTable, &application_handler_.sequenceHandler_);
+    &session_handler_, &application_handler_.sequenceHandler_,
+    &SessionHandler::setComponentGroupQCsTable, &SessionHandler::getGroupFiltersTable, &application_handler_.sequenceHandler_);
   auto comp_rsd_filters_main_window_ = std::make_shared<SequenceSegmentWidget>("CompRSDFiltersMainWindow", "Component RSD Filters",
-                                   &session_handler_, &application_handler_.sequenceHandler_,
-                                   &SessionHandler::setComponentRSDFiltersTable, &SessionHandler::getFiltersTable, &application_handler_.sequenceHandler_);
+    &session_handler_, &application_handler_.sequenceHandler_,
+    &SessionHandler::setComponentRSDFiltersTable, &SessionHandler::getFiltersTable, &application_handler_.sequenceHandler_);
   auto comp_group_rds_filters_main_window_ = std::make_shared<SequenceSegmentWidget>("CompGroupRSDFiltersMainWindow", "Component Group RSD Filters",
-                                   &session_handler_, &application_handler_.sequenceHandler_,
-                                   &SessionHandler::setComponentGroupRSDFiltersTable, &SessionHandler::getGroupFiltersTable, &application_handler_.sequenceHandler_);
+    &session_handler_, &application_handler_.sequenceHandler_,
+    &SessionHandler::setComponentGroupRSDFiltersTable, &SessionHandler::getGroupFiltersTable, &application_handler_.sequenceHandler_);
   auto comp_rsdcqcs_main_window_ = std::make_shared<SequenceSegmentWidget>("CompRSDQCsMainWindow", "Component RSD QCs",
-                                   &session_handler_, &application_handler_.sequenceHandler_,
-                                   &SessionHandler::setComponentRSDQCsTable, &SessionHandler::getFiltersTable, &application_handler_.sequenceHandler_);
+    &session_handler_, &application_handler_.sequenceHandler_,
+    &SessionHandler::setComponentRSDQCsTable, &SessionHandler::getFiltersTable, &application_handler_.sequenceHandler_);
   auto comp_group_rsdqcs_main_window_ = std::make_shared<SequenceSegmentWidget>("CompGroupRSDQCsMainWindow", "Component Group RSD QCs",
-                                   &session_handler_, &application_handler_.sequenceHandler_, 
-                                   &SessionHandler::setComponentGroupRSDQCsTable, &SessionHandler::getGroupFiltersTable, &application_handler_.sequenceHandler_);
+    &session_handler_, &application_handler_.sequenceHandler_,
+    &SessionHandler::setComponentGroupRSDQCsTable, &SessionHandler::getGroupFiltersTable, &application_handler_.sequenceHandler_);
   auto comp_background_filters_main_window_ = std::make_shared<SequenceSegmentWidget>("CompBackgroundFiltersMainWindow", "Component Background Filters",
-                                   &session_handler_, &application_handler_.sequenceHandler_, 
-                                   &SessionHandler::setComponentBackgroundFiltersTable, &SessionHandler::getFiltersTable, &application_handler_.sequenceHandler_);
+    &session_handler_, &application_handler_.sequenceHandler_,
+    &SessionHandler::setComponentBackgroundFiltersTable, &SessionHandler::getFiltersTable, &application_handler_.sequenceHandler_);
   auto comp_group_background_filters_main_window_ = std::make_shared<SequenceSegmentWidget>("CompGroupBackgroundFiltersMainWindow", "Component Group Background Filters",
-                                   &session_handler_, &application_handler_.sequenceHandler_, 
-                                   &SessionHandler::setComponentGroupBackgroundFiltersTable, &SessionHandler::getGroupFiltersTable, &application_handler_.sequenceHandler_);
+    &session_handler_, &application_handler_.sequenceHandler_,
+    &SessionHandler::setComponentGroupBackgroundFiltersTable, &SessionHandler::getGroupFiltersTable, &application_handler_.sequenceHandler_);
   auto comp_background_qcs_main_window_ = std::make_shared<SequenceSegmentWidget>("CompBackgroundQCsMainWindow", "Component Background QCs",
-                                   &session_handler_, &application_handler_.sequenceHandler_, 
-                                   &SessionHandler::setComponentBackgroundQCsTable, &SessionHandler::getFiltersTable, &application_handler_.sequenceHandler_);
+    &session_handler_, &application_handler_.sequenceHandler_,
+    &SessionHandler::setComponentBackgroundQCsTable, &SessionHandler::getFiltersTable, &application_handler_.sequenceHandler_);
   auto comp_group_background_qcs_main_window_ = std::make_shared<SequenceSegmentWidget>("CompGroupBackgroundQCsMainWindow", "Component Group Background QCs",
-                                   &session_handler_, &application_handler_.sequenceHandler_,
-                                   &SessionHandler::setComponentGroupBackgroundQCsTable, &SessionHandler::getGroupFiltersTable, &application_handler_.sequenceHandler_);
+    &session_handler_, &application_handler_.sequenceHandler_,
+    &SessionHandler::setComponentGroupBackgroundQCsTable, &SessionHandler::getGroupFiltersTable, &application_handler_.sequenceHandler_);
   auto comp_rsd_estimations_main_window_ = std::make_shared<SequenceSegmentWidget>("CompRSDEstimationsMainWindow", "Component RSD Filters",
-                                   &session_handler_, &application_handler_.sequenceHandler_,
-                                   &SessionHandler::setComponentRSDEstimationsTable, &SessionHandler::getFiltersTable, &application_handler_.sequenceHandler_);
+    &session_handler_, &application_handler_.sequenceHandler_,
+    &SessionHandler::setComponentRSDEstimationsTable, &SessionHandler::getFiltersTable, &application_handler_.sequenceHandler_);
   auto comp_group_rsd_estimation_main_window_ = std::make_shared<SequenceSegmentWidget>("CompGroupRSDEstimationsMainWindow", "Component Group RSD Filters",
-                                   &session_handler_, &application_handler_.sequenceHandler_,
-                                   &SessionHandler::setComponentGroupRSDEstimationsTable, &SessionHandler::getGroupFiltersTable, &application_handler_.sequenceHandler_);
+    &session_handler_, &application_handler_.sequenceHandler_,
+    &SessionHandler::setComponentGroupRSDEstimationsTable, &SessionHandler::getGroupFiltersTable, &application_handler_.sequenceHandler_);
   auto comp_background_estimations_main_window_ = std::make_shared<SequenceSegmentWidget>("CompBackgroundEstimationsMainWindow", "Component Background Filters",
-                                   &session_handler_, &application_handler_.sequenceHandler_,
-                                   &SessionHandler::setComponentBackgroundEstimationsTable, &SessionHandler::getFiltersTable, &application_handler_.sequenceHandler_);
+    &session_handler_, &application_handler_.sequenceHandler_,
+    &SessionHandler::setComponentBackgroundEstimationsTable, &SessionHandler::getFiltersTable, &application_handler_.sequenceHandler_);
   auto comp_group_background_estimations_main_window_ = std::make_shared<SequenceSegmentWidget>("CompGroupBackgroundEstimationsMainWindow", "Component Group Background Filters",
-                                   &session_handler_, &application_handler_.sequenceHandler_,
-                                   &SessionHandler::setComponentGroupBackgroundEstimationsTable, &SessionHandler::getGroupFiltersTable, &application_handler_.sequenceHandler_);
+    &session_handler_, &application_handler_.sequenceHandler_,
+    &SessionHandler::setComponentGroupBackgroundEstimationsTable, &SessionHandler::getGroupFiltersTable, &application_handler_.sequenceHandler_);
   auto features_table_main_window_ = std::make_shared<FeaturesTableWidget>("featuresTableMainWindow", "Features table", &event_dispatcher);
   auto feature_matrix_main_window_ = std::make_shared<GenericTableWidget>("featureMatrixMainWindow", "Features matrix");
 
@@ -378,55 +378,66 @@ int main(int argc, char** argv)
   };
   */
 
-  split_window.top_windows_ = {
-    statistics_,
-    sequence_main_window_,
-    transitions_main_window_,
-    spectrum_main_window_,
-    workflow_,
-    parameters_table_widget_,
-    quant_method_main_window_,
-    stds_consc_main_window_,
-    comp_filters_main_window_,
-    comp_group_filters_main_window_,
-    comp_qc_main_window_,
-    comp_group_qc_main_window_,
-    comp_rsd_filters_main_window_,
-    comp_group_rds_filters_main_window_,
-    comp_rsdcqcs_main_window_,
-    comp_group_rsdqcs_main_window_,
-    comp_background_filters_main_window_,
-    comp_group_background_filters_main_window_,
-    comp_background_qcs_main_window_,
-    comp_group_background_qcs_main_window_,
-    comp_rsd_estimations_main_window_,
-    comp_group_rsd_estimation_main_window_,
-    comp_background_estimations_main_window_,
-    comp_group_background_estimations_main_window_,
-    features_table_main_window_,
-    feature_matrix_main_window_,
-    chromatogram_plot_widget_,
-    chromatogram_tic_plot_widget_,
-    chromatogram_ms1_xic_plot_widget_,
-    chromatogram_ms2_xic_plot_widget_,
-    spectra_plot_widget_,
-    feature_line_plot_,
-    heatmap_plot_widget_,
-    calibrators_line_plot_
-  };
-
-  split_window.bottom_windows_ = {
+split_window.default_layout_ =
+{
+  {
+    "top",
+    {
+      statistics_,
+      sequence_main_window_,
+      transitions_main_window_,
+      spectrum_main_window_,
+      workflow_,
+      parameters_table_widget_,
+      quant_method_main_window_,
+      stds_consc_main_window_,
+      comp_filters_main_window_,
+      comp_group_filters_main_window_,
+      comp_qc_main_window_,
+      comp_group_qc_main_window_,
+      comp_rsd_filters_main_window_,
+      comp_group_rds_filters_main_window_,
+      comp_rsdcqcs_main_window_,
+      comp_group_rsdqcs_main_window_,
+      comp_background_filters_main_window_,
+      comp_group_background_filters_main_window_,
+      comp_background_qcs_main_window_,
+      comp_group_background_qcs_main_window_,
+      comp_rsd_estimations_main_window_,
+      comp_group_rsd_estimation_main_window_,
+      comp_background_estimations_main_window_,
+      comp_group_background_estimations_main_window_,
+      features_table_main_window_,
+      feature_matrix_main_window_,
+      chromatogram_plot_widget_,
+      chromatogram_tic_plot_widget_,
+      chromatogram_ms1_xic_plot_widget_,
+      chromatogram_ms2_xic_plot_widget_,
+      spectra_plot_widget_,
+      feature_line_plot_,
+      heatmap_plot_widget_,
+      calibrators_line_plot_
+    },
+  },
+  {
+    "bottom",
+    {
     quickInfoText_,
     log_widget_,
     spectra_msms_plot_widget_,
     spectra_ms2_plot_widget_,
-  };
+    },
+  },
+  {
+    "left",
+    {
+      injections_explorer_window_,
+      transitions_explorer_window_,
+      features_explorer_window_
+    },
+  }
+};
 
-  split_window.left_windows_ = {
-    injections_explorer_window_,
-    transitions_explorer_window_,
-    features_explorer_window_
-  };
 
   std::vector<std::shared_ptr<Widget>> popups = {
       file_picker_,
@@ -443,9 +454,9 @@ int main(int argc, char** argv)
   split_window.setupLayoutLoader(layout_loader);
 
   // We need titles for all sub windows
-  checkTitles(split_window.top_windows_);
-  checkTitles(split_window.bottom_windows_);
-  checkTitles(split_window.left_windows_);
+  // checkTitles(split_window.top_windows_);
+  // checkTitles(split_window.bottom_windows_);
+  // checkTitles(split_window.left_windows_);
 
   // Create log path
   const std::time_t t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());

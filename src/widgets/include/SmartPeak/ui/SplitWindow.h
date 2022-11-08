@@ -50,9 +50,7 @@ namespace SmartPeak
 
     WindowSizesAndPositions win_size_and_pos_;
 
-    std::vector<std::shared_ptr<Widget>> top_windows_;
-    std::vector<std::shared_ptr<Widget>> bottom_windows_;
-    std::vector<std::shared_ptr<Widget>> left_windows_;
+    std::map<std::string, std::vector<std::shared_ptr<Widget>>> default_layout_;
 
     // All windows
     std::shared_ptr<Widget> quickInfoText_;
@@ -100,6 +98,6 @@ namespace SmartPeak
     bool reset_layout_ = true;
 
   protected:
-    void showWindows(std::vector<std::shared_ptr<Widget>> &windows);
+    void showWindows(const std::vector<std::shared_ptr<Widget>> &windows);
   };
 }
