@@ -23,15 +23,15 @@
 
 #pragma once
 
-#include <SmartPeak/core/PresetWorkflows/PresetWorkflow.h>
+#include <SmartPeak/PresetWorkflows/PresetWorkflow.h>
 
 namespace SmartPeak
 {
-  struct LCMS_DDA_Transitions_Library_Construction : public PresetWorkflow {
+  struct GCMS_SIM_Unknowns : public PresetWorkflow {
 
     virtual std::string getName() const override 
     { 
-      return "LCMS DDA Transitions Library Construction";
+      return "GCMS SIM Unknowns";
     };
 
     virtual std::vector<std::string> getWorkflowSteps() const override
@@ -39,11 +39,13 @@ namespace SmartPeak
       return
       {
         "LOAD_RAW_DATA",
-        "PICK_3D_FEATURES",
-        "SEARCH_SPECTRUM_MS1",
-        "MERGE_FEATURES_MS1",
-        "EXTRACT_SPECTRA_NON_TARGETED",
-        "STORE_MSP",
+        "MAP_CHROMATOGRAMS",
+        "EXTRACT_CHROMATOGRAM_WINDOWS",
+        "ZERO_CHROMATOGRAM_BASELINE",
+        "PICK_MRM_FEATURES",
+        "QUANTIFY_FEATURES",
+        "CHECK_FEATURES",
+        "SELECT_FEATURES",
         "STORE_FEATURES"
       };
     };

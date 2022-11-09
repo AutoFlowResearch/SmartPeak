@@ -27,18 +27,18 @@
 #include <plog/Log.h>
 #include <SmartPeak/core/SharedProcessors.h>
 
-#include <SmartPeak/core/PresetWorkflows/FIAMS_Unknowns.h>
-#include <SmartPeak/core/PresetWorkflows/GCMS_Full_Scan_Unknowns.h>
-#include <SmartPeak/core/PresetWorkflows/GCMS_SIM_Unknowns.h>
-#include <SmartPeak/core/PresetWorkflows/HPLC_UV_Standards.h>
-#include <SmartPeak/core/PresetWorkflows/HPLC_UV_Unknowns.h>
-#include <SmartPeak/core/PresetWorkflows/LCMS_DDA_Spectra_Library_Construction.h>
-#include <SmartPeak/core/PresetWorkflows/LCMS_DDA_Spectra_Library_Matching.h>
-#include <SmartPeak/core/PresetWorkflows/LCMS_DDA_Transitions_Library_Construction.h>
-#include <SmartPeak/core/PresetWorkflows/LCMS_MRM_Standards.h>
-#include <SmartPeak/core/PresetWorkflows/LCMS_MRM_Unknowns.h>
-#include <SmartPeak/core/PresetWorkflows/LCMS_MRM_Validation_LP.h>
-#include <SmartPeak/core/PresetWorkflows/LCMS_MRM_Validation_QMIP.h>
+#include <SmartPeak/PresetWorkflows/FIAMS_Unknowns.h>
+#include <SmartPeak/PresetWorkflows/GCMS_Full_Scan_Unknowns.h>
+#include <SmartPeak/PresetWorkflows/GCMS_SIM_Unknowns.h>
+#include <SmartPeak/PresetWorkflows/HPLC_UV_Standards.h>
+#include <SmartPeak/PresetWorkflows/HPLC_UV_Unknowns.h>
+#include <SmartPeak/PresetWorkflows/LCMS_DDA_Spectra_Library_Construction.h>
+#include <SmartPeak/PresetWorkflows/LCMS_DDA_Spectra_Library_Matching.h>
+#include <SmartPeak/PresetWorkflows/LCMS_DDA_Transitions_Library_Construction.h>
+#include <SmartPeak/PresetWorkflows/LCMS_MRM_Standards.h>
+#include <SmartPeak/PresetWorkflows/LCMS_MRM_Unknowns.h>
+#include <SmartPeak/PresetWorkflows/LCMS_MRM_Validation_LP.h>
+#include <SmartPeak/PresetWorkflows/LCMS_MRM_Validation_QMIP.h>
 
 #include <mutex> 
 

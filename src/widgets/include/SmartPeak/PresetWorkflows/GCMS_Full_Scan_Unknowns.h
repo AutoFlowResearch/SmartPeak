@@ -23,15 +23,15 @@
 
 #pragma once
 
-#include <SmartPeak/core/PresetWorkflows/PresetWorkflow.h>
+#include <SmartPeak/PresetWorkflows/PresetWorkflow.h>
 
 namespace SmartPeak
 {
-  struct LCMS_MRM_Validation_QMIP : public PresetWorkflow {
+  struct GCMS_Full_Scan_Unknowns : public PresetWorkflow {
 
     virtual std::string getName() const override 
     { 
-      return "LCMS MRM Validation - QMIP";
+      return "GCMS Full Scan Unknowns";
     };
 
     virtual std::vector<std::string> getWorkflowSteps() const override
@@ -40,10 +40,12 @@ namespace SmartPeak
       {
         "LOAD_RAW_DATA",
         "MAP_CHROMATOGRAMS",
+        "EXTRACT_CHROMATOGRAM_WINDOWS",
+        "ZERO_CHROMATOGRAM_BASELINE",
         "PICK_MRM_FEATURES",
-        "FILTER_FEATURES",
-        "FILTER_FEATURES",
-        "VALIDATE_FEATURES",
+        "QUANTIFY_FEATURES",
+        "CHECK_FEATURES",
+        "SELECT_FEATURES",
         "STORE_FEATURES"
       };
     };

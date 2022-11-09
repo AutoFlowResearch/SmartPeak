@@ -23,7 +23,7 @@
 #pragma once
 
 #include <SmartPeak/ui/Widget.h>
-#include <SmartPeak/core/PresetWorkflows/PresetWorkflow.h>
+#include <SmartPeak/PresetWorkflows/PresetWorkflow.h>
 #include <SmartPeak/core/ApplicationHandler.h>
 #include <string>
 #include <vector>

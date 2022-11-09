@@ -23,15 +23,15 @@
 
 #pragma once
 
-#include <SmartPeak/core/PresetWorkflows/PresetWorkflow.h>
+#include <SmartPeak/PresetWorkflows/PresetWorkflow.h>
 
 namespace SmartPeak
 {
-  struct GCMS_Full_Scan_Unknowns : public PresetWorkflow {
+  struct HPLC_UV_Standards : public PresetWorkflow {
 
     virtual std::string getName() const override 
     { 
-      return "GCMS Full Scan Unknowns";
+      return "HPLC UV Standards";
     };
 
     virtual std::vector<std::string> getWorkflowSteps() const override
@@ -43,9 +43,11 @@ namespace SmartPeak
         "EXTRACT_CHROMATOGRAM_WINDOWS",
         "ZERO_CHROMATOGRAM_BASELINE",
         "PICK_MRM_FEATURES",
-        "QUANTIFY_FEATURES",
         "CHECK_FEATURES",
         "SELECT_FEATURES",
+        "OPTIMIZE_CALIBRATION",
+        "STORE_QUANTITATION_METHODS",
+        "QUANTIFY_FEATURES",
         "STORE_FEATURES"
       };
     };
