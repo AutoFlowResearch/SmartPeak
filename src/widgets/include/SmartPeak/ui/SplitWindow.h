@@ -25,6 +25,7 @@
 #include <SmartPeak/ui/Widget.h>
 #include <SmartPeak/ui/LayoutLoader.h>
 #include <SmartPeak/ui/WindowSizesAndPositions.h>
+#include <SmartPeak/PresetWorkflows/AllWindows.h>
 
 #include <string>
 #include <vector>
@@ -37,8 +38,9 @@ namespace SmartPeak
   class SplitWindow final : public Widget
   {
   public:
-    SplitWindow() :
-      Widget("SplitWindow")
+    SplitWindow(const AllWindows& all_windows) :
+      Widget("SplitWindow"),
+      all_windows_(all_windows)
     { };
 
     void draw() override;
@@ -52,52 +54,14 @@ namespace SmartPeak
 
     std::map<std::string, std::vector<std::shared_ptr<Widget>>> default_layout_;
 
-    // All windows
-    std::shared_ptr<Widget> quickInfoText_;
-    std::shared_ptr<Widget> workflow_;
-    std::shared_ptr<Widget> statistics_;
-    std::shared_ptr<Widget> log_widget_;
-    std::shared_ptr<Widget> parameters_table_widget_;
-    std::shared_ptr<Widget> chromatogram_plot_widget_;
-    std::shared_ptr<Widget> chromatogram_ms2_xic_plot_widget_;
-    std::shared_ptr<Widget> spectra_ms2_plot_widget_;
-    std::shared_ptr<Widget> chromatogram_ms1_xic_plot_widget_;
-    std::shared_ptr<Widget> spectra_msms_plot_widget_;
-    std::shared_ptr<Widget> chromatogram_tic_plot_widget_;
-    std::shared_ptr<Widget> heatmap_plot_widget_;
-    std::shared_ptr<Widget> spectra_plot_widget_;
-    std::shared_ptr<Widget> feature_line_plot_;
-    std::shared_ptr<Widget> injections_explorer_window_;
-    std::shared_ptr<Widget> calibrators_line_plot_;
-    std::shared_ptr<Widget> transitions_explorer_window_;
-    std::shared_ptr<Widget> features_explorer_window_;
-    std::shared_ptr<Widget> sequence_main_window_;
-    std::shared_ptr<Widget> transitions_main_window_;
-    std::shared_ptr<Widget> spectrum_main_window_;
-    std::shared_ptr<Widget> quant_method_main_window_;
-    std::shared_ptr<Widget> stds_consc_main_window_;
-    std::shared_ptr<Widget> comp_filters_main_window_;
-    std::shared_ptr<Widget> comp_group_filters_main_window_;
-    std::shared_ptr<Widget> comp_qc_main_window_;
-    std::shared_ptr<Widget> comp_group_qc_main_window_;
-    std::shared_ptr<Widget> comp_rsd_filters_main_window_;
-    std::shared_ptr<Widget> comp_group_rds_filters_main_window_;
-    std::shared_ptr<Widget> comp_rsdcqcs_main_window_;
-    std::shared_ptr<Widget> comp_group_rsdqcs_main_window_;
-    std::shared_ptr<Widget> comp_background_filters_main_window_;
-    std::shared_ptr<Widget> comp_group_background_filters_main_window_;
-    std::shared_ptr<Widget> comp_background_qcs_main_window_;
-    std::shared_ptr<Widget> comp_group_background_qcs_main_window_;
-    std::shared_ptr<Widget> comp_rsd_estimations_main_window_;
-    std::shared_ptr<Widget> comp_group_rsd_estimation_main_window_;
-    std::shared_ptr<Widget> comp_background_estimations_main_window_;
-    std::shared_ptr<Widget> comp_group_background_estimations_main_window_;
-    std::shared_ptr<Widget> features_table_main_window_;
-    std::shared_ptr<Widget> feature_matrix_main_window_;
+    void resetLayout(const std::map<std::string, std::vector<std::shared_ptr<Widget>>>& layout);
 
-    bool reset_layout_ = true;
+    const AllWindows& all_windows_;
 
   protected:
     void showWindows(const std::vector<std::shared_ptr<Widget>> &windows);
+    bool reset_layout_ = true;
+    std::map<std::string, std::vector<std::shared_ptr<Widget>>> current_layout_;
+    std::map<std::string, std::vector<std::shared_ptr<Widget>>> new_layout;
   };
 }

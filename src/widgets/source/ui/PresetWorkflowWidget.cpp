@@ -116,13 +116,6 @@ namespace SmartPeak
     ImGui::Text(current_preset->getDescription().c_str());
     ImGui::EndChild();
 
-    bool reset_layout = true;
-    if (ImGui::Checkbox("Set layout for this workflow", &reset_layout))
-    {
-
-    }
-
-    ImGui::SameLine(); 
     if (ImGui::Button("Ok"))
     {
       preset_workflow_observer_.onPresetWorkflowSelected(*current_preset);

@@ -59,5 +59,10 @@ namespace SmartPeak
         "Cras tincidunt suscipit sem, id placerat elit lobortis a.";
     };
 
+    virtual std::map<std::string, std::vector<std::shared_ptr<Widget>>> getLayout(const AllWindows& all_windows) const override
+    {
+      return {};
+    };
+
   };
 }

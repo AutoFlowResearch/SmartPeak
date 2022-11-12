@@ -30,9 +30,14 @@ namespace SmartPeak
 
   void SplitWindow::setupLayoutLoader(LayoutLoader& layout_loader)
   {
-    const std::vector<std::shared_ptr<Widget>>& top_windows_ = default_layout_.at("top");
-    const std::vector<std::shared_ptr<Widget>>& bottom_windows_ = default_layout_.at("bottom");
-    const std::vector<std::shared_ptr<Widget>>& left_windows_ = default_layout_.at("left");
+    if (reset_layout_)
+    {
+      current_layout_.clear();
+      current_layout_ = new_layout;
+    }
+    const std::vector<std::shared_ptr<Widget>>& top_windows_ = current_layout_.at("top");
+    const std::vector<std::shared_ptr<Widget>>& bottom_windows_ = current_layout_.at("bottom");
+    const std::vector<std::shared_ptr<Widget>>& left_windows_ = current_layout_.at("left");
 
     for (auto& window : top_windows_)
     {
@@ -77,9 +82,15 @@ namespace SmartPeak
     static bool visible = true;
     if (ImGui::Begin("Splitter", &visible, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus))
     {
-      const std::vector<std::shared_ptr<Widget>>& top_windows_ = default_layout_.at("top");
-      const std::vector<std::shared_ptr<Widget>>& bottom_windows_ = default_layout_.at("bottom");
-      const std::vector<std::shared_ptr<Widget>>& left_windows_ = default_layout_.at("left");
+      if (reset_layout_)
+      {
+        current_layout_.clear();
+        current_layout_ = new_layout;
+      }
+
+      const std::vector<std::shared_ptr<Widget>>& top_windows_ = current_layout_.at("top");
+      const std::vector<std::shared_ptr<Widget>>& bottom_windows_ = current_layout_.at("bottom");
+      const std::vector<std::shared_ptr<Widget>>& left_windows_ = current_layout_.at("left");
 
       // Build default docking
       ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
@@ -119,4 +130,11 @@ namespace SmartPeak
     ImGui::PopStyleVar();
     return;
   }
+
+  void SplitWindow::resetLayout(const std::map<std::string, std::vector<std::shared_ptr<Widget>>>& layout)
+  {
+    new_layout = layout;
+    reset_layout_ = true;
+  }
+
 }

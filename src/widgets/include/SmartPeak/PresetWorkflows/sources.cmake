@@ -3,6 +3,7 @@ set(directory include/SmartPeak/core/PresetWorkflows)
 
 ### list all header files of the directory here
 set(sources_list_h
+	AllWindows.h
 	PresetWorkflow.h
 	FIAMS_Unknowns.h
 	GCMS_Full_Scan_Unknowns.h

@@ -880,6 +880,7 @@ namespace SmartPeak
     std::vector<std::string> ids = preset_workflow.getWorkflowSteps();
     application_handler_.sequenceHandler_.setWorkflow(ids);
     application_handler_.sequenceHandler_.notifyWorkflowUpdated();
+    split_window_.resetLayout(preset_workflow.getLayout(split_window_.all_windows_));
     LOGI << "Local workflow has been replaced";
   }
 

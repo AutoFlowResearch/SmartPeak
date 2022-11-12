@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <SmartPeak/PresetWorkflows/AllWindows.h>
+
 #include <string>
 #include <vector>
 
@@ -32,5 +34,6 @@ namespace SmartPeak
     virtual std::string getName() const = 0;
     virtual std::string getDescription() const = 0;
     virtual std::vector<std::string> getWorkflowSteps() const = 0;
+    virtual std::map<std::string, std::vector<std::shared_ptr<Widget>>> getLayout(const AllWindows& all_windows) const = 0;
   };
 }

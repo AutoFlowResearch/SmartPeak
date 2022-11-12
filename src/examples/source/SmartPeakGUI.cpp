@@ -57,6 +57,7 @@
 #include <SmartPeak/ui/LoadSessionWizard.h>
 #include <SmartPeak/ui/LayoutLoader.h>
 #include <SmartPeak/ui/SplitWindow.h>
+#include <SmartPeak/PresetWorkflows/AllWindows.h>
 #include <SmartPeak/core/EventDispatcher.h>
 #include <SmartPeak/core/RawDataProcessors/StoreParameters.h>
 #include <SmartPeak/core/RawDataProcessors/StoreValidationData.h>
@@ -118,7 +119,8 @@ int main(int argc, char** argv)
   GuiAppender appender_;
   WorkflowClient workflow_client_;
   std::future<std::string> runworkflow_future_;
-  SplitWindow split_window;
+  AllWindows all_windows;
+  SplitWindow split_window(all_windows);
   LayoutLoader layout_loader(application_handler_);
 
   // EventDispatcher will dispatch events triggered by the observers in the main GUI thread
@@ -165,7 +167,7 @@ int main(int argc, char** argv)
     event_dispatcher,
     event_dispatcher,
     event_dispatcher);
-  auto workflow_ = std::make_shared<WorkflowWidget>("Workflow", application_handler_, workflow_manager_);
+  auto workflow_ = std::make_shared<WorkflowWidget>("Workflow", application_handler_, workflow_manager_, split_window);
   auto statistics_ = std::make_shared<StatisticsWidget>("Statistics", application_handler_, event_dispatcher);
   auto log_widget_ = std::make_shared<LogWidget>(appender_, "Log");
   auto parameters_table_widget_ = std::make_shared<ParametersTableWidget>(session_handler_, application_handler_, "ParametersMainWindow", "Parameters");
@@ -256,47 +258,47 @@ int main(int argc, char** argv)
   transitions_explorer_window_->visible_ = true;
 
   // windows organization
-  split_window.calibrators_line_plot_ = calibrators_line_plot_;
-  split_window.quickInfoText_ = quickInfoText_;
-  split_window.log_widget_ = log_widget_;
-  split_window.spectra_msms_plot_widget_ = spectra_msms_plot_widget_;
-  split_window.spectra_ms2_plot_widget_ = spectra_ms2_plot_widget_;
-  split_window.injections_explorer_window_ = injections_explorer_window_;
-  split_window.transitions_explorer_window_ = transitions_explorer_window_;
-  split_window.features_explorer_window_ = features_explorer_window_;
-  split_window.statistics_ = statistics_;
-  split_window.sequence_main_window_ = sequence_main_window_;
-  split_window.transitions_main_window_ = transitions_main_window_;
-  split_window.spectrum_main_window_ = spectrum_main_window_;
-  split_window.workflow_ = workflow_;
-  split_window.parameters_table_widget_ = parameters_table_widget_;
-  split_window.quant_method_main_window_ = quant_method_main_window_;
-  split_window.stds_consc_main_window_ = stds_consc_main_window_;
-  split_window.comp_filters_main_window_ = comp_filters_main_window_;
-  split_window.comp_group_filters_main_window_ = comp_group_filters_main_window_;
-  split_window.comp_qc_main_window_ = comp_qc_main_window_;
-  split_window.comp_group_qc_main_window_ = comp_group_qc_main_window_;
-  split_window.comp_rsd_filters_main_window_ = comp_rsd_filters_main_window_;
-  split_window.comp_group_rds_filters_main_window_ = comp_group_rds_filters_main_window_;
-  split_window.comp_rsdcqcs_main_window_ = comp_rsdcqcs_main_window_;
-  split_window.comp_group_rsdqcs_main_window_ = comp_group_rsdqcs_main_window_;
-  split_window.comp_background_filters_main_window_ = comp_background_filters_main_window_;
-  split_window.comp_group_background_filters_main_window_ = comp_group_background_filters_main_window_;
-  split_window.comp_background_qcs_main_window_ = comp_background_qcs_main_window_;
-  split_window.comp_group_background_qcs_main_window_ = comp_group_background_qcs_main_window_;
-  split_window.comp_rsd_estimations_main_window_ = comp_rsd_estimations_main_window_;
-  split_window.comp_group_rsd_estimation_main_window_ = comp_group_rsd_estimation_main_window_;
-  split_window.comp_background_estimations_main_window_ = comp_background_estimations_main_window_;
-  split_window.comp_group_background_estimations_main_window_ = comp_group_background_estimations_main_window_;
-  split_window.features_table_main_window_ = features_table_main_window_;
-  split_window.feature_matrix_main_window_ = feature_matrix_main_window_;
-  split_window.chromatogram_plot_widget_ = chromatogram_plot_widget_;
-  split_window.chromatogram_tic_plot_widget_ = chromatogram_tic_plot_widget_;
-  split_window.chromatogram_ms1_xic_plot_widget_ = chromatogram_ms1_xic_plot_widget_;
-  split_window.chromatogram_ms2_xic_plot_widget_ = chromatogram_ms2_xic_plot_widget_;
-  split_window.spectra_plot_widget_ = spectra_plot_widget_;
-  split_window.feature_line_plot_ = feature_line_plot_;
-  split_window.heatmap_plot_widget_ = heatmap_plot_widget_;
+  all_windows.calibrators_line_plot_ = calibrators_line_plot_;
+  all_windows.quickInfoText_ = quickInfoText_;
+  all_windows.log_widget_ = log_widget_;
+  all_windows.spectra_msms_plot_widget_ = spectra_msms_plot_widget_;
+  all_windows.spectra_ms2_plot_widget_ = spectra_ms2_plot_widget_;
+  all_windows.injections_explorer_window_ = injections_explorer_window_;
+  all_windows.transitions_explorer_window_ = transitions_explorer_window_;
+  all_windows.features_explorer_window_ = features_explorer_window_;
+  all_windows.statistics_ = statistics_;
+  all_windows.sequence_main_window_ = sequence_main_window_;
+  all_windows.transitions_main_window_ = transitions_main_window_;
+  all_windows.spectrum_main_window_ = spectrum_main_window_;
+  all_windows.workflow_ = workflow_;
+  all_windows.parameters_table_widget_ = parameters_table_widget_;
+  all_windows.quant_method_main_window_ = quant_method_main_window_;
+  all_windows.stds_consc_main_window_ = stds_consc_main_window_;
+  all_windows.comp_filters_main_window_ = comp_filters_main_window_;
+  all_windows.comp_group_filters_main_window_ = comp_group_filters_main_window_;
+  all_windows.comp_qc_main_window_ = comp_qc_main_window_;
+  all_windows.comp_group_qc_main_window_ = comp_group_qc_main_window_;
+  all_windows.comp_rsd_filters_main_window_ = comp_rsd_filters_main_window_;
+  all_windows.comp_group_rds_filters_main_window_ = comp_group_rds_filters_main_window_;
+  all_windows.comp_rsdcqcs_main_window_ = comp_rsdcqcs_main_window_;
+  all_windows.comp_group_rsdqcs_main_window_ = comp_group_rsdqcs_main_window_;
+  all_windows.comp_background_filters_main_window_ = comp_background_filters_main_window_;
+  all_windows.comp_group_background_filters_main_window_ = comp_group_background_filters_main_window_;
+  all_windows.comp_background_qcs_main_window_ = comp_background_qcs_main_window_;
+  all_windows.comp_group_background_qcs_main_window_ = comp_group_background_qcs_main_window_;
+  all_windows.comp_rsd_estimations_main_window_ = comp_rsd_estimations_main_window_;
+  all_windows.comp_group_rsd_estimation_main_window_ = comp_group_rsd_estimation_main_window_;
+  all_windows.comp_background_estimations_main_window_ = comp_background_estimations_main_window_;
+  all_windows.comp_group_background_estimations_main_window_ = comp_group_background_estimations_main_window_;
+  all_windows.features_table_main_window_ = features_table_main_window_;
+  all_windows.feature_matrix_main_window_ = feature_matrix_main_window_;
+  all_windows.chromatogram_plot_widget_ = chromatogram_plot_widget_;
+  all_windows.chromatogram_tic_plot_widget_ = chromatogram_tic_plot_widget_;
+  all_windows.chromatogram_ms1_xic_plot_widget_ = chromatogram_ms1_xic_plot_widget_;
+  all_windows.chromatogram_ms2_xic_plot_widget_ = chromatogram_ms2_xic_plot_widget_;
+  all_windows.spectra_plot_widget_ = spectra_plot_widget_;
+  all_windows.feature_line_plot_ = feature_line_plot_;
+  all_windows.heatmap_plot_widget_ = heatmap_plot_widget_;
 
   /*
   split_window.all_windows_ = {
@@ -451,6 +453,7 @@ split_window.default_layout_ =
       load_session_wizard_->set_input_output_widget
   };
 
+  split_window.resetLayout(split_window.default_layout_);
   split_window.setupLayoutLoader(layout_loader);
 
   // We need titles for all sub windows
@@ -841,7 +844,7 @@ split_window.default_layout_ =
       {
         if (ImGui::MenuItem("Reset Window Layout"))
         {
-          split_window.reset_layout_ = true;
+          split_window.resetLayout(split_window.default_layout_);
           calibrators_line_plot_->reset_layout_ = true;
         }
         ImGui::EndMenu();

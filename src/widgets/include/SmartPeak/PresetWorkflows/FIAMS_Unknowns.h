@@ -24,6 +24,7 @@
 #pragma once
 
 #include <SmartPeak/PresetWorkflows/PresetWorkflow.h>
+#include <SmartPeak/ui/SplitWindow.h>
 
 namespace SmartPeak
 {
@@ -61,6 +62,11 @@ namespace SmartPeak
         "Nunc pellentesque sagittis lorem non interdum. Donec pulvinar laoreet velit, in cursus sapien lacinia quis. " 
         "Interdum et malesuada fames ac ante ipsum primis in faucibus. "
         "Cras tincidunt suscipit sem, id placerat elit lobortis a.";
+    };
+
+    virtual std::map<std::string, std::vector<std::shared_ptr<Widget>>> getLayout(const AllWindows& all_windows) const override
+    {
+      return {};
     };
 
   };
