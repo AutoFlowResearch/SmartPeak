@@ -59,64 +59,26 @@ namespace SmartPeak
         "Cras tincidunt suscipit sem, id placerat elit lobortis a.";
     };
 
-    virtual std::map<std::string, std::vector<std::shared_ptr<Widget>>> getLayout(const AllWindows& all_windows) const override
+    virtual std::map<std::string, std::vector<std::tuple<std::shared_ptr<Widget>, bool>>> getLayout(const AllWindows& all_windows) const override
     {
       return
       {
         {
           "top",
           {
-            all_windows.injections_explorer_window_,
-            all_windows.statistics_,
-            all_windows.sequence_main_window_,
-            all_windows.transitions_main_window_,
-            all_windows.spectrum_main_window_,
-            all_windows.workflow_,
-            all_windows.parameters_table_widget_,
-            all_windows.quant_method_main_window_,
-            all_windows.stds_consc_main_window_,
-            all_windows.comp_filters_main_window_,
-            all_windows.comp_group_filters_main_window_,
-            all_windows.comp_qc_main_window_,
-            all_windows.comp_group_qc_main_window_,
-            all_windows.comp_rsd_filters_main_window_,
-            all_windows.comp_group_rds_filters_main_window_,
-            all_windows.comp_rsdcqcs_main_window_,
-            all_windows.comp_group_rsdqcs_main_window_,
-            all_windows.comp_background_filters_main_window_,
-            all_windows.comp_group_background_filters_main_window_,
-            all_windows.comp_background_qcs_main_window_,
-            all_windows.comp_group_background_qcs_main_window_,
-            all_windows.comp_rsd_estimations_main_window_,
-            all_windows.comp_group_rsd_estimation_main_window_,
-            all_windows.comp_background_estimations_main_window_,
-            all_windows.comp_group_background_estimations_main_window_,
-            all_windows.features_table_main_window_,
-            all_windows.feature_matrix_main_window_,
-            all_windows.chromatogram_plot_widget_,
-            all_windows.chromatogram_tic_plot_widget_,
-            all_windows.chromatogram_ms1_xic_plot_widget_,
-            all_windows.chromatogram_ms2_xic_plot_widget_,
-            all_windows.spectra_plot_widget_,
-            all_windows.feature_line_plot_,
-            all_windows.heatmap_plot_widget_,
-            all_windows.calibrators_line_plot_
+            {all_windows.injections_explorer_window_, true}
           },
         },
         {
           "bottom",
           {
-          all_windows.quickInfoText_,
-          all_windows.log_widget_,
-          all_windows.spectra_msms_plot_widget_,
-          all_windows.spectra_ms2_plot_widget_,
+            {all_windows.log_widget_, true}
           },
         },
         {
           "left",
           {
-            all_windows.transitions_explorer_window_,
-            all_windows.features_explorer_window_
+            {all_windows.transitions_explorer_window_, true}
           },
         }
       };

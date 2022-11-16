@@ -52,16 +52,16 @@ namespace SmartPeak
 
     WindowSizesAndPositions win_size_and_pos_;
 
-    std::map<std::string, std::vector<std::shared_ptr<Widget>>> default_layout_;
+    std::map<std::string, std::vector<std::tuple<std::shared_ptr<Widget>,bool>>> default_layout_;
 
-    void resetLayout(const std::map<std::string, std::vector<std::shared_ptr<Widget>>>& layout);
+    void resetLayout(const std::map<std::string, std::vector<std::tuple<std::shared_ptr<Widget>, bool>>>& layout);
 
     const AllWindows& all_windows_;
 
   protected:
-    void showWindows(const std::vector<std::shared_ptr<Widget>> &windows);
+    void showWindows(const std::vector<std::tuple<std::shared_ptr<Widget>, bool>>&windows);
     bool reset_layout_ = true;
-    std::map<std::string, std::vector<std::shared_ptr<Widget>>> current_layout_;
-    std::map<std::string, std::vector<std::shared_ptr<Widget>>> new_layout;
+    std::map<std::string, std::vector<std::tuple<std::shared_ptr<Widget>, bool>>> current_layout_;
+    std::map<std::string, std::vector<std::tuple<std::shared_ptr<Widget>, bool>>> new_layout;
   };
 }
