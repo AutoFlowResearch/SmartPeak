@@ -15,8 +15,6 @@ set(sources_list_h
 	LCMS_DDA_Transitions_Library_Construction.h
 	LCMS_MRM_Standards.h
 	LCMS_MRM_Unknowns.h
-	LCMS_MRM_Validation_LP.h
-	LCMS_MRM_Validation_QMIP.h
 )
 
 ### add path to the filenames
