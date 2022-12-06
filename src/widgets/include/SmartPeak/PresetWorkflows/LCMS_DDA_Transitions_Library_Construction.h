@@ -43,7 +43,9 @@ namespace SmartPeak
         "SEARCH_SPECTRUM_MS1",
         "MERGE_FEATURES_MS1",
         "EXTRACT_SPECTRA_NON_TARGETED",
-        "STORE_MSP",
+        "SEARCH_SPECTRUM_MS2",
+        "MERGE_FEATURES_MS2",
+        "CONSTRUCT_TRANSITIONS_LIST",
         "STORE_FEATURES"
       };
     };
