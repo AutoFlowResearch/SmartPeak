@@ -67,13 +67,14 @@ namespace SmartPeak
           "top",
           {
             {all_windows.workflow_, true},
-            {all_windows.chromatogram_plot_widget_, true}
+            {all_windows.chromatogram_plot_widget_, true},
+            {all_windows.statistics_, true}
           },
         },
         {
           "bottom",
           {
-            {all_windows.log_widget_, true}
+            {all_windows.quickInfoText_, true}
           },
         },
         {
