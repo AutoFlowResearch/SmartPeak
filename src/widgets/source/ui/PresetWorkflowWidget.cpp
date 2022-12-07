@@ -18,7 +18,7 @@
 //
 // --------------------------------------------------------------------------
 // $Maintainer: Douglas McCloskey, Ahmed Khalil $
-// $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
+// $Authors: Douglas McCloskey, Bertrand Boudaud $
 // --------------------------------------------------------------------------
 
 #include <SmartPeak/ui/PresetWorkflowWidget.h>
@@ -38,8 +38,6 @@
 #include <SmartPeak/PresetWorkflows/LCMS_DDA_Transitions_Library_Construction.h>
 #include <SmartPeak/PresetWorkflows/LCMS_MRM_Standards.h>
 #include <SmartPeak/PresetWorkflows/LCMS_MRM_Unknowns.h>
-#include <SmartPeak/PresetWorkflows/LCMS_MRM_Validation_LP.h>
-#include <SmartPeak/PresetWorkflows/LCMS_MRM_Validation_QMIP.h>
 
 namespace SmartPeak
 {
@@ -73,9 +71,7 @@ namespace SmartPeak
       std::make_shared<LCMS_DDA_Spectra_Library_Matching>(),
       std::make_shared<LCMS_DDA_Transitions_Library_Construction>(),
       std::make_shared<LCMS_MRM_Standards>(),
-      std::make_shared<LCMS_MRM_Unknowns>(),
-      std::make_shared<LCMS_MRM_Validation_LP>(),
-      std::make_shared<LCMS_MRM_Validation_QMIP>()
+      std::make_shared<LCMS_MRM_Unknowns>()
     };
 
     ImVec2 preset_list_size = ImVec2(vMax.x * 0.3, vMax.y - buttons_space);

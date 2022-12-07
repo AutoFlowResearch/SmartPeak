@@ -18,7 +18,7 @@
 //
 // --------------------------------------------------------------------------
 // $Maintainer: Douglas McCloskey $
-// $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
+// $Authors: Douglas McCloskey, Bertrand Boudaud $
 // --------------------------------------------------------------------------
 
 #include <SmartPeak/ui/WorkflowWidget.h>
@@ -37,8 +37,6 @@
 #include <SmartPeak/PresetWorkflows/LCMS_DDA_Transitions_Library_Construction.h>
 #include <SmartPeak/PresetWorkflows/LCMS_MRM_Standards.h>
 #include <SmartPeak/PresetWorkflows/LCMS_MRM_Unknowns.h>
-#include <SmartPeak/PresetWorkflows/LCMS_MRM_Validation_LP.h>
-#include <SmartPeak/PresetWorkflows/LCMS_MRM_Validation_QMIP.h>
 
 #include <mutex> 
 
