@@ -348,7 +348,7 @@ split_window.default_layout_ =
     "left",
     {
       {injections_explorer_window_, true},
-      {transitions_explorer_window_, true },
+      {transitions_explorer_window_, false },
       {features_explorer_window_, false},
     },
   }
