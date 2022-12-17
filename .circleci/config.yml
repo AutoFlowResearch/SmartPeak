@@ -49,8 +49,9 @@ jobs:
           command: |
             cd ~ &&
             git clone --branch develop --depth 1 https://github.com/OpenMS/OpenMS.git &&
+            cd OpenMS &&
             git checkout 70ed07f1e9833d43337c8af4d87ae2ed8ec9f70b &&
-            cd OpenMS && git submodule update --init THIRDPARTY &&
+            git submodule update --init THIRDPARTY &&
             cmake -DBOOST_USE_STATIC=OFF -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Release -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF ~/OpenMS &&
             make -j4 OpenMS
       - run:
@@ -129,8 +130,8 @@ jobs:
           command: |
             cd ~ &&
             git clone --branch develop --depth 1 https://github.com/OpenMS/OpenMS.git &&
-            git checkout 70ed07f1e9833d43337c8af4d87ae2ed8ec9f70b &&
-            cd OpenMS
+            cd OpenMS &&
+            git checkout 70ed07f1e9833d43337c8af4d87ae2ed8ec9f70b
             mkdir contrib_build && cd contrib_build
             curl -C - -O https://abibuilder.cs.uni-tuebingen.de/archive/openms/contrib/macOS/10.15.4/x64/appleclang-11.0.0/contrib_build.tar.gz
             tar -xzf contrib_build.tar.gz
@@ -241,8 +242,8 @@ jobs:
           command: |
             cd ~
             git clone --branch develop --depth 1 https://github.com/OpenMS/OpenMS.git
-            git checkout 70ed07f1e9833d43337c8af4d87ae2ed8ec9f70b
             cd ~/OpenMS
+            git checkout 70ed07f1e9833d43337c8af4d87ae2ed8ec9f70b
       - run:
           name: Building OpenMS
           command: |
