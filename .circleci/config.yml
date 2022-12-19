@@ -113,7 +113,7 @@ jobs:
             brew install cppcheck gnuplot
             brew install libomp
             brew install eigen
-            pip3 install -r tools/smartpeak/requirements.txt
+            pip3 install -r tools/smartpeak/requirements.txt --user
       - run:
           name: "Pull latest (only release)"
           command: |
@@ -130,7 +130,7 @@ jobs:
             git clone --branch develop --depth 1 https://github.com/OpenMS/OpenMS.git &&
             cd OpenMS
             mkdir contrib_build && cd contrib_build
-            curl -C - -O https://abibuilder.informatik.uni-tuebingen.de/archive/openms/contrib/macOS/10.15.4/x64/appleclang-11.0.0/contrib_build.tar.gz
+            curl -C - -O https://abibuilder.cs.uni-tuebingen.de/archive/openms/contrib/macOS/10.15.4/x64/appleclang-11.0.0/contrib_build.tar.gz
             tar -xzf contrib_build.tar.gz
             sed -i '' 's/std::auto_ptr/std::unique_ptr/g' include/seqan/basic/test_system.h
             rm lib/libz.* && rm -rf lib/pkgconfig
@@ -254,7 +254,7 @@ jobs:
             }
             cd ~/OpenMS
             mkdir contrib_build; cd contrib_build
-            $url_contrib = 'https://abibuilder.informatik.uni-tuebingen.de/archive/openms/contrib/windows/x64/msvc-14.2/contrib_build.tar.gz'
+            $url_contrib = 'https://abibuilder.cs.uni-tuebingen.de/archive/openms/contrib/windows/x64/msvc-14.2/contrib_build.tar.gz'
             $contrib_tmp = New-TemporaryFile | Rename-Item -NewName { $_ -replace 'contrib_tmp$', 'tar.gz' } –PassThru
             Invoke-WebRequest $url_contrib -OutFile $contrib_tmp
             7z x $contrib_tmp -o'.'
@@ -378,7 +378,7 @@ jobs:
             apt-key adv --keyserver keyserver.ubuntu.com --recv-key C99B11DEB97541F0
             apt-add-repository https://cli.github.com/packages
             apt-get update
-            apt-get install -y gh curl wget jq
+            apt-get install -y --allow-unauthenticated gh curl wget jq
             pip install -r tools/smartpeak/requirements.txt
             GHR_VERSION=0.13.0
             GHR_URL=https://github.com/tcnksm/ghr/releases/download/v${GHR_VERSION}/ghr_v${GHR_VERSION}_linux_amd64.tar.gz
