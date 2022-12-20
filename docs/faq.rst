@@ -10,8 +10,7 @@ What types of experiments does SmartPeak support?
 
 SmartPeak supports various types of analytical chemistry experimental designs.  The experimental designs are specified in the sequence file by the ordering and grouping of sample types.  
 
-.. todo::
-    Images for different experimental designs.
+.. image:: ../images/MassSpecSchemas-01.png
 
 An example of a sequence for a bracketed experimental design common to targeted quantification experiments is provided below.
 
@@ -271,62 +270,88 @@ Feature metadata
 
     * - Type
       - Description
-    * - asymmetry_factor
-      - todo
-    * - baseline_delta_2_height
-      - todo
-    * - calculated_concentration
-      - todo
-    * - logSN
-      - todo
-    * - peak_apex_int
-      - todo
-    * - peak_area
-      - todo
-    * - points_across_baseline
-      - todo
-    * - points_across_half_height
-      - todo
-    * - QC_transition_pass
-      - todo
-    * - QC_transition_message
-      - todo
-    * - QC_transition_score
-      - todo
-    * - QC_transition_group_pass
-      - todo
-    * - QC_transition_group_message
-      - todo
-    * - QC_transition_group_score
-      - todo
     * - tailing_factor
-      - todo
+      - The tailing factor is a measure of peak tailing.
+        It is defined as the distance from the front slope of the peak to the back slope
+        divided by twice the distance from the center line of the peak to the front slope,
+        with all measurements made at 5% of the maximum peak height.
+        tailing_factor = Tf = W0.05/2a
+        where W0.05 is peak width at 5% max peak height
+        a = min width to peak maximum at 5% max peak height
+        b = max width to peak maximum at 5% max peak height
+        0.9 < Tf < 1.2
+        front Tf < 0.9
+        tailing Tf > 1.2
+    * - slope_of_baseline
+      - The slope of the baseline is a measure of slope change.
+        It is approximated as the difference in baselines between the peak start and peak end.
+    * - Convex hull
+      - The peak's hull points
+    * - asymmetry_factor
+      - The asymmetry factor is a measure of peak tailing.
+    * - asymmetry_factor
+      - The asymmetry factor is a measure of peak tailing.
+    * - asymmetry_factor
+      - The asymmetry factor is a measure of peak tailing.
+        It is defined as the distance from the center line of the peak to the back slope
+        divided by the distance from the center line of the peak to the front slope,
+        with all measurements made at 10% of the maximum peak height.
+        asymmetry_factor = As = b/a
+        where a is min width to peak maximum at 10% max peak height
+        b is max width to peak maximum at 10% max peak height
+    * - baseline_delta_2_height
+      - The change in baseline divided by the height is
+        a way of comparing the influence of the change of baseline on the peak height.
+    * - calculated_concentration
+      - The absolute concentration of the component determined by applying a quantitation method to transform the measured peak area or height to concentration.
+    * - logSN
+      - Log10 of the signal to noise ratio.
+    * - peak_apex_int
+      - The peak's highest intensity
+    * - peak_area
+      - The peak's computed area
+    * - points_across_baseline
+      - The number of points across the baseline.
+    * - points_across_half_height
+      - The number of points across half the peak's height.
+    * - QC_transition_pass
+      - True or False depending on whether the transition passed the user defined QC metrics.
+    * - QC_transition_message
+      - The failing transition QC metrics.
+    * - QC_transition_score
+      - The total score of all passing transition QC metrics
+    * - QC_transition_group_pass
+      - True or False depending on whether the transition group passed the user defined QC metrics.
+    * - QC_transition_group_message
+      - The failing transition group QC metrics.
+    * - QC_transition_group_score
+      - The total score of all passing transition group QC metrics
     * - total_width
-      - todo
+      - The peak's total width.
     * - width_at_50
-      - todo
+      - The width of the peak at 50% the peak's height.
     * - RT
-      - todo
+      - The position of the point with highest intensity.
     * - leftWidth
-      - todo
+      - The time or mass to charge of the left end of the peak.
     * - rightWidth
-      - todo
+      - the time or mass to charge of the right end of the peak.
     * - scan_polarity
-      - todo
+      - The polarity of the instrument (i.e., positive or negative for electrospray ionization)
     * - description
-      - todo
+      - The description of the component.
     * - modifications
-      - todo
+      - Adducts that were measured in addition to the component.
     * - chemical_formula
-      - todo
+      - The predicted chemical formula for the component.
     * - mz
-      - todo
+      - The mass to charge ratio.
     * - charge
-      - todo
+      - The charge of the component.
     * - mz_error_ppm
-      - todo
+      - The difference between measured and predicted mass to charge ratio error in parts per million.
     * - mz_error_Da
-      - todo
+      - The difference between measured and predicted mass to charge ratio error in Daltons
     * - average_accuracy
       - todo
     * - absolute_difference
