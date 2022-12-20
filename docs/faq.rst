@@ -1,15 +1,77 @@
 FAQ
 ===
 
-This is a list of Frequently Asked Questions about SmartPeak. Feel free to suggest new entries!
+This is a list of Frequently Asked Questions about SmartPeak.
 
 .. _sample-types
 
 What types of experiments does SmartPeak support?
 -------------------------------------------------
 
-.. todo::
-    Describe the different types of segmented sequences in SmartPeak.
+SmartPeak supports various types of analytical chemistry experimental designs.  The experimental designs are specified in the sequence file by the ordering and grouping of sample types.  An example of a sequence for a bracketed experimental design common to targeted quantification experiments is provided below.
+
+Bracketed sequence
+~~~~~~~~~~~~~~~~~~
+
+.. list-table::
+    :widths: 25 75
+    :header-rows: 1
+
+    * - sample_name
+      - sample_type
+      - sample_group_name
+      - sequence_segment
+    * - blank-1
+      - Blank
+      - blank-1
+      - segment-1
+    * - standard-1-low
+      - Standard
+      - standard-1
+      - segment-1
+    * - standard-1-medium
+      - Standard
+      - standard-1
+      - segment-1
+    * - standard-1-high
+      - Standard
+      - standard-1
+      - segment-1
+    * - sample-1-rep-1
+      - Unknown
+      - sample-1
+      - segment-1
+    * - sample-1-rep-2
+      - Unknown
+      - sample-1
+      - segment-1
+    * - sample-1-rep-3
+      - Unknown
+      - sample-1
+      - segment-1
+    * - blank-1
+      - Blank
+      - blank-1
+      - segment-1
+    * - standard-2-low
+      - Standard
+      - standard-2
+      - segment-1
+    * - standard-medium
+      - Standard
+      - standard-2
+      - segment-1
+    * - standard-2-high
+      - Standard
+      - standard-1
+      - segment-1
+
+All Blank, QC, Standard, and Unknown sample types that are a part of the same `sequence segment` are processed together.  This means that e.g., `background estimation`, `QC variance calculations`, and `quantitation method calculations` are calculated based off of the samples that are in the same `sequence segment` and applied to the samples in the same `sequence segment`.
+
+The different sample types that can be specified by the user are given below.
+
+Sample types
+~~~~~~~~~~~~
 
 .. list-table::
     :widths: 25 75
@@ -18,24 +80,26 @@ What types of experiments does SmartPeak support?
     * - Type
       - Description
     * - Unknown
-      - todo
+      - Normal samples of unknown concentration
     * - Standard
-      - todo
+      - Samples of known concentration. These samples are used for the creation of the calibration curve.
     * - QC
-      - todo
+      - Quality Controls. SmartPeak supports two types of quality control samples: 1) analytical controls and 2) process controls.  Analytical controls are samples of known concentration are used to check the accuracy of the calibration curve but do not influence its actual construction.  Process controls are a mix of biological replicates that are representative of the dataset and that are injected at standard intervals to estimate the variance given in the same matrix during the run.
     * - Blank
-      - todo
+      - These are generally samples containing the internal standard compounds, if used, but no analytes, and which have been through the normal sample preparation procedure.
     * - Double Blank
-      - todo
+      - These are samples with neither internal standards nor analytes.
     * - Solvent
-      - todo
+      - These are double blanks that have not been through the normal sample work-up procedure.
     * - Unrecognized
-      - todo
+      - User specified sample type that is not recognized by SmartPeak.
       
 .. _workflow-commands:
 
 What are the different types of data processing workflows that SmartPeak supports?
 ----------------------------------------------------------------------------------
+
+SmartPeak supports data processing workflows for quantitation, phenotyping, and discovery analytical chemistry applications.  Specifically, single reaction monitoring (SRM), single ion monitoring (SIM), full scan, data-dependent acquisition with product ion scans based off of SRM or full scan survey scans, and data-dependent acquisition (e.g., SWATH) with or without liquid or gas chromatography are supported.  High performance liquid chromatography (HPLC) with refractive index (RI) or ultra violet (UV) detection are also supported.  Data processing preset workflow for each of the supported workflows are available in SmartPeak.  The preset workflows can be customized by the user and saved for later re-use.  The available workflow steps are listed below.
 
 Raw Data Methods
 ~~~~~~~~~~~~~~~~
@@ -170,7 +234,6 @@ Sequence Segment Methods
     * - LOAD_FEATURE_BACKGROUND_ESTIMATIONS
       - Load the component and component group percent Background Interference estimations from file.
 
-
 Sample Group Methods
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -191,6 +254,11 @@ Sample Group Methods
 
 What types of feature metadata does SmartPeak record?
 -----------------------------------------------------
+
+Various feature metadata is calculated and recorded during workflow execution, and made available for viewing and reporting after workflow execution.  
+
+Feature metadata
+~~~~~~~~~~~~~~~~
 
 .. list-table::
     :widths: 25 75
@@ -264,6 +332,8 @@ What types of feature metadata does SmartPeak record?
 What do the integrity checks do?
 --------------------------------
 
+The integrity checks allow the user to check that the input files are consistent prior to executing a workflow.
+
 .. list-table:: 
     :widths: 25 75
     :header-rows: 1
@@ -271,13 +341,13 @@ What do the integrity checks do?
     * - Type
       - Description
     * - SAMPLE
-      - todo
+      - Are sample names consistent between the Sequence and StandardsConcentrations files?
     * - COMP
-      - todo
+      - Are the component_names consistent between the Transitions, QuantitationMethods, StandardsConcentrations, FeatureFilters, and FeatureQCs files?
     * - COMP_GROUP
-      - todo
+      - Are the component_group_names consistent between the Transitions, FeatureFilters, and FeatureQCs files?
     * - IS
-      - todo
+      - Is the same internal standard (IS) specified for the same component in the QuantitationMethods and StandardsConcentrations files? 
       
 .. _clear-data:
 
