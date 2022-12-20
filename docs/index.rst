@@ -27,7 +27,6 @@ SmartPeak
    :maxdepth: 1
 
    about/contribute
-   about/parameters
    about/developer
    api/library_root
    about/roadmap
