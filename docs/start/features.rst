@@ -1,13 +1,103 @@
 SmartPeak Features
 =============================================================================
 
-Select features from dilutions preference
+Audit trail
 -----------------------------------------------------------------------------
 
 Usage
 ~~~~~
 
-Once workflow has been run, we sometimes know that we will have more interresting features to analyse compared to others depending on the dilution factor of the corresponding sample that produced this feature for a specific component.
+.. todo::
+    Describe the usage.
+
+Example
+~~~~~~~
+
+.. todo::
+    Provide an example.
+
+Modify existing or create new data process workflows
+-----------------------------------------------------------------------------
+
+Usage
+~~~~~
+
+.. todo::
+    Describe the usage.
+
+Example
+~~~~~~~
+
+.. todo::
+    Provide an example.
+
+Optimize workflow step algorithm parameters
+-----------------------------------------------------------------------------
+
+Usage
+~~~~~
+
+.. todo::
+    Describe the usage.
+
+Example
+~~~~~~~
+
+.. todo::
+    Provide an example.
+
+Debug feature picking, selection, and filtering (and acquisition methods)
+-----------------------------------------------------------------------------
+
+Usage
+~~~~~
+
+.. todo::
+    Describe the usage.
+
+Example
+~~~~~~~
+
+.. todo::
+    Provide an example.
+
+Optimize calibration curves and quantitation methods
+-----------------------------------------------------------------------------
+
+Usage
+~~~~~
+
+.. todo::
+    Describe the usage.
+
+Example
+~~~~~~~
+
+.. todo::
+    Provide an example.
+
+Enable automated QC/QA of workflows
+-----------------------------------------------------------------------------
+
+Usage
+~~~~~
+
+.. todo::
+    Describe the usage.
+
+Example
+~~~~~~~
+
+.. todo::
+    Provide an example.
+
+Select features from the "best" dilution
+-----------------------------------------------------------------------------
+
+Usage
+~~~~~
+
+Once workflow has been run, we sometimes know that we will have more interesting features to analyse compared to others depending on the dilution factor of the corresponding sample that produced this feature for a specific component.
 
 SmartPeak allows to specify this selection as a step of the ``MERGE_INJECTIONS`` workflow step using the ``select_preferred_dilution`` parameter (false by default).
 

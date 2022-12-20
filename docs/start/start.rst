@@ -17,4 +17,4 @@ The best way to start with SmartPeak is to get familiar with following pages:
 
 * :doc:`../guide/install`.
 
-* :doc:`../guide/guistart`.
+* :doc:`../guide/gui`.
