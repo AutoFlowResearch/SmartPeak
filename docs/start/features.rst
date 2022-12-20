@@ -1,6 +1,8 @@
 SmartPeak Features
 =============================================================================
 
+SmartPeak provides a plethora of features for analytical chemistry data processing.  An incomplete set of features are described below.
+
 Audit trail
 -----------------------------------------------------------------------------
 
