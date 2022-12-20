@@ -19,6 +19,21 @@ Example
 Modify existing or create new data process workflows
 -----------------------------------------------------------------------------
 
+Creating, saving, and loading sessions
+-----------------------------------------------------------------------------
+
+Usage
+~~~~~
+
+.. todo::
+    Describe the usage.
+
+Example
+~~~~~~~
+
+.. todo::
+    Provide an example.
+
 Usage
 ~~~~~
 
