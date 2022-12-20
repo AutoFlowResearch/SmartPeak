@@ -364,6 +364,9 @@ What do the integrity checks do?
 
 The integrity checks allow the user to check that the input files are consistent prior to executing a workflow.
 
+Integrity checks
+~~~~~~~~~~~~~~~~
+
 .. list-table:: 
     :widths: 25 75
     :header-rows: 1

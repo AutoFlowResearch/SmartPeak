@@ -11,7 +11,7 @@ SmartPeak
    start/start
    start/features
    changelog
-   faq
+   start/faq
    
 .. toctree::
    :caption: Step-by-step guides
