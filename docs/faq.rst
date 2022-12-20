@@ -61,7 +61,7 @@ Bracketed sequence
       - Standard
       - standard-2
       - segment-1
-    * - standard-medium
+    * - standard-2-medium
       - Standard
       - standard-2
       - segment-1
