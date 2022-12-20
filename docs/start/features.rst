@@ -112,7 +112,8 @@ Select features from the "best" dilution
 Usage
 ~~~~~
 
-Once workflow has been run, we sometimes know that we will have more interesting features to analyse compared to others depending on the dilution factor of the corresponding sample that produced this feature for a specific component.
+Due to the orders of magnitude difference between different metabolite, lipid, and protein species concentrations in biological samples, one often needs to run the same sample at different concentrations to capture all of the different species within the limits of detection for the instrument.
+After processing each of the different sample dilutions (referred to as dilution_factor in SmartPeak), the user often would like to select a specific dilution that a particular component should be reported because that dilution has been found to provide the best signal to noise ratio for that component.
 
 SmartPeak allows to specify this selection as a step of the ``MERGE_INJECTIONS`` workflow step using the ``select_preferred_dilution`` parameter (false by default).
 
