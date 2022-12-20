@@ -9,7 +9,10 @@ This page describes the remote server for scaling SmartPeak to large and computa
     Describe the functionality of the SmartPeak Server.
 
 .. todo::
-    Describe how to use the SmartPeak Server.
+    Describe how to set-up the SmartPeak Server as an IT administrator.
+
+.. todo::
+    Describe how to connect to the SmartPeak Server as a user.
 
 .. warning::
     SmartPeak Server is currently experimental!

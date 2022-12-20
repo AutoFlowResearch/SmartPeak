@@ -13,8 +13,10 @@ Download SmartPeak from `GitHub <https://github.com/AutoFlowResearch/SmartPeak/r
 
 The best way to start with SmartPeak is to get familiar with following pages:
 
+* :doc:`faq`.
+
 * :doc:`features`.
 
 * :doc:`../guide/install`.
 
-* :doc:`../guide/gui`.
+* :doc:`../guide/usage`.

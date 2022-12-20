@@ -8,7 +8,12 @@ This is a list of Frequently Asked Questions about SmartPeak.
 What types of experiments does SmartPeak support?
 -------------------------------------------------
 
-SmartPeak supports various types of analytical chemistry experimental designs.  The experimental designs are specified in the sequence file by the ordering and grouping of sample types.  An example of a sequence for a bracketed experimental design common to targeted quantification experiments is provided below.
+SmartPeak supports various types of analytical chemistry experimental designs.  The experimental designs are specified in the sequence file by the ordering and grouping of sample types.  
+
+.. todo::
+    Images for different experimental designs.
+
+An example of a sequence for a bracketed experimental design common to targeted quantification experiments is provided below.
 
 Bracketed sequence
 ~~~~~~~~~~~~~~~~~~
