@@ -20,7 +20,8 @@ jobs:
             export DEBIAN_FRONTEND=noninteractive && apt-get install -y tzdata &&  
             ln -fs /usr/share/zoneinfo/UTC /etc/localtime &&
             dpkg-reconfigure --frontend noninteractive tzdata &&
-            apt-get install -y cmake qt5-default libeigen3-dev &&
+            apt-get install -y cmake=3.21.0
+            apt-get install -y qt5-default libeigen3-dev &&
             apt-get install -y libboost-all-dev &&
             apt-get install -y libxerces-c-dev coinor-libcbc-dev libsvm-dev &&
             apt-get install -y libwildmagic-dev libsqlite3-dev &&
@@ -211,7 +212,7 @@ jobs:
             [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
             $ProgressPreference = "SilentlyContinue"
             Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
-            choco install cmake --version=3.17.2 --installargs '"ADD_CMAKE_TO_PATH=System"'
+            choco install cmake --version=3.21.0 --installargs '"ADD_CMAKE_TO_PATH=System"'
             choco install gnuplot.portable
             choco install doxygen.install
             choco install nsis.portable
