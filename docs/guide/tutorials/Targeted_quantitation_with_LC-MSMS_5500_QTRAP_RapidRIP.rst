@@ -47,15 +47,22 @@ added or deleted direclty from SmartPeakGUI.
 A detailed explanation of each command step
 can be found in :ref:`Workflow Commands`.
 
-	* LOAD_RAW_DATA
-	* MAP_CHROMATOGRAMS
-	* PICK_MRM_FEATURES
-	* CHECK_FEATURES
-	* SELECT_FEATURES
-	* CALCULATE_CALIBRATION
-	* STORE_QUANTITATION_METHODS
-	* QUANTIFY_FEATURES
-	* STORE_FEATURES
+.. table:: LCMS SRM Standards workflow commands
+	:widths: auto
+
+	=========================================
+	Workflow command
+	=========================================
+	LOAD_RAW_DATA
+	MAP_CHROMATOGRAMS
+	PICK_MRM_FEATURES
+	CHECK_FEATURES
+	SELECT_FEATURES
+	CALCULATE_CALIBRATION
+	STORE_QUANTITATION_METHODS
+	QUANTIFY_FEATURES
+	STORE_FEATURES
+	=========================================
 
 	The calibration curve for each transition's quantitation method can be inspected after all workflow steps have been run, to do so please
 	click on view and then "Calibrators". From the transition tab select Antranilicacid and Indole
@@ -92,13 +99,20 @@ can be found in :ref:`Workflow Commands`.
 
 The workflow steps for LC-MS/MS-SRM Unknowns are :
 
-	* LOAD_RAW_DATA
-	* MAP_CHROMATOGRAMS
-	* PICK_MRM_FEATURES
-	* QUANTIFY_FEATURES
-	* CHECK_FEATURES
-	* SELECT_FEATURES
-	* STORE_FEATURES
+.. table:: LCMS SRM Unknowns workflow commands
+	:widths: auto
+
+	=========================================
+	Workflow command
+	=========================================
+	LOAD_RAW_DATA
+	MAP_CHROMATOGRAMS
+	PICK_MRM_FEATURES
+	QUANTIFY_FEATURES
+	CHECK_FEATURES
+	SELECT_FEATURES
+	STORE_FEATURES
+	=========================================
 
 	To inspect the features for the selected transition groups, select "Features (line)" from the view menu
 	then open the features tab (can be opened from the view menu as well) to select the "asymetry_factors" and "logSN"

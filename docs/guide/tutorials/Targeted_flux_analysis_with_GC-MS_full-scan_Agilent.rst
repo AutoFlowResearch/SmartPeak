@@ -3,7 +3,7 @@ Targeted flux analysis with GC-MS full-scan Agilent
 
 This tutorial walks you through the workflow for analyzing targeted full-scan flux analysis 
 using SIM GC-MS data starting from input file generation, to processing the data in SmartPeak, 
-to reviewing the data in SmartPeak, to reporting the results for later use.
+to reviewing the data in SmartPeak, to reporting the results.
 
 Objectives
 ~~~~~~~~~~
@@ -41,18 +41,25 @@ added or deleted direclty from SmartPeakGUI within the "workflow" tap in the rig
 A detailed explanation of each command step
 can be found in :ref:`Workflow Commands`.
 
-	* LOAD_RAW_DATA
-	* MAP_CHROMATOGRAMS
-	* EXTRACT_CHROMATOGRAM_WINDOWS
-	* ZERO_CHROMATOGRAM_BASELINE
-	* PICK_MRM_FEATURES
-	* QUANTIFY_FEATURES
-	* CHECK_FEATURES
-	* SELECT_FEATURES
-	* CALCULATE_MDVS
-	* ISOTOPIC_CORRECTIONS
-	* CALCULATE_MDV_ACCURACIES
-	* STORE_FEATURES
+.. table:: GCMS Full Scan Unknowns workflow commands
+	:widths: auto
+
+	=========================================
+	Workflow command
+	=========================================
+	LOAD_RAW_DATA
+	MAP_CHROMATOGRAMS
+	EXTRACT_CHROMATOGRAM_WINDOWS
+	ZERO_CHROMATOGRAM_BASELINE
+	PICK_MRM_FEATURES
+	QUANTIFY_FEATURES
+	CHECK_FEATURES
+	SELECT_FEATURES
+	CALCULATE_MDVS
+	ISOTOPIC_CORRECTIONS
+	CALCULATE_MDV_ACCURACIES
+	STORE_FEATURES
+	=========================================
 
 	The workflow pipeline is initialized by loading the raw data followed 
 	by mapping the chromatograms to the loaded set of transitions. Once done,

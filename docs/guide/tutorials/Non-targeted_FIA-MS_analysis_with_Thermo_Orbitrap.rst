@@ -81,19 +81,26 @@ added or deleted direclty from SmartPeakGUI within the "workflow" tap in the rig
 A detailed explanation of each command step
 can be found in :ref:`Workflow Commands`.
 
-	* LOAD_RAW_DATA
-	* EXTRACT_SPECTRA_WINDOWS
-	* MERGE_SPECTRA
-	* PICK_MS1_FEATURES
-	* SEARCH_ACCURATE_MASS
-	* STORE_ANNOTATIONS
-	* STORE_FEATURES
-	* ESTIMATE_FEATURE_BACKGROUND_INTERFERENCES
-	* STORE_FEATURE_BACKGROUND_ESTIMATIONS
-	* FILTER_FEATURES_BACKGROUND_INTERFERENCES
-	* MERGE_FEATURES
-	* MERGE_INJECTIONS
-	* STORE_FEATURES_SAMPLE_GROUP
+.. table:: FIAMS workflow commands
+	:widths: auto
+
+	=========================================
+	Workflow command
+	=========================================
+	LOAD_RAW_DATA
+	EXTRACT_SPECTRA_WINDOWS
+	MERGE_SPECTRA
+	PICK_MS1_FEATURES
+	SEARCH_ACCURATE_MASS
+	STORE_ANNOTATIONS
+	STORE_FEATURES
+	ESTIMATE_FEATURE_BACKGROUND_INTERFERENCES
+	STORE_FEATURE_BACKGROUND_ESTIMATIONS
+	FILTER_FEATURES_BACKGROUND_INTERFERENCES
+	MERGE_FEATURES
+	MERGE_INJECTIONS
+	STORE_FEATURES_SAMPLE_GROUP
+	=========================================
 
 	The workflow pipeline is initialized by loading the raw data followed 
 	by extracting the spectra windows based on the given parameters by the user
@@ -103,10 +110,14 @@ can be found in :ref:`Workflow Commands`.
 	to disk as ``mzTab`` and ``featureXML`` file formats respectively. 
 	The feature list can be saved before or after the features are annotated using the mass search routine 
 	depending upon whether a user would like to re-process the feature list using different accurate
-	mass search databases. In addition, options are included for retaining or removing features that were not annotated. 
+	mass search databases. Options are included for retaining or removing features that were not annotated. 
+	
 	A major processing step in this workflow is to estimate the Background Interferences 
-	for component feature from blank samples followed by storing component percent Background Interference 
-	estimations to disk. Then, components can be filtered based on their percentage signal intensity found in the blanks and specified by the user. 
+	for component features from blank samples. 
+	Blank samples in the ``same sequence_segment`` are used to estimate the average Background Intereference for each user specified component.
+	The Background Intereference Estimates are saved to disk for inspection and re-use. 
+	Then, components can be filtered based on their percentage signal intensity found in the blanks and specified by the user. 
+	
 	Another major processing step in the workflow is the merging of features and injections.
 	Adducts corresponding to the same compound are merged into a single feature. 
 	Injections corresponding to a single sample are merged into a single sample. 

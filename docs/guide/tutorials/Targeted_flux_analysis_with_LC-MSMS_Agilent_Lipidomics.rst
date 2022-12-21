@@ -3,7 +3,7 @@ Targeted flux analysis with LC-MS/MS Agilent Lipidomics
 
 This tutorial walks you through the workflow for analyzing targeted flux analysis 
 using LC-MS/MS data starting from input file generation, to processing the data in SmartPeak, 
-to reviewing the data in SmartPeak, to reporting the results for later use.
+to reviewing the data in SmartPeak, to reporting the results.
 
 Objectives
 ~~~~~~~~~~
@@ -41,12 +41,19 @@ added or deleted direclty from SmartPeakGUI within the "workflow" tap in the rig
 A detailed explanation of each command step
 can be found in :ref:`Workflow Commands`.
 
-	* LOAD_RAW_DATA
-	* MAP_CHROMATOGRAMS
-	* PICK_MRM_FEATURES
-	* FILTER_FEATURES
-	* CHECK_FEATURES
-	* STORE_FEATURES
+.. table:: LCMS Unknowns workflow commands
+	:widths: auto
+
+	=========================================
+	Workflow command
+	=========================================
+	LOAD_RAW_DATA
+	MAP_CHROMATOGRAMS
+	PICK_MRM_FEATURES
+	FILTER_FEATURES
+	CHECK_FEATURES
+	STORE_FEATURES
+	=========================================
 
 	The workflow pipeline is initialized by loading the raw data followed 
 	by mapping the chromatograms to the loaded set og transitions. Once done, the peak picking routine
