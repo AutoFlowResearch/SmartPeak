@@ -1,9 +1,11 @@
-Non-targeted FIA-MS analysis with Thermo Orbitrap
+Non-targeted analysis using FIA-MS acquisition
 -------------------------------------------------
+
+.. image:: ../../images/MassSpecSchemas-FIAMS.png
 
 This tutorial walks you through the workflow for analyzing non-targeted FIA-MS 
 data starting from input file generation, to processing the data in SmartPeak, 
-to reviewing the data in SmartPeak, to reporting the results for later use.
+to reviewing the data in SmartPeak, to reporting the results.
 
 Objectives
 ~~~~~~~~~~
@@ -18,6 +20,12 @@ The Workflows include
 #. Defining the accurate mass search database
 #. Processing Unknowns
 #. Reviewing the results
+
+Notes
+~~~~~
+
+The algorithm parameters used in the following workflows have been highly tuned for feature detection using the Thermo Orbitrap technology.  
+Slight modifications to the algorithm parameters in the ``FIAMS``, ``Pick2DFeatures``, and ``AccurateMassSearchEngine`` sections are needed for Time of Flight (ToF) technologies.
 
 Steps
 ~~~~~

@@ -11,6 +11,10 @@ The datasets and input files can be used as templates for getting started with a
 
 * :doc:`tutorials/Non-targeted_FIA-MS_analysis_with_Thermo_Orbitrap`.
 
+* :doc:`tutorials/Non-targeted_LC-MSMS_DDA_analysis_with_Thermo_Orbitrap`.
+
+* :doc:`tutorials/Non-targeted_LC-MSMS_DIA_analysis`.
+
 * :doc:`tutorials/Targeted_flux_analysis_with_LC-MSMS_Agilent_Lipidomics`.
 
 * :doc:`tutorials/Targeted_flux_analysis_with_GC-MS_SIM_Agilent`.
