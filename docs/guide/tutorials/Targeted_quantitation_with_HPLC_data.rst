@@ -18,6 +18,12 @@ The Workflows include
 #. Calculating the calibration curves to generate quantitation methods for each component using Standard samples
 #. Processing Unknown samples using the quantitation methods
 
+Notes
+~~~~~
+
+Due to the non-standard formats used by HPLC and GC vendors, customized raw data file parsing routines are needed.  
+Currently, Thermo HPLC text file inputs are supported.  Additional vendor input files can be supported upon request.
+
 Steps
 ~~~~~
 
