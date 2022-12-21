@@ -3,7 +3,7 @@ Targeted quantitation with HPLC data
 
 This tutorial walks you through the workflow for analyzing targeted HPLC data
 starting from input file generation, to processing the data in SmartPeak, 
-to reviewing the data in SmartPeak, to reporting the results for later use.
+to reviewing the data in SmartPeak, to reporting the results.
 
 Objectives
 ~~~~~~~~~~
@@ -15,8 +15,8 @@ Objectives
 The Workflows include
 ~~~~~~~~~~~~~~~~~~~~~
 
-#. Calculating the calibration curves using Standards
-#. Processing Unknowns
+#. Calculating the calibration curves to generate quantitation methods for each component using Standard samples
+#. Processing Unknown samples using the quantitation methods
 
 Steps
 ~~~~~
@@ -50,7 +50,7 @@ can be found in :ref:`Workflow Commands`.
 	* QUANTIFY_FEATURES
 	* STORE_FEATURES
 
-	The calibration curve can be inspected after all workflow steps had been run, to do so please
+	The calibration curve for each transition's quantitation method can be inspected after all workflow steps have been run, to do so please
 	click on view and then "Calibrators". From the transition tab select Antranilicacid and Indole
 	as ``transition_group`` to plot their concentration curves within the given concentration range as
 	shown below:
@@ -116,7 +116,7 @@ The workflow steps for HPLC UV Unknowns are :
 
 	To run the analysis, please follow the steps for 
 	:ref:`Using SmartPeak GUI` or :ref:`Using SmartPeak CLI`
-	to execute the workflow steps and review the results including plotting.
+	to execute the workflow steps, review the results, and report the results.
 
 #. Reporting the results
 
