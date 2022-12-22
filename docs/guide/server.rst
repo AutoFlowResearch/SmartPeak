@@ -16,3 +16,5 @@ This page describes the remote server for scaling SmartPeak to large and computa
 
 .. warning::
     SmartPeak Server is currently experimental!
+
+.. end_smartpeak_server_usage
