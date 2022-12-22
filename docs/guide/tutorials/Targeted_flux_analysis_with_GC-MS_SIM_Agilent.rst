@@ -5,6 +5,8 @@ This tutorial walks you through the workflow for analyzing targeted flux analysi
 using SIM GC-MS/MS data starting from input file generation, to processing the data in SmartPeak, 
 to reviewing the data in SmartPeak, to reporting the results for later use.
 
+.. image:: ../../images/MassSpecSchemas-GCMSSIM.png
+
 Objectives
 ~~~~~~~~~~
 

@@ -1,11 +1,11 @@
 Non-targeted analysis using LC-MS/MS DDA acquisition
 ----------------------------------------------------
 
-.. image:: ../../images/MassSpecSchemas-DDA.png
-
 This tutorial walks you through the workflow for analyzing non-targeted liquid chromatography high resolution mass spectrometry (LC-MS/MS) data-dependent acquisition (DDA) 
 data starting from input file generation, to processing the data in SmartPeak, 
 to reviewing the data in SmartPeak, to reporting the results.
+
+.. image:: ../../images/MassSpecSchemas-DDA.png
 
 Objectives
 ~~~~~~~~~~

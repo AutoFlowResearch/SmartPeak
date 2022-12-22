@@ -1,11 +1,11 @@
 Non-targeted analysis using LC-MS/MS DIA acquisition
 ----------------------------------------------------
 
-.. image:: ../../images/MassSpecSchemas-DIA.png
-
 This tutorial walks you through the workflow for analyzing non-targeted liquid chromatography high resolution mass spectrometry (LC-MS/MS) data-independent acquisition (DIA) 
 data starting from input file generation, to processing the data in SmartPeak, 
 to reviewing the data in SmartPeak, to reporting the results.
+
+.. image:: ../../images/MassSpecSchemas-DIA.png
 
 Objectives
 ~~~~~~~~~~

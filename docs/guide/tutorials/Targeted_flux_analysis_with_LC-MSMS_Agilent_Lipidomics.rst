@@ -5,6 +5,8 @@ This tutorial walks you through the workflow for analyzing targeted flux analysi
 using LC-MS/MS data starting from input file generation, to processing the data in SmartPeak, 
 to reviewing the data in SmartPeak, to reporting the results.
 
+.. image:: ../../images/MassSpecSchemas-SRM.png
+
 Objectives
 ~~~~~~~~~~
 

@@ -1,11 +1,11 @@
 Targeted quantitation using LC-MS/MS-SRM acquisition
 ----------------------------------------------------
 
-.. image:: ../../images/MassSpecSchemas-SRM.png
-
 This tutorial walks you through the workflow for analyzing targeted single reaction monitoring (SRM) data
 starting from input file generation, to processing the data in SmartPeak, 
 to reviewing the data in SmartPeak, to reporting the results.
+
+.. image:: ../../images/MassSpecSchemas-SRM.png
 
 Objectives
 ~~~~~~~~~~
