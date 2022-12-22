@@ -47,25 +47,22 @@ added or deleted direclty from SmartPeakGUI within the "workflow" tap in the rig
 A detailed explanation of each command step
 can be found in :ref:`Workflow Commands`.
 
-.. table:: GCMS SIM Unknowns workflow commands
-	:widths: auto
+	.. list-table:: workflow_GCMSSIM_Flux_Unknowns.csv
+	  :header-rows: 1
 
-	=========================================
-	Workflow command
-	=========================================
-	LOAD_RAW_DATA
-	MAP_CHROMATOGRAMS
-	EXTRACT_CHROMATOGRAM_WINDOWS
-	ZERO_CHROMATOGRAM_BASELINE
-	PICK_MRM_FEATURES
-	QUANTIFY_FEATURES
-	CHECK_FEATURES
-	SELECT_FEATURES
-	CALCULATE_MDVS
-	ISOTOPIC_CORRECTIONS
-	CALCULATE_MDV_ACCURACIES
-	STORE_FEATURES
-	=========================================
+	  * - workflow_step
+	  * - LOAD_RAW_DATA
+	  * - MAP_CHROMATOGRAMS
+	  * - EXTRACT_CHROMATOGRAM_WINDOWS
+	  * - ZERO_CHROMATOGRAM_BASELINE
+	  * - PICK_MRM_FEATURES
+	  * - QUANTIFY_FEATURES
+	  * - CHECK_FEATURES
+	  * - SELECT_FEATURES
+	  * - CALCULATE_MDVS
+	  * - ISOTOPIC_CORRECTIONS
+	  * - CALCULATE_MDV_ACCURACIES
+	  * - STORE_FEATURES
 
 	The workflow pipeline is initialized by loading the raw data followed 
 	by mapping the chromatograms to the loaded set of transitions. Once done,

@@ -47,19 +47,16 @@ added or deleted direclty from SmartPeakGUI within the "workflow" tap in the rig
 A detailed explanation of each command step
 can be found in :ref:`Workflow Commands`.
 
-.. table:: LCMS Unknowns workflow commands
-	:widths: auto
+	.. list-table:: workflow_LCMS_Flux_Unknowns.csv
+	  :header-rows: 1
 
-	=========================================
-	Workflow command
-	=========================================
-	LOAD_RAW_DATA
-	MAP_CHROMATOGRAMS
-	PICK_MRM_FEATURES
-	FILTER_FEATURES
-	CHECK_FEATURES
-	STORE_FEATURES
-	=========================================
+	  * - workflow_step
+	  * - LOAD_RAW_DATA
+	  * - MAP_CHROMATOGRAMS
+	  * - PICK_MRM_FEATURES
+	  * - FILTER_FEATURES
+	  * - CHECK_FEATURES
+	  * - STORE_FEATURES
 
 	The workflow pipeline is initialized by loading the raw data followed 
 	by mapping the chromatograms to the loaded set og transitions. Once done, the peak picking routine

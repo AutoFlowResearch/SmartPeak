@@ -81,26 +81,23 @@ added or deleted direclty from SmartPeakGUI within the "workflow" tap in the rig
 A detailed explanation of each command step
 can be found in :ref:`Workflow Commands`.
 
-.. table:: FIAMS workflow commands
-	:widths: auto
+	.. list-table:: workflow_FIAMS_Unknowns.csv
+	  :header-rows: 1
 
-	=========================================
-	Workflow command
-	=========================================
-	LOAD_RAW_DATA
-	EXTRACT_SPECTRA_WINDOWS
-	MERGE_SPECTRA
-	PICK_MS1_FEATURES
-	SEARCH_ACCURATE_MASS
-	STORE_ANNOTATIONS
-	STORE_FEATURES
-	ESTIMATE_FEATURE_BACKGROUND_INTERFERENCES
-	STORE_FEATURE_BACKGROUND_ESTIMATIONS
-	FILTER_FEATURES_BACKGROUND_INTERFERENCES
-	MERGE_FEATURES
-	MERGE_INJECTIONS
-	STORE_FEATURES_SAMPLE_GROUP
-	=========================================
+	  * - workflow_step
+	  * - LOAD_RAW_DATA
+	  * - EXTRACT_SPECTRA_WINDOWS
+	  * - MERGE_SPECTRA
+	  * - PICK_MS1_FEATURES
+	  * - SEARCH_ACCURATE_MASS
+	  * - STORE_ANNOTATIONS
+	  * - STORE_FEATURES
+	  * - ESTIMATE_FEATURE_BACKGROUND_INTERFERENCES
+	  * - STORE_FEATURE_BACKGROUND_ESTIMATIONS
+	  * - FILTER_FEATURES_BACKGROUND_INTERFERENCES
+	  * - MERGE_FEATURES
+	  * - MERGE_INJECTIONS
+	  * - STORE_FEATURES_SAMPLE_GROUP
 
 	The workflow pipeline is initialized by loading the raw data followed 
 	by extracting the spectra windows based on the given parameters by the user
