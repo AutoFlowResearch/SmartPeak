@@ -1,5 +1,5 @@
-Targeted quantitation with HPLC data
-------------------------------------
+Targeted quantitation using HPLC IR and UV acquisition
+------------------------------------------------------
 
 This tutorial walks you through the workflow for analyzing targeted HPLC data
 starting from input file generation, to processing the data in SmartPeak, 
@@ -44,7 +44,7 @@ added or deleted direclty from SmartPeakGUI.
 A detailed explanation of each command step
 can be found in :ref:`Workflow Commands`.
 
-	.. list-table:: workflow_HPLC_UV_Standards
+	.. list-table:: workflow_HPLC_UV_Standards.csv
 	  :header-rows: 1
 
 	  * - workflow_step
@@ -95,7 +95,7 @@ can be found in :ref:`Workflow Commands`.
 
 The workflow steps for HPLC UV Unknowns are :
 
-	.. list-table:: workflow_HPLC_UV_Unknowns
+	.. list-table:: workflow_HPLC_UV_Unknowns.csv
 	  :header-rows: 1
 
 	  * - workflow_step

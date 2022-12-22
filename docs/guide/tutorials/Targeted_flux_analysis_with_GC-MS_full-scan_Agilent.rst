@@ -1,5 +1,5 @@
-Targeted flux analysis with GC-MS full-scan Agilent
----------------------------------------------------
+Targeted flux analysis using GC-MS full-scan acquisition
+--------------------------------------------------------
 
 This tutorial walks you through the workflow for analyzing targeted full-scan flux analysis 
 using SIM GC-MS data starting from input file generation, to processing the data in SmartPeak, 
@@ -17,6 +17,12 @@ The Workflows include
 
 #. Processing Unknowns
 #. Reviewing the results
+
+Notes
+~~~~~
+
+The algorithm parameters used in the following workflows have been highly tuned for feature detection using an Agilent GC and single quad system.  
+With that said, we have found the algorithm parameters to generalize well to most gas chromatography coupled to mass spectrometry systems.
 
 Steps
 ~~~~~

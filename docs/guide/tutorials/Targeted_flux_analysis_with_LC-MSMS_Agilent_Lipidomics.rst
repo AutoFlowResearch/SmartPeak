@@ -1,5 +1,5 @@
-Targeted flux analysis with LC-MS/MS Agilent Lipidomics
--------------------------------------------------------
+Targeted flux analysis using LC-MS/MS-SRM acquisition
+-----------------------------------------------------
 
 This tutorial walks you through the workflow for analyzing targeted flux analysis 
 using LC-MS/MS data starting from input file generation, to processing the data in SmartPeak, 
@@ -17,6 +17,12 @@ The Workflows include
 
 #. Processing Unknowns
 #. Reviewing the results
+
+Notes
+~~~~~
+
+The algorithm parameters used in the following workflows have been highly tuned for feature detection using tan Agilent HPLC and triple quad systems.  
+With that said, we have found the algorithm parameters to generalize well to most liquid chromatography coupled to mass spectrometry systems.
 
 Steps
 ~~~~~
