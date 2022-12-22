@@ -1,11 +1,11 @@
 Non-targeted analysis using FIA-MS acquisition
 -------------------------------------------------
 
-.. image:: ../../images/MassSpecSchemas-FIAMS.png
-
 This tutorial walks you through the workflow for analyzing non-targeted FIA-MS 
 data starting from input file generation, to processing the data in SmartPeak, 
 to reviewing the data in SmartPeak, to reporting the results.
+
+.. image:: ../../images/MassSpecSchemas-FIAMS.png
 
 Objectives
 ~~~~~~~~~~

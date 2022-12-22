@@ -77,7 +77,7 @@ can be found in :ref:`Workflow Commands`.
 	alignment algorithms is executed. Mass distribution vectors can then be 
 	calculated followed by isotopic corrections and comparing the MDVs to the
 	theoretical values. As the final step in the workflow, the features
-	 for the sample group is stored to disk as a ``featureXML`` files.
+	for the sample group is stored to disk as a ``featureXML`` files.
 
 	To plot the intensities over time for given injections and transitions, view the "chromatogram" from the "view" menu
 	then select the injections and transitions to plot from their respective tabs on the left. The following shows the chromatogram
@@ -90,10 +90,10 @@ can be found in :ref:`Workflow Commands`.
 
 	.. image:: ../../images/gcms_sim_unknowns_heatmap.png
 
-	#. Reporting the results
+#. Reporting the results
 
-	To export the results, select "Report" from the "Actions" which will show the 
-	"Create Report" window:
+To export the results, select "Report" from the "Actions" which will show the 
+"Create Report" window:
 
 	.. image:: ../../images/lcms_targeted_flux_exports.png
 

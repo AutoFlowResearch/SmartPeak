@@ -71,7 +71,7 @@ can be found in :ref:`Workflow Commands`.
 	then select the injections and transitions to plot from their respective tabs on the left. The following shows the chromatogram
 	for one injection using 6pgc and 23dpg transitions and their intensity differences over time.
 
-	.. image:: ../images/lcms_targeted_chromatogram.png
+	.. image:: ../images/lcms_targeted_flux_chromatogram.png
 
 	The Spectra for the two injection samples can be inspected after all workflow steps had been run, to do so please
 	click on view and then "Spectra". From the Injections tab check "Plot/Unplot All" select all injection samples and 
