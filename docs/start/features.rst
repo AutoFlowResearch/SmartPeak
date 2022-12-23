@@ -34,12 +34,10 @@ An example set of optimized workflows have been given presets within SmartPeak f
 Please see :ref:`tutorials` for in depth walkthroughs for using each of the preset workflows.
 The workflow presets are also a good starting point for developing a custom workflow.
 Workflow steps can be added or removed using the GUI.
+Modified workflows can be saved to a ``workflow.csv`` file and loaded into SmartPeak.
 
 .. todo::
     Workflow modification screen shots.
-
-A complete list of workflow steps and their description can be found in the :ref:`faq`.
-Customized workflows can be saved as a ``workflow.csv`` file and loaded into SmartPeak.
 
 Workflow execution engine
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -59,6 +57,15 @@ While the number of CPU cores/threads determines the number of samples that can 
 If you find that workflows are taking a long time, we recommend profiling the system memory to see if your computer is out of memory.
 Please see the :ref:`faq` for tips on how to improve system memory utilization for workflows involved large numbers of samples and large data files (e.g., non-targeted metabolomics).
 
+Workflow steps
+~~~~~~~~~~~~~~
+
+All workflow steps are written in modern C++ so that workflows are as fast and safe as possible.
+Many of workflow steps that involve complex algorithms are wrappers around classes or functions that have been deposited in the open-source mass spectrometry library `OpenMS<https://github.com/OpenMS/OpenMS>`_ an externally validated by the open-source community or scientific reviewers if the works were published in a peer-reviewed journal.
+SmartPeak integrates with the classes and functions natively so that workflows can be executed in memory without the need for expensive and time consuming disk IO.
+SmartPeak also provides logging, exception handling, and other facilities that would be expected of a professional application to ensure robust and reliable execution of open-source algorithms.
+A complete list of workflow steps and their description can be found in the :ref:`faq`.
+The SmartPeak team closely collaborates with the open-source community including with the developers at OpenMS, so if you have a workflow step request, please contact us.
 
 Creating, saving, and loading sessions
 -----------------------------------------------------------------------------
