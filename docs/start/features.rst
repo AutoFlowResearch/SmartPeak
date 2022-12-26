@@ -154,17 +154,42 @@ Optimize calibration curves and quantitation methods
 Usage
 ~~~~~
 
-.. todo::
-    Describe the usage.
+SmartPeak provides algorithms and workflow steps for automatically optimizing calibration curves.
+The user must first specify the quantitation method for each component to use for each transition and the amount of standards for each component in the Standards samples.
+The QuantitationMethods.csv and StandardsConcentrations.csv files, respectively, are used for these purposes.
+The user can optimize all calibration curves automatically using the workflow steps for ``OPTIMIZE_CALIBRATION`` and ``STORE_QUANTITATION_METHODS``.
+The user can then review all calibration curves in the GUI to further optimize the quantitation methods semi-manually.
 
 Example
 ~~~~~~~
 
+After running the workflow, the calibration curves for each quantitation method are available to view.
+The quantitation method parameters are shown on the left and the calibration curve and points are shown on the right.
+The user has the option to view different components and sequence segments using the menu on the top left.
+The user can also modify the quantitation method input parameters on the left.
+
 .. image:: ../images/calibrators.png
+
+Each point (i.e.., Injection) can be hovered over and a tooltip will display with additional information about that particular point
+
 .. image:: ../images/calibrators_tooltip.png
+
+Each point can be right clicked to bring up a menu that allows for showing the chromatogram for the point or including/excluding the point from the calibration curve.
+
 .. image:: ../images/calibrators_chromatogram_select.png
+
+Selecting ``Show chromatogram`` brings up the chromatogram view for that point.
+
 .. image:: ../images/calibrators_chromatogram.png
+
+Selecting ``Exclude from calibration`` will remove the point from the calibration curve.
+If ``Fit calibration`` is selected in the ``Actions`` menu of the Calibrators view, the quantitation method will be re-calculated without the point included.
+If ``Optimize calibrations`` is selected in the ``Actions`` menu of the Calibrators view, the quantitation method will be re-optimized using the workflow step ``OPTIMIZE_CALIBRATION``.
+
 .. image:: ../images/calibrators_refit.png
+
+A tabular view of all quantitation methods can be found under ``View | Workflow parameters | Quantitation methods``.
+
 .. image:: ../images/calibrators_quant_methods.png
 
 Enable automated QC/QA of workflows
