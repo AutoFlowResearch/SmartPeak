@@ -74,7 +74,7 @@ Workflow steps
 ~~~~~~~~~~~~~~
 
 All workflow steps are written in modern C++ so that workflows are as fast and safe as possible.
-Many of workflow steps that involve complex algorithms are wrappers around classes or functions that have been deposited in the open-source mass spectrometry library `OpenMS<https://github.com/OpenMS/OpenMS>`_ an externally validated by the open-source community or scientific reviewers if the works were published in a peer-reviewed journal.
+Many of workflow steps that involve complex algorithms are wrappers around classes or functions that have been deposited in the open-source mass spectrometry library `OpenMS <https://github.com/OpenMS/OpenMS>`_ an externally validated by the open-source community or scientific reviewers if the works were published in a peer-reviewed journal.
 SmartPeak integrates with the classes and functions natively so that workflows can be executed in memory without the need for expensive and time consuming disk IO.
 SmartPeak also provides logging, exception handling, and other facilities that would be expected of a professional application to ensure robust and reliable execution of open-source algorithms.
 A complete list of workflow steps and their description can be found in the :ref:`faq`.
