@@ -26,6 +26,15 @@ Notes
 The algorithm parameters used in the following workflows have been highly tuned for feature detection using the Sciex 5500 QTRAP and 6500+ systems with Shimadzu and Agilent HPLC systems.  
 With that said, we have found the algorithm parameters to generalize well to most liquid chromatography coupled to mass spectrometry systems.
 
+.. image:: ../../images/lcms_srm_standards_chromatograms.png
+.. image:: ../../images/lcms_srm_standards_features_line.png
+.. image:: ../../images/lcms_srm_standards_features_heatmap.png
+.. image:: ../../images/lcms_srm_unknowns_workflow.png
+.. image:: ../../images/lcms_srm_unknowns_features_line.png
+.. image:: ../../images/lcms_srm_unknowns_features_heatmap.png
+.. image:: ../../images/lcms_srm_unknowns_chromatograms.png
+.. image:: ../../images/lcms_srm_unknowns_exports.png
+
 Steps
 ~~~~~
 
