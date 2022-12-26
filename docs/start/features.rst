@@ -31,27 +31,40 @@ Data procesing workflow presets
 
 SmartPeak has been used and optimized for various analytical chemistry workflows.
 An example set of optimized workflows have been given presets within SmartPeak for faster selection and execution.
+
+.. image:: ../images/workflow_presets.png
+
 Please see :ref:`tutorials` for in depth walkthroughs for using each of the preset workflows.
 The workflow presets are also a good starting point for developing a custom workflow.
 Workflow steps can be added or removed using the GUI.
+
+.. image:: ../images/workflow_add_step.png
+
 Modified workflows can be saved to a ``workflow.csv`` file and loaded into SmartPeak.
 
-.. todo::
-    Workflow modification screen shots.
+.. image:: ../images/workflow_save.png
 
 Workflow execution engine
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 SmartPeak includes a workflow engine that optimizes the order of workflow step executions and the resources used to process samples in parallel.
 Before any workflow is executed, SmartPeak determines which workflow steps can be executed in parallel and which need to be executed in serial by analyzing the workflow step dependencies.
+
+.. image:: ../images/workflow_optimized.png
+
 The user has the option to specify the number of resources (i.e., CPU threads) that can be allocated to executing a workflow.
 By default, the maximum number of threads available to the user will be used.
 Once the order of workflow step executions and resources used to process samples in parallel are optimized, SmartPeak estimates the time needed to complete the workflow.
 
-.. todo::
-    Workflow modification screen shots.
+.. image:: ../images/workflow_estimate_0.png
 
 The time estimate is continuously updated as the workflow is executed to better reflect operating conditions.
+
+.. image:: ../images/workflow_estimate_1.png
+
+The actual workflow time is logged and also displayed in the GUI.
+
+.. image:: ../images/workflow_estimate_2.png
 
 While the number of CPU cores/threads determines the number of samples that can be ran in parallel, it is important to note that the system memory (i.e., RAM) provides an upper limit on the number of samples that can be run during a single workflow.
 If you find that workflows are taking a long time, we recommend profiling the system memory to see if your computer is out of memory.
@@ -73,14 +86,37 @@ Creating, saving, and loading sessions
 Usage
 ~~~~~
 
-.. todo::
-    Describe the usage.
+A custom database is used by SmartPeak to store all SmartPeak application data, which is called the "session object".
+The data includes user input, algorithm parameters, workflow steps, workflow step outputs, and UI settings.
+Certain user input and workflow step outputs are large (e.g., raw data files and feature files); SmartPeak does not store those directly, but stores the links to the files.
+This enables a user to share a relatively small session object with colleagues so that they can visualize the results of a SmartPeak workflow and interact with the SmartPeak UI just as the user had done when they saved the session.
+This also enables the user to re-run a workflow or further process a saved session from another computer so long as the computer has access to the files.
+Note that the user will be prompted to update the session file links if SmartPeak detects that the links are no longer valid prior to running any workflow that requires access to the session file data.
 
 Example
 ~~~~~~~
 
-.. todo::
-    Provide an example.
+After starting SmartPeak, create a new session by navigatin to ``file | new session``.
+
+.. image:: ../images/new_load_session.png
+
+A dialogue box to select the folder to load/save session files will be displayed.
+
+.. image:: ../images/create_session.png
+
+Files that have been named using the SmartPeak convention will be identified automatically.
+The user can select alternative files as needed.
+The modal will alert the user if missing sessions files are identified.
+
+.. image:: ../images/session_files.png
+
+The user can specify which files should be stored within the SmartPeak session object, and which remain external to the session object.
+
+.. image:: ../images/session_external_internal.png
+
+The user can save all application settings including the current UI view to the session object.
+
+.. image:: ../images/save_session.png
 
 Optimize workflow step algorithm parameters
 -----------------------------------------------------------------------------
@@ -124,8 +160,12 @@ Usage
 Example
 ~~~~~~~
 
-.. todo::
-    Provide an example.
+.. image:: ../images/calibrators.png
+.. image:: ../images/calibrators_tooltip.png
+.. image:: ../images/calibrators_chromatogram_select.png
+.. image:: ../images/calibrators_chromatogram.png
+.. image:: ../images/calibrators_refit.png
+.. image:: ../images/calibrators_quant_methods.png
 
 Enable automated QC/QA of workflows
 -----------------------------------------------------------------------------
