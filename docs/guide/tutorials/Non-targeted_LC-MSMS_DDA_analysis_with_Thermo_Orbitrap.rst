@@ -89,30 +89,27 @@ The tutorial includes the following steps :
 
 #. Defining the workflow in SmartPeak
 
-For LC-MS/MS-SRM Standards analysis, the following steps are saved 
-into the ``workflow.csv`` file. Alternatively, steps can be replaced, 
-added or deleted direclty from SmartPeakGUI. 
-A detailed explanation of each command step
-can be found in :ref:`Workflow Commands`.
+For LC-MS/MS-DDA transition library generation analysis, the following steps are saved into the ``workflow.csv`` file.
+Alternatively, steps can be replaced, added or deleted direclty from SmartPeakGUI. 
+A detailed explanation of each command step can be found in :ref:`Workflow Commands`.
 
-	.. list-table:: workflow_LCMSSRM_Standards.csv
+	.. list-table:: workflow_LCMS_DDA_transition.csv
 	  :header-rows: 1
 
 	  * - workflow_step
 	  * - LOAD_RAW_DATA
-	  * - MAP_CHROMATOGRAMS
-	  * - PICK_MRM_FEATURES
-	  * - CHECK_FEATURES
-	  * - SELECT_FEATURES
-	  * - CALCULATE_CALIBRATION
-	  * - STORE_QUANTITATION_METHODS
-	  * - QUANTIFY_FEATURES
+	  * - PICK_3D_FEATURES
+	  * - SEARCH_SPECTRUM_MS1
+	  * - MERGE_FEATURES_MS1
+	  * - EXTRACT_SPECTRA_NON_TARGETED
+	  * - SEARCH_SPECTRUM_MS2
+	  * - MERGE_FEATURES_MS2
+	  * - CONSTRUCT_TRANSITIONS_LIST
 	  * - STORE_FEATURES
 
 	The calibration curve for each transition's quantitation method can be inspected after all workflow steps have been run, to do so please
 	click on view and then "Calibrators". From the menu select ser-L.ser-L_1.Light
-	as ``component`` to plot its concentration curves within the given concentration range as
-	shown below:
+	as ``component`` to plot its concentration curves within the given concentration range as shown below:
 
 	.. image:: ../images/calibrators.png
 
@@ -121,6 +118,46 @@ can be found in :ref:`Workflow Commands`.
 	in the plot column. The line plot illistrates the value for each transition group and feature as shown below:
 
 	.. image:: ../../images/lcms_srm_standards_features_line.png
+
+.. todo::
+    The rest of the tutorial.
+
+#. Defining the workflow in SmartPeak
+
+For LC-MS/MS-DDA spectral database generation analysis, the following steps are saved into the ``workflow.csv`` file.
+Alternatively, steps can be replaced, added or deleted direclty from SmartPeakGUI. 
+A detailed explanation of each command step can be found in :ref:`Workflow Commands`.
+
+	.. list-table:: workflow_LCMS_DDA_spectral.csv
+	  :header-rows: 1
+
+	  * - workflow_step
+	  * - LOAD_RAW_DATA
+	  * - PICK_3D_FEATURES
+	  * - SEARCH_SPECTRUM_MS1
+	  * - MERGE_FEATURES_MS1
+	  * - EXTRACT_SPECTRA_NON_TARGETED
+	  * - STORE_MSP
+	  * - STORE_FEATURES
+
+.. todo::
+    The rest of the tutorial.
+
+#. Defining the workflow in SmartPeak
+
+For LC-MS/MS-DDA spectral database matching analysis, the following steps are saved into the ``workflow.csv`` file.
+Alternatively, steps can be replaced, added or deleted direclty from SmartPeakGUI. 
+A detailed explanation of each command step can be found in :ref:`Workflow Commands`.
+
+	.. list-table:: workflow_LCMS_DDA_spectra.csv
+	  :header-rows: 1
+
+	  * - workflow_step
+	  * - LOAD_RAW_DATA
+	  * - PICK_3D_FEATURES
+	  * - EXTRACT_SPECTRA_NON_TARGETED
+	  * - MATCH_SPECTRA
+	  * - STORE_FEATURES
 
 .. todo::
     The rest of the tutorial.
