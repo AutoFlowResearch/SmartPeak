@@ -63,5 +63,64 @@ The tutorial includes the following steps :
 		
 	Furthermore, the ``parameters.csv`` file contains the following settings for this workflow:
 
+	.. table:: DDA Settings in parameters.csv
+		:widths: auto
+
+		======================== ================================================= =============================================== ======
+        function                 name                                              value                                           type
+		======================== ================================================= =============================================== ======
+		FeatureFindingMetabo     report_chromatograms                              TRUE                                            bool
+		FeatureFindingMetabo     report_convex_hulls                               TRUE                                            bool
+		FeatureFindingMetabo     use_smoothed_intensities                          FALSE                                           bool
+		Pick3DFeatures           enable_elution                                    FALSE                                           bool
+		Pick3DFeatures           max_traces                                        1000                                            int
+		Pick3DFeatures           force_processing                                  FALSE                                           bool
+		TargetedSpectraExtractor AccurateMassSearchEngine:db:mapping               ['CHEMISTRY/HMDBMappingFileGermicidinA.tsv']    list
+		TargetedSpectraExtractor AccurateMassSearchEngine:db:struct                ['CHEMISTRY/HMDB2StructMappingGermicidinA.tsv'] list
+		TargetedSpectraExtractor AccurateMassSearchEngine:positive_adducts         CHEMISTRY/PositiveAdducts.tsv                   string
+		TargetedSpectraExtractor AccurateMassSearchEngine:negative_adducts         CHEMISTRY/NegativeAdducts.tsv                   string
+		TargetedSpectraExtractor relative_allowable_product_mass                   50                                              float
+		TargetedSpectraExtractor AccurateMassSearchEngine:ionization_mode          auto                                            string
+		TargetedSpectraExtractor AccurateMassSearchEngine:mass_error_value         10                                              float
+		TargetedSpectraExtractor rt_window                                         60                                              float
+		TargetedSpectraExtractor mz_tolerance                                      0.001                                           float
+		TargetedSpectraExtractor AccurateMassSearchEngine:keep_unidentified_masses TRUE                                            bool
+		======================== ================================================= =============================================== ======
+
+#. Defining the workflow in SmartPeak
+
+For LC-MS/MS-SRM Standards analysis, the following steps are saved 
+into the ``workflow.csv`` file. Alternatively, steps can be replaced, 
+added or deleted direclty from SmartPeakGUI. 
+A detailed explanation of each command step
+can be found in :ref:`Workflow Commands`.
+
+	.. list-table:: workflow_LCMSSRM_Standards.csv
+	  :header-rows: 1
+
+	  * - workflow_step
+	  * - LOAD_RAW_DATA
+	  * - MAP_CHROMATOGRAMS
+	  * - PICK_MRM_FEATURES
+	  * - CHECK_FEATURES
+	  * - SELECT_FEATURES
+	  * - CALCULATE_CALIBRATION
+	  * - STORE_QUANTITATION_METHODS
+	  * - QUANTIFY_FEATURES
+	  * - STORE_FEATURES
+
+	The calibration curve for each transition's quantitation method can be inspected after all workflow steps have been run, to do so please
+	click on view and then "Calibrators". From the menu select ser-L.ser-L_1.Light
+	as ``component`` to plot its concentration curves within the given concentration range as
+	shown below:
+
+	.. image:: ../images/calibrators.png
+
+	To inspect the features for the selected transition groups, select "Features (line)" from the view menu
+	then open the features tab (can be opened from the view menu as well) to select the "asymetry_factors" and "logSN"
+	in the plot column. The line plot illistrates the value for each transition group and feature as shown below:
+
+	.. image:: ../../images/lcms_srm_standards_features_line.png
+
 .. todo::
     The rest of the tutorial.

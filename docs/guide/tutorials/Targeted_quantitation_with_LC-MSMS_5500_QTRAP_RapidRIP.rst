@@ -66,7 +66,7 @@ can be found in :ref:`Workflow Commands`.
 	as ``component`` to plot its concentration curves within the given concentration range as
 	shown below:
 
-	.. image:: ../images/calibrators.png
+	.. image:: ../../images/calibrators.png
 
 	To inspect the features for the selected transition groups, select "Features (line)" from the view menu
 	then open the features tab (can be opened from the view menu as well) to select the "asymetry_factors" and "logSN"
