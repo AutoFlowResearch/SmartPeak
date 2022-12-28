@@ -67,7 +67,7 @@ The tutorial includes the following steps :
 		:widths: auto
 
 		======================== ================================================= =============================================== ======
-        function                 name                                              value                                           type
+		function                 name                                              value                                           type
 		======================== ================================================= =============================================== ======
 		FeatureFindingMetabo     report_chromatograms                              TRUE                                            bool
 		FeatureFindingMetabo     report_convex_hulls                               TRUE                                            bool
@@ -129,7 +129,7 @@ A detailed explanation of each command step can be found in :ref:`Workflow Comma
 
 	The features found can be viewed at ``view | features (table)`` in long form.
 
-	.. image:: ../images/lcms_dda_features_table.png
+	.. image:: ../../images/lcms_dda_features_table.png
 
 	Or at ``view | features (matrix)`` in compact form.
 
@@ -175,17 +175,15 @@ A detailed explanation of each command step can be found in :ref:`Workflow Comma
 
 	The spectral database in MSP format generated for each sample can be found in the ``output features`` directory. A snippet of the table is shown below.
 	
-	.. table:: DDA_spectral_library.csv
-		:widths: auto
+	.. list-table:: DDA_spectral_library.csv
+		:header-rows: 0
 
-		==========================
-		Name: HMDB:HMDB0000001
-		Retention Time: 370.346
-		base peak intensity: 476.0
-		total ion current: 940.0
-		Num Peaks: 2
-		134.957:476 217.105:464 
-		==========================
+		* - Name: HMDB:HMDB0000001
+		* - Retention Time: 370.346
+		* - base peak intensity: 476.0
+		* - total ion current: 940.0
+		* - Num Peaks: 2
+		* - 134.957:476 217.105:464
 
 #. Defining the workflow in SmartPeak
 
