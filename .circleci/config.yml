@@ -20,18 +20,6 @@ jobs:
             export DEBIAN_FRONTEND=noninteractive && apt-get install -y tzdata &&  
             ln -fs /usr/share/zoneinfo/UTC /etc/localtime &&
             dpkg-reconfigure --frontend noninteractive tzdata &&
-            apt remove --purge --auto-remove cmake
-            apt update
-            apt install -y software-properties-common lsb-release
-            apt clean all
-            wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor - | tee /etc/apt/trusted.gpg.d/kitware.gpg >/dev/null
-            apt-add-repository "deb https://apt.kitware.com/ubuntu/ $(lsb_release -cs) main"
-            apt update
-            apt install kitware-archive-keyring
-            rm /etc/apt/trusted.gpg.d/kitware.gpg
-            apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 6AF7F09730B3F0A4
-            apt update
-            apt install cmake
             apt-get install -y qt5-default libeigen3-dev &&
             apt-get install -y libboost-all-dev &&
             apt-get install -y libxerces-c-dev coinor-libcbc-dev libsvm-dev &&
@@ -43,6 +31,8 @@ jobs:
             apt-get install -y python3-sphinx python3-breathe python3-sphinx-rtd-theme sphinx-doc doxygen-latex doxygen-doc gsfonts graphviz-doc libgd-tools xapian-tools &&
             pip3 install exhale && 
             pip3 install -r tools/smartpeak/requirements.txt
+            apt remove cmake
+            pip3 install cmake --upgrade
       - run:
           # CircleCI doesn't support regex for conditional steps unfortunately...
           # During the release workflow, the previous job will push version update commit to release branch.
