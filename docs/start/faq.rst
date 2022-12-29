@@ -399,7 +399,7 @@ Please visit :ref:`logs`.
 
 .. _issues:
 
-My question is not listed here. Where can I contact the developers?
+My question is not listed here. How can I contact the developers?
 -------------------------------------------------------------------
 
 SmartPeak is an open-source project that values feedback from the community.  Please feel free to notify us of any bugs, request any features, or ask any questions by filing an Issue as https://github.com/AutoFlowResearch/SmartPeak/issues.

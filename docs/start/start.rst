@@ -5,6 +5,7 @@ Getting started with SmartPeak
    :start-after: begin_introduction
    :end-before:  end_introduction
 
+.. image:: ../images/Fig01_SmartPeak_overview.jpg
 
 Quick Start
 -----------

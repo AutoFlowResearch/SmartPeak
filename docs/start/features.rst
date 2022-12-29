@@ -118,36 +118,6 @@ The user can save all application settings including the current UI view to the 
 
 .. image:: ../images/save_session.png
 
-Optimize workflow step algorithm parameters
------------------------------------------------------------------------------
-
-Usage
-~~~~~
-
-.. todo::
-    Describe the usage.
-
-Example
-~~~~~~~
-
-.. todo::
-    Provide an example.
-
-Debug feature picking, selection, and filtering (and acquisition methods)
------------------------------------------------------------------------------
-
-Usage
-~~~~~
-
-.. todo::
-    Describe the usage.
-
-Example
-~~~~~~~
-
-.. todo::
-    Provide an example.
-
 Optimize calibration curves and quantitation methods
 -----------------------------------------------------------------------------
 
@@ -191,21 +161,6 @@ If ``Optimize calibrations`` is selected in the ``Actions`` menu of the Calibrat
 A tabular view of all quantitation methods can be found under ``View | Workflow parameters | Quantitation methods``.
 
 .. image:: ../images/calibrators_quant_methods.png
-
-Enable automated QC/QA of workflows
------------------------------------------------------------------------------
-
-Usage
-~~~~~
-
-.. todo::
-    Describe the usage.
-
-Example
-~~~~~~~
-
-.. todo::
-    Provide an example.
 
 Select features from the "best" dilution
 -----------------------------------------------------------------------------
@@ -330,3 +285,48 @@ Indeed the feature database willl show us that it is the maximum ``peak_apex_int
 .. image:: ../images/select_dilutions_featuresdb.png
 
 Now, in our dilution file, if we set trp-L.trp-L_1.Heavy to preferred dilution_factor 1, the result will be 137, which is the maximum ``peak_apex_int`` from the sample based on dilution 1.
+
+Optimize workflow step algorithm parameters
+-----------------------------------------------------------------------------
+
+Usage
+~~~~~
+
+.. todo::
+    Describe the usage.
+
+Example
+~~~~~~~
+
+.. todo::
+    Provide an example.
+
+Debug feature picking, selection, and filtering (and acquisition methods)
+-----------------------------------------------------------------------------
+
+Usage
+~~~~~
+
+.. todo::
+    Describe the usage.
+
+Example
+~~~~~~~
+
+.. todo::
+    Provide an example.
+
+Enable automated QC/QA of workflows
+-----------------------------------------------------------------------------
+
+Usage
+~~~~~
+
+.. todo::
+    Describe the usage.
+
+Example
+~~~~~~~
+
+.. todo::
+    Provide an example.
