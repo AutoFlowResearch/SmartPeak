@@ -1,9 +1,11 @@
-Targeted quantitation with HPLC data
-------------------------------------
+Targeted quantitation using HPLC IR and UV acquisition
+------------------------------------------------------
 
 This tutorial walks you through the workflow for analyzing targeted HPLC data
 starting from input file generation, to processing the data in SmartPeak, 
-to reviewing the data in SmartPeak, to reporting the results for later use.
+to reviewing the data in SmartPeak, to reporting the results.
+
+.. image:: ../../images/MassSpecSchemas-HPLCUV.png
 
 Objectives
 ~~~~~~~~~~
@@ -15,8 +17,14 @@ Objectives
 The Workflows include
 ~~~~~~~~~~~~~~~~~~~~~
 
-#. Calculating the calibration curves using Standards
-#. Processing Unknowns
+#. Calculating the calibration curves to generate quantitation methods for each component using Standard samples
+#. Processing Unknown samples using the quantitation methods
+
+Notes
+~~~~~
+
+Due to the non-standard formats used by HPLC and GC vendors, customized raw data file parsing routines are needed.  
+Currently, Thermo HPLC text file inputs are supported.  Additional vendor input files can be supported upon request.
 
 Steps
 ~~~~~
@@ -38,19 +46,23 @@ added or deleted direclty from SmartPeakGUI.
 A detailed explanation of each command step
 can be found in :ref:`Workflow Commands`.
 
-	* LOAD_RAW_DATA
-	* MAP_CHROMATOGRAMS
-	* EXTRACT_CHROMATOGRAM_WINDOWS
-	* ZERO_CHROMATOGRAM_BASELINE
-	* PICK_MRM_FEATURES
-	* CHECK_FEATURES
-	* SELECT_FEATURES
-	* CALCULATE_CALIBRATION
-	* STORE_QUANTITATION_METHODS
-	* QUANTIFY_FEATURES
-	* STORE_FEATURES
+	.. list-table:: workflow_HPLC_UV_Standards.csv
+	  :header-rows: 1
 
-	The calibration curve can be inspected after all workflow steps had been run, to do so please
+	  * - workflow_step
+	  * - LOAD_RAW_DATA
+	  * - MAP_CHROMATOGRAMS
+	  * - EXTRACT_CHROMATOGRAM_WINDOWS
+	  * - ZERO_CHROMATOGRAM_BASELINE
+	  * - PICK_MRM_FEATURES
+	  * - CHECK_FEATURES
+	  * - SELECT_FEATURES
+	  * - CALCULATE_CALIBRATION
+	  * - STORE_QUANTITATION_METHODS
+	  * - QUANTIFY_FEATURES
+	  * - STORE_FEATURES
+
+	The calibration curve for each transition's quantitation method can be inspected after all workflow steps have been run, to do so please
 	click on view and then "Calibrators". From the transition tab select Antranilicacid and Indole
 	as ``transition_group`` to plot their concentration curves within the given concentration range as
 	shown below:
@@ -85,15 +97,19 @@ can be found in :ref:`Workflow Commands`.
 
 The workflow steps for HPLC UV Unknowns are :
 
-	* LOAD_RAW_DATA
-	* MAP_CHROMATOGRAMS
-	* EXTRACT_CHROMATOGRAM_WINDOWS
-	* ZERO_CHROMATOGRAM_BASELINE
-	* PICK_MRM_FEATURES
-	* QUANTIFY_FEATURES
-	* CHECK_FEATURES
-	* SELECT_FEATURES
-	* STORE_FEATURES
+	.. list-table:: workflow_HPLC_UV_Unknowns.csv
+	  :header-rows: 1
+
+	  * - workflow_step
+	  * - LOAD_RAW_DATA
+	  * - MAP_CHROMATOGRAMS
+	  * - EXTRACT_CHROMATOGRAM_WINDOWS
+	  * - ZERO_CHROMATOGRAM_BASELINE
+	  * - PICK_MRM_FEATURES
+	  * - QUANTIFY_FEATURES
+	  * - CHECK_FEATURES
+	  * - SELECT_FEATURES
+	  * - STORE_FEATURES
 
 	To inspect the features for the selected transition groups, select "Features (line)" from the view menu
 	then open the features tab (can be opened from the view menu as well) to select the "asymetry_factors" and "logSN"
@@ -116,7 +132,7 @@ The workflow steps for HPLC UV Unknowns are :
 
 	To run the analysis, please follow the steps for 
 	:ref:`Using SmartPeak GUI` or :ref:`Using SmartPeak CLI`
-	to execute the workflow steps and review the results including plotting.
+	to execute the workflow steps, review the results, and report the results.
 
 #. Reporting the results
 

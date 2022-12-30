@@ -1,9 +1,11 @@
-Targeted flux analysis with LC-MS/MS Agilent Lipidomics
--------------------------------------------------------
+Targeted flux analysis using LC-MS/MS-SRM acquisition
+-----------------------------------------------------
 
 This tutorial walks you through the workflow for analyzing targeted flux analysis 
 using LC-MS/MS data starting from input file generation, to processing the data in SmartPeak, 
-to reviewing the data in SmartPeak, to reporting the results for later use.
+to reviewing the data in SmartPeak, to reporting the results.
+
+.. image:: ../../images/MassSpecSchemas-SRM.png
 
 Objectives
 ~~~~~~~~~~
@@ -17,6 +19,12 @@ The Workflows include
 
 #. Processing Unknowns
 #. Reviewing the results
+
+Notes
+~~~~~
+
+The algorithm parameters used in the following workflows have been highly tuned for feature detection using tan Agilent HPLC and triple quad systems.  
+With that said, we have found the algorithm parameters to generalize well to most liquid chromatography coupled to mass spectrometry systems.
 
 Steps
 ~~~~~
@@ -41,12 +49,16 @@ added or deleted direclty from SmartPeakGUI within the "workflow" tap in the rig
 A detailed explanation of each command step
 can be found in :ref:`Workflow Commands`.
 
-	* LOAD_RAW_DATA
-	* MAP_CHROMATOGRAMS
-	* PICK_MRM_FEATURES
-	* FILTER_FEATURES
-	* CHECK_FEATURES
-	* STORE_FEATURES
+	.. list-table:: workflow_LCMS_Flux_Unknowns.csv
+	  :header-rows: 1
+
+	  * - workflow_step
+	  * - LOAD_RAW_DATA
+	  * - MAP_CHROMATOGRAMS
+	  * - PICK_MRM_FEATURES
+	  * - FILTER_FEATURES
+	  * - CHECK_FEATURES
+	  * - STORE_FEATURES
 
 	The workflow pipeline is initialized by loading the raw data followed 
 	by mapping the chromatograms to the loaded set og transitions. Once done, the peak picking routine
@@ -59,7 +71,7 @@ can be found in :ref:`Workflow Commands`.
 	then select the injections and transitions to plot from their respective tabs on the left. The following shows the chromatogram
 	for one injection using 6pgc and 23dpg transitions and their intensity differences over time.
 
-	.. image:: ../images/lcms_targeted_chromatogram.png
+	.. image:: ../images/lcms_targeted_flux_chromatogram.png
 
 	The Spectra for the two injection samples can be inspected after all workflow steps had been run, to do so please
 	click on view and then "Spectra". From the Injections tab check "Plot/Unplot All" select all injection samples and 

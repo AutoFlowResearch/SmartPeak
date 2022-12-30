@@ -11,7 +11,7 @@ SmartPeak
    start/start
    start/features
    changelog
-   faq
+   start/faq
    
 .. toctree::
    :caption: Step-by-step guides
@@ -27,7 +27,6 @@ SmartPeak
    :maxdepth: 1
 
    about/contribute
-   about/parameters
    about/developer
    api/library_root
    about/roadmap
