@@ -23,9 +23,12 @@
 
 #pragma once
 
-#include <SmartPeak/ui/Widget.h>
 #include <SmartPeak/core/ApplicationHandler.h>
 #include <SmartPeak/iface/ISequenceObserver.h>
+
+#include <SmartPeak/ui/Widget.h>
+#include <SmartPeak/ui/ExplorerWidget.h>
+
 #include <string>
 #include <vector>
 #include <chrono>
@@ -34,7 +37,9 @@ namespace SmartPeak
 {
   class StatisticsWidget final : 
     public Widget, 
-    public ISequenceObserver
+    public ISequenceObserver,
+    public IFeaturesObserver,
+    public IExplorerWidgetObserver
   {
 
   public:
@@ -64,6 +69,16 @@ namespace SmartPeak
      ISequenceObserver
     */
     virtual void onSequenceUpdated() override;
+
+    /**
+     IFeaturesObserver
+    */
+    virtual void onFeaturesUpdated() override;
+
+    /**
+      IExplorerWidgetObserver
+    */
+    virtual void onExplorerCheckboxesChanged() override;
 
   private:
     struct DashboardChartData
