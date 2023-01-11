@@ -25,6 +25,7 @@
 #include <SmartPeak/ui/Widget.h>
 #include <SmartPeak/ui/LayoutLoader.h>
 #include <SmartPeak/ui/WindowSizesAndPositions.h>
+#include <SmartPeak/PresetWorkflows/AllWindows.h>
 
 #include <string>
 #include <vector>
@@ -37,8 +38,9 @@ namespace SmartPeak
   class SplitWindow final : public Widget
   {
   public:
-    SplitWindow() :
-      Widget("SplitWindow")
+    SplitWindow(const AllWindows& all_windows) :
+      Widget("SplitWindow"),
+      all_windows_(all_windows)
     { };
 
     void draw() override;
@@ -49,13 +51,17 @@ namespace SmartPeak
     void setupLayoutLoader(LayoutLoader& layout_loader);
 
     WindowSizesAndPositions win_size_and_pos_;
-    std::vector<std::shared_ptr<Widget>> top_windows_;
-    std::vector<std::shared_ptr<Widget>> bottom_windows_;
-    std::vector<std::shared_ptr<Widget>> left_windows_;
 
-    bool reset_layout_ = true;
+    std::map<std::string, std::vector<std::tuple<std::shared_ptr<Widget>,bool>>> default_layout_;
+
+    void resetLayout(const std::map<std::string, std::vector<std::tuple<std::shared_ptr<Widget>, bool>>>& layout);
+
+    const AllWindows& all_windows_;
 
   protected:
-    void showWindows(std::vector<std::shared_ptr<Widget>> &windows);
+    void showWindows(const std::vector<std::tuple<std::shared_ptr<Widget>, bool>>&windows);
+    bool reset_layout_ = true;
+    std::map<std::string, std::vector<std::tuple<std::shared_ptr<Widget>, bool>>> current_layout_;
+    std::map<std::string, std::vector<std::tuple<std::shared_ptr<Widget>, bool>>> new_layout;
   };
 }

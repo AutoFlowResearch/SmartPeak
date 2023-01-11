@@ -148,7 +148,7 @@ namespace SmartPeak
       transitions_chart_.error_message_ = "Too much points to draw. Try to filter data.";
     }
     drawChart(transitions_chart_, "#Features/Transition", "Transitions", "#Features");
-
+    refresh_needed_ = false;
   }
 
   void StatisticsWidget::drawChart(DashboardChartData& chart_data, const char* title, const char* x_label, const char* y_label) const
@@ -218,6 +218,16 @@ namespace SmartPeak
   }
 
   void StatisticsWidget::onSequenceUpdated()
+  {
+    refresh_needed_ = true;
+  }
+
+  void StatisticsWidget::onFeaturesUpdated()
+  {
+    refresh_needed_ = true;
+  }
+
+  void StatisticsWidget::onExplorerCheckboxesChanged()
   {
     refresh_needed_ = true;
   }

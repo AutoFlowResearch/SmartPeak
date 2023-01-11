@@ -23,6 +23,7 @@ set(sources_list
 	ParameterEditorWidget.cpp
 	ParametersTableWidget.cpp
 	Plotter.cpp
+	PresetWorkflowWidget.cpp
 	Report.cpp
 	RunWorkflowWidget.cpp
 	SampleTypeEditorWidget.cpp

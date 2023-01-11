@@ -11,7 +11,6 @@ set(sources_list
 	FeatureFiltersUtils.cpp
 	FeatureMetadata.cpp
 	Filenames.cpp
-	Helloworld.cpp
 	InjectionHandler.cpp
 	MetaDataHandler.cpp
 	Parameters.cpp

@@ -24,6 +24,7 @@ set(sources_list_h
 	ParameterEditorWidget.h
 	ParametersTableWidget.h
 	Plotter.h
+	PresetWorkflowWidget.h
 	Report.h
 	RunWorkflowWidget.h
 	SampleTypeEditorWidget.h
