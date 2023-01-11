@@ -18,16 +18,22 @@
 //
 // --------------------------------------------------------------------------
 // $Maintainer: Douglas McCloskey $
-// $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
+// $Authors: Douglas McCloskey, Bertrand Boudaud $
 // --------------------------------------------------------------------------
 
 #pragma once
 
+#include <SmartPeak/PresetWorkflows/AllWindows.h>
+
+#include <string>
+#include <vector>
+
 namespace SmartPeak
 {
-  class Helloworld
-  {
-public:
-    double addNumbers(const double& x, const double& y) const;
+  struct PresetWorkflow {
+    virtual std::string getName() const = 0;
+    virtual std::string getDescription() const = 0;
+    virtual std::vector<std::string> getWorkflowSteps() const = 0;
+    virtual std::map<std::string, std::vector<std::tuple<std::shared_ptr<Widget>, bool>>> getLayout(const AllWindows& all_windows) const = 0;
   };
 }

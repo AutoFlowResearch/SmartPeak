@@ -43,6 +43,11 @@ namespace SmartPeak
 {
   extern bool enable_quick_help;
 
+  struct IExplorerWidgetObserver
+  {
+    virtual void onExplorerCheckboxesChanged() = 0;
+  };
+
   /**
     @brief ExplorerWidget is a table widgets that also exposes a set of checkboxes (possibly one column for each functionality) associated with each lines.
   */
@@ -52,8 +57,9 @@ namespace SmartPeak
       public IFeaturesObserver
     {
     public:
-      ExplorerWidget(const std::string& table_id, const std::string title ="", SequenceObservable* sequence_observable = nullptr)
-        :GenericTableWidget(table_id, title)
+      ExplorerWidget(const std::string& table_id, const std::string title, IExplorerWidgetObserver& observer, SequenceObservable* sequence_observable = nullptr)
+        :GenericTableWidget(table_id, title),
+         observer_(observer)
       {
         if (sequence_observable)
         {
@@ -89,6 +95,9 @@ namespace SmartPeak
     Eigen::Tensor<std::string, 1> checkbox_headers_;
     Eigen::Tensor<bool, 2> *checkbox_columns_ = nullptr;
 
+    Eigen::Tensor<std::string, 1> previous_checkbox_headers_;
+    Eigen::Tensor<bool, 2> previous_checkbox_columns_;
+
     std::map<int, std::vector<bool>> serialized_checkboxes_;
 
     ImGuiTextFilter filter_;
@@ -98,6 +107,10 @@ namespace SmartPeak
     */
     void onCheckboxesChanged();
 
+    protected:
+      void notifyUserChanges();
+
+      IExplorerWidgetObserver& observer_;
   };
 
 }

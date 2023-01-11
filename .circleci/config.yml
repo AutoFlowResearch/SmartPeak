@@ -20,7 +20,7 @@ jobs:
             export DEBIAN_FRONTEND=noninteractive && apt-get install -y tzdata &&  
             ln -fs /usr/share/zoneinfo/UTC /etc/localtime &&
             dpkg-reconfigure --frontend noninteractive tzdata &&
-            apt-get install -y cmake qt5-default libeigen3-dev &&
+            apt-get install -y qt5-default libeigen3-dev &&
             apt-get install -y libboost-all-dev &&
             apt-get install -y libxerces-c-dev coinor-libcbc-dev libsvm-dev &&
             apt-get install -y libwildmagic-dev libsqlite3-dev &&
@@ -31,6 +31,8 @@ jobs:
             apt-get install -y python3-sphinx python3-breathe python3-sphinx-rtd-theme sphinx-doc doxygen-latex doxygen-doc gsfonts graphviz-doc libgd-tools xapian-tools &&
             pip3 install exhale && 
             pip3 install -r tools/smartpeak/requirements.txt
+            apt remove cmake
+            pip3 install cmake --upgrade
       - run:
           # CircleCI doesn't support regex for conditional steps unfortunately...
           # During the release workflow, the previous job will push version update commit to release branch.
@@ -65,7 +67,7 @@ jobs:
           command: |
             mkdir ~/smartpeak_release_build
             cd ~/smartpeak_release_build
-            cmake -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -G "Unix Makefiles" -DCMAKE_PREFIX_PATH=$HOME/OpenMS-build/ -DPLOG_INCLUDE_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/plog/include -DIMGUI_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/imgui -DIMPLOT_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/implot -DPORTABLEFILEDIALOGS_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/portablefiledialogs  -DCMAKE_BUILD_TYPE=Release ~/SmartPeak
+            cmake -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -G "Unix Makefiles" -DCMAKE_PREFIX_PATH=$HOME/OpenMS-build/ -D=OpenMS_DIR=$HOME/OpenMS -DPLOG_INCLUDE_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/plog/include -DIMGUI_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/imgui -DIMPLOT_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/implot -DPORTABLEFILEDIALOGS_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/portablefiledialogs  -DCMAKE_BUILD_TYPE=Release ~/SmartPeak
             make -j4
       - run:
           name: Running SmartPeak Class Tests
@@ -211,7 +213,7 @@ jobs:
             [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
             $ProgressPreference = "SilentlyContinue"
             Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
-            choco install cmake --version=3.17.2 --installargs '"ADD_CMAKE_TO_PATH=System"'
+            choco install cmake --version=3.21.0 --installargs '"ADD_CMAKE_TO_PATH=System"'
             choco install gnuplot.portable
             choco install doxygen.install
             choco install nsis.portable
@@ -300,16 +302,16 @@ jobs:
             $env:PYTHONPATH = $PWD.Path + "\tools"
             python -m unittest discover -s .\tools\smartpeak\
             ThrowOnFailure "Python tests failed!"
-      - run:
-          name: Signing SmartPeak with trusted certificate
-          command: |
-            $ErrorActionPreference = "Stop"
-            cd ~/SmartPeak/smartpeak_release_build
-            git clone --branch main https://github.com/AutoFlowResearch/CodeSigning
-            Import-Module .\CodeSigning\CertCrypto.psm1
-            Unprotect-Cert '.\CodeSigning\CodeSigning_DTU_AIT_KIT_DTUDOC.pfx.AES' -KeyAsPlainText $env:PFX_AES -RemoveSource
-            certutil -p $env:PFX_PSWD -importpfx .\CodeSigning\CodeSigning_DTU_AIT_KIT_DTUDOC.pfx
-            & 'C:\Program Files (x86)\windows kits\10\bin\x64\signtool.exe' sign /v /sm /s My /n "DTU-AIT-DTUDOC client Plugin"  *.exe
+#      - run:
+#          name: Signing SmartPeak with trusted certificate
+#          command: |
+#            $ErrorActionPreference = "Stop"
+#            cd ~/SmartPeak/smartpeak_release_build
+#            git clone --branch main https://github.com/AutoFlowResearch/CodeSigning
+#            Import-Module .\CodeSigning\CertCrypto.psm1
+#            Unprotect-Cert '.\CodeSigning\CodeSigning_DTU_AIT_KIT_DTUDOC.pfx.AES' -KeyAsPlainText $env:PFX_AES -RemoveSource
+#            certutil -p $env:PFX_PSWD -importpfx .\CodeSigning\CodeSigning_DTU_AIT_KIT_DTUDOC.pfx
+#            & 'C:\Program Files (x86)\windows kits\10\bin\x64\signtool.exe' sign /v /sm /s My /n "DTU-AIT-DTUDOC client Plugin"  *.exe
       - run:
           name: Preparing Artifact
           command: |

@@ -1,9 +1,11 @@
-Non-targeted FIA-MS analysis with Thermo Orbitrap
+Non-targeted analysis using FIA-MS acquisition
 -------------------------------------------------
 
 This tutorial walks you through the workflow for analyzing non-targeted FIA-MS 
 data starting from input file generation, to processing the data in SmartPeak, 
-to reviewing the data in SmartPeak, to reporting the results for later use.
+to reviewing the data in SmartPeak, to reporting the results.
+
+.. image:: ../../images/MassSpecSchemas-FIAMS.png
 
 Objectives
 ~~~~~~~~~~
@@ -18,6 +20,12 @@ The Workflows include
 #. Defining the accurate mass search database
 #. Processing Unknowns
 #. Reviewing the results
+
+Notes
+~~~~~
+
+The algorithm parameters used in the following workflows have been highly tuned for feature detection using the Thermo Orbitrap technology.  
+Slight modifications to the algorithm parameters in the ``FIAMS``, ``Pick2DFeatures``, and ``AccurateMassSearchEngine`` sections are needed for Time of Flight (ToF) technologies.
 
 Steps
 ~~~~~
@@ -73,35 +81,47 @@ added or deleted direclty from SmartPeakGUI within the "workflow" tap in the rig
 A detailed explanation of each command step
 can be found in :ref:`Workflow Commands`.
 
-	* LOAD_RAW_DATA
-	* EXTRACT_SPECTRA_WINDOWS
-	* MERGE_SPECTRA
-	* PICK_MS1_FEATURES
-	* SEARCH_ACCURATE_MASS
-	* STORE_ANNOTATIONS
-	* STORE_FEATURES
-	* ESTIMATE_FEATURE_BACKGROUND_INTERFERENCES
-	* STORE_FEATURE_BACKGROUND_ESTIMATIONS
-	* FILTER_FEATURES_BACKGROUND_INTERFERENCES
-	* MERGE_FEATURES
-	* MERGE_INJECTIONS
-	* STORE_FEATURES_SAMPLE_GROUP
+	.. list-table:: workflow_FIAMS_Unknowns.csv
+	  :header-rows: 1
+
+	  * - workflow_step
+	  * - LOAD_RAW_DATA
+	  * - EXTRACT_SPECTRA_WINDOWS
+	  * - MERGE_SPECTRA
+	  * - PICK_MS1_FEATURES
+	  * - SEARCH_ACCURATE_MASS
+	  * - STORE_ANNOTATIONS
+	  * - STORE_FEATURES
+	  * - ESTIMATE_FEATURE_BACKGROUND_INTERFERENCES
+	  * - STORE_FEATURE_BACKGROUND_ESTIMATIONS
+	  * - FILTER_FEATURES_BACKGROUND_INTERFERENCES
+	  * - MERGE_FEATURES
+	  * - MERGE_INJECTIONS
+	  * - STORE_FEATURES_SAMPLE_GROUP
 
 	The workflow pipeline is initialized by loading the raw data followed 
 	by extracting the spectra windows based on the given parameters by the user
 	then merging spectras over the time axis. Once done, the peak picking routine
 	will be executed on the MS1 spectras followed by executing the mass search routine.
 	As an intermediate workflow step, the mzTab annotations and feature lists are saved 
-	to disk as ``mzTab`` and ``featureXML`` file formats respectively. A major processing
-	step in this workflow is to estimate the Background Interferences for component and 
-	component group feature filter as well as ion intensity attributes from blank samples
-	followed by storing component and component group percent Background Interference 
-	estimations to disk. Then, filter transitions and transitions groups based on criteria
-	provided by the user followed by creating merged features from the accurate mass search
-	results as well as merging multiple injections of the same sample. An as the final step
-	in the workflow pipeline, the features for the sample group is saved to disk as a 
+	to disk as ``mzTab`` and ``featureXML`` file formats respectively. 
+	The feature list can be saved before or after the features are annotated using the mass search routine 
+	depending upon whether a user would like to re-process the feature list using different accurate
+	mass search databases. Options are included for retaining or removing features that were not annotated. 
+	
+	A major processing step in this workflow is to estimate the Background Interferences 
+	for component features from blank samples. 
+	Blank samples in the ``same sequence_segment`` are used to estimate the average Background Intereference for each user specified component.
+	The Background Intereference Estimates are saved to disk for inspection and re-use. 
+	Then, components can be filtered based on their percentage signal intensity found in the blanks and specified by the user. 
+	
+	Another major processing step in the workflow is the merging of features and injections.
+	Adducts corresponding to the same compound are merged into a single feature. 
+	Injections corresponding to a single sample are merged into a single sample. 
+	The user can specify which injections correspond to which sample group using the ``sample_group_name`` column in the ``sequence`` file. 
+	In addition, the user can specify how features and/or injections are merged in the ``parameters`` file. 
+	Finally, features for the sample group (i.e., merged injections) are saved to disk as a 
 	``featureXML`` file.
-
 
 	The Spectra for the two injection samples can be inspected after all workflow steps had been run, to do so please
 	click on view and then "Spectra". From the Injections tab check "Plot/Unplot All" select all injection samples and 
@@ -131,4 +151,4 @@ can be found in :ref:`Workflow Commands`.
 	data for a given injection sample which includes a list of features with a set of ``UserParam`` for each feature such as
 	``PeptideRef``, ``native_id`` and ``scan_polarity``. The ``mzTab`` file includes a summary of the accurate mass search.
 	These files can be parsed and processed by the `pyOpenMS <https://pyopenms.readthedocs.io/en/latest/id_by_mz.html?highlight=mztab>`_
-	Python package.
+	Python package. Examples of FIA-MS post-processing analyses can be found in `BFAIR <https://github.com/AutoFlowResearch/BFAIR/blob/develop/docs/examples/FIA_MS_example_notebook.ipynb>`_.

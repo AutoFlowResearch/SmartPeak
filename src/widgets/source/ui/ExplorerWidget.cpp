@@ -244,12 +244,42 @@ namespace SmartPeak
       }
       ImGui::EndTable();
     }
+    notifyUserChanges();
   }
 
   void ExplorerWidget::onCheckboxesChanged()
   {
     table_scanned_ = false;
     plot_unplot_all_deactivated_ = true;
+  }
+
+  void ExplorerWidget::notifyUserChanges()
+  {
+    bool something_changed = false;
+    if (previous_checkbox_headers_.data())
+    {
+      Eigen::Tensor<bool, 0> checkbox_headers_eq = (previous_checkbox_headers_ == checkbox_headers_).all();
+      something_changed = !checkbox_headers_eq(0);
+    }
+    if (something_changed)
+    {
+      observer_.onExplorerCheckboxesChanged();
+    }
+    previous_checkbox_headers_ = checkbox_headers_;
+    if (checkbox_columns_)
+    {
+      something_changed = false;
+      if (previous_checkbox_columns_.data())
+      {
+        Eigen::Tensor<bool, 0> checkbox_columns_eq = (previous_checkbox_columns_ == *checkbox_columns_).all();
+        something_changed = !checkbox_columns_eq(0);
+      }
+      if (something_changed)
+      {
+        observer_.onExplorerCheckboxesChanged();
+      }
+      previous_checkbox_columns_ = *checkbox_columns_;
+    }
   }
 
   std::map<std::string, CastValue::Type> ExplorerWidget::getPropertiesSchema() const

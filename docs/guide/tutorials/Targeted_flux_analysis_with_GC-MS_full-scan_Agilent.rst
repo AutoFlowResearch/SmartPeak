@@ -1,9 +1,11 @@
-Targeted flux analysis with GC-MS full-scan Agilent
----------------------------------------------------
+Targeted flux analysis using GC-MS full-scan acquisition
+--------------------------------------------------------
 
 This tutorial walks you through the workflow for analyzing targeted full-scan flux analysis 
 using SIM GC-MS data starting from input file generation, to processing the data in SmartPeak, 
-to reviewing the data in SmartPeak, to reporting the results for later use.
+to reviewing the data in SmartPeak, to reporting the results.
+
+.. image:: ../../images/MassSpecSchemas-GCMSFullScan.png
 
 Objectives
 ~~~~~~~~~~
@@ -17,6 +19,12 @@ The Workflows include
 
 #. Processing Unknowns
 #. Reviewing the results
+
+Notes
+~~~~~
+
+The algorithm parameters used in the following workflows have been highly tuned for feature detection using an Agilent GC and single quad system.  
+With that said, we have found the algorithm parameters to generalize well to most gas chromatography coupled to mass spectrometry systems.
 
 Steps
 ~~~~~
@@ -41,18 +49,22 @@ added or deleted direclty from SmartPeakGUI within the "workflow" tap in the rig
 A detailed explanation of each command step
 can be found in :ref:`Workflow Commands`.
 
-	* LOAD_RAW_DATA
-	* MAP_CHROMATOGRAMS
-	* EXTRACT_CHROMATOGRAM_WINDOWS
-	* ZERO_CHROMATOGRAM_BASELINE
-	* PICK_MRM_FEATURES
-	* QUANTIFY_FEATURES
-	* CHECK_FEATURES
-	* SELECT_FEATURES
-	* CALCULATE_MDVS
-	* ISOTOPIC_CORRECTIONS
-	* CALCULATE_MDV_ACCURACIES
-	* STORE_FEATURES
+	.. list-table:: workflow_GCMSFullScan_Flux_Unknowns.csv
+	  :header-rows: 1
+
+	  * - workflow_step
+	  * - LOAD_RAW_DATA
+	  * - MAP_CHROMATOGRAMS
+	  * - EXTRACT_CHROMATOGRAM_WINDOWS
+	  * - ZERO_CHROMATOGRAM_BASELINE
+	  * - PICK_MRM_FEATURES
+	  * - QUANTIFY_FEATURES
+	  * - CHECK_FEATURES
+	  * - SELECT_FEATURES
+	  * - CALCULATE_MDVS
+	  * - ISOTOPIC_CORRECTIONS
+	  * - CALCULATE_MDV_ACCURACIES
+	  * - STORE_FEATURES
 
 	The workflow pipeline is initialized by loading the raw data followed 
 	by mapping the chromatograms to the loaded set of transitions. Once done,
@@ -65,7 +77,7 @@ can be found in :ref:`Workflow Commands`.
 	alignment algorithms is executed. Mass distribution vectors can then be 
 	calculated followed by isotopic corrections and comparing the MDVs to the
 	theoretical values. As the final step in the workflow, the features
-	 for the sample group is stored to disk as a ``featureXML`` files.
+	for the sample group is stored to disk as a ``featureXML`` files.
 
 	To plot the intensities over time for given injections and transitions, view the "chromatogram" from the "view" menu
 	then select the injections and transitions to plot from their respective tabs on the left. The following shows the 
@@ -78,7 +90,7 @@ can be found in :ref:`Workflow Commands`.
 
 	.. image:: ../../images/gcms_fullscan_agilent_heapmap.png
 
-	#. Reporting the results
+#. Reporting the results
 
 	To export the results, select "Report" from the "Actions" which will show the 
 	"Create Report" window:

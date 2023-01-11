@@ -18,13 +18,15 @@
 //
 // --------------------------------------------------------------------------
 // $Maintainer: Douglas McCloskey $
-// $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
+// $Authors: Douglas McCloskey, Bertrand Boudaud $
 // --------------------------------------------------------------------------
 
 #pragma once
 
 #include <SmartPeak/ui/Widget.h>
 #include <SmartPeak/ui/WorkflowStepWidget.h>
+#include <SmartPeak/ui/PresetWorkflowWidget.h>
+#include <SmartPeak/ui/SplitWindow.h>
 #include <SmartPeak/core/ApplicationHandler.h>
 #include <SmartPeak/core/WorkflowManager.h>
 #include <SmartPeak/core/ApplicationProcessors/BuildCommandsFromNames.h>
@@ -147,25 +149,35 @@ namespace SmartPeak
     bool is_graph_hovered_ = false;
   };
 
-  class WorkflowWidget : public Widget
+  class WorkflowWidget : public Widget, public IPresetWorkflowWidgetObserver
   {
   public:
 
-    WorkflowWidget(const std::string title, ApplicationHandler& application_handler, WorkflowManager& workflow_manager)
+    WorkflowWidget(const std::string title, 
+                  ApplicationHandler& application_handler, 
+                  WorkflowManager& workflow_manager,
+                  SplitWindow& split_window)
       : Widget(title),
       application_handler_(application_handler),
       workflow_step_widget_(application_handler),
       workflow_manager_(workflow_manager),
-      workflow_node_graph_(application_handler, workflow_manager)
+      workflow_node_graph_(application_handler, workflow_manager),
+      preset_workflow_widget_(application_handler, *this),
+      split_window_(split_window)
     {
     };
 
     void draw() override;
+
+    // from IPresetWorkflowWidgetObserver
+    virtual void onPresetWorkflowSelected(const PresetWorkflow& preset_workflow) override;
 
   protected:
     ApplicationHandler& application_handler_;
     WorkflowStepWidget workflow_step_widget_;
     WorkflowManager& workflow_manager_;
     WorfklowStepNodeGraph workflow_node_graph_;
+    PresetWorkflowWidget preset_workflow_widget_;
+    SplitWindow& split_window_;
   };
 }

@@ -30,24 +30,33 @@ namespace SmartPeak
 
   void SplitWindow::setupLayoutLoader(LayoutLoader& layout_loader)
   {
-    for (auto& window : top_windows_)
+    if (reset_layout_)
+    {
+      current_layout_.clear();
+      current_layout_ = new_layout;
+    }
+    const auto& top_windows_ = current_layout_.at("top");
+    const auto& bottom_windows_ = current_layout_.at("bottom");
+    const auto& left_windows_ = current_layout_.at("left");
+
+    for (auto& [window, visible] : top_windows_)
     {
       layout_loader.properties_handlers_.push_back(window.get());
     }
-    for (auto& window : bottom_windows_)
+    for (auto& [window, visible] : bottom_windows_)
     {
       layout_loader.properties_handlers_.push_back(window.get());
     }
-    for (auto& window : left_windows_)
+    for (auto& [window, visible] : left_windows_)
     {
       layout_loader.properties_handlers_.push_back(window.get());
     }
     layout_loader.properties_handlers_.push_back(&win_size_and_pos_);
   }
 
-  void SplitWindow::showWindows(std::vector<std::shared_ptr<Widget>>& windows)
+  void SplitWindow::showWindows(const std::vector<std::tuple<std::shared_ptr<Widget>, bool>>& windows)
   {
-    for (auto& widget : windows)
+    for (auto& [widget, visible] : windows)
     {
       if (widget->visible_)
       {
@@ -73,6 +82,16 @@ namespace SmartPeak
     static bool visible = true;
     if (ImGui::Begin("Splitter", &visible, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus))
     {
+      if (reset_layout_)
+      {
+        current_layout_.clear();
+        current_layout_ = new_layout;
+      }
+
+      const auto& top_windows_ = current_layout_.at("top");
+      const auto& bottom_windows_ = current_layout_.at("bottom");
+      const auto& left_windows_ = current_layout_.at("left");
+
       // Build default docking
       ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
       if (reset_layout_)
@@ -84,16 +103,19 @@ namespace SmartPeak
         ImGui::DockBuilderSetNodeSize(dockspace_id, ImVec2(io.DisplaySize.x, io.DisplaySize.y - menu_height));
         ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Left, 0.3, &left_node, &center_node); // The second parameter defines the direction of the split
         ImGui::DockBuilderSplitNode(center_node, ImGuiDir_Down, 0.5, &bottom_node, &center_node); // The second parameter defines the direction of the split
-        for (auto& widget : left_windows_)
+        for (auto& [widget, visible] : left_windows_)
         {
+          widget->visible_ = visible;
           ImGui::DockBuilderDockWindow(widget->title_.c_str() , left_node);
         }
-        for (auto& widget : top_windows_)
+        for (auto& [widget, visible] : top_windows_)
         {
+          widget->visible_ = visible;
           ImGui::DockBuilderDockWindow(widget->title_.c_str(), center_node);
         }
-        for (auto& widget : bottom_windows_)
+        for (auto& [widget, visible] : bottom_windows_)
         {
+          widget->visible_ = visible;
           ImGui::DockBuilderDockWindow(widget->title_.c_str(), bottom_node);
         }
         ImGui::DockBuilderFinish(dockspace_id);
@@ -111,4 +133,38 @@ namespace SmartPeak
     ImGui::PopStyleVar();
     return;
   }
+
+  void SplitWindow::resetLayout(const std::map<std::string, std::vector<std::tuple<std::shared_ptr<Widget>, bool>>>& layout)
+  {
+    new_layout = layout;
+    // complete with the default layout
+    for (const auto& default_entry : default_layout_)
+    {
+      for (const auto& [default_widget, default_visible] : default_entry.second)
+      {
+        bool found = false;
+        for (const auto& new_entry : layout)
+        {
+          for (const auto& [new_widget, new_visible] : new_entry.second)
+          {
+            if (default_widget.get() == new_widget.get())
+            {
+              found = true;
+              break;
+            }
+            if (found)
+            {
+              break;
+            }
+          }
+        }
+        if (!found)
+        {
+          new_layout[default_entry.first].push_back(std::make_tuple(default_widget, false)); //  default is not found, add it but invisible
+        }
+      }
+    }
+    reset_layout_ = true;
+  }
+
 }

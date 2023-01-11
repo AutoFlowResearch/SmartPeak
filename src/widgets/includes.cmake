@@ -7,6 +7,7 @@ set(SmartPeak_sources_h  CACHE INTERNAL "This variable should hold all SmartPeak
 
 ## ATTENTION: The order of includes should be similar to the inclusion hierarchy
 include(include/SmartPeak/ui/sources.cmake)
+include(include/SmartPeak/PresetWorkflows/sources.cmake)
 
 ## add configured config.h&Co to source group
 source_group("Header Files\\SmartPeak" FILES ${SmartPeak_configured_headers})

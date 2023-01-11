@@ -3,7 +3,7 @@
 Using SmartPeak GUI
 ----------------------------------------------------------------------------------------------------------
 
-After successful installation of SmartPeak, on Windows open menu start and browse for relevant icon, you can also find the shortcut on desktop.
+This page describes the graphical user interface (GUI) for working with SmartPeak. SmartPeak GUI provides functionality to facilitate users to get up and running as quickly as possible.  SmartPeak GUI also provides various graphical views and plots to enable faster debugging and configuration of workflows and algorithms.  After installation of SmartPeak on Windows, MacOS, and/or Linux, a shortcut should be available for quickly launching the application.
 
 .. _logs:
 
