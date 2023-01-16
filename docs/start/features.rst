@@ -1,12 +1,14 @@
 SmartPeak Features
 =============================================================================
 
-SmartPeak provides a plethora of features for analytical chemistry data processing.  An incomplete set of features are described below.
+SmartPeak provides a plethora of features for analytical chemistry data processing.
+An incomplete set of features are described below.
 
 Audit trail and data provenance
 -----------------------------------------------------------------------------
 
-A complete record of all actions and data processing steps invoked by the user is often required in regulated environments.  In addition, for debugging, it is useful to have a record of all actions the software has taken.
+A complete record of all actions and data processing steps invoked by the user is often required in regulated environments.
+In addition, for debugging, it is useful to have a record of all actions the software has taken.
 
 SmartPeak records all actions and data processing steps for audit trail and debugging purposes at two levels: 1) an application log, and 2) feature log.
 
@@ -292,38 +294,21 @@ Optimize workflow step algorithm parameters
 Usage
 ~~~~~
 
-.. todo::
-    Describe the usage.
+The algorithms behind each workflow step can be optimized and fine-tuned for each particular use case.
+The parameters used in a workflow can be viewed and modified through ``View | Workflow settings | Parameters``.
+The parameters that have been specified by the user are shown in white, defaults not set by the user are shown in grey, and unused paramters are shown in blue.
+Hovering over the name of the parameter displays a tooltip that provides a brief explanation of what the paramter does.
 
-Example
-~~~~~~~
+.. image:: ../images/select_dilutions_result.png
 
-.. todo::
-    Provide an example.
-
-Debug feature picking, selection, and filtering (and acquisition methods)
------------------------------------------------------------------------------
-
-Usage
-~~~~~
-
-.. todo::
-    Describe the usage.
-
-Example
-~~~~~~~
+Example 1: Debug feature picking, selection, and filtering (and acquisition methods)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. todo::
     Provide an example.
 
-Enable automated QC/QA of workflows
------------------------------------------------------------------------------
-
-Usage
-~~~~~
-
-.. todo::
-    Describe the usage.
+Example 2: Debug automated QC/QA of workflows
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Example
 ~~~~~~~
