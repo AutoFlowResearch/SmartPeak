@@ -304,14 +304,40 @@ Hovering over the name of the parameter displays a tooltip that provides a brief
 
 .. image:: ../images/workflow_parameters_edit.png
 
-Example 1: Debug feature picking, selection, and filtering (and acquisition methods)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Example 1: Debug feature finding, selection, and filtering
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. todo::
-    Provide an example.
+The first part of developing an automated data processing method is to optimize the feature finding, selection, and filtering paramters.
+
+**Feature Finding**
+The feature finding step entails (optionally) smoothing and integrating the features (also called peaks or convex hulls) in 2D (e.g., XIC chromatogram of intensity vs time or XIC spectrum of time vs m/z) or 3D (e.g., intensity vs time vs m/z).
+Note that multiple features are found in any given chromatogram or spectrum.
+Additional steps including baseline normalizing, windowing, etc. are available to preprocess the data before running the feature finding step.
+For single reaction monitoring (SRM/MRM) or data independent (DIA) methods, the ``MRMFeatureFinderScoring`` functions are the ones to be manipulated.
+For data dependent (DDA) or full scan methods, the ``FeatureFindingMetabo``, ``ElutionPeakDetection``, ``MassTraceDetection`` functions are the ones to be manipulated.
+*Check that all features are being found and properly integrated prior to moving on to Feature Selection!*
+
+**Feature Selection**
+The feature selection step entails aligning the retention time of features and selecting the most probable feature.
+Feature alignment is one of the biggest bottlenecks in targeted and non-targeted chromatography-based mass spectrometry.
+SmartPeak provides an advanced feature alignment algorithm that is based on relative retention time instead of absolute retention time to allow for accurate feature alignment even when retention time shifts of several minutes occur.
+For single reaction monitoring (SRM/MRM) or data independent (DIA) methods, the ``MRMFeatureSelector.schedule_MRMFeatures_qmip` functions are the ones to be manipulated.
+*Check that all features are being properly selected prior to moving on to Feature Filtering!*
+
+**Feature Filtering**
+The feature filtering step removes features from a chromatogram or spectrum based on user specified criteria.
+Feature filtering can be performed before or after feature selection.
+The feature filters are specified in the ``ComponentGroupFilters.csv`` and ``ComponentFilters.csv`` files for filtering at the ComponentGroup (TransitionGroup in SRM) and Component (Tansition in SRM) levels, respectively.
+It is our experience that if the feature finding and selection parameters have been well optimized, the feature filtering step is not needed.
+However, there are use cases where there are only a few components (transitions in SRM) that make optimal feature selection difficult, and feature filtering can come in handy.
+
+Examples of optimized parameters for different acquisition methods are provided in the :ref:`tutorials`.
 
 Example 2: Debug automated QC/QA of workflows
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The next part of developing an automated data processing method is to optimize the QC/QA reporting metrics.
+
 
 Example
 ~~~~~~~
