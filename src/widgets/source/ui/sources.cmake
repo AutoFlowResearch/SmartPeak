@@ -24,6 +24,7 @@ set(sources_list
 	ParametersTableWidget.cpp
 	Plotter.cpp
 	PresetWorkflowWidget.cpp
+	PresetWorkflow.cpp
 	Report.cpp
 	RunWorkflowWidget.cpp
 	SampleTypeEditorWidget.cpp

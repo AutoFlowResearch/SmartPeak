@@ -25,6 +25,7 @@
 #include <SmartPeak/ui/Widget.h>
 #include <SmartPeak/core/ApplicationHandler.h>
 #include <SmartPeak/core/WorkflowManager.h>
+#include <SmartPeak/ui/SplitWindow.h>
 #include <SmartPeak/ui/FilePicker.h>
 #include <misc/cpp/imgui_stdlib.h>
 #include <string>
@@ -46,6 +47,7 @@ namespace SmartPeak
       ApplicationHandler& application_handler,
       SessionFilesWidget::Mode mode,
       WorkflowManager& workflow_manager,
+      SplitWindow& split_window,
       IApplicationProcessorObserver* application_processor_observer = nullptr,
       ISequenceProcessorObserver* sequence_processor_observer = nullptr,
       ISequenceSegmentProcessorObserver* sequence_segment_processor_observer = nullptr,
@@ -77,6 +79,7 @@ namespace SmartPeak
     Mode mode_;
     std::set<std::string> requirements_;
     WorkflowManager& workflow_manager_;
+    SplitWindow& split_window_;
 
   protected:
     virtual void doUpdateSession();

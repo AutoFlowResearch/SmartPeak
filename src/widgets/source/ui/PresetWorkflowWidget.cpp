@@ -27,17 +27,7 @@
 #include <SmartPeak/core/SharedProcessors.h>
 #include <SmartPeak/core/ApplicationProcessors/BuildCommandsFromNames.h>
 #include <SmartPeak/core/SharedProcessors.h>
-
-#include <SmartPeak/PresetWorkflows/FIAMS_Unknowns.h>
-#include <SmartPeak/PresetWorkflows/GCMS_Full_Scan_Unknowns.h>
-#include <SmartPeak/PresetWorkflows/GCMS_SIM_Unknowns.h>
-#include <SmartPeak/PresetWorkflows/HPLC_UV_Standards.h>
-#include <SmartPeak/PresetWorkflows/HPLC_UV_Unknowns.h>
-#include <SmartPeak/PresetWorkflows/LCMS_DDA_Spectra_Library_Construction.h>
-#include <SmartPeak/PresetWorkflows/LCMS_DDA_Spectra_Library_Matching.h>
-#include <SmartPeak/PresetWorkflows/LCMS_DDA_Transitions_Library_Construction.h>
-#include <SmartPeak/PresetWorkflows/LCMS_MRM_Standards.h>
-#include <SmartPeak/PresetWorkflows/LCMS_MRM_Unknowns.h>
+#include <SmartPeak/PresetWorkflows/PresetWorkflow.h>
 
 namespace SmartPeak
 {
@@ -61,22 +51,9 @@ namespace SmartPeak
     ImVec2 vMin = ImGui::GetWindowContentRegionMin();
     ImVec2 vMax = ImGui::GetWindowContentRegionMax();
 
-    static const std::vector<std::shared_ptr<PresetWorkflow>> presets = {
-      std::make_shared<FIAMS_Unknowns>(),
-      std::make_shared<GCMS_Full_Scan_Unknowns>(),
-      std::make_shared<GCMS_SIM_Unknowns>(),
-      std::make_shared<HPLC_UV_Standards>(),
-      std::make_shared<HPLC_UV_Unknowns>(),
-      std::make_shared<LCMS_DDA_Spectra_Library_Construction>(),
-      std::make_shared<LCMS_DDA_Spectra_Library_Matching>(),
-      std::make_shared<LCMS_DDA_Transitions_Library_Construction>(),
-      std::make_shared<LCMS_MRM_Standards>(),
-      std::make_shared<LCMS_MRM_Unknowns>()
-    };
-
     ImVec2 preset_list_size = ImVec2(vMax.x * 0.3, vMax.y - buttons_space);
     // compute the largest preset name
-    for (const auto& preset : presets)
+    for (const auto& preset : PresetWorkflow::all_presets_)
     {
       ImVec2 preset_text_size = ImGui::CalcTextSize(preset->getName().c_str());
       if (preset_text_size.x > preset_list_size.x)
@@ -87,7 +64,7 @@ namespace SmartPeak
     preset_list_size.x += ImGui::GetStyle().WindowPadding.x * 2;
     ImGui::BeginChild(ImGui::GetID("preset_list"), preset_list_size, ImGuiWindowFlags_NoMove);
     unsigned int counter = 0;
-    for (const auto& preset : presets)
+    for (const auto& preset : PresetWorkflow::all_presets_)
     {
       if (ImGui::Selectable(preset->getName().c_str()))
       {
@@ -97,7 +74,7 @@ namespace SmartPeak
     }
     ImGui::EndChild();
 
-    const auto& current_preset = presets.at(selected_preset_index_);
+    const auto& current_preset = PresetWorkflow::all_presets_.at(selected_preset_index_);
 
     ImVec2 preset_description_size = ImVec2(vMax.x - (preset_list_size.x + ImGui::GetStyle().WindowPadding.x * 2),
                                             vMax.y - buttons_space);
