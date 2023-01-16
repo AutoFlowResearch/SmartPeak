@@ -296,10 +296,13 @@ Usage
 
 The algorithms behind each workflow step can be optimized and fine-tuned for each particular use case.
 The parameters used in a workflow can be viewed and modified through ``View | Workflow settings | Parameters``.
+
+.. image:: ../images/workflow_parameters_view.png
+
 The parameters that have been specified by the user are shown in white, defaults not set by the user are shown in grey, and unused paramters are shown in blue.
 Hovering over the name of the parameter displays a tooltip that provides a brief explanation of what the paramter does.
 
-.. image:: ../images/select_dilutions_result.png
+.. image:: ../images/workflow_parameters_edit.png
 
 Example 1: Debug feature picking, selection, and filtering (and acquisition methods)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
