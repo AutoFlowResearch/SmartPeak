@@ -304,10 +304,14 @@ Hovering over the name of the parameter displays a tooltip that provides a brief
 
 .. image:: ../images/workflow_parameters_edit.png
 
+Examples of optimized parameters for different acquisition methods are provided in the :ref:`tutorials`.
+
 Example 1: Debug feature finding, selection, and filtering
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The first part of developing an automated data processing method is to optimize the feature finding, selection, and filtering paramters.
+We recommend using the bulk statistics in ``View | Statistics`` and visualizations provided in ``View | Chromatograms`` to gain intuition about how each of the parameter changes affect feature finding, selection, and filtering.
+We also recommend using the feature reports in ``Actions | Report`` and exporting the long (Feature DB) or matrix (Feature Table) formats to get a more fine-grained view of how each of the parameter changes affect feature finding, selection, and filtering.
 
 **Feature Finding**
 The feature finding step entails (optionally) smoothing and integrating the features (also called peaks or convex hulls) in 2D (e.g., XIC chromatogram of intensity vs time or XIC spectrum of time vs m/z) or 3D (e.g., intensity vs time vs m/z).
@@ -331,16 +335,13 @@ The feature filters are specified in the ``ComponentGroupFilters.csv`` and ``Com
 It is our experience that if the feature finding and selection parameters have been well optimized, the feature filtering step is not needed.
 However, there are use cases where there are only a few components (transitions in SRM) that make optimal feature selection difficult, and feature filtering can come in handy.
 
-Examples of optimized parameters for different acquisition methods are provided in the :ref:`tutorials`.
-
 Example 2: Debug automated QC/QA of workflows
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The next part of developing an automated data processing method is to optimize the QC/QA reporting metrics.
+We recommend using the feature reports in ``Actions | Report`` and exporting the long (Feature DB) or matrix (Feature Table) formats after checking ``QC_transition_message``, ``QC_transition_score``, ``QC_transition_group_message``, and ``QC_transition_group_score`` to get a more fine-grained view of how each of the parameter changes affect feature finding, selection, and filtering.
 
-
-Example
-~~~~~~~
-
-.. todo::
-    Provide an example.
+**Feature QC**
+The feature QC step flags features from a chromatogram or spectrum based on user specified criteria (same algorithm and similar format to Feature Filtering above).
+Feature QC can be performed at anytime during a data processing workflow.
+The feature QCs are specified in the ``ComponentGroupQCs.csv`` and ``ComponentQCss.csv`` files for QC/QA at the ComponentGroup (TransitionGroup in SRM) and Component (Tansition in SRM) levels, respectively.
