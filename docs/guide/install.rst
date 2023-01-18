@@ -40,5 +40,5 @@ A warning from Windows Defender SmartScreen may appear.
 Example on MacOS
 ----------------
 
-.. todo::
-    Add instructions how to install SmartPeak on MacOS.
+Download latest release for MacOS, e.g. ``SmartPeak-1.26.0-Darwin.dmg``. 
+Drag and drop **both** the application files **and** `share` folder from the SmartPeak installation to the MacOS `Applications` folder.
