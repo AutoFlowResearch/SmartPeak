@@ -60,8 +60,9 @@ namespace SmartPeak
 
   protected:
     void showWindows(const std::vector<std::tuple<std::shared_ptr<Widget>, bool>>&windows);
+    void focusFirstWindow(const std::vector<std::tuple<std::shared_ptr<Widget>, bool>>& windows);
     bool reset_layout_ = true;
     std::map<std::string, std::vector<std::tuple<std::shared_ptr<Widget>, bool>>> current_layout_;
-    std::map<std::string, std::vector<std::tuple<std::shared_ptr<Widget>, bool>>> new_layout;
+    std::map<std::string, std::vector<std::tuple<std::shared_ptr<Widget>, bool>>> new_layout_;
   };
 }
