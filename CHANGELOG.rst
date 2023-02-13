@@ -1,6 +1,14 @@
 SmartPeak Changelog
 ===================
 
+v1.27.0 (2023-02-12)
+--------------------
+
+Features
+~~~~~~~~
+- Updated documentation  `(#554) <https://github.com/AutoFlowResearch/SmartPeak/pull/554>`_
+- Preset Workflow `(#553) <https://github.com/AutoFlowResearch/SmartPeak/pull/553>`_
+
 v1.26.0 (2022-08-29)
 --------------------
 
