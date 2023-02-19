@@ -85,42 +85,42 @@ namespace SmartPeak
     };
 
     for (OpenMS::Feature& feature : featureMap) {
-      std::cout << "NEW FEATURE\n";
+      LOGD << "NEW FEATURE";
       const double left { feature.getMetaValue("leftWidth") };
       const double right { feature.getMetaValue("rightWidth") };
-      std::cout << "Boundaries: [" << left << ", " << right << "]\n";
+      LOGD << "Boundaries: [" << left << ", " << right << "]";
       std::vector<OpenMS::Feature>& subordinates { feature.getSubordinates() };
-      std::cout << "n. subordinates: " << subordinates.size() << "\n";
+      LOGD << "n. subordinates: " << subordinates.size();
       for (OpenMS::Feature& subfeature : subordinates) {
-        std::cout << "NEW SUBFEATURE\n";
+        LOGD << "NEW SUBFEATURE";
         const OpenMS::String name = subfeature.getMetaValue("native_id");
-        std::cout << "Subordinate name: " << name << "\n";
+        LOGD << "Subordinate name: " << name;
         const OpenMS::MSChromatogram& chromatogram = getChromatogramByName(name);
-        std::cout << "Chromatogram found!\n";
+        LOGD << "Chromatogram found!";
         std::vector<double> x;
         std::vector<double> y;
         extractPointsIntoVectors(chromatogram, left, right, x, y);
-        std::cout << "Extracted n. points: " << x.size() << "\n";
+        LOGD << "Extracted n. points: " << x.size();
 
         if (x.size() < 3) {
-          std::cout << "Less than 2 points. Skipping: " << name << "\n\n";
+          LOGD << "Less than 2 points. Skipping: " << name;
           continue;
         }
 
         // EMG parameter estimation with gradient descent
         double h, mu, sigma, tau;
-        std::cout << "Estimating EMG parameters...\n";
+        LOGD << "Estimating EMG parameters...";
         emg.estimateEmgParameters(x, y, h, mu, sigma, tau);
 
         // Estimate the intensities for each point
         std::vector<double> out_xs;
         std::vector<double> out_ys;
-        std::cout << "Applying estimated parameters...\n";
+        LOGD << "Applying estimated parameters...";
         emg.applyEstimatedParameters(x, h, mu, sigma, tau, out_xs, out_ys);
 
         // integrate area and estimate background, update the subfeature
 
-        std::cout << "emg peak # points: " << out_xs.size() << "\n";
+        LOGD << "emg peak # points: " << out_xs.size();
         OpenMS::ConvexHull2D::PointArrayType hull_points(out_xs.size());
         OpenMS::MSChromatogram emg_chrom;
         for (size_t i = 0; i < out_xs.size(); ++i) {
@@ -130,29 +130,29 @@ namespace SmartPeak
         }
         OpenMS::ConvexHull2D hull;
         hull.addPoints(hull_points);
-        subfeature.getConvexHulls().push_back(hull);
+        subfeature.getConvexHulls().push_back(hull); 
 
         OpenMS::PeakIntegrator pi;
-        std::cout << "Updating ranges...\n";
+        LOGD << "Updating ranges...";
         emg_chrom.updateRanges();
-        std::cout << "Ranges updated.\n";
+        LOGD << "Ranges updated.";
         const double emg_chrom_left { emg_chrom.getMinRT() };
         const double emg_chrom_right { emg_chrom.getMaxRT() };
-        std::cout << "Positions calculated.\n";
+        LOGD << "Positions calculated.";
         OpenMS::PeakIntegrator::PeakArea pa = pi.integratePeak(emg_chrom, emg_chrom_left, emg_chrom_right);
-        std::cout << "Area calculated.\n";
+        LOGD << "Area calculated.";
         OpenMS::PeakIntegrator::PeakBackground pb = pi.estimateBackground(emg_chrom, emg_chrom_left, emg_chrom_right, pa.apex_pos);
-        std::cout << "Background calculated.\n";
+        LOGD << "Background calculated.";
         double peak_integral { pa.area - pb.area };
         double peak_apex_int { pa.height - pb.height };
         if (peak_integral < 0) { peak_integral = 0; }
         if (peak_apex_int < 0) { peak_apex_int = 0; }
 
-        std::cout << "Intensity: " << subfeature.getIntensity() << "\t" << peak_integral << "\n";
-        std::cout << "peak_apex_position: " << subfeature.getMetaValue("peak_apex_position") << "\t" << pa.apex_pos << "\n";
-        std::cout << "peak_apex_int: " << subfeature.getMetaValue("peak_apex_int") << "\t" << peak_apex_int << "\n";
-        std::cout << "area_background_level: " << subfeature.getMetaValue("area_background_level") << "\t" << pb.area << "\n";
-        std::cout << "noise_background_level: " << subfeature.getMetaValue("noise_background_level") << "\t" << pb.height << "\n\n";
+        LOGD << "Intensity: " << subfeature.getIntensity() << "\t" << peak_integral;
+        LOGD << "peak_apex_position: " << subfeature.getMetaValue("peak_apex_position") << "\t" << pa.apex_pos;
+        LOGD << "peak_apex_int: " << subfeature.getMetaValue("peak_apex_int") << "\t" << peak_apex_int;
+        LOGD << "area_background_level: " << subfeature.getMetaValue("area_background_level") << "\t" << pb.area;
+        LOGD << "noise_background_level: " << subfeature.getMetaValue("noise_background_level") << "\t" << pb.height;
 
         subfeature.setIntensity(peak_integral);
         subfeature.setMetaValue("peak_apex_position", pa.apex_pos);
@@ -176,7 +176,7 @@ namespace SmartPeak
     y.clear();
     OpenMS::MSChromatogram::ConstIterator it = chromatogram.PosBegin(left);
     const OpenMS::MSChromatogram::ConstIterator end = chromatogram.PosEnd(right);
-    std::cout << "empty range: " << (it == end) << "\n";
+    LOGD << "empty range: " << (it == end);
     for (; it != end; ++it) {
       x.push_back(it->getPos());
       y.push_back(it->getIntensity());
