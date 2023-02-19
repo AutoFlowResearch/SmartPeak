@@ -21,21 +21,32 @@
 // $Authors: Douglas McCloskey, Bertrand Boudaud $
 // --------------------------------------------------------------------------
 
-#pragma once
+#include <SmartPeak/PresetWorkflows/PresetWorkflow.h>
 
-#include <SmartPeak/PresetWorkflows/AllWindows.h>
-
-#include <string>
-#include <vector>
+#include <SmartPeak/PresetWorkflows/FIAMS_Unknowns.h>
+#include <SmartPeak/PresetWorkflows/GCMS_Full_Scan_Unknowns.h>
+#include <SmartPeak/PresetWorkflows/GCMS_SIM_Unknowns.h>
+#include <SmartPeak/PresetWorkflows/HPLC_UV_Standards.h>
+#include <SmartPeak/PresetWorkflows/HPLC_UV_Unknowns.h>
+#include <SmartPeak/PresetWorkflows/LCMS_DDA_Spectra_Library_Construction.h>
+#include <SmartPeak/PresetWorkflows/LCMS_DDA_Spectra_Library_Matching.h>
+#include <SmartPeak/PresetWorkflows/LCMS_DDA_Transitions_Library_Construction.h>
+#include <SmartPeak/PresetWorkflows/LCMS_MRM_Standards.h>
+#include <SmartPeak/PresetWorkflows/LCMS_MRM_Unknowns.h>
 
 namespace SmartPeak
 {
-  struct PresetWorkflow {
-    virtual std::string getName() const = 0;
-    virtual std::string getDescription() const = 0;
-    virtual std::vector<std::string> getWorkflowSteps() const = 0;
-    virtual std::map<std::string, std::vector<std::tuple<std::shared_ptr<Widget>, bool>>> getLayout(const AllWindows& all_windows) const = 0;
-
-    static const std::vector<std::shared_ptr<PresetWorkflow>> all_presets_;
+  const std::vector<std::shared_ptr<PresetWorkflow>> PresetWorkflow::all_presets_ =
+  {
+    std::make_shared<FIAMS_Unknowns>(),
+    std::make_shared<GCMS_Full_Scan_Unknowns>(),
+    std::make_shared<GCMS_SIM_Unknowns>(),
+    std::make_shared<HPLC_UV_Standards>(),
+    std::make_shared<HPLC_UV_Unknowns>(),
+    std::make_shared<LCMS_DDA_Spectra_Library_Construction>(),
+    std::make_shared<LCMS_DDA_Spectra_Library_Matching>(),
+    std::make_shared<LCMS_DDA_Transitions_Library_Construction>(),
+    std::make_shared<LCMS_MRM_Standards>(),
+    std::make_shared<LCMS_MRM_Unknowns>()
   };
 }

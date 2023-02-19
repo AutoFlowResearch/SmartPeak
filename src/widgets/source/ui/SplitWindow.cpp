@@ -33,7 +33,7 @@ namespace SmartPeak
     if (reset_layout_)
     {
       current_layout_.clear();
-      current_layout_ = new_layout;
+      current_layout_ = new_layout_;
     }
     const auto& top_windows_ = current_layout_.at("top");
     const auto& bottom_windows_ = current_layout_.at("bottom");
@@ -70,6 +70,18 @@ namespace SmartPeak
     }
   }
 
+  void SplitWindow::focusFirstWindow(const std::vector<std::tuple<std::shared_ptr<Widget>, bool>>& windows)
+  {
+    for (auto& [widget, visible] : windows)
+    {
+      if (widget->visible_)
+      {
+        ImGui::SetWindowFocus(widget->title_.c_str());
+        break;
+      }
+    }
+  }
+
   void SplitWindow::draw()
   {
     ImGuiIO& io = ImGui::GetIO();
@@ -85,12 +97,12 @@ namespace SmartPeak
       if (reset_layout_)
       {
         current_layout_.clear();
-        current_layout_ = new_layout;
+        current_layout_ = new_layout_;
       }
 
-      const auto& top_windows_ = current_layout_.at("top");
-      const auto& bottom_windows_ = current_layout_.at("bottom");
-      const auto& left_windows_ = current_layout_.at("left");
+      const auto& top_windows = current_layout_.at("top");
+      const auto& bottom_windows = current_layout_.at("bottom");
+      const auto& left_windows = current_layout_.at("left");
 
       // Build default docking
       ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
@@ -103,31 +115,37 @@ namespace SmartPeak
         ImGui::DockBuilderSetNodeSize(dockspace_id, ImVec2(io.DisplaySize.x, io.DisplaySize.y - menu_height));
         ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Left, 0.3, &left_node, &center_node); // The second parameter defines the direction of the split
         ImGui::DockBuilderSplitNode(center_node, ImGuiDir_Down, 0.5, &bottom_node, &center_node); // The second parameter defines the direction of the split
-        for (auto& [widget, visible] : left_windows_)
+        for (auto& [widget, visible] : left_windows)
         {
           widget->visible_ = visible;
           ImGui::DockBuilderDockWindow(widget->title_.c_str() , left_node);
         }
-        for (auto& [widget, visible] : top_windows_)
+        for (auto& [widget, visible] : top_windows)
         {
           widget->visible_ = visible;
           ImGui::DockBuilderDockWindow(widget->title_.c_str(), center_node);
         }
-        for (auto& [widget, visible] : bottom_windows_)
+        for (auto& [widget, visible] : bottom_windows)
         {
           widget->visible_ = visible;
           ImGui::DockBuilderDockWindow(widget->title_.c_str(), bottom_node);
         }
         ImGui::DockBuilderFinish(dockspace_id);
-        reset_layout_ = false;
       }
 
       ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_None);
 
       // Instanciate windows
-      showWindows(left_windows_);
-      showWindows(top_windows_);
-      showWindows(bottom_windows_);
+      showWindows(left_windows);
+      showWindows(top_windows);
+      showWindows(bottom_windows);
+      if (reset_layout_)
+      {
+        focusFirstWindow(left_windows);
+        focusFirstWindow(top_windows);
+        focusFirstWindow(bottom_windows);
+      }
+      reset_layout_ = false;
     }
     ImGui::End();
     ImGui::PopStyleVar();
@@ -136,7 +154,7 @@ namespace SmartPeak
 
   void SplitWindow::resetLayout(const std::map<std::string, std::vector<std::tuple<std::shared_ptr<Widget>, bool>>>& layout)
   {
-    new_layout = layout;
+    new_layout_ = layout;
     // complete with the default layout
     for (const auto& default_entry : default_layout_)
     {
@@ -160,7 +178,7 @@ namespace SmartPeak
         }
         if (!found)
         {
-          new_layout[default_entry.first].push_back(std::make_tuple(default_widget, false)); //  default is not found, add it but invisible
+          new_layout_[default_entry.first].push_back(std::make_tuple(default_widget, false)); //  default is not found, add it but invisible
         }
       }
     }

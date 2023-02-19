@@ -25,6 +25,7 @@
 #include <SmartPeak/core/SharedProcessors.h>
 #include <SmartPeak/core/SequenceProcessor.h>
 #include <SmartPeak/core/ApplicationProcessors/LoadSession.h>
+#include <SmartPeak/PresetWorkflows/PresetWorkflow.h>
 
 #include <imgui.h>
 #include <plog/Log.h>
@@ -51,6 +52,7 @@ namespace SmartPeak
     ApplicationHandler& application_handler,
     SessionFilesWidget::Mode mode,
     WorkflowManager& workflow_manager,
+    SplitWindow& split_window,
     IApplicationProcessorObserver* application_processor_observer,
     ISequenceProcessorObserver* sequence_processor_observer,
     ISequenceSegmentProcessorObserver* sequence_segment_processor_observer,
@@ -59,6 +61,7 @@ namespace SmartPeak
     application_handler_(application_handler),
     mode_(mode),
     workflow_manager_(workflow_manager),
+    split_window_(split_window),
     application_processor_observer_(application_processor_observer),
     sequence_processor_observer_(sequence_processor_observer),
     sequence_segment_processor_observer_(sequence_segment_processor_observer),
@@ -384,6 +387,19 @@ namespace SmartPeak
         {
           // The file is not embedded, we don't want to export it - set it to saved.
           application_handler_.setFileSavedState(fef.first, true);
+        }
+      }
+      if (mode_ == Mode::ECreation)
+      {
+        std::vector<std::string> command_names = application_handler_.sequenceHandler_.getWorkflow();
+        // try to apply layout on based on preset defaults
+        for (const auto& preset : PresetWorkflow::all_presets_)
+        {
+          if (preset->getWorkflowSteps() == command_names)
+          {
+            split_window_.resetLayout(preset->getLayout(split_window_.all_windows_));
+            break;
+          }
         }
       }
     }

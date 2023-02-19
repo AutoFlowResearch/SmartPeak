@@ -136,8 +136,8 @@ int main(int argc, char** argv)
 
   // widgets: pop ups
   auto file_picker_ = std::make_shared<FilePicker>();
-  auto session_files_widget_create_ = std::make_shared<SessionFilesWidget>(application_handler_, SessionFilesWidget::Mode::ECreation, workflow_manager_, &event_dispatcher);
-  auto session_files_widget_modify_ = std::make_shared<SessionFilesWidget>(application_handler_, SessionFilesWidget::Mode::EModification, workflow_manager_, &event_dispatcher);
+  auto session_files_widget_create_ = std::make_shared<SessionFilesWidget>(application_handler_, SessionFilesWidget::Mode::ECreation, workflow_manager_, split_window, &event_dispatcher);
+  auto session_files_widget_modify_ = std::make_shared<SessionFilesWidget>(application_handler_, SessionFilesWidget::Mode::EModification, workflow_manager_, split_window, &event_dispatcher);
   auto create_session_widget_ = std::make_shared<CreateSessionWidget>(application_handler_, session_files_widget_create_);
   auto run_workflow_widget_ = std::make_shared<RunWorkflowWidget>(application_handler_,
     session_handler_,
