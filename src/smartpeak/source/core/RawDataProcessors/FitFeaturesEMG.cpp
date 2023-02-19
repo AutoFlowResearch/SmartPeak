@@ -130,7 +130,11 @@ namespace SmartPeak
         }
         OpenMS::ConvexHull2D hull;
         hull.addPoints(hull_points);
-        subfeature.getConvexHulls().push_back(hull); 
+        // Bug in OpenMS Feature::getConvexHulls() returns the bounding box
+        // when more than a single convex hull is detected, which does not allow for plotting.
+        //subfeature.getConvexHulls().push_back(hull); 
+        std::vector<OpenMS::ConvexHull2D> hulls{ hull };
+        subfeature.setConvexHulls(hulls);
 
         OpenMS::PeakIntegrator pi;
         LOGD << "Updating ranges...";
