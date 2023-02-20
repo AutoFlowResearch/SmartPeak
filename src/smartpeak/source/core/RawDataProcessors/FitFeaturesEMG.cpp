@@ -152,11 +152,11 @@ namespace SmartPeak
         if (peak_integral < 0) { peak_integral = 0; }
         if (peak_apex_int < 0) { peak_apex_int = 0; }
 
-        LOGD << "Intensity: " << subfeature.getIntensity() << "\t" << peak_integral;
-        LOGD << "peak_apex_position: " << subfeature.getMetaValue("peak_apex_position") << "\t" << pa.apex_pos;
-        LOGD << "peak_apex_int: " << subfeature.getMetaValue("peak_apex_int") << "\t" << peak_apex_int;
-        LOGD << "area_background_level: " << subfeature.getMetaValue("area_background_level") << "\t" << pb.area;
-        LOGD << "noise_background_level: " << subfeature.getMetaValue("noise_background_level") << "\t" << pb.height;
+        LOGD << "Intensity: " << (int)subfeature.getIntensity() << "\t" << peak_integral;
+        LOGD << "peak_apex_position: " << (float)subfeature.getMetaValue("peak_apex_position") << "\t" << pa.apex_pos;
+        LOGD << "peak_apex_int: " << (float)subfeature.getMetaValue("peak_apex_int") << "\t" << peak_apex_int;
+        LOGD << "area_background_level: " << (float)subfeature.getMetaValue("area_background_level") << "\t" << pb.area;
+        LOGD << "noise_background_level: " << (float)subfeature.getMetaValue("noise_background_level") << "\t" << pb.height;
 
         subfeature.setIntensity(peak_integral);
         subfeature.setMetaValue("peak_apex_position", pa.apex_pos);
